@@ -143,6 +143,7 @@ case "${dbtype}" in
 			cd ..
 			
 			cd KC-RELEASE-3_1_SP2-SCRIPT
+			sqlplus "${un}"/"${pw}${DBSvrNm}" < KRC-RELEASE-3_1_SP2-Upgrade-ORACLE.sql
 			sqlplus "${un}"/"${pw}${DBSvrNm}" < KC-RELEASE-3_1_SP2-Upgrade-ORACLE.sql
 			if [ "${InstRice}" = "Y" ] || [ "${mode}" = "BUNDLE" ]
 			then
@@ -155,6 +156,7 @@ case "${dbtype}" in
 		if [ "${version}" = "3.1M2" ] || [ "${version}" = "3.0.1" ] || [ "${version}" = "3.0" ] || [ "${version}" = "NEW" ]
 		then
 			cd KC-RELEASE-3_1_SP3-SCRIPT
+			sqlplus "${un}"/"${pw}${DBSvrNm}" < KRC-RELEASE-3_1_SP3-Upgrade-ORACLE.sql
 			sqlplus "${un}"/"${pw}${DBSvrNm}" < KC-RELEASE-3_1_SP3-Upgrade-ORACLE.sql
 			if [ "${InstRice}" = "Y" ] || [ "${mode}" = "BUNDLE" ]
 			then
@@ -216,6 +218,7 @@ case "${dbtype}" in
             cd ..
             
             cd KC-RELEASE-3_1_SP2-SCRIPT
+            mysql -u ${un} -p${pw} -D ${DBSvrNm} -s -f < KRC-RELEASE-3_1_SP2-Upgrade-MYSQL.sql > KRC-RELEASE-3_1_SP2-Upgrade-MYSQL-Install.log 2>&1
             mysql -u ${un} -p${pw} -D ${DBSvrNm} -s -f < KC-RELEASE-3_1_SP2-Upgrade-MYSQL.sql > KC-RELEASE-3_1_SP2-Upgrade-MYSQL-Install.log 2>&1
             if [ "${InstRice}" = "Y" ] || [ "${mode}" = "BUNDLE" ]
             then
@@ -228,6 +231,7 @@ case "${dbtype}" in
 		if [ "${version}" = "3.1M2" ] || [ "${version}" = "3.0.1" ] || [ "${version}" = "3.0" ] || [ "${version}" = "NEW" ]
 		then
             cd KC-RELEASE-3_1_SP3-SCRIPT
+            mysql -u ${un} -p${pw} -D ${DBSvrNm} -s -f < KRC-RELEASE-3_1_SP3-Upgrade-MYSQL.sql > KRC-RELEASE-3_1_SP3-Upgrade-MYSQL-Install.log 2>&1
             mysql -u ${un} -p${pw} -D ${DBSvrNm} -s -f < KC-RELEASE-3_1_SP3-Upgrade-MYSQL.sql > KC-RELEASE-3_1_SP3-Upgrade-MYSQL-Install.log 2>&1
             if [ "${InstRice}" = "Y" ] || [ "${mode}" = "BUNDLE" ]
             then
