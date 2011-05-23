@@ -108,6 +108,8 @@ case "${dbtype}" in
 				then
 					if [ "${InstRice}" = "Y" ]
 					then
+						sqlplus "${Riceun}"/"${Ricepw}${RiceDBSvrNm}" < oracle_server_full.sql
+					else
 						sqlplus "${Riceun}"/"${Ricepw}${RiceDBSvrNm}" < oracle_server.sql
 					fi
 					sqlplus "${un}"/"${pw}${DBSvrNm}" < oracle_client.sql
@@ -135,9 +137,9 @@ case "${dbtype}" in
 		then
 			cd KC-RELEASE-3_1_SP1-SCRIPT
 			sqlplus "${un}"/"${pw}${DBSvrNm}" < KC-Release-3_0_1-3_1_S1-Upgrade-Oracle-Install.sql
+			sqlplus "${Riceun}"/"${Ricepw}${RiceDBSvrNm}" < KR-Release-3_0_1-3_1_S1-Upgrade-Oracle-Install.sql
 			if [ "${InstRice}" = "Y" ] || [ "${mode}" = "BUNDLE" ]
 			then
-				sqlplus "${Riceun}"/"${Ricepw}${RiceDBSvrNm}" < KR-Release-3_0_1-3_1_S1-Upgrade-Oracle-Install.sql
 				sqlplus "${Riceun}"/"${Ricepw}${RiceDBSvrNm}" < KR-Server-Release-1_0_3-1_0_3_1-Upgrade-Oracle-Install.sql
 			fi
 			mv *.log ../LOGS/
@@ -146,20 +148,14 @@ case "${dbtype}" in
 			cd KC-RELEASE-3_1_SP2-SCRIPT
 			sqlplus "${un}"/"${pw}${DBSvrNm}" < KRC-RELEASE-3_1_SP2-Upgrade-ORACLE.sql
 			sqlplus "${un}"/"${pw}${DBSvrNm}" < KC-RELEASE-3_1_SP2-Upgrade-ORACLE.sql
-			if [ "${InstRice}" = "Y" ] || [ "${mode}" = "BUNDLE" ]
-			then
-				sqlplus "${Riceun}"/"${Ricepw}${RiceDBSvrNm}" < KR-RELEASE-3_1_SP2-Upgrade-ORACLE.sql
-			fi
+			sqlplus "${Riceun}"/"${Ricepw}${RiceDBSvrNm}" < KR-RELEASE-3_1_SP2-Upgrade-ORACLE.sql
 			mv *.log ../LOGS/
 			cd ..
 
 			cd KC-RELEASE-3_1_SP3-SCRIPT
 			sqlplus "${un}"/"${pw}${DBSvrNm}" < KRC-RELEASE-3_1_SP3-Upgrade-ORACLE.sql
 			sqlplus "${un}"/"${pw}${DBSvrNm}" < KC-RELEASE-3_1_SP3-Upgrade-ORACLE.sql
-			if [ "${InstRice}" = "Y" ] || [ "${mode}" = "BUNDLE" ]
-			then
-				sqlplus "${Riceun}"/"${Ricepw}${RiceDBSvrNm}" < KR-RELEASE-3_1_SP3-Upgrade-ORACLE.sql
-			fi
+			sqlplus "${Riceun}"/"${Ricepw}${RiceDBSvrNm}" < KR-RELEASE-3_1_SP3-Upgrade-ORACLE.sql
 			mv *.log ../LOGS/
 			cd ..
 		fi 
