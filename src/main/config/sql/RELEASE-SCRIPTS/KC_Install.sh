@@ -46,7 +46,7 @@ fi
 
 dbtype=`getChoice 'Enter Database Type' ORACLE MYSQL`
 
-version=`getChoice 'Enter Version' NEW 3.0 3.0.1 3.1M2`
+version=`getChoice 'Enter Version' NEW 3.0 3.0.1`
 
 un=`getAnswer 'Enter KC Database Username'`
 
@@ -69,7 +69,7 @@ else
 	fi
 fi
 
-if [ "${mode}" = "EMBED" ] && [ "${InstRice}" = "Y" ]
+if [ "${mode}" = "EMBED" ]
 then
 	Riceun=`getAnswer 'Enter Rice Database Username'`
 	Ricepw=`getAnswer 'Enter Rice Database Password'`
@@ -121,6 +121,7 @@ case "${dbtype}" in
 		then
 			cd KC-RELEASE-3_0_1-SCRIPT
 			sqlplus "${un}"/"${pw}${DBSvrNm}" < KC-Release-3_0-3_0_1-Upgrade-Oracle-Install.sql
+			sqlplus "${Riceun}"/"${Ricepw}${RiceDBSvrNm}" < KR-Release-3_0-3_0_1-Upgrade-Oracle-Install.sql
 			mv *.log ../LOGS/
 			cd .. 
 		fi
@@ -151,10 +152,7 @@ case "${dbtype}" in
 			fi
 			mv *.log ../LOGS/
 			cd ..
-		fi 
-		
-		if [ "${version}" = "3.1M2" ] || [ "${version}" = "3.0.1" ] || [ "${version}" = "3.0" ] || [ "${version}" = "NEW" ]
-		then
+
 			cd KC-RELEASE-3_1_SP3-SCRIPT
 			sqlplus "${un}"/"${pw}${DBSvrNm}" < KRC-RELEASE-3_1_SP3-Upgrade-ORACLE.sql
 			sqlplus "${un}"/"${pw}${DBSvrNm}" < KC-RELEASE-3_1_SP3-Upgrade-ORACLE.sql
@@ -218,7 +216,6 @@ case "${dbtype}" in
             cd ..
             
             cd KC-RELEASE-3_1_SP2-SCRIPT
-            mysql -u ${un} -p${pw} -D ${DBSvrNm} -s -f < KRC-RELEASE-3_1_SP2-Upgrade-MYSQL.sql > KRC-RELEASE-3_1_SP2-Upgrade-MYSQL-Install.log 2>&1
             mysql -u ${un} -p${pw} -D ${DBSvrNm} -s -f < KC-RELEASE-3_1_SP2-Upgrade-MYSQL.sql > KC-RELEASE-3_1_SP2-Upgrade-MYSQL-Install.log 2>&1
             if [ "${InstRice}" = "Y" ] || [ "${mode}" = "BUNDLE" ]
             then
