@@ -13,4 +13,9 @@ spool KC-Release-3_0-Clean-Oracle-Install.log
 @krrelease/datasql/KC_KRNS_NMSPC_T.sql
 @krrelease/datasql/KC_KRNS_PARM_DTL_TYP_T.sql
 @krrelease/datasql/KC_KRNS_PARM_T.sql
+@krrelease/datasql/KC_KRIM_PERM_ATTR_DATA_T.sql
+@krrelease/datasql/KC_KRIM_ROLE_PERM_T.sql
+@krrelease/datasql/KC_KRIM_ROLE_RSP_ACTN_T.sql
+@krrelease/datasql/KC_KRIM_ROLE_RSP_T.sql
+@krrelease/datasql/KC_KRIM_TYP_ATTR_T.sql
 quit
