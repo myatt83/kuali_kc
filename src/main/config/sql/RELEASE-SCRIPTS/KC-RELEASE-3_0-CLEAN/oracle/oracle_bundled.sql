@@ -67,6 +67,7 @@ spool KC-Release-3_0-Clean-Oracle-Install.log
 @krrelease/datasql/KRSB_SVC_DEF_T.sql
 @krrelease/datasql/KR_COUNTRY_T.sql
 @krrelease/datasql/KR_STATE_T.sql
+@oracle_server.sql
 @kcrelease/datasql/ABSTRACT_TYPE.sql
 @kcrelease/datasql/ACCOUNT_TYPE.sql
 @kcrelease/datasql/ACTIVITY_TYPE.sql
