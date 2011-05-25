@@ -110,7 +110,7 @@ case "${dbtype}" in
 					then
 						sqlplus "${Riceun}"/"${Ricepw}${RiceDBSvrNm}" < oracle_server_full.sql
 					else
-						sqlplus "${Riceun}"/"${Ricepw}${RiceDBSvrNm}" < oracle_server.sql
+						sqlplus "${Riceun}"/"${Ricepw}${RiceDBSvrNm}" < oracle_server_kc.sql
 					fi
 					sqlplus "${un}"/"${pw}${DBSvrNm}" < oracle_client.sql
 				fi
