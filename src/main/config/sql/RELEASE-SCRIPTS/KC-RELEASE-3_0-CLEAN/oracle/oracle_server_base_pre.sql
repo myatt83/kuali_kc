@@ -65,4 +65,4 @@ set define off
 @krrelease/datasql/KRSB_SVC_DEF_T.sql
 @krrelease/datasql/KR_COUNTRY_T.sql
 @krrelease/datasql/KR_STATE_T.sql
-quit
+

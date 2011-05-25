@@ -17,4 +17,3 @@ set define off
 @krrelease/datasql/KC_KRIM_ROLE_RSP_ACTN_T.sql
 @krrelease/datasql/KC_KRIM_ROLE_RSP_T.sql
 @krrelease/datasql/KC_KRIM_TYP_ATTR_T.sql
-quit
