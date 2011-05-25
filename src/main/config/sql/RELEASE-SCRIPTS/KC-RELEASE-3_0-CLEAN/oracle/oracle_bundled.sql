@@ -1,6 +1,6 @@
 set sqlblanklines on
 set define off
-spool KC-Release-3_0-Clean-Oracle-Install.log
+spool KC-Release-3_0-Clean-Bundled-Install.log
 @krrelease/sql/schema.sql
 @kcrelease/sql/schema.sql
 @krrelease/datasql/KREN_CHNL_T.sql
