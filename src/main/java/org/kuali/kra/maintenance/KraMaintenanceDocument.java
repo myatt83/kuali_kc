@@ -48,6 +48,7 @@ public class KraMaintenanceDocument extends MaintenanceDocumentBase {
     @Override
     public void prepareForSave(KualiDocumentEvent event) {
         super.prepareForSave(event);
+        populateDocumentAttachment();
 
         MaintenanceDocumentDictionaryService maintenanceDocumentDictionaryService = KNSServiceLocator
                 .getMaintenanceDocumentDictionaryService();
