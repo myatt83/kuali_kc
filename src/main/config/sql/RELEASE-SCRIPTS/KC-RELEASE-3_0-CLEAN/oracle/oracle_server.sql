@@ -1,5 +1,6 @@
 set sqlblanklines on
 set define off
+@krrelease/datasql/KC_KREN_CHNL_PRODCR_T.sql
 @krrelease/datasql/KC_KREN_CHNL_T.sql
 @krrelease/datasql/KC_KRIM_ATTR_DEFN_T.sql
 @krrelease/datasql/KC_KRIM_GRP_T.sql
