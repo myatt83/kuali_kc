@@ -2,7 +2,6 @@ set define off
 set sqlblanklines on 
 spool KR-Release-3_0_1-3_1_S1-Upgrade-Oracle-Install.log
 @ORACLE/DML/DML_BS_OBJ_ID_CLEAN.sql
-@ORACLE/DML/DML_BS1_KREN_PRODCR_T.sql
 @ORACLE/DML/DML_BS2_KRNS_PARM_DTL_TYP_T.sql
 @ORACLE/DML/DML_BS2_KRNS_PARM_T.sql
 @ORACLE/DML/DML_BS3_KRIM_PERM_T.sql
