@@ -177,7 +177,9 @@ case "${dbtype}" in
 				then
 					if [ "${InstRice}" = "Y" ]
 					then
-						mysql -u ${Riceun} -p${Ricepw} -D ${RiceDBSvrNm} -s < mysql_server.sql
+						mysql -u ${Riceun} -p${Ricepw} -D ${RiceDBSvrNm} -s < mysql_server_full.sql
+				    else
+				        mysql -u ${Riceun} -p${Ricepw} -D ${RiceDBSvrNm} -s < mysql_server_kc.sql
 					fi
 					mysql -u ${un} -p${pw} -D ${DBSvrNm} -s -f < mysql_client.sql
 				fi
