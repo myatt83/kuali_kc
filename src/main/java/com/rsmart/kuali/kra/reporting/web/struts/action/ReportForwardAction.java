@@ -49,7 +49,7 @@ public class ReportForwardAction extends KualiDocumentActionBase {
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
             throws Exception {
         
-        String currentUserId = GlobalVariables.getUserSession().getPrincipalId();
+        String currentUserId = GlobalVariables.getUserSession().getPrincipalName();
         String awardId = request.getParameter("awardId");
         AuthTokenGenerator tokenGenerator = new AuthTokenGenerator();
         
