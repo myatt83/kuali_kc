@@ -932,10 +932,10 @@
       p:serviceNameSpaceURI="" 
       p:serviceInterface="org.kuali.rice.krms.framework.type.TermResolverTypeService"/>
      
-   <bean id="tokenGenerator" class="com.rsmart.rfabric.jasperreports.auth.AuthTokenGenerator">
+   <bean id="tokenGenerator" class="com.rsmart.rfabric.auth.tokenauth.AuthTokenGenerator">
       <property name="secret" value="SECRETKEYVALUE"/>
    </bean>
-   <bean id="urlGenerator" class="com.rsmart.rfabric.jasperreports.auth.AuthTokenURLGenerator">
+   <bean id="urlGenerator" class="com.rsmart.rfabric.auth.tokenauth.AuthTokenURLGenerator">
      <property name="tokenGenerator" ref="tokenGenerator"/>
    </bean>
    

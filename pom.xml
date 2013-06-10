@@ -213,6 +213,10 @@
 				<configuration>
 					<source>1.6</source>
 					<target>1.6</target>
+					<fork>true</fork>
+                                        <meminitial>2048m</meminitial>
+                                        <maxmem>2048m</maxmem>
+                                        <permgensize>512m</permgensize>
 				</configuration>
 			</plugin>
 		    <plugin>
@@ -505,28 +509,12 @@
 	<dependencies>
     <dependency>
       <groupId>com.rsmart</groupId>
-      <artifactId>jasper-tokenauth</artifactId>
-      <version>0.9.1</version>
+      <artifactId>tokenauth</artifactId>
+      <version>1.0.3</version>
       <exclusions>
         <exclusion>
-          <groupId>com.jaspersoft.jasperserver</groupId>
-          <artifactId>jasperserver-common-ws</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>com.jaspersoft.jasperserver</groupId>
-          <artifactId>jasperserver-remote-services</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.springframework</groupId>
-          <artifactId>spring-web</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.springframework.security</groupId>
-          <artifactId>spring-security-core</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>log4j</groupId>
-          <artifactId>log4j</artifactId>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
