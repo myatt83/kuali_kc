@@ -32,8 +32,8 @@ import org.kuali.rice.core.api.config.property.ConfigContext;
 import org.kuali.rice.kns.web.struts.action.KualiDocumentActionBase;
 import org.kuali.rice.krad.util.GlobalVariables;
 
-import com.rsmart.rfabric.jasperreports.auth.AuthTokenGenerator;
-import com.rsmart.rfabric.jasperreports.auth.AuthTokenURLGenerator;
+import com.rsmart.rfabric.auth.tokenauth.AuthTokenGenerator;
+import com.rsmart.rfabric.auth.tokenauth.AuthTokenURLGenerator;
 
 /**
  * 
@@ -50,6 +50,7 @@ public class ReportForwardAction extends KualiDocumentActionBase {
             throws Exception {
         
         String currentUserId = GlobalVariables.getUserSession().getPrincipalName();
+        String domainName = request.getServerName();
         String awardId = request.getParameter("awardId");
         AuthTokenGenerator tokenGenerator = new AuthTokenGenerator();
         
@@ -63,7 +64,8 @@ public class ReportForwardAction extends KualiDocumentActionBase {
 
         String urlBase = ConfigContext.getCurrentContextConfig().getProperty(URL_BASE);
         String queryBase = ConfigContext.getCurrentContextConfig().getProperty(QUERY_BASE);
-        String url = tokenURLGenerator.generateRelativeURL(request, urlBase, queryBase + awardId, currentUserId, isPI);
+        String credentials[] = new String[] {currentUserId, Boolean.toString(isPI), domainName};
+        String url = tokenURLGenerator.generateRelativeURL(request, urlBase, queryBase + awardId, credentials);
         
         response.sendRedirect(url);
         return null;
