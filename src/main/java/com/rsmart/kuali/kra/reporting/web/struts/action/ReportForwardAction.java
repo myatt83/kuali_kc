@@ -27,6 +27,8 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.KraServiceLocator;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.kuali.kra.proposaldevelopment.bo.ProposalPerson;
 import org.kuali.rice.core.api.config.property.ConfigContext;
 import org.kuali.rice.kns.web.struts.action.KualiDocumentActionBase;
@@ -41,6 +43,8 @@ import com.rsmart.rfabric.auth.tokenauth.AuthTokenURLGenerator;
  */
 public class ReportForwardAction extends KualiDocumentActionBase {
 
+    private static Log LOG = LogFactory.getLog(ReportForwardAction.class);
+    private static final String URL_RELATIVE = "rsmart.report.url.relative";
     private static final String URL_BASE = "rsmart.report.url.base";
     private static final String QUERY_BASE = "rsmart.report.query.base";
     private static final String SHARED_SECRET = "rsmart.report.shared.secret";
@@ -62,11 +66,21 @@ public class ReportForwardAction extends KualiDocumentActionBase {
 //        AuthTokenURLGenerator tokenURLGenerator = (AuthTokenURLGenerator) KraServiceLocator.getAppContext().getBean("urlGenerator");
         boolean isPI = isPrincipalInvestigator(currentUserId);
 
+        String urlRelative = ConfigContext.getCurrentContextConfig().getProperty(URL_RELATIVE);
         String urlBase = ConfigContext.getCurrentContextConfig().getProperty(URL_BASE);
         String queryBase = ConfigContext.getCurrentContextConfig().getProperty(QUERY_BASE);
         String credentials[] = new String[] {currentUserId, Boolean.toString(isPI), domainName};
-        String url = tokenURLGenerator.generateRelativeURL(request, urlBase, queryBase + awardId, credentials);
+        String url = null;
         
+        if (Boolean.parseBoolean(urlRelative)) {
+          LOG.debug("generating relative URL");
+          url = tokenURLGenerator.generateRelativeURL(request, urlBase, queryBase + awardId, credentials);
+        } else {
+          LOG.debug("generating absolute URL");
+          url = tokenURLGenerator.generateAbsoluteURL(urlBase, queryBase + awardId, credentials);
+        }
+        
+        LOG.debug("redirecting to url \"" + url + "\"");
         response.sendRedirect(url);
         return null;
     }    
