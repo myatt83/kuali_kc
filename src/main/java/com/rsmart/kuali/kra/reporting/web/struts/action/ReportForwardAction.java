@@ -48,13 +48,27 @@ public class ReportForwardAction extends KualiDocumentActionBase {
     private static final String URL_BASE = "rsmart.report.url.base";
     private static final String QUERY_BASE = "rsmart.report.query.base";
     private static final String SHARED_SECRET = "rsmart.report.shared.secret";
+    private static final String CLUSTER_ID_VAR = "RSMART_CLUSTER";
+    
+    protected String getClientId(final HttpServletRequest request) {
+      String clientId = System.getenv(CLUSTER_ID_VAR);
+      
+      if (clientId == null) {
+        clientId = request.getServerName();
+        LOG.debug("Client ID could not be found in env. vars., using server name: " + clientId);
+      } else {
+        LOG.debug("Client ID is: " + clientId); 
+      }
+      
+      return clientId;
+    }
     
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
             throws Exception {
         
         String currentUserId = GlobalVariables.getUserSession().getPrincipalName();
-        String domainName = request.getServerName();
+        String clientId = getClientId(request);
         String awardId = request.getParameter("awardId");
         AuthTokenGenerator tokenGenerator = new AuthTokenGenerator();
         
@@ -69,7 +83,7 @@ public class ReportForwardAction extends KualiDocumentActionBase {
         String urlRelative = ConfigContext.getCurrentContextConfig().getProperty(URL_RELATIVE);
         String urlBase = ConfigContext.getCurrentContextConfig().getProperty(URL_BASE);
         String queryBase = ConfigContext.getCurrentContextConfig().getProperty(QUERY_BASE);
-        String credentials[] = new String[] {currentUserId, Boolean.toString(isPI), domainName};
+        String credentials[] = new String[] {currentUserId, Boolean.toString(isPI), clientId};
         String url = null;
         
         if (Boolean.parseBoolean(urlRelative)) {
