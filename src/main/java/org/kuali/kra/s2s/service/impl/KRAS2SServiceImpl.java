@@ -430,7 +430,9 @@ public class KRAS2SServiceImpl implements S2SService {
 			appSubmission.setComments(S2SConstants.GRANTS_GOV_COMMENTS_MESSAGE);
 			SubmitApplicationResponse response = null;
 
-            String applicationXml = getGrantApplicationDocument(pdDoc, forms);
+      String applicationXml = getGrantApplicationDocument(pdDoc, forms);
+      // FIXME change log to debug level before production
+      LOG.info("S2S applicationXml = \n" + applicationXml);
 
 			response = grantsGovConnectorService.submitApplication(
 					applicationXml, attachments, pdDoc
