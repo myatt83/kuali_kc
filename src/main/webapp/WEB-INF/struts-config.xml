@@ -17,25 +17,28 @@
 <!-- Rice content End -->
 
 		<form-bean name="ProposalDevelopmentForm" type="org.kuali.kra.proposaldevelopment.web.struts.form.ProposalDevelopmentForm" />
+		<form-bean name="ReportGenerationForm" type="org.kuali.kra.reporting.web.struts.form.ReportGenerationForm" />
 		<form-bean name="BudgetForm" type="org.kuali.kra.budget.web.struts.form.BudgetForm" />
 		<form-bean name="AwardBudgetForm" type="org.kuali.kra.award.budget.AwardBudgetForm" />
 		<form-bean name="AwardForm" type="org.kuali.kra.award.AwardForm" />
+		<form-bean name="AwardSubcontractingGoalsExpendituresForm" type="org.kuali.kra.award.subcontracting.goalsAndExpenditures.AwardSubcontractingGoalsExpendituresForm" />
+		<form-bean name="SubcontractingExpendituresDataGenerationForm" type="org.kuali.kra.award.subcontracting.reporting.SubcontractingExpendituresDataGenerationForm" />
 		<form-bean name="TimeAndMoneyForm" type="org.kuali.kra.timeandmoney.TimeAndMoneyForm" />
 		<form-bean name="AwardHierarchyForm" type="org.kuali.kra.award.AwardHierarchyForm" />
 		<form-bean name="DocHandlerForm" type="org.kuali.rice.kew.routing.web.DocHandlerForm" />
 		<form-bean name="UnitHierarchyForm" type="org.kuali.kra.web.struts.form.UnitHierarchyForm" />
 		<form-bean name="SponsorHierarchyForm" type="org.kuali.kra.web.struts.form.SponsorHierarchyForm" />
 		<form-bean name="ProtocolForm" type="org.kuali.kra.irb.ProtocolForm" />
-		<form-bean name="ResearchAreasForm" type="org.kuali.kra.web.struts.form.ResearchAreasForm" />
+		<form-bean name="ResearchAreasForm" type="org.kuali.kra.irb.ResearchAreasForm" />
 		<form-bean name="CommitteeForm" type="org.kuali.kra.committee.web.struts.form.CommitteeForm" />
-		<form-bean name="CommonCommitteeForm" type="org.kuali.kra.common.committee.web.struts.form.CommonCommitteeForm" />
+		<form-bean name="IacucCommitteeForm" type="org.kuali.kra.iacuc.committee.web.struts.form.IacucCommitteeForm" />
 		<form-bean name="InstitutionalProposalForm" type="org.kuali.kra.institutionalproposal.web.struts.form.InstitutionalProposalForm" />
 	    <form-bean name="QuestionMaintenanceForm" type="org.kuali.kra.questionnaire.question.QuestionMaintenanceForm" />
         <form-bean name="KualiMaintenanceForm" type="org.kuali.rice.kns.web.struts.form.KualiMaintenanceForm" />
         <form-bean name="QuestionLookupForm" type="org.kuali.kra.questionnaire.QuestionLookupForm" />
         <form-bean name="KrmsRuleLookupForm" type="org.kuali.kra.questionnaire.KrmsRuleLookupForm" />
         <form-bean name="MeetingForm" type="org.kuali.kra.meeting.MeetingForm" />
-        <form-bean name="CommonMeetingForm" type="org.kuali.kra.common.committee.meeting.MeetingForm" />
+        <form-bean name="IacucMeetingForm" type="org.kuali.kra.iacuc.committee.meeting.IacucMeetingForm" />
         <form-bean name="QuestionnaireMaintenanceForm" type="org.kuali.kra.questionnaire.QuestionnaireMaintenanceForm" />
         <form-bean name="ProposalLogMergeForm" type="org.kuali.kra.institutionalproposal.proposallog.ProposalLogMergeForm" />
         <form-bean name="ProposalLogPrintForm" type="org.kuali.kra.institutionalproposal.proposallog.ProposalLogPrintForm" />
@@ -49,6 +52,7 @@
         <form-bean name="SubAwardForm" type="org.kuali.kra.subaward.SubAwardForm" />       
         <form-bean name="CurrentOrPendingReportForm" type="org.kuali.kra.proposaldevelopment.web.struts.form.CurrentOrPendingReportForm" />
 		<form-bean name="CoiDisclosureForm" type="org.kuali.kra.coi.CoiDisclosureForm" />
+		<form-bean name="CoiCustomSearchForm" type="org.kuali.kra.coi.lookup.CoiCustomSearchForm" />
 		<form-bean name="FinancialEntityForm" type="org.kuali.kra.coi.personfinancialentity.FinancialEntityForm" />
 		<form-bean name="NegotiationForm" type="org.kuali.kra.negotiations.web.struts.form.NegotiationForm" />
 		<form-bean name="PersonMassChangeForm" type="org.kuali.kra.personmasschange.web.struts.form.PersonMassChangeForm" />
@@ -56,10 +60,8 @@
         <form-bean name="IacucProtocolForm" type="org.kuali.kra.iacuc.IacucProtocolForm" />
         <form-bean name="IacucProtocolOnlineReviewForm" type="org.kuali.kra.iacuc.onlinereview.IacucProtocolOnlineReviewForm"/> 
         <form-bean name="IacucProtocolCorrespondenceTemplateForm" type="org.kuali.kra.iacuc.correspondence.IacucProtocolCorrespondenceTemplateForm" />
-        
-        <!-- AAP: report form -->
-        <form-bean name="ReportForm" type="com.rsmart.kuali.kra.reporting.web.struts.form.ReportFormwardForm" />
-       
+		<form-bean name="IacucResearchAreasForm" type="org.kuali.kra.iacuc.IacucResearchAreasForm" />
+		<form-bean name="IsrSsrReportGenerationForm" type="org.kuali.kra.subawardReporting.web.struts.form.IsrSsrReportGenerationForm" />
     </form-beans>
 
 <!-- Rice content Start -->
@@ -125,6 +127,17 @@
         <action path="/kraHoldingPage" name="KualiForm" type="org.kuali.kra.web.struts.action.KraHoldingPageAction">
             <forward name="basic" path="/kraHoldingPage.jsp" />
         </action>
+               
+<!-- BIRT REPORTING -->
+           
+        <action path="/reporting" name="ReportGenerationForm" type="org.kuali.kra.reporting.web.struts.action.ReportGenerationAction" scope="request">
+            <forward name="basic" path="/WEB-INF/jsp/reporting/reportGeneration.jsp" />
+        </action>
+        
+        
+        <action path="/isrSsrReporting" name="IsrSsrReportGenerationForm" type="org.kuali.kra.subawardReporting.web.struts.action.IsrSsrReportGenerationAction" scope="request">
+            <forward name="basic" path="/WEB-INF/jsp/subawardReporting/isrSsrReporting.jsp" />
+        </action>
         
       <!--  KRA Proposal Development Mapping -->
       <action path="/proposalDevelopment*" name="ProposalDevelopmentForm" input="/WEB-INF/jsp/proposaldevelopment/ProposalDevelopment{1}.jsp" type="org.kuali.kra.proposaldevelopment.web.struts.action.ProposalDevelopment{1}Action"  scope="request" parameter="methodToCall" validate="true" attribute="KualiForm">
@@ -160,14 +173,14 @@
  		<action path="/unitHierarchy" name="UnitHierarchyForm" type="org.kuali.kra.web.struts.action.UnitHierarchyAction" scope="request">
             <forward name="basic" path="/unitHierarchy.jsp" />
         </action>
- 		<action path="/researchAreas" name="ResearchAreasForm" type="org.kuali.kra.web.struts.action.ResearchAreasAction">
-            <forward name="basic" path="/researchAreaHierarchy.jsp" />
+ 		<action path="/researchAreas" name="ResearchAreasForm" type="org.kuali.kra.irb.ResearchAreasAction">
+            <forward name="basic" path="/WEB-INF/jsp/irb/researchAreaHierarchy.jsp" />
             <!-- <forward name="lookup" path="/researchAreaSearch.jsp" /> -->
         </action>
- 		<action path="/researchAreaAjax" name="ResearchAreasForm" type="org.kuali.kra.web.struts.action.ResearchAreasAction">
-            <forward name="basic" path="/researchAreaAjax.jsp" />
+ 		<action path="/researchAreaAjax" name="ResearchAreasForm" type="org.kuali.kra.irb.ResearchAreasAction">
+            <forward name="basic" path="/WEB-INF/jsp/irb/researchAreaAjax.jsp" />
         </action>
-        <!-- <action path="/researchAreaSearch" name="ResearchAreasForm" type="org.kuali.kra.web.struts.action.ResearchAreasAction">
+        <!-- <action path="/researchAreaSearch" name="ResearchAreasForm" type="org.kuali.kra.irb.ResearchAreasAction">
             <forward name="basic" path="/researchAreaSearch.jsp" />
         </action> -->
         
@@ -263,6 +276,10 @@
           <forward name="basic" path="/WEB-INF/jsp/timeandmoney/TimeAndMoney{1}.jsp" />          
       </action>
       
+      <action path="/awardHistory" name="AwardForm" input="/WEB-INF/jsp/award/AwardHistory.jsp" type="org.kuali.kra.award.web.struts.action.AwardHomeAction" scope="request" parameter="methodToCall" validate="true" attribute="KualiForm">
+          <forward name="basic" path="/WEB-INF/jsp/award/AwardHistory.jsp" />          
+      </action>
+      
       <action path="/awardHierarchyTimeAndMoneyAjax" name="TimeAndMoneyForm" type="org.kuali.kra.timeandmoney.web.struts.action.TimeAndMoneyAction" attribute="KualiForm">
           <forward name="basic" path="/WEB-INF/jsp/timeandmoney/awardHierarchyTimeAndMoneyAjax.jsp" />
       </action>
@@ -338,9 +355,20 @@
       
       <action path="/mergeProposalLog" name="ProposalLogMergeForm" attribute="KualiForm" scope="request" parameter="methodToCall" validate="false" input="/WEB-INF/jsp/institutionalproposal/ProposalLogMerge.jsp" type="org.kuali.kra.institutionalproposal.proposallog.ProposalLogMergeAction">
         <forward name="basic" path="/WEB-INF/jsp/institutionalproposal/ProposalLogMerge.jsp" />
+        <forward name="temporaryList" path="/WEB-INF/jsp/institutionalproposal/ProposalLogTemporaryList.jsp" />
       </action>
       <action path="/printProposalLog" name="ProposalLogPrintForm" attribute="KualiForm" scope="request" parameter="methodToCall" validate="false" type="org.kuali.kra.institutionalproposal.proposallog.ProposalLogPrintAction">
         <forward name="basic" path="/portal.jsp" redirect="true" />
+      </action>
+      
+      
+      <!-- Award Subcontracting -->      
+      <action path="/awardSubcontractingGoalsExpenditures" name="AwardSubcontractingGoalsExpendituresForm" input="/WEB-INF/jsp/award/AwardSubcontractingGoalsExpenditures.jsp" type="org.kuali.kra.award.web.struts.action.AwardSubcontractingGoalsExpendituresAction" scope="request" parameter="methodToCall" validate="true" attribute="KualiForm">
+            <forward name="basic" path="/WEB-INF/jsp/award/AwardSubcontractingGoalsExpenditures.jsp" />
+      </action>
+      
+      <action path="/subcontractingExpendituresDataGeneration" name="SubcontractingExpendituresDataGenerationForm" input="/WEB-INF/jsp/award/SubcontractingExpendituresDataGeneration.jsp" type="org.kuali.kra.award.web.struts.action.SubcontractingExpendituresDataGenerationAction" scope="request" parameter="methodToCall" validate="true" attribute="KualiForm">
+            <forward name="basic" path="/WEB-INF/jsp/award/SubcontractingExpendituresDataGeneration.jsp" />
       </action>
       
       
@@ -429,6 +457,16 @@
       
       
       <!-- IACUC Mapping -->
+      
+      
+ 		<action path="/iacucResearchAreas" name="IacucResearchAreasForm" type="org.kuali.kra.iacuc.IacucResearchAreasAction">
+            <forward name="basic" path="/WEB-INF/jsp/iacuc/IacucResearchAreaHierarchy.jsp" />
+        </action>
+      
+ 		<action path="/iacucResearchAreaAjax" name="IacucResearchAreasForm" type="org.kuali.kra.iacuc.IacucResearchAreasAction">
+            <forward name="basic" path="/WEB-INF/jsp/iacuc/IacucResearchAreaAjax.jsp" />
+        </action>
+      
       <action path="/iacucProtocolProtocol" name="IacucProtocolForm" input="/WEB-INF/jsp/iacuc/ProtocolProtocol.jsp" type="org.kuali.kra.iacuc.protocol.IacucProtocolProtocolAction"  scope="request" parameter="methodToCall" validate="true" attribute="KualiForm">
         <forward name="basic" path="/WEB-INF/jsp/iacuc/ProtocolProtocol.jsp" />
         &iacuc_forwards;
@@ -528,14 +566,14 @@
       </action>
       
       
-      <!--  Common Committee Mapping -->
-      <action path="/commonCommittee*" name="CommonCommitteeForm" input="/WEB-INF/jsp/committee/CommonCommittee{1}.jsp" type="org.kuali.kra.common.committee.web.struts.action.Committee{1}Action"  scope="request" parameter="methodToCall" validate="true" attribute="KualiForm">
-          <forward name="basic" path="/WEB-INF/jsp/committee/CommonCommittee{1}.jsp" />
-          <forward name="committee" path="/WEB-INF/jsp/committee/CommonCommitteeCommittee.jsp" />
-          <forward name="committeeMembership" path="/WEB-INF/jsp/committee/CommonCommitteeMembership.jsp" />
-          <forward name="committeeSchedule" path="/WEB-INF/jsp/committee/CommonCommitteeSchedule.jsp" />
-          <forward name="committeeActions" path="/WEB-INF/jsp/committee/CommonCommitteeActions.jsp" />
-          <forward name="maintainSchedule" path="/WEB-INF/jsp/meeting/CommonMeetingManagement.jsp" />
+      <!--  Iacuc Committee Mapping -->
+      <action path="/iacucCommittee*" name="IacucCommitteeForm" input="/WEB-INF/jsp/committee/IacucCommittee{1}.jsp" type="org.kuali.kra.iacuc.committee.web.struts.action.IacucCommittee{1}Action"  scope="request" parameter="methodToCall" validate="true" attribute="KualiForm">
+          <forward name="basic" path="/WEB-INF/jsp/committee/IacucCommittee{1}.jsp" />
+          <forward name="committee" path="/WEB-INF/jsp/committee/IacucCommitteeCommittee.jsp" />
+          <forward name="committeeMembership" path="/WEB-INF/jsp/committee/IacucCommitteeMembership.jsp" />
+          <forward name="committeeSchedule" path="/WEB-INF/jsp/committee/IacucCommitteeSchedule.jsp" />
+          <forward name="committeeActions" path="/WEB-INF/jsp/committee/IacucCommitteeActions.jsp" />
+          <forward name="maintainSchedule" path="/WEB-INF/jsp/meeting/IacucMeetingManagement.jsp" />
       </action>
       
       
@@ -570,11 +608,11 @@
      </action>
 
 	
-     <action path="/commonMeeting*" name="CommonMeetingForm" type="org.kuali.kra.common.committee.meeting.Meeting{1}Action" input="/WEB-INF/jsp/meeting/CommonMeeting{1}.jsp" attribute="KualiForm">
-            <forward name="basic" path="/WEB-INF/jsp/meeting/CommonMeeting{1}.jsp" />
-            <forward name="management" path="/WEB-INF/jsp/meeting/CommonMeetingManagement.jsp" />
-            <forward name="actions" path="/WEB-INF/jsp/meeting/CommonMeetingActions.jsp" />
-            <forward name="correspondence" path="/WEB-INF/jsp/meeting/CommonMeetingCorrespondenceAction.jsp" />
+     <action path="/iacucMeeting*" name="IacucMeetingForm" type="org.kuali.kra.iacuc.committee.meeting.IacucMeeting{1}Action" input="/WEB-INF/jsp/meeting/IacucMeeting{1}.jsp" attribute="KualiForm">
+            <forward name="basic" path="/WEB-INF/jsp/meeting/IacucMeeting{1}.jsp" />
+            <forward name="management" path="/WEB-INF/jsp/meeting/IacucMeetingManagement.jsp" />
+            <forward name="actions" path="/WEB-INF/jsp/meeting/IacucMeetingActions.jsp" />
+            <forward name="correspondence" path="/WEB-INF/jsp/meeting/IacucMeetingCorrespondenceAction.jsp" />
      </action>
 
      
@@ -592,6 +630,7 @@
           <forward name="financial" path="/WEB-INF/jsp/subaward/SubAwardFinancial.jsp" />
           <forward name="customData" path="/WEB-INF/jsp/subaward/SubAwardCustomData.jsp" /> 
           <forward name="subAwardActions" path="/WEB-INF/jsp/subaward/SubAwardActions.jsp" />
+          <forward name="notificationEditor" path="/WEB-INF/jsp/subaward/SubAwardNotificationEditor.jsp" />
           <forward name="medusa" path="/WEB-INF/jsp/subaward/SubAwardMedusa.jsp" />
       </action>
 <!-- end -->
@@ -600,27 +639,19 @@
           <forward name="basic" path="/WEB-INF/jsp/currentOrPendingReport.jsp" />
      </action>
      
-     <action path="/coi*" name="CoiDisclosureForm" input="/WEB-INF/jsp/coi/Coi{1}.jsp" type="org.kuali.kra.committee.web.struts.action.Committee{1}Action"  scope="request" parameter="methodToCall" validate="true" attribute="KualiForm">
-          <forward name="basic" path="/WEB-INF/jsp/committee/Committee{1}.jsp" />
-          <forward name="committee" path="/WEB-INF/jsp/committee/CommitteeCommittee.jsp" />
-          <forward name="committeeMembership" path="/WEB-INF/jsp/committee/CommitteeMembership.jsp" />
-          <forward name="committeeSchedule" path="/WEB-INF/jsp/committee/CommitteeSchedule.jsp" />
-          <forward name="committeeActions" path="/WEB-INF/jsp/committee/CommitteeActions.jsp" />
-          <forward name="maintainSchedule" path="/WEB-INF/jsp/meeting/meetingManagement.jsp" />
-      </action>
-      <action path="/coiDisclosure" name="CoiDisclosureForm" input="/WEB-INF/jsp/coi/CoiDisclosure.jsp" type="org.kuali.kra.coi.disclosure.CoiDisclosureAction"  scope="request" parameter="methodToCall" validate="true" attribute="KualiForm">
-          <forward name="basic" path="/WEB-INF/jsp/coi/CoiDisclosure.jsp" />
+      <action path="/coi*" name="CoiDisclosureForm" input="/WEB-INF/jsp/coi/{1}.jsp" type="org.kuali.kra.coi.disclosure.CoiDisclosureAction"  scope="request" parameter="methodToCall" validate="true" attribute="KualiForm">
+          <forward name="basic" path="/WEB-INF/jsp/coi/{1}.jsp" />
           <forward name="masterDisclosure" path="/WEB-INF/jsp/coi/MasterDisclosure.jsp" />
           <forward name="masterDisclosureNotAvailable" path="/WEB-INF/jsp/coi/MasterDisclosureNotAvailable.jsp" />
           <forward name="updateDisclosure" path="/WEB-INF/jsp/coi/UpdateDisclosure.jsp" />
           &coi_forwards;
        </action>
-       <action path="/coiDisclosureActions" name="CoiDisclosureForm" input="/WEB-INF/jsp/coi/CoiDisclosure.jsp" type="org.kuali.kra.coi.actions.CoiDisclosureActionsAction"  scope="request" parameter="methodToCall" validate="true" attribute="KualiForm">
+       <action path="/coiDisclosureActions" name="CoiDisclosureForm" input="/WEB-INF/jsp/coi/Disclosure.jsp" type="org.kuali.kra.coi.actions.CoiDisclosureActionsAction"  scope="request" parameter="methodToCall" validate="true" attribute="KualiForm">
           <forward name="basic" path="/WEB-INF/jsp/coi/CoiDisclosureActions.jsp" />
           <forward name="masterDisclosure" path="/WEB-INF/jsp/coi/MasterDisclosure.jsp" />
           &coi_forwards;
        </action>
-       <action path="/coiNoteAndAttachment" name="CoiDisclosureForm" input="/WEB-INF/jsp/coi/CoiDisclosure.jsp" type="org.kuali.kra.coi.notesandattachments.CoiNoteAndAttachmentAction"  scope="request" parameter="methodToCall" validate="true" attribute="KualiForm">
+       <action path="/coiNoteAndAttachment" name="CoiDisclosureForm" input="/WEB-INF/jsp/coi/Disclosure.jsp" type="org.kuali.kra.coi.notesandattachments.CoiNoteAndAttachmentAction"  scope="request" parameter="methodToCall" validate="true" attribute="KualiForm">
           <forward name="basic" path="/WEB-INF/jsp/coi/CoiNoteAndAttachment.jsp" />
           &coi_forwards;
       </action>
@@ -628,8 +659,16 @@
           <forward name="basic" path="/WEB-INF/jsp/coi/CoiDisclosureNotificationEditor.jsp"/>
           &coi_forwards;
       </action>
-
-       
+      <action path="/coiSearchOpen" name="CoiCustomSearchForm" input="/WEB-INF/jsp/coi/CoiSearchOpen.jsp" type="org.kuali.kra.coi.lookup.CoiCustomSearchAction" scope="request" parameter="methodToCall" validate="true" attribute="KualiForm">
+        <forward name="basic" path="/WEB-INF/jsp/coi/CoiSearchOpen.jsp" />
+        <forward name="openReviews" path="/WEB-INF/jsp/coi/CoiSearchOpen.jsp" />
+      </action>
+      <action path="/coiPersonSearch" name="CoiDisclosureForm" input="/WEB-INF/jsp/coi/MasterDisclosure.jsp" type="org.kuali.kra.coi.lookup.CoiDisclosurePersonSearchAction"  scope="request" parameter="methodToCall" validate="true" attribute="KualiForm">
+          <forward name="basic" path="/WEB-INF/jsp/coi/MasterDisclosure.jsp" />
+          <forward name="masterDisclosure" path="/WEB-INF/jsp/coi/MasterDisclosure.jsp" />
+          <forward name="masterDisclosureNotAvailable" path="/WEB-INF/jsp/coi/MasterDisclosureNotAvailable.jsp" />
+          &coi_forwards;
+       </action>             
       <action path="/projectEventDisclosure" name="CoiDisclosureForm" input="/WEB-INF/jsp/coi/ProjectEvent.jsp" type="org.kuali.kra.coi.disclosure.CoiDisclosureAction" scope="request" parameter="methodToCall" validate="true" attribute="KualiForm">
         <forward name="basic" path="/WEB-INF/jsp/coi/ProjectEvent.jsp" />
       </action>
@@ -652,7 +691,10 @@
           <forward name="basic" path="/WEB-INF/jsp/negotiation/NegotiationNegotiation.jsp" />
      	  <forward name="customData" path="/WEB-INF/jsp/negotiation/NegotiationNegotiation.jsp" />
      	  <forward name="notificationEditor" path="/WEB-INF/jsp/negotiation/NegotiationNotificationEditor.jsp" />
+     	  <forward name="portal" path="/portal.jsp" redirect="true" />
+          <forward name="lostPlaceMessagePage" path="/WEB-INF/jsp/negotiation/NegotiationLostPlaceMessage.jsp" />
        </action>
+
        <action path="/negotiationNotificationEditor" name="NegotiationForm" input="/WEB-INF/jsp/negotiation/NegotiationNotificationEditor.jsp" type="org.kuali.kra.negotiations.web.struts.action.NegotiationNotificationAction" scope="request" parameter="methodToCall" validate="true" attribute="KualiForm">
        	  <forward name="basic" path="/WEB-INF/jsp/negotiation/NegotiationNotificationEditor.jsp" />
        	  <forward name="negotiation" path="/WEB-INF/jsp/negotiation/NegotiationNegotiation.jsp" />
@@ -664,11 +706,6 @@
             <forward name="view" path="/WEB-INF/jsp/personmasschange/PersonMassChangeView.jsp" />
         </action>
      
-        <!-- AAP: adding report controller -->
-		<action path="/displayExternalReport" name="ReportForm" type="com.rsmart.kuali.kra.reporting.web.struts.action.ReportForwardAction">
-            <forward name="basic" path="/reportRedirect.jsp"/>
-        </action>
-
     </action-mappings>
 
 
