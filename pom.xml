@@ -10,7 +10,7 @@
 	<artifactId>kc_project</artifactId>
 	<packaging>war</packaging>
 	<name>Kuali Coeus</name>
-	<version>5.1.1</version>
+	<version>5.1.1.0-rsmart-SNAPSHOT</version>
 	<description>The Kuali Coeus (KC) project is building a comprehensive system to manage the complexities of research administration that fully addresses the needs from the faculty researcher through grants administration to federal funding agencies. KC is using MIT’s proven COEUS system as its baseline design, filling in missing functionality from COEUS, and updating its technical architecture for vendor independence and easier integration with other administration systems.</description>
 	<url>http://kuali.org/kc</url>
 	<organization>
@@ -228,6 +228,10 @@
 				<configuration>
 					<source>1.6</source>
 					<target>1.6</target>
+					<fork>true</fork>
+                                        <meminitial>2048m</meminitial>
+                                        <maxmem>2048m</maxmem>
+                                        <permgensize>512m</permgensize>
 				</configuration>
 			</plugin>
 		    <plugin>
@@ -486,12 +490,6 @@
 				<version>${jetty.version}</version>
 				<dependencies>
 	                <dependency>
-	                    <groupId>com.oracle</groupId>
-	                    <artifactId>ojdbc6</artifactId>
-	                    <version>${oracle.version}</version>
-	                    <scope>runtime</scope>
-	                </dependency>
-	                <dependency>
 	                    <groupId>mysql</groupId>
 	                    <artifactId>mysql-connector-java</artifactId>
 	                    <version>${mysql.version}</version>
@@ -506,12 +504,6 @@
                 <version>1.0</version>
                 <dependencies>  
                     <dependency>
-                        <groupId>com.oracle</groupId>
-                        <artifactId>ojdbc6</artifactId>
-                        <version>${oracle.version}</version>
-                        <scope>runtime</scope>
-                    </dependency>
-                    <dependency>
                         <groupId>mysql</groupId>
                         <artifactId>mysql-connector-java</artifactId>
                         <version>${mysql.version}</version>
@@ -520,6 +512,13 @@
                 </dependencies>
             </plugin>
 		</plugins>
+    <extensions>
+      <extension>
+        <groupId>org.kuali.maven.wagons</groupId>
+        <artifactId>maven-s3-wagon</artifactId>
+        <version>${wagon.s3.version}</version>
+      </extension>
+    </extensions>
 	</build>
 
 	<dependencies>
@@ -529,6 +528,17 @@
 			<artifactId>jaxb-impl</artifactId>
 			<version>2.2.6</version>
 		</dependency>
+    <dependency>
+      <groupId>com.rsmart</groupId>
+      <artifactId>tokenauth</artifactId>
+      <version>1.0.5</version>
+      <exclusions>
+        <exclusion>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
 		<!-- For FTP client -->
 		<dependency>
 			<groupId>commons-net</groupId>
@@ -550,13 +560,6 @@
 		    <groupId>cglib</groupId>
 		    <artifactId>cglib-nodep</artifactId>
 		    <version>2.2.2</version>
-		</dependency>
-		<dependency>
-		    <groupId>com.oracle</groupId>
-		    <artifactId>ojdbc6</artifactId>
-		    <version>${oracle.version}</version>
-		    <!-- should be provided once embedded jetty is figured out -->
-		    <scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.birt.runtime.3_7_1</groupId>
@@ -1090,10 +1093,6 @@
 				<exclusion>
 					<groupId>com.oracle</groupId>
 					<artifactId>ojdbc14</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>com.oracle</groupId>
-					<artifactId>ojdbc6</artifactId>
 				</exclusion>
 				<exclusion>
 					<groupId>htmlunit</groupId>
@@ -1664,6 +1663,17 @@
 			<name>jboss</name>
 			<url>http://repository.jboss.org/nexus/content/groups/public/</url>
 		</repository>
+    <repository>
+      <id>rsmart-dev</id>
+      <name>rsmart-dev</name>
+      <url>https://nexus.rsmart.com/nexus/content/groups/public/</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+    </repository>
 	</repositories>
 	
     <pluginRepositories>
@@ -1680,19 +1690,30 @@
    		</pluginRepository>
    	</pluginRepositories>
 	
-	<scm>
-		<connection>scm:svn:https://test.kuali.org/svn/kc_project/trunk
-		</connection>
-		<developerConnection>scm:svn:https://test.kuali.org/svn/kc_project/trunk
-		</developerConnection>
-		<tag>HEAD</tag>
-		<url>https://test.kuali.org/fisheye/browse/kc_project</url>
-	</scm>
+  <scm>
+    <connection>scm:git:git://github.com/rSmart/kuali_kc.git</connection>
+    <developerConnection>scm:git:git@github.com:rSmart/kuali_kc.git</developerConnection>
+    <url>https://github.com/rSmart/kuali_kc</url>
+  </scm>
 	
-	<issueManagement>
-		<system>Jira</system>
-		<url>https://test.kuali.org/jira/</url>
-	</issueManagement>
+  <distributionManagement>
+    <downloadUrl>https://github.com/rSmart/kc_platform</downloadUrl>
+    <snapshotRepository>
+       <id>rsmart.snapshot.repo</id>
+       <name>rsmart snapshot repository</name>
+       <url>s3://rsmart-dev/artifacts/maven/snapshot</url>
+    </snapshotRepository>
+    <repository>
+      <id>rsmart.release.repo</id>
+      <name>rsmart release repository</name>
+      <url>s3://rsmart-dev/artifacts/maven/release</url>
+    </repository>
+  </distributionManagement>
+
+  <issueManagement>
+    <system>github</system>
+    <url>https://github.com/rSmart/kuali_kc/issues</url>
+  </issueManagement>
 
 	<ciManagement>
 		<system>hudson</system>
@@ -1720,7 +1741,8 @@
 		<mail.version>1.4.4</mail.version>
 		<mysql.version>5.1.16</mysql.version>
 		<oracle.version>10.2.0.3.0</oracle.version>
-		<rice.version>2.1.7</rice.version>		
+		<!-- TODO <rice.version>2.1.7.0-rsmart-SNAPSHOT</rice.version> -->
+		<rice.version>2.1.7</rice.version>
 		<selenium.version>2.21.0</selenium.version>
 		<servlet.version>2.5</servlet.version>
 		<jsp-api.version>2.1</jsp-api.version>
@@ -1828,5 +1850,6 @@
     	<monitoring.listener />
         <monitoring.spring.import />
         <monitoring.spring.service />	
+    <wagon.s3.version>1.1.19</wagon.s3.version>
 	</properties>
 </project>
