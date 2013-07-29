@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation.
+ * Copyright 2005-2013 The Kuali Foundation.
  * 
  * Licensed under the Educational Community License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -89,7 +89,7 @@ import org.kuali.kra.s2s.util.S2SConstants;
  */
 public class RRBudgetV1_1Generator extends RRBudgetBaseGenerator {
 
-	private static final Log LOG = LogFactory.getLog(RRBudgetV1_0Generator.class);
+	private static final Log LOG = LogFactory.getLog(RRBudgetV1_1Generator.class);
 
 	/**
 	 * This method returns RRBudgetDocument object based on proposal development
@@ -120,6 +120,7 @@ public class RRBudgetV1_1Generator extends RRBudgetBaseGenerator {
 		List<BudgetPeriodInfo> budgetperiodList;
 		BudgetSummaryInfo budgetSummary = null;
 		try {
+		    validateBudgetForForm(pdDoc);
 			budgetperiodList = s2sBudgetCalculatorService
 					.getBudgetPeriods(pdDoc);
 			budgetSummary = s2sBudgetCalculatorService.getBudgetInfo(pdDoc,budgetperiodList);

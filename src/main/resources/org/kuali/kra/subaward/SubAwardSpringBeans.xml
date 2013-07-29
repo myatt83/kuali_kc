@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-	Copyright 2005-2010 The Kuali Foundation.
+	Copyright 2005-2013 The Kuali Foundation.
 
 	Licensed under the Educational Community License, Version 1.0 (the "License");
 	you may not use this file except in compliance with the License.
@@ -128,6 +128,8 @@
         <property name="serviceName" value="sequenceAccessorService" />
     </bean>
     
+    <bean id="subAwardNotificationRoleQualifierService" class="org.kuali.kra.subaward.notification.SubAwardNotificationRoleQualifierServiceImpl" scope="prototype" />
+    
     <bean id="unitAuthorizationService" class="org.kuali.rice.krad.config.GlobalResourceLoaderServiceFactoryBean">
         <property name="serviceName" value="unitAuthorizationService" />
     </bean>
@@ -153,6 +155,26 @@
     </bean>
     
     <!-- SubAward Services -->
+    <bean id="subAwardPrintingService" class="org.kuali.kra.subawardReporting.printing.service.impl.SubAwardPrintingServiceImpl">
+    	<property name="subAwardSF294Print" ref="subAwardSF294Print" />
+    	<property name="subAwardSF295Print" ref="subAwardSF295Print" />
+    	<property name="printingService" ref="printingService" />    	
+    </bean>
+    
+    <bean id="subAwardSF294Print" class="org.kuali.kra.subawardReporting.printing.print.SubAwardSF294Print">
+        <property name="xmlStream" ref="subawardXmlStream" />
+    </bean>
+    <bean id="subAwardSF295Print" class="org.kuali.kra.subawardReporting.printing.print.SubAwardSF295Print">
+        <property name="xmlStream" ref="subawardXmlStream" />
+    </bean>
+    
+    <bean id="subawardXmlStream" class="org.kuali.kra.subawardReporting.printing.xmlstream.SubawardXmlStream">
+        <property name="businessObjectService" ref="businessObjectService" />
+    </bean>
+    
+    <bean id="printingService" class="org.kuali.rice.krad.config.GlobalResourceLoaderServiceFactoryBean">
+        <property name="serviceName" value="printingService" />
+    </bean>
     
     <bean id="subAwardService" class="org.kuali.kra.subaward.service.impl.SubAwardServiceImpl">
         <property name="businessObjectService" ref="businessObjectService" />
@@ -191,6 +213,10 @@
                 
                  <bean class="org.kuali.kra.subaward.document.authorizer.ModifySubAwardAutherizer" parent="parentSubAwardAuthorizer">
                     <property name="taskName" value="modifySubaward" />
+                </bean>
+                
+                <bean class="org.kuali.kra.subaward.document.authorizer.addInvoiceSubAwardAuthorizer" parent="parentSubAwardAuthorizer">
+                    <property name="taskName" value="addInvoiceSubAward" />
                 </bean>          
             </list>
          </property>
@@ -200,8 +226,9 @@
 
     </bean>
     
-	<bean class="org.kuali.rice.ksb.api.bus.support.CallbackServiceExporter" p:serviceBus-ref="kc.import.serviceBus" 
-		p:callbackService-ref="subAwardRequisitionerDerivedRoleTypeService" p:localServiceName="subAwardRequisitionerDerivedRoleTypeService" 
-		p:serviceInterface="org.kuali.rice.kim.framework.role.RoleTypeService" p:serviceNameSpaceURI="" />
+	<bean id="subAwardRequisitionerDerivedRoleTypeServiceCallback" parent="kcCallbackService" 
+		p:callbackService-ref="subAwardRequisitionerDerivedRoleTypeService" 
+		p:localServiceName="subAwardRequisitionerDerivedRoleTypeService" 
+		p:serviceInterface="org.kuali.rice.kim.framework.role.RoleTypeService"/>
 	
 </beans>	

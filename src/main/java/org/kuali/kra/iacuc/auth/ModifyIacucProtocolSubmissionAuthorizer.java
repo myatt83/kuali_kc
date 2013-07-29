@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,13 @@ package org.kuali.kra.iacuc.auth;
 
 import org.kuali.kra.iacuc.actions.IacucProtocolActionType;
 import org.kuali.kra.infrastructure.PermissionConstants;
-import org.kuali.kra.protocol.Protocol;
+import org.kuali.kra.protocol.ProtocolBase;
 
 public class ModifyIacucProtocolSubmissionAuthorizer extends IacucProtocolAuthorizer {
 
     @Override
     public boolean isAuthorized(String userId, IacucProtocolTask task) {
-        Protocol protocol = task.getProtocol();
+        ProtocolBase protocol = task.getProtocol();
         return hasPermission(userId, protocol, PermissionConstants.MODIFY_IACUC_PROTO_SUBMISSION) 
             && canExecuteAction(task.getProtocol(), IacucProtocolActionType.MODIFY_PROTOCOL_SUBMISSION);
     }

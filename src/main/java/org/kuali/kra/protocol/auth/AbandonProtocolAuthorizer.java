@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.kuali.kra.infrastructure.PermissionConstants;
-import org.kuali.kra.protocol.Protocol;
+import org.kuali.kra.protocol.ProtocolBase;
 import org.kuali.kra.irb.actions.ProtocolAction;
 import org.kuali.kra.irb.actions.ProtocolActionType;
 import org.kuali.rice.kim.api.identity.Person;
@@ -29,7 +29,7 @@ import org.kuali.rice.krad.util.GlobalVariables;
  * 
  * This class to check whether user has authorization to abandon protocol
  */
-public class AbandonProtocolAuthorizer extends ProtocolAuthorizer {
+public class AbandonProtocolAuthorizer extends ProtocolAuthorizerBase {
 
     private static final List<String> APPROVE_ACTION_TYPES;
     static {
@@ -41,13 +41,11 @@ public class AbandonProtocolAuthorizer extends ProtocolAuthorizer {
     }
 
     /**
-     * @see org.kuali.kra.protocol.auth.ProtocolAuthorizer#isAuthorized(java.lang.String, org.kuali.kra.protocol.auth.ProtocolTask)
+     * @see org.kuali.kra.protocol.auth.ProtocolAuthorizerBase#isAuthorized(java.lang.String, org.kuali.kra.protocol.auth.ProtocolTaskBase)
      */
-    public boolean isAuthorized(String userId, ProtocolTask task) {
+    public boolean isAuthorized(String userId, ProtocolTaskBase task) {
         // TODO : permission : PI and protocol has never been approved. protocol status is SRR/SMR
         return canExecuteAction(task.getProtocol(), ProtocolActionType.ABANDON_PROTOCOL) 
-            //&& isInitialProtocol(task.getProtocol())
-            //&& isPrincipalInvestigator(task.getProtocol()) ;
             && (hasPermission(userId, task.getProtocol(), PermissionConstants.SUBMIT_PROTOCOL)
                     || hasPermission(userId, task.getProtocol(), PermissionConstants.MODIFY_ANY_PROTOCOL));
     }
@@ -55,24 +53,15 @@ public class AbandonProtocolAuthorizer extends ProtocolAuthorizer {
     /*
      * check if this protocol has not been approved
      */
-    private boolean isInitialProtocol(Protocol protocol) {
+    private boolean isInitialProtocol(ProtocolBase protocol) {
         boolean initialProtocol = true;
-        
-        /* -- commented as part of GENERATED CODE need to verify
-        for (ProtocolAction action : protocol.getProtocolActions()) {
-            if (APPROVE_ACTION_TYPES.contains(action.getProtocolActionTypeCode())) {
-                initialProtocol = false;
-                break;
-            }
-        }
-        */
         return initialProtocol;
     }
     
     /*
      * check if user is PI
      */
-    private boolean isPrincipalInvestigator(Protocol protocol) {
+    private boolean isPrincipalInvestigator(ProtocolBase protocol) {
         Person user = GlobalVariables.getUserSession().getPerson();
         boolean isPi = false;
         if (user.getPrincipalId().equals(protocol.getPrincipalInvestigator().getPersonId())) {

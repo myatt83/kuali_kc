@@ -49,13 +49,11 @@
                 </start>
                 <requests name="PeopleFlows">
                     <activationType>R</activationType>
-                    <rulesEngine executorClass="org.kuali.kra.iacuc.rules.IacucProtocolRulesEngineExecutorImpl"/>
+                    <rulesEngine executorClass="org.kuali.kra.iacuc.IacucProtocolRulesEngineExecutorImpl"/>
                 </requests>
                  <role name="IACUCReview">
 					<qualifierResolver>IACUC ProtocolApprover-XPathQualifierResolver</qualifierResolver> 
-                    <activationType>P</activationType>
-                    <mandatoryRoute>true</mandatoryRoute>                    
-					<finalApproval>false</finalApproval>
+                    <activationType>S</activationType>
 	            </role>   
             </routeNodes>
             <parent>KC</parent>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ import org.kuali.kra.award.home.Award;
 import org.kuali.kra.infrastructure.AwardTaskNames;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.KraServiceLocator;
+import org.kuali.kra.infrastructure.PermissionConstants;
 import org.kuali.kra.infrastructure.TaskName;
 import org.kuali.kra.timeandmoney.AwardHierarchyNode;
 import org.kuali.rice.coreservice.framework.parameter.ParameterConstants;
@@ -65,8 +66,11 @@ public class AwardDocumentAuthorizer extends KcTransactionalDocumentAuthorizerBa
         if (awardDocument.getAward().getAwardId() == null) {
             if (canCreateAward(user.getPrincipalId())) {
                 editModes.add(AuthorizationConstants.EditMode.FULL_ENTRY);         
-                if (canViewChartOfAccountsElement()) {
+                if (canViewChartOfAccountsElement(awardDocument)) {
                     editModes.add("viewChartOfAccountsElement");
+                }
+                if (canViewAccountElement(awardDocument)) {
+                    editModes.add("viewAccountElement");
                 }
             }
             else {
@@ -74,7 +78,8 @@ public class AwardDocumentAuthorizer extends KcTransactionalDocumentAuthorizerBa
             }
         }
         else {
-            if (canExecuteAwardTask(user.getPrincipalId(), awardDocument, AwardTaskNames.MODIFY_AWARD.getAwardTaskName())) {  
+            boolean isCanceled = awardDocument.isCanceled();
+            if (!awardDocument.isCanceled() && canExecuteAwardTask(user.getPrincipalId(), awardDocument, AwardTaskNames.MODIFY_AWARD.getAwardTaskName())) {  
                 editModes.add(AuthorizationConstants.EditMode.FULL_ENTRY);
             }
             else if (canExecuteAwardTask(user.getPrincipalId(), awardDocument, AwardTaskNames.VIEW_AWARD.getAwardTaskName())) {
@@ -84,7 +89,7 @@ public class AwardDocumentAuthorizer extends KcTransactionalDocumentAuthorizerBa
                 editModes.add(AuthorizationConstants.EditMode.UNVIEWABLE);
             }
             
-            if (canExecuteAwardTask(user.getPrincipalId(), awardDocument, TaskName.ADD_BUDGET)) {
+            if (!isCanceled && canExecuteAwardTask(user.getPrincipalId(), awardDocument, TaskName.ADD_BUDGET)) {
                 editModes.add("addBudget");
             }
                     
@@ -92,7 +97,7 @@ public class AwardDocumentAuthorizer extends KcTransactionalDocumentAuthorizerBa
                 editModes.add("openBudgets");
             }
                     
-            if (canExecuteAwardTask(user.getPrincipalId(), awardDocument, TaskName.MODIFY_BUDGET)) {
+            if (!isCanceled && canExecuteAwardTask(user.getPrincipalId(), awardDocument, TaskName.MODIFY_BUDGET)) {
                 editModes.add("modifyAwardBudget");
             }
             
@@ -106,8 +111,11 @@ public class AwardDocumentAuthorizer extends KcTransactionalDocumentAuthorizerBa
             if (awardHasHierarchyChildren(document)) {
                 editModes.add("awardSync");
             }   
-            if (canViewChartOfAccountsElement()) {
+            if (canViewChartOfAccountsElement(awardDocument)) {
                 editModes.add("viewChartOfAccountsElement");
+            }
+            if (canViewAccountElement(awardDocument)) {
+                editModes.add("viewAccountElement");
             }
         }
         
@@ -138,7 +146,7 @@ public class AwardDocumentAuthorizer extends KcTransactionalDocumentAuthorizerBa
             
             // if the integration parameter is ON
             if (isFinancialSystemIntegrationParameterOn()) {
-                hasPermission = hasCreateAccountPermission();
+                hasPermission = hasCreateAccountPermission(awardDocument);
                 // only the OSP admin can create a financial account
                 // if account has already been created, anyone can see it
                 if (award.getFinancialAccountDocumentNumber() != null) {
@@ -151,34 +159,40 @@ public class AwardDocumentAuthorizer extends KcTransactionalDocumentAuthorizerBa
     }
     
     protected boolean isFinancialSystemIntegrationParameterOn() {
-        String awardAccountParameter = getParameterService().getParameterValueAsString (
+        Boolean awardAccountParameter = getParameterService().getParameterValueAsBoolean (
                                                                 Constants.PARAMETER_MODULE_AWARD, 
                                                                 ParameterConstants.DOCUMENT_COMPONENT, 
                                                                 Constants.FIN_SYSTEM_INTEGRATION_ON_OFF_PARAMETER);
-        return awardAccountParameter.equalsIgnoreCase(Constants.FIN_SYSTEM_INTEGRATION_ON) ? true : false;
+        return awardAccountParameter;
     }
     
-    public boolean hasCreateAccountPermission() {
-        boolean hasPermission = false;
-        Map<String,String> set =new HashMap<String,String>();
-        set.put("documentTypeName", "AwardDocument");
-        set.put("documentAction", "Create award account");
-        // if the user has permission.
-        hasPermission = getPermissionService().hasPermission(GlobalVariables.getUserSession().getPrincipalId(), 
-                                                                "KC-AWARD", "Create Award Account");
-        return hasPermission;    
+    public boolean hasCreateAccountPermission(AwardDocument document) {  
+        return canExecuteAwardTask(GlobalVariables.getUserSession().getPrincipalId(), document, AwardTaskNames.CREATE_AWARD_ACCOUNT.getAwardTaskName());
     }
     
     /*
-     * Same permissions for creating and linking accounts
+     * This only appears when the integration is ON
      */
-    public boolean canViewChartOfAccountsElement() {
-        if (hasCreateAccountPermission() && isFinancialSystemIntegrationParameterOn()) {
+    public boolean canViewChartOfAccountsElement(AwardDocument document) {
+        if (hasCreateAccountPermission(document) && isFinancialSystemIntegrationParameterOn()) {
             return true;
         }
         return false;
     }
-    
+    /*
+     * This field appears even if the financial integration if OFF 
+     * but when it is ON, the user needs to have
+     * the create account permission to view it.
+     */
+    public boolean canViewAccountElement(AwardDocument document) {
+        boolean hasPermission = true;
+        if (isFinancialSystemIntegrationParameterOn()) { 
+            if (!hasCreateAccountPermission(document)) {
+                hasPermission = false;
+            }
+        }
+        return hasPermission;
+    }
     /**
      * @see org.kuali.rice.kns.document.authorization.DocumentAuthorizer#canOpen(org.kuali.rice.krad.document.Document, org.kuali.rice.kim.api.identity.Person)
      */
@@ -195,7 +209,8 @@ public class AwardDocumentAuthorizer extends KcTransactionalDocumentAuthorizerBa
      */
     @Override
     public boolean canEdit(Document document, Person user) {
-        return canExecuteAwardTask(user.getPrincipalId(), (AwardDocument) document, AwardTaskNames.MODIFY_AWARD.getAwardTaskName());
+        boolean isCanceled = ((AwardDocument)document).isCanceled();
+        return !isCanceled && canExecuteAwardTask(user.getPrincipalId(), (AwardDocument) document, AwardTaskNames.MODIFY_AWARD.getAwardTaskName());
     }
     
     /**
@@ -205,15 +220,7 @@ public class AwardDocumentAuthorizer extends KcTransactionalDocumentAuthorizerBa
     public boolean canSave(Document document, Person user) {
         return canEdit(document, user);
     }
-    
-    /**
-     * @see org.kuali.kra.authorization.KcTransactionalDocumentAuthorizerBase#canReload(org.kuali.rice.krad.document.Document, org.kuali.rice.kim.api.identity.Person)
-     */
-    @Override
-    public boolean canReload(Document document, Person user) {
-        return canEdit(document, user);
-    }
-    
+  
     /**
      * @see org.kuali.kra.authorization.KcTransactionalDocumentAuthorizerBase#canCopy(org.kuali.rice.krad.document.Document, org.kuali.rice.kim.api.identity.Person)
      */

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,13 @@
  */
 package org.kuali.kra.iacuc.actions.reviewcomments;
 
-import org.kuali.kra.common.committee.meeting.CommitteeScheduleMinute;
+import org.kuali.kra.common.committee.meeting.CommitteeScheduleMinuteBase;
 import org.kuali.kra.iacuc.IacucProtocolDocument;
-import org.kuali.kra.protocol.actions.reviewcomments.ProtocolAddReviewCommentEvent;
+import org.kuali.kra.protocol.actions.reviewcomments.ProtocolAddReviewCommentEventBase;
 
-public class IacucProtocolAddReviewCommentEvent extends ProtocolAddReviewCommentEvent {
+public class IacucProtocolAddReviewCommentEvent extends ProtocolAddReviewCommentEventBase {
 
-    public IacucProtocolAddReviewCommentEvent(IacucProtocolDocument document, String propertyName, CommitteeScheduleMinute reviewComment) {
+    public IacucProtocolAddReviewCommentEvent(IacucProtocolDocument document, String propertyName, CommitteeScheduleMinuteBase reviewComment) {
         super(document, propertyName, reviewComment);
     }
 

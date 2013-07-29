@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,14 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.struts.upload.FormFile;
+import org.kuali.kra.SkipVersioning;
+import org.kuali.kra.bo.Organization;
+import org.kuali.kra.budget.core.Budget;
 import org.kuali.kra.budget.core.BudgetAssociate;
+import org.kuali.kra.infrastructure.DeepCopyIgnore;
 import org.kuali.kra.proposaldevelopment.hierarchy.HierarchyMaintainable;
 
 /**
@@ -42,7 +48,11 @@ public class BudgetSubAwards extends BudgetAssociate implements HierarchyMaintai
 
     private String comments;
 
+    private String organizationId;
+    
     private String organizationName;
+    
+    private Organization organization;
 
     private Integer subAwardStatusCode;
 
@@ -69,6 +79,8 @@ public class BudgetSubAwards extends BudgetAssociate implements HierarchyMaintai
     private List<BudgetSubAwardAttachment> budgetSubAwardAttachments;
 
     private List<BudgetSubAwardFiles> budgetSubAwardFiles;
+    
+    private List<BudgetSubAwardPeriodDetail> budgetSubAwardPeriodDetails;
 
     private String hierarchyProposalNumber;
 
@@ -81,6 +93,7 @@ public class BudgetSubAwards extends BudgetAssociate implements HierarchyMaintai
     public BudgetSubAwards() {
         budgetSubAwardAttachments = new ArrayList<BudgetSubAwardAttachment>();
         budgetSubAwardFiles = new ArrayList<BudgetSubAwardFiles>();
+        budgetSubAwardPeriodDetails = new ArrayList<BudgetSubAwardPeriodDetail>();
     }
 
     public String getProposalNumber() {
@@ -369,17 +382,63 @@ public class BudgetSubAwards extends BudgetAssociate implements HierarchyMaintai
     public int compareTo(BudgetSubAwards o) {
         int retVal = -1;
         if (o != null) {
-            retVal = this.getOrganizationName().compareTo(o.getOrganizationName());
+            retVal = ObjectUtils.compare(getOrganizationName(), o.getOrganizationName());
             if (retVal == 0) {
-                retVal = this.getComments().compareTo(o.getComments());
+                retVal = ObjectUtils.compare(getComments(), o.getComments());
                 if (retVal == 0) {
-                    retVal = this.getSubAwardXfdFileName().compareTo(o.getSubAwardXfdFileName());
+                    retVal = ObjectUtils.compare(getSubAwardXfdFileName(), o.getSubAwardXfdFileName());
                     if (retVal == 0) {
-                        retVal = this.getSubAwardNumber().compareTo(o.getSubAwardNumber());
+                        retVal = ObjectUtils.compare(getSubAwardNumber(), o.getSubAwardNumber());
                     }
                 }
             }
         }
         return retVal;
     }
+
+    public List<BudgetSubAwardPeriodDetail> getBudgetSubAwardPeriodDetails() {
+        return budgetSubAwardPeriodDetails;
+    }
+
+    public void setBudgetSubAwardPeriodDetails(List<BudgetSubAwardPeriodDetail> budgetSubAwardPeriodDetails) {
+        this.budgetSubAwardPeriodDetails = budgetSubAwardPeriodDetails;
+    }
+
+    public String getOrganizationId() {
+        return organizationId;
+    }
+
+    public void setOrganizationId(String organizationId) {
+        if (!StringUtils.equals(this.organizationId, organizationId)) {
+            this.organizationId = organizationId;
+            refreshReferenceObject("organization");
+            if (getOrganization() != null) {
+                setOrganizationName(getOrganization().getOrganizationName());
+            }
+        }
+    }
+
+    public Organization getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(Organization organization) {
+        this.organization = organization;
+    }
+    
+    public void computePeriodDetails() {
+        for (BudgetSubAwardPeriodDetail detail : getBudgetSubAwardPeriodDetails()) {
+            detail.computeTotal();
+        }
+    }
+    
+    public boolean hasModifiedAmounts() {
+        for (BudgetSubAwardPeriodDetail detail : getBudgetSubAwardPeriodDetails()) {
+            if (detail.isAmountsModified()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

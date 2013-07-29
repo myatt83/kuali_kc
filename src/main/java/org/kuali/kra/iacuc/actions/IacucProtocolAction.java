@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  *
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,20 @@
 package org.kuali.kra.iacuc.actions;
 
 import org.kuali.kra.bo.CoeusModule;
+import org.kuali.kra.common.committee.service.CommitteeServiceBase;
 import org.kuali.kra.iacuc.IacucProtocol;
 import org.kuali.kra.iacuc.actions.submit.IacucProtocolSubmission;
-import org.kuali.kra.protocol.actions.ProtocolAction;
+import org.kuali.kra.iacuc.committee.service.IacucCommitteeService;
+import org.kuali.kra.iacuc.questionnaire.IacucSubmissionQuestionnaireHelper;
+import org.kuali.kra.protocol.ProtocolBase;
+import org.kuali.kra.protocol.actions.ProtocolActionBase;
+import org.kuali.kra.protocol.questionnaire.ProtocolSubmissionQuestionnaireHelper;
 
 /**
  * 
  * This class manages all the attributes needed to maintain a protocol action.
  */
-public class IacucProtocolAction extends ProtocolAction {
+public class IacucProtocolAction extends ProtocolActionBase {
     
     private static final long serialVersionUID = -4895673225969021493L;
 
@@ -53,5 +58,15 @@ public class IacucProtocolAction extends ProtocolAction {
         this.createdSubmission = createdSubmission;
     }
     
+    @Override
+    protected Class<? extends CommitteeServiceBase> getCommitteeServiceClassHook() {
+        return IacucCommitteeService.class;
+    }
+
+    @Override
+    protected ProtocolSubmissionQuestionnaireHelper getProtocolSubmissionQuestionnaireHelperHook(ProtocolBase protocol, String actionTypeCode,
+            String submissionNumber) {
+        return new IacucSubmissionQuestionnaireHelper(protocol, actionTypeCode, submissionNumber, true);
+    }
     
 }

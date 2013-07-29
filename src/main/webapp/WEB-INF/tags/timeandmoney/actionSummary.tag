@@ -1,5 +1,5 @@
 <%--
- Copyright 2005-2010 The Kuali Foundation
+ Copyright 2005-2013 The Kuali Foundation
  
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -49,36 +49,24 @@
         	</tr>
         	<c:forEach var="timeAndMoneyActionSummaryItems" items="${KualiForm.document.timeAndMoneyActionSummaryItems}" varStatus="status">
         	<tr>
-        		<td align="center" valign="middle" >
-        		<div align="center">
+        		<td class="datacell"><div>
         			<fmt:formatDate value="${timeAndMoneyActionSummaryItems.noticeDate}" pattern="MM/dd/yyyy" />
-				</div>	
-				</td>
-				<td align="center" valign="middle" >
-				<div align="center">								        		
+				</div></td>
+				<td class="datacell"><div>								        		
 					${timeAndMoneyActionSummaryItems.transactionType}
-				</div>
-				</td>
-				<td align="center" valign="middle" >
-				<div align="center">
+				</div></td>
+				<td class="datacell"><div>
 					<fmt:formatDate value="${timeAndMoneyActionSummaryItems.obligationStartDate}" pattern="MM/dd/yyyy" />
-				</div>
-				</td>
-				<td align="center" valign="middle" >
-				<div align="center">
+				</div></td>
+				<td class="datacell"><div>
 					<fmt:formatDate value="${timeAndMoneyActionSummaryItems.obligationEndDate}" pattern="MM/dd/yyyy" />
-				</div>
-				</td>
-				<td align="center" valign="middle" >
-				<div align="center">				        		
-					${timeAndMoneyActionSummaryItems.obligationCumulative}
-				</div>
-				</td>
-				<td align="center" valign="middle" >
-				<div align="center">				        		
-					${timeAndMoneyActionSummaryItems.changeAmount}
-				</div>
-				</td>
+				</div></td>
+				<td class="datacell"><div>				        		
+					<fmt:formatNumber type="currency" currencySymbol="" value="${timeAndMoneyActionSummaryItems.obligationCumulative}"/>
+				</div></td>
+				<td class="datacell"><div>				        		
+					<fmt:formatNumber type="currency" currencySymbol="" value="${timeAndMoneyActionSummaryItems.changeAmount}"/>
+				</div></td>
         	</tr>
         	</c:forEach>
         

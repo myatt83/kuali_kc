@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.kuali.kra.bo.CoeusModule;
 import org.kuali.kra.common.notification.service.KcNotificationService;
-//temp import org.kuali.kra.iacuc.actions.IacucProtocolSubmissionBuilder;
-import org.kuali.kra.protocol.actions.submit.ProtocolActionService;
 import org.kuali.kra.iacuc.IacucProtocol;
 import org.kuali.kra.iacuc.actions.IacucProtocolAction;
 import org.kuali.kra.iacuc.actions.IacucProtocolActionType;
@@ -35,8 +33,8 @@ import org.kuali.kra.iacuc.actions.submit.IacucProtocolReviewType;
 import org.kuali.kra.iacuc.actions.submit.IacucProtocolSubmission;
 import org.kuali.kra.iacuc.actions.submit.IacucProtocolSubmissionBuilder;
 import org.kuali.kra.iacuc.actions.submit.IacucProtocolSubmissionStatus;
+import org.kuali.kra.iacuc.notification.IacucProtocolNotification;
 import org.kuali.kra.iacuc.notification.IacucProtocolNotificationContext;
-import org.kuali.kra.iacuc.notification.IacucProtocolNotificationRenderer;
 import org.kuali.kra.iacuc.notification.IacucProtocolRequestActionNotificationRenderer;
 import org.kuali.kra.questionnaire.answer.AnswerHeader;
 import org.kuali.rice.kew.api.exception.WorkflowException;
@@ -82,9 +80,6 @@ public class IacucProtocolRequestServiceImpl implements IacucProtocolRequestServ
          * The submission is created first so that its new primary key can be added
          * to the protocol action entry.
          */
-        // if doing request following 'Approve' immediately, it may get OLE issue, which is caused by saving documentheader
-        // refresh ProtodolDocument to keep it uptodate
-//        protocol.refreshReferenceObject("protocolDocument");
         String prevSubmissionStatusCode = protocol.getProtocolSubmission().getSubmissionStatusCode();
 
         IacucProtocolSubmission submission = createProtocolSubmission(protocol, requestBean);
@@ -109,13 +104,7 @@ public class IacucProtocolRequestServiceImpl implements IacucProtocolRequestServ
             requestBean.setAnswerHeaders(new ArrayList<AnswerHeader>());
         }
         cleanUnreferencedQuestionnaire(protocol.getProtocolNumber());
-//        businessObjectService.save(protocol.getProtocolDocument());
         documentService.saveDocument(protocol.getProtocolDocument());
-//        try {
-//            sendRequestNotification(protocol, requestBean);
-//        } catch (Exception e) {
-//            LOG.info("Request notification exception " + e.getStackTrace());
-//        }
     }
     
     private void saveQuestionnaire(IacucProtocolRequestBean requestBean, Integer submissionNumber) {
@@ -160,7 +149,6 @@ public class IacucProtocolRequestServiceImpl implements IacucProtocolRequestServ
         submissionBuilder.setProtocolReviewTypeCode(IacucProtocolReviewType.FULL_COMMITTEE_REVIEW);
         submissionBuilder.setSubmissionStatus(IacucProtocolSubmissionStatus.PENDING);
         submissionBuilder.setCommittee(requestBean.getCommitteeId());
-       // submissionBuilder.addAttachment(requestBean.getFile());
         submissionBuilder.setActionAttachments(requestBean.getActionAttachments());
         return submissionBuilder.create();
     }
@@ -175,7 +163,7 @@ public class IacucProtocolRequestServiceImpl implements IacucProtocolRequestServ
         
         IacucProtocolRequestActionNotificationRenderer renderer = new IacucProtocolRequestActionNotificationRenderer(protocol, requestBean.getReason());
         IacucProtocolNotificationContext context = new IacucProtocolNotificationContext(protocol, protocolActionTypeCode, description, renderer);
-        kcNotificationService.sendNotification(context);
+        getKcNotificationService().sendNotificationAndPersist(context, new IacucProtocolNotification(), protocol);
     }
 
 
@@ -185,6 +173,10 @@ public class IacucProtocolRequestServiceImpl implements IacucProtocolRequestServ
     
     public void setKcNotificationService(KcNotificationService kcNotificationService) {
         this.kcNotificationService = kcNotificationService;
+    }
+
+    public KcNotificationService getKcNotificationService() {
+        return kcNotificationService;
     }
 
 }

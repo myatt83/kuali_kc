@@ -1,5 +1,5 @@
 <%--
- Copyright 2005-2010 The Kuali Foundation
+ Copyright 2005-2013 The Kuali Foundation
 
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 
 <kul:documentPage
     showDocumentInfo="true"
-    htmlFormAction="coiDisclosure"
+    htmlFormAction="coiUpdateDisclosure"
     documentTypeName="CoiDisclosureDocument"
     renderMultipart="true"
     showTabButtons="true"
@@ -70,6 +70,24 @@
                $j(".financialEntitySubpanel").click();
            }
                 
+        	if ($j(".disclosedProjectsSubpanel").length > 0) {
+                $j(".disclosedProjectsSubpanel").toggle(
+                         function()
+                         {
+                        	 var controlId = $j(this).attr("id");
+                             var contentId = controlId.replace("Control","Content");
+                             $j("#"+contentId).hide();
+                             $j(this).html("<img src='kr/images/tinybutton-show.gif' alt='show/hide panel' width='45' height='15' border='0' align='absmiddle'>");
+                         },function(){
+                             var controlId = $j(this).attr("id");
+                             var contentId = controlId.replace("Control","Content");
+                             $j("#"+contentId).slideDown(500);
+                             $j(this).html("<img src='kr/images/tinybutton-hide.gif' alt='show/hide panel' width='45' height='15' border='0' align='absmiddle'>");
+                         }
+                );
+                $j(".disclosedProjectsSubpanel").click();
+            }
+            
             }) // end document ready
             
 
@@ -86,11 +104,16 @@
 	<kra-coi:disclosureQuestionnaire />
 	<script type="text/javascript" src="scripts/questionnaireAnswer.js"></script>
 </c:if> 
-<kra-coi:updateDisclosureProjects/>
+<kra-coi:allDisclosedProjects/>
 <kra-coi:coiNoteAndAttachment/>
+<c:set var="masterDisclosure" value="${KualiForm.disclosureHelper.masterDisclosureBean}" />
+<c:if test="${fn:length(masterDisclosure.allProjects) > 0}" >
+    <kra-coi:masterDisclosures />
+</c:if>
 <kra-coi:coiCertification topTab="false" />
+<c:if test="${KualiForm.document.coiDisclosure.disclosureSaved}">
 <kra:dataValidation auditActivated="${KualiForm.auditActivated}" topTab="false"/>
-
+</c:if>
 
 <kul:panelFooter />
     <kul:documentControls 

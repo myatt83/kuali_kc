@@ -1,5 +1,5 @@
 <!--
- Copyright 2005-2010 The Kuali Foundation.
+ Copyright 2005-2013 The Kuali Foundation.
  
  Licensed under the Educational Community License, Version 1.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -37,6 +37,7 @@
         <field-descriptor name="updateTimestamp" column="UPDATE_TIMESTAMP" jdbc-type="TIMESTAMP" />
         <field-descriptor name="updateUser" column="UPDATE_USER" jdbc-type="VARCHAR" />
         <field-descriptor name="deadlineDate" column="DEADLINE_DATE" jdbc-type="DATE" />
+        <field-descriptor name="deadlineTime" column="DEADLINE_TIME" jdbc-type="VARCHAR" />
         <field-descriptor name="fiscalMonth" column="FISCAL_MONTH" jdbc-type="INTEGER" />
         <field-descriptor name="fiscalYear" column="FISCAL_YEAR" jdbc-type="INTEGER" />
         <field-descriptor name="versionNumber" column="VER_NBR" jdbc-type="BIGINT" locking="false" />
@@ -45,7 +46,7 @@
         <reference-descriptor name="proposalType" class-ref="org.kuali.kra.proposaldevelopment.bo.ProposalType" auto-retrieve="true" auto-update="none" auto-delete="none"> 
             <foreignkey field-ref="proposalTypeCode"/>
         </reference-descriptor>
-        <reference-descriptor name="unit" class-ref="org.kuali.kra.bo.Unit" auto-retrieve="false" auto-update="none" auto-delete="none"> 
+        <reference-descriptor name="unit" class-ref="org.kuali.kra.bo.Unit" auto-retrieve="true" auto-update="none" auto-delete="none"> 
             <foreignkey field-ref="leadUnit"/>
         </reference-descriptor>
         <reference-descriptor name="rolodex" class-ref="org.kuali.kra.bo.NonOrganizationalRolodex" auto-retrieve="true" auto-update="none" auto-delete="none"> 
@@ -60,6 +61,10 @@
         <reference-descriptor name="proposalLogType" class-ref="org.kuali.kra.institutionalproposal.proposallog.ProposalLogType" auto-retrieve="true" auto-update="none" auto-delete="none"> 
             <foreignkey field-ref="proposalLogTypeCode" />
         </reference-descriptor>
+        <reference-descriptor name="mergedWithProposal" class-ref="org.kuali.kra.institutionalproposal.proposallog.ProposalLog" auto-retrieve="true" auto-update="none" auto-delete="none"> 
+            <foreignkey field-ref="mergedWith" />
+        </reference-descriptor>
+        
     </class-descriptor>
     
     <class-descriptor class="org.kuali.kra.institutionalproposal.proposallog.ProposalLogStatus" table="PROPOSAL_LOG_STATUS">
@@ -126,6 +131,7 @@
 		<field-descriptor name="totalIndirectCostTotal" column="TOTAL_INDIRECT_COST_TOTAL" jdbc-type="DECIMAL" conversion="org.kuali.rice.core.framework.persistence.ojb.conversion.OjbKualiDecimalFieldConversion" />
 		<field-descriptor name="numberOfCopies" column="NUMBER_OF_COPIES" jdbc-type="VARCHAR" />
 		<field-descriptor name="deadlineDate" column="DEADLINE_DATE" jdbc-type="DATE" />
+		<field-descriptor name="deadlineTime" column="DEADLINE_TIME" jdbc-type="VARCHAR" />
 		<field-descriptor name="deadlineType" column="DEADLINE_TYPE" jdbc-type="VARCHAR"/>
 		<field-descriptor name="mailBy" column="MAIL_BY" jdbc-type="VARCHAR" />
 		<field-descriptor name="mailType" column="MAIL_TYPE" jdbc-type="VARCHAR" />
@@ -240,6 +246,45 @@
 			<inverse-foreignkey field-ref="proposalId"/>
 		</collection-descriptor>
 	</class-descriptor>
+	<class-descriptor class="org.kuali.kra.institutionalproposal.home.InstitutionalProposalBoLite" table="PROPOSAL">
+		<field-descriptor name="proposalId" column="PROPOSAL_ID" jdbc-type="BIGINT" primarykey="true" autoincrement="true" sequence-name="SEQ_PROPOSAL_PROPOSAL_ID"/>
+		<field-descriptor name="proposalNumber" column="PROPOSAL_NUMBER" jdbc-type="VARCHAR" />
+		<field-descriptor name="sequenceNumber" column="SEQUENCE_NUMBER" jdbc-type="INTEGER" />
+		<field-descriptor name="proposalTypeCode" column="PROPOSAL_TYPE_CODE" jdbc-type="INTEGER" />
+		<field-descriptor name="statusCode" column="STATUS_CODE" jdbc-type="INTEGER" />
+		<field-descriptor name="title" column="TITLE" jdbc-type="VARCHAR" />
+		<field-descriptor name="sponsorCode" column="SPONSOR_CODE" jdbc-type="VARCHAR" />
+		<field-descriptor name="activityTypeCode" column="ACTIVITY_TYPE_CODE" jdbc-type="VARCHAR" />
+		<field-descriptor name="requestedStartDateInitial" column="REQUESTED_START_DATE_INITIAL" jdbc-type="DATE" />
+		<field-descriptor name="requestedStartDateTotal" column="REQUESTED_START_DATE_TOTAL" jdbc-type="DATE" />
+		<field-descriptor name="requestedEndDateInitial" column="REQUESTED_END_DATE_INITIAL" jdbc-type="DATE" />
+		<field-descriptor name="requestedEndDateTotal" column="REQUESTED_END_DATE_TOTAL" jdbc-type="DATE" />
+		<field-descriptor name="totalDirectCostInitial" column="TOTAL_DIRECT_COST_INITIAL" jdbc-type="DECIMAL" conversion="org.kuali.rice.core.framework.persistence.ojb.conversion.OjbKualiDecimalFieldConversion" />
+		<field-descriptor name="totalDirectCostTotal" column="TOTAL_DIRECT_COST_TOTAL" jdbc-type="DECIMAL" conversion="org.kuali.rice.core.framework.persistence.ojb.conversion.OjbKualiDecimalFieldConversion" />
+		<field-descriptor name="totalIndirectCostInitial" column="TOTAL_INDIRECT_COST_INITIAL" jdbc-type="DECIMAL" conversion="org.kuali.rice.core.framework.persistence.ojb.conversion.OjbKualiDecimalFieldConversion" />
+		<field-descriptor name="totalIndirectCostTotal" column="TOTAL_INDIRECT_COST_TOTAL" jdbc-type="DECIMAL" conversion="org.kuali.rice.core.framework.persistence.ojb.conversion.OjbKualiDecimalFieldConversion" />
+		<field-descriptor name="updateTimestamp" column="UPDATE_TIMESTAMP" jdbc-type="TIMESTAMP" />
+		<field-descriptor name="updateUser" column="UPDATE_USER" jdbc-type="VARCHAR" />
+		<field-descriptor name="unitNumber" column="LEAD_UNIT_NUMBER" jdbc-type="VARCHAR" />
+		<field-descriptor name="versionNumber" column="VER_NBR" jdbc-type="BIGINT" locking="false" />
+		<field-descriptor name="objectId" column="OBJ_ID" jdbc-type="VARCHAR" />
+		
+        <reference-descriptor name="proposalType" class-ref="org.kuali.kra.proposaldevelopment.bo.ProposalType" auto-retrieve="true" auto-update="none" auto-delete="none"> 
+            <foreignkey field-ref="proposalTypeCode"/>
+        </reference-descriptor>
+        <reference-descriptor name="sponsor" class-ref="org.kuali.kra.bo.Sponsor" auto-retrieve="true" auto-update="none" auto-delete="none"> 
+            <foreignkey field-ref="sponsorCode" />
+        </reference-descriptor>
+        <reference-descriptor name="leadUnit" class-ref="org.kuali.kra.bo.Unit" auto-retrieve="true" auto-update="none" auto-delete="none">
+            <foreignkey field-ref="unitNumber"/>
+        </reference-descriptor>
+        <reference-descriptor name="activityType" class-ref="org.kuali.kra.proposaldevelopment.bo.ActivityType" auto-retrieve="true" auto-update="none" auto-delete="none"> 
+            <foreignkey field-ref="activityTypeCode"/>
+        </reference-descriptor>
+		<collection-descriptor name="projectPersons" proxy="true" element-class-ref="org.kuali.kra.institutionalproposal.contacts.InstitutionalProposalPerson" collection-class="org.apache.ojb.broker.util.collections.ManageableArrayList" auto-retrieve="true" auto-update="object" auto-delete="object">
+            <inverse-foreignkey field-ref="proposalId"/>
+        </collection-descriptor>
+	</class-descriptor>
 	
 	<!--
 	<class-descriptor class="org.kuali.kra.institutionalproposal.home.InstitutionalProposalAdminDetails" table="PROPOSAL_ADMIN_DETAILS">
@@ -338,7 +383,7 @@
         <field-descriptor name="versionNumber" column="VER_NBR" jdbc-type="BIGINT" locking="false" />
         <field-descriptor name="objectId" column="OBJ_ID" jdbc-type="VARCHAR" />
         
-        <reference-descriptor name="customAttribute" class-ref="org.kuali.kra.bo.CustomAttribute" auto-retrieve="false" auto-update="none" auto-delete="none"> 
+        <reference-descriptor name="customAttribute" class-ref="org.kuali.kra.bo.CustomAttribute" auto-retrieve="true" auto-update="none" auto-delete="none"> 
             <foreignkey field-ref="customAttributeId"/>
         </reference-descriptor>
         <reference-descriptor name="institutionalProposal" class-ref="org.kuali.kra.institutionalproposal.home.InstitutionalProposal" auto-retrieve="false" auto-update="none" auto-delete="none"> 

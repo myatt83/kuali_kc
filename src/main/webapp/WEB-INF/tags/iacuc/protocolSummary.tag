@@ -79,7 +79,7 @@
                 ${protocolSummary.piName}&nbsp;
                 <input type="hidden" name="${prefix}.piProtocolPersonId"
                        value="${protocolSummary.piProtocolPersonId}" />
-                <kul:directInquiry boClassName="org.kuali.kra.irb.personnel.ProtocolPerson"
+                <kul:directInquiry boClassName="org.kuali.kra.iacuc.personnel.IacucProtocolPerson"
                                    inquiryParameters="${prefix}.piProtocolPersonId:protocolPersonId" 
                                    anchor="${currentTabIndex}" />
             </td>
@@ -170,10 +170,10 @@
 				            <tr>
 				                <th style="width:50px">&nbsp;</th>
 				                <td class="${attachment.fileNameChanged ? 'changed' : ''}">${attachment.fileName}</td>
-				                <td><div align="left">${attachment.attachmentType}</div></td>
-				                <td><div align="left">${attachment.description}</div></td>
-				                <td><div align="left"><fmt:formatDate value="${attachment.updateTimestamp}" pattern="MM/dd/yyyy KK:mm a" /></div></td>
-				                <td><div align="left">${attachment.updateUser}</div></td>
+				                <td class="${attachment.attachmentTypeChanged ? 'changed' : ''}"><div align="left">${attachment.attachmentType}</div></td>
+				                <td class="${attachment.descriptionChanged ? 'changed' : ''}"><div align="left">${attachment.description}</div></td>
+				                <td class="${attachment.dateChanged ? 'changed' : ''}"><div align="left"><fmt:formatDate value="${attachment.updateTimestamp}" pattern="MM/dd/yyyy KK:mm a" /></div></td>
+				                <td class="${attachment.userChanged ? 'changed' : ''}"><div align="left">${attachment.updateUser}</div></td>
 				                <td style="width:90%">
 				                <c:choose>
 				                    <c:when test="${fn:contains(prefix, 'prevProtocolSummary')}">

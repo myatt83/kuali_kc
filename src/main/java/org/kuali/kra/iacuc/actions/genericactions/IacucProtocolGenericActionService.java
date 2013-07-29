@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,18 +15,18 @@
  */
 package org.kuali.kra.iacuc.actions.genericactions;
 
-import org.kuali.kra.protocol.Protocol;
+import org.kuali.kra.protocol.ProtocolBase;
 import org.kuali.kra.protocol.actions.genericactions.ProtocolGenericActionBean;
 import org.kuali.kra.protocol.actions.genericactions.ProtocolGenericActionService;
 
 public interface IacucProtocolGenericActionService extends ProtocolGenericActionService {
     
-    void iacucAcknowledgement(Protocol protocol, ProtocolGenericActionBean actionBean) throws Exception;    
+    void iacucAcknowledgement(ProtocolBase protocol, ProtocolGenericActionBean actionBean) throws Exception;    
 
-    void iacucDeactivate(Protocol protocol, ProtocolGenericActionBean actionBean) throws Exception;    
+    void iacucDeactivate(ProtocolBase protocol, ProtocolGenericActionBean actionBean) throws Exception;    
     
-    void iacucHold(Protocol protocol, ProtocolGenericActionBean actionBean) throws Exception;
+    void iacucHold(ProtocolBase protocol, ProtocolGenericActionBean actionBean) throws Exception;
     
-    void iacucLiftHold(Protocol protocol, ProtocolGenericActionBean actionBean) throws Exception;
+    void iacucLiftHold(ProtocolBase protocol, ProtocolGenericActionBean actionBean) throws Exception;
 
 }

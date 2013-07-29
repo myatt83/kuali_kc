@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,11 +21,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
-import org.kuali.kra.common.committee.bo.CommonCommittee;
-import org.kuali.kra.common.committee.bo.CommitteeMembership;
+import org.kuali.kra.common.committee.bo.CommitteeBase;
+import org.kuali.kra.common.committee.bo.CommitteeMembershipBase;
 import org.kuali.kra.iacuc.IacucProtocol;
 import org.kuali.kra.kim.bo.KcKimAttributes;
-import org.kuali.kra.protocol.Protocol;
+import org.kuali.kra.protocol.ProtocolBase;
 import org.kuali.rice.core.api.exception.RiceIllegalArgumentException;
 import org.kuali.rice.core.api.membership.MemberType;
 import org.kuali.rice.kim.api.role.RoleMembership;
@@ -53,12 +53,12 @@ public class ActiveCommitteeMemberOnIacucProtocolDerivedRoleTypeServiceImpl exte
         String protocolNumber = qualification.get(KcKimAttributes.PROTOCOL);
         
         if (StringUtils.isNotBlank(protocolNumber)) {
-            Protocol protocol = getProtocolByNumber(protocolNumber);
+            ProtocolBase protocol = getProtocolByNumber(protocolNumber);
             if (protocol != null) {
                 if (protocol.getProtocolSubmission() != null) {
-                    CommonCommittee committee = protocol.getProtocolSubmission().getCommittee();
+                    CommitteeBase<?, ?, ?> committee = protocol.getProtocolSubmission().getCommittee();
                     if (committee != null) {
-                        for (CommitteeMembership membership : committee.getCommitteeMemberships()) {
+                        for (CommitteeMembershipBase membership : committee.getCommitteeMemberships()) {
                             if (membership.getPersonId()!=null && membership.isActive()) {
                                 members.add(RoleMembership.Builder.create(null, null, membership.getPersonId(), MemberType.PRINCIPAL, null).build());
                             }
@@ -83,12 +83,12 @@ public class ActiveCommitteeMemberOnIacucProtocolDerivedRoleTypeServiceImpl exte
         String protocolNumber = qualification.get(KcKimAttributes.PROTOCOL);
         
         if (StringUtils.isNotBlank(protocolNumber)) {
-            Protocol protocol = getProtocolByNumber(protocolNumber);
+            ProtocolBase protocol = getProtocolByNumber(protocolNumber);
             if (protocol != null) {
                 if (protocol.getProtocolSubmission() != null) {
-                    CommonCommittee committee = protocol.getProtocolSubmission().getCommittee();
+                    CommitteeBase<?, ?, ?> committee = protocol.getProtocolSubmission().getCommittee();
                     if (committee != null) {
-                        for (CommitteeMembership membership : committee.getCommitteeMemberships()) {
+                        for (CommitteeMembershipBase membership : committee.getCommitteeMemberships()) {
                             if (membership.getPersonId()!=null && StringUtils.equals(principalId, membership.getPersonId())) {
                                 return true;
                             }
@@ -102,11 +102,11 @@ public class ActiveCommitteeMemberOnIacucProtocolDerivedRoleTypeServiceImpl exte
         return false;
     }
     
-    private Protocol getProtocolByNumber(String protocolNumber) {
+    private ProtocolBase getProtocolByNumber(String protocolNumber) {
         // TODO : this seems buggy.  protocolnumber is not a PK.  need to refactor this
         Map<String,Object> keymap = new HashMap<String,Object>();
         keymap.put( "protocolNumber", protocolNumber);
-        return (Protocol)getBusinessObjectService().findByPrimaryKey(IacucProtocol.class, keymap );    
+        return (ProtocolBase)getBusinessObjectService().findByPrimaryKey(IacucProtocol.class, keymap );    
     }
 
     /*

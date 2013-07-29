@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,14 @@
  */
 package org.kuali.kra.iacuc.noteattachment;
 
-import org.kuali.kra.protocol.noteattachment.SubmitProtocolAttachmentProtocolRuleImpl;
+import org.kuali.kra.protocol.noteattachment.SubmitProtocolAttachmentProtocolRuleImplBase;
 
-public class SubmitIacucProtocolAttachmentProtocolRuleImpl extends SubmitProtocolAttachmentProtocolRuleImpl {
+public class SubmitIacucProtocolAttachmentProtocolRuleImpl extends SubmitProtocolAttachmentProtocolRuleImplBase {
 
     public SubmitIacucProtocolAttachmentProtocolRuleImpl() {
         super();
         
         // TODO : temporarily plugin this propertyprefix to fix runtime exception.  need to rework to have correct prefix
         protocolHelper = new IacucProtocolAttachmentProtocolRuleHelper("notesAttachmentsHelper.newAttachmentProtocol");
-       // protocolHelper = new IacucProtocolAttachmentProtocolRuleHelper(null);
     }
 }

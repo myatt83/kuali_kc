@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,30 +15,7 @@
  */
 package org.kuali.kra.irb.protocol.location;
 
-import org.kuali.kra.irb.Protocol;
 
-
-public interface ProtocolLocationService {
-
-    /**
-     * This method adds ProtocolLocation to the List of ProtocolLocations.
-     * @param protocol which contains list of ProtocolLocations.
-     * @param ProtocolLocation object is added to ProtocolLocations list.
-     */
-    public abstract void addProtocolLocation(Protocol protocol, ProtocolLocation protocolLocation);
-    
-    /**
-     * This method adds a default ProtocolLocation to the List of ProtocolLocations.
-     * i.e. Initialize protocol location with a default organization
-     * @param protocol which contains list of ProtocolLocations.
-     */
-    public abstract void addDefaultProtocolLocation(Protocol protocol);
-
-    /**
-     * This method will clear ProtocolLocation address from the List at specified position(lineNumber)
-     * @param protocol which contains list of ProtocolLocations
-     * @param lineNumber to clear location address
-     */
-    public abstract void clearProtocolLocationAddress(Protocol protocol, int lineNumber);
+public interface ProtocolLocationService extends org.kuali.kra.protocol.protocol.location.ProtocolLocationService {
 
 }

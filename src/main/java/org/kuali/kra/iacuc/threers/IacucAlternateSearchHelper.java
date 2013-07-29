@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import org.kuali.kra.iacuc.IacucProtocolForm;
 import org.kuali.kra.iacuc.auth.IacucProtocolTask;
 import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.infrastructure.TaskName;
-import org.kuali.kra.protocol.auth.ProtocolTask;
+import org.kuali.kra.protocol.auth.ProtocolTaskBase;
 import org.kuali.kra.service.TaskAuthorizationService;
 import org.kuali.rice.krad.util.GlobalVariables;
 
@@ -52,8 +52,6 @@ public class IacucAlternateSearchHelper implements Serializable {
     }
     
     public void prepareView() {
-//        newAlternateSearch = new IacucAlternateSearch();
-//        newDatabases = new ArrayList<String>();
     }
     
     public IacucProtocolForm getForm() {
@@ -73,7 +71,7 @@ public class IacucAlternateSearchHelper implements Serializable {
     }
 
     public boolean isModifyPermissions() {
-        final ProtocolTask task = new IacucProtocolTask(TaskName.MODIFY_IACUC_PROTOCOL_THREE_RS, (IacucProtocol) form.getProtocolDocument().getProtocol());
+        final ProtocolTaskBase task = new IacucProtocolTask(TaskName.MODIFY_IACUC_PROTOCOL_THREE_RS, (IacucProtocol) form.getProtocolDocument().getProtocol());
         return getTaskAuthorizationService().isAuthorized(GlobalVariables.getUserSession().getPrincipalId(), task);
     }
 

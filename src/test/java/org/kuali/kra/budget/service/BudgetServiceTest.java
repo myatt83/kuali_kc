@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package org.kuali.kra.budget.service;
 
 import java.sql.Date;
+import java.util.UUID;
 
 import org.junit.After;
 import org.junit.Before;
@@ -75,7 +76,13 @@ public class BudgetServiceTest extends KcUnitTestBase {
         String testDocumentDescription = "Test New Budget Doc";
         
         UserSession currentSession = GlobalVariables.getUserSession();
+        String kualiSessionId = currentSession.getKualiSessionId();
+        if (kualiSessionId == null) {
+            kualiSessionId = UUID.randomUUID().toString();
+            currentSession.setKualiSessionId(kualiSessionId);
+        }
         PessimisticLock lock = KRADServiceLocatorWeb.getPessimisticLockService().generateNewLock(pdDocument.getDocumentNumber(), pdDocument.getDocumentNumber()+"-BUDGET", currentSession.getPerson());
+        
         pdDocument.addPessimisticLock(lock);
         
         BudgetDocument budgetDocument = budgetCommonService.getNewBudgetVersion(pdDocument, testDocumentDescription);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import org.kuali.kra.irb.actions.ProtocolActionType;
 import org.kuali.kra.irb.actions.submit.ProtocolSubmission;
 import org.kuali.kra.irb.actions.submit.ProtocolSubmissionStatus;
 import org.kuali.kra.irb.actions.submit.ProtocolSubmissionType;
+import org.kuali.kra.protocol.actions.submit.ProtocolSubmissionBase;
 
 /**
  * 
@@ -41,9 +42,9 @@ public class IrbAcknowledgementAuthorizer extends ProtocolAuthorizer {
         Protocol protocol = task.getProtocol();
         if (protocol.getNotifyIrbSubmissionId() != null) {
             // not the current submission, then check programically
-            for (ProtocolSubmission submission : protocol.getProtocolSubmissions()) {
+            for (ProtocolSubmissionBase submission : protocol.getProtocolSubmissions()) {
                 if (submission.getSubmissionId().equals(protocol.getNotifyIrbSubmissionId())) {
-                    isValid = isValidFYI(submission);
+                    isValid = isValidFYI((ProtocolSubmission) submission);
                 }
             }
         }
@@ -68,7 +69,6 @@ public class IrbAcknowledgementAuthorizer extends ProtocolAuthorizer {
     private boolean isFYIReview(String reviewTypeCode) {
         // in coeus 4.4, it does not check whether its FYI or not.
         return StringUtils.isNotBlank(reviewTypeCode);
-       // return StringUtils.isNotBlank(reviewTypeCode) && ProtocolReviewType.FYI_TYPE_CODE.equals(reviewTypeCode);
     }
 
     private boolean isStatusValid(String submissionStatusCode) {

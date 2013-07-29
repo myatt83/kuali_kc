@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,4 +43,12 @@ public interface ProtocolAssignCmtSchedService {
      * @throws Exception 
      */
     public void assignToCommitteeAndSchedule(Protocol protocol, ProtocolAssignCmtSchedBean actionBean) throws Exception;
+
+    /**
+     * Assign a protocol to a committee/schedule after the protocol has already been assigned to an agenda.
+     * @param protocol the protocol
+     * @param actionBean contains committee/schedule
+     * @throws Exception 
+     */
+    public void assignToCommitteeAndSchedulePostAgendaAssignment(Protocol protocol, ProtocolAssignCmtSchedBean cmtAssignBean) throws Exception;
 }

@@ -127,22 +127,21 @@ ${kfunc:registerEditableProperty(KualiForm, "actionHelper.selectedHistoryItem")}
 		           		                            <c:forEach items="${protocolAction.protocolCorrespondences}" var="correspondence" varStatus="attachmentStatus">
 		           		    	                        <tr>
 		           		    	                            <td>${correspondence.protocolCorrespondenceType.description}</td>
-                    <td align="left" valign="middle">
-                        <div align="left"><fmt:formatDate value="${correspondence.createTimestamp}" pattern="MM/dd/yyyy KK:mm a" /> </div>
-                    </td>
-                    <td align="left" valign="middle">
-                        <div align="left"> 
-                            <c:choose>
-                                  <c:when test="${correspondence.finalFlag}">
-                                     Yes (<fmt:formatDate value="${correspondence.finalFlagTimestamp}" pattern="MM/dd/yyyy KK:mm a" /> )
-                                  </c:when>
-                                  <c:otherwise>
-                                     No
-                                  </c:otherwise>
-                                     
-                            </c:choose>
-                        </div>
-                    </td>
+                    										<td align="left" valign="middle">
+                        										<div align="left"><fmt:formatDate value="${correspondence.createTimestamp}" pattern="MM/dd/yyyy KK:mm a" /> </div>
+                    										</td>
+										                    <td align="left" valign="middle">
+                        										<div align="left"> 
+                            										<c:choose>
+                                  										<c:when test="${correspondence.finalFlag}">
+                                     										Yes (<fmt:formatDate value="${correspondence.finalFlagTimestamp}" pattern="MM/dd/yyyy KK:mm a" /> )
+                                  										</c:when>
+                                  										<c:otherwise>
+                                     										No
+                                  										</c:otherwise>
+                                     								</c:choose>
+                        										</div>
+                    										</td>
 		           		 					                <td align="center" valign="middle">
                                                                 <div align="center">
                                                                   <c:if test="${iacucAdmin or correspondence.finalFlag}">
@@ -161,6 +160,50 @@ ${kfunc:registerEditableProperty(KualiForm, "actionHelper.selectedHistoryItem")}
                                                                    </c:if>
 								                               </div>
 							                                 </td>
+		           		    	                        </tr>
+		           		                            </c:forEach>
+		            		                    </tbody>
+		            		                </table>
+	            		                </div>
+	            		        	</kul:innerTab>
+	            		        </td>            		        
+	            			</tr>
+	            		</c:if>
+	
+		            	<c:if test="${fn:length(protocolAction.filteredProtocolNotifications) > 0}">
+	            			<tr>
+	            				<td class="infoline">&nbsp;</td>
+	            		        <td colspan="4">
+	            		        	<kul:innerTab tabTitle="Notifications" tabItemCount="${fn:length(protocolAction.filteredProtocolNotifications)}" parentTab="attachment${status.index}" defaultOpen="false" tabErrorKey="">
+	            		        		<div class="innerTab-container" align="left">
+		                                    <table class="tab" cellpadding="0" cellspacing="0" summary="">
+		                                        <tbody>
+		                                            <tr>
+                                                       <th style="text-align:center">Date Created</th>
+		                                               <th style="text-align:center">Recipients</th>
+		                                               <th style="text-align:center">Subject</th>
+                                                       <th style="text-align:center">Message</th>
+		                                            </tr>
+		           		                            <c:forEach items="${protocolAction.filteredProtocolNotifications}" var="notification" varStatus="notificationStatus">
+		           		    	                        <tr>
+															<td>
+																<div align="center"><fmt:formatDate value="${notification.updateTimestamp}" pattern="MM/dd/yyyy KK:mm a" /> 
+															</div>
+                    										<td align="left" valign="middle">
+																<div align="center">
+																    ${notification.recipients}
+                        										</div>
+                    										</td>
+										                    <td align="left" valign="middle">
+                        										<div align="left"> 
+                            										${notification.subject}
+                        										</div>
+                    										</td>
+		           		 					                <td align="center" valign="middle">
+                                                                <div align="left">
+                                                                	${notification.message}
+								                            	</div>
+							                                </td>
 		           		    	                        </tr>
 		           		                            </c:forEach>
 		            		                    </tbody>
@@ -210,36 +253,24 @@ ${kfunc:registerEditableProperty(KualiForm, "actionHelper.selectedHistoryItem")}
 	            			</tr>
 	            		</c:if>
 
-	            		<c:if test="${protocolAction.answerHeadersCount > 0}">
+	            		<c:if test="${fn:length(protocolAction.questionnaireHelper.answerHeaders) > 0}">
 	            		    <c:set var="printOption" value="${protocolAction.questionnairePrintOption}"/>
 	            			<tr>
 	            				<td class="infoline">&nbsp;</td>
 	            			    <td class="infoline" colspan="4">
-                                    <div class="innerTab-head">
-                                        <a href="#" id ="qnhistory${status.index}" class="printQnSubpanel"><img src='kr/images/tinybutton-show.gif' alt='show/hide panel' width='45' height='15' border='0' align='absmiddle'></a>
-                                               <b>Questionnaires(${protocolAction.answerHeadersCount})</b>
-                                    </div>
-                            
-	                   				<div id ="qnhistory${status.index}Content" class="printQnSubpanelContent">
-							        	<html:image property="viewQnhistory${status.index}"
-								        	src='${ConfigProperties.kra.externalizable.images.url}tinybutton-view.gif' styleClass="tinybutton"
-											onclick="ajaxLoadQn('${printOption.itemKey}','${printOption.subItemKey}','${KualiForm.formKey}',' ${KualiForm.document.sessionDocument}', ${printOption.subItemCode != '2'}, ${status.index}); return false;"
-								        	alt="View Questionnaire" />
-	                   				</div>
-	            			</td>
-	            			<%-- 
-	            		        <td> &nbsp;
-	            		        </td>            		        
-	            				<td class="infoline">Questionnaire</td>
-	            				<td align="left" valign="middle" colspan="4">
-                                    <div id = "qnDiv" align="left">
-							        <html:image property="methodToCall.questionnaire.actionType116.anchor${currentTabIndex}"
-								        src='${ConfigProperties.kra.externalizable.images.url}tinybutton-view.gif' styleClass="tinybutton"
-									onclick="ajaxLoadQn('${printOption.itemKey}','${printOption.subItemKey}','${KualiForm.formKey}',' ${KualiForm.document.sessionDocument}', ${printOption.subItemCode != '2'}); return false;"
-								        alt="View Questionnaire" />
-                                     </div>
-                                  </td>
-	            				--%>
+	            		        	<kul:innerTab tabTitle="Questionnaires" tabItemCount="${fn:length(protocolAction.questionnaireHelper.answerHeaders)}" parentTab="attachment${status.index}" defaultOpen="false" tabErrorKey="">
+	            		        		<div class="innerTab-container" align="left">
+	            		        			<c:forEach var="answerHeader" items="${protocolAction.questionnaireHelper.answerHeaders}" varStatus="answerStatus">
+	            		        				<kra-questionnaire:questionnaireAnswersInnerTab parentTab="Questionnaires" 
+	            		        					bean="${protocolAction.questionnaireHelper}" 
+	            		        					answerHeaderIndex="${answerStatus.index}" 
+	            		        					property="document.protocol.protocolActions[${status.index}].questionnaireHelper"
+	            		        					overrideDivClass="inner-subhead"
+	            		        					readOnly="true"/>
+	            		        			</c:forEach>
+	            		        		</div>
+	            		        	</kul:innerTab>	                                    
+								</td>
 	            			</tr>
 	            		</c:if>
 	

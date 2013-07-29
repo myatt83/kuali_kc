@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  *
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,10 @@ public class AwardTemplateTerm extends KraPersistableBusinessObjectBase {
     private String sponsorTermTypeCode;
 
     private SponsorTerm sponsorTerm;
+    
+    private String description;
+    
+    private String sponsorTermCode;
 
     public AwardTemplateTerm() {
     }
@@ -118,6 +122,39 @@ public class AwardTemplateTerm extends KraPersistableBusinessObjectBase {
      */
     public void setSponsorTerm(SponsorTerm sponsorTerm) {
         this.sponsorTerm = sponsorTerm;
+    }
+
+    /**
+     * Gets the description attribute. 
+     * @return Returns the description.
+     */
+    public String getDescription() {
+        return sponsorTerm.getDescription();
+    }
+
+    /**
+     * Sets the description attribute value.
+     * @param description The description to set.
+     */
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+
+    /**
+     * Gets the sponsorTermCode attribute. 
+     * @return Returns the sponsorTermCode.
+     */
+    public String getSponsorTermCode() {
+        return sponsorTerm.getSponsorTermCode();
+    }
+    
+    /**
+     * Sets the sponsorTermCode attribute value.
+     * @param sponsorTermCode The sponsorTermCode to set.
+     */
+    public void setSponsorTermCode(String sponsorTermCode) {
+        this.sponsorTermCode = sponsorTermCode;
     }
 
     public String getTemplateCode() {

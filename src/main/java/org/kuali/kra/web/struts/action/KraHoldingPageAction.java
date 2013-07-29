@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,6 +74,10 @@ public class KraHoldingPageAction extends AbstractHoldingPageAction {
             // clean up the session and also remove the messages meant for the return page
             cleanupUserSession(alternateDocIdSessionKey);
             GlobalVariables.getUserSession().removeObject(Constants.HOLDING_PAGE_MESSAGES);
+        } else if(GlobalVariables.getUserSession().retrieveObject(Constants.FORCE_HOLDING_PAGE_FOR_ACTION_LIST) != null) {
+            // this is a temporary solution
+            // introduced to unload the block ui in embedded mode
+            GlobalVariables.getUserSession().removeObject(Constants.FORCE_HOLDING_PAGE_FOR_ACTION_LIST); 
         }
         else if (isDocumentPostprocessingComplete(document)) {
             // get the return location and clean up session

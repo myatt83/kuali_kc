@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,6 +49,7 @@ import org.kuali.kra.infrastructure.KeyConstants;
 import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.infrastructure.PermissionConstants;
 import org.kuali.kra.proposaldevelopment.bo.DevelopmentProposal;
+import org.kuali.kra.proposaldevelopment.budget.bo.ProposalDevelopmentBudgetExt;
 import org.kuali.kra.proposaldevelopment.document.ProposalDevelopmentDocument;
 import org.kuali.kra.proposaldevelopment.hierarchy.bo.HierarchyProposalSummary;
 import org.kuali.kra.proposaldevelopment.hierarchy.service.ProposalHierarchyService;
@@ -117,6 +118,20 @@ public class ProposalHierarcyActionHelper {
             }
         }
     }
+    
+    public void syncBudgetToParent(ProposalDevelopmentBudgetExt budget, DevelopmentProposal childProposal, boolean allowEndDateChange) {
+        DevelopmentProposal hierarchy = getProposalHierarchyService().getDevelopmentProposal(childProposal.getHierarchyParentProposalNumber());
+        if (validateChildForSync(childProposal, hierarchy, allowEndDateChange)) {
+            try {
+                getProposalHierarchyService().synchronizeChildProposalBudget(budget, childProposal);
+                KNSGlobalVariables.getMessageList().add(MESSAGE_SYNC_SUCCESS);
+    
+            }
+            catch (ProposalHierarchyException e) {
+                doUnexpectedError(e, FIELD_GENERIC, true);
+            }
+        }
+    }    
 
     public void createHierarchy(DevelopmentProposal initialChildProposal) {
         LOG.info(String.format("createHierarchy called with Proposal $s", initialChildProposal.getProposalNumber()));

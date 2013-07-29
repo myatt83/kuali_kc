@@ -1,5 +1,5 @@
 <%--
- Copyright 2005-2010 The Kuali Foundation
+ Copyright 2005-2013 The Kuali Foundation
 
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -156,7 +156,13 @@
                     
                 </table>
 
-          <kra-irb-action:requestQuestionnaire actionTypeCode="${actionTypeCode}" altLabel="Request Submission Questionnaire"/>
+			<c:forEach var="answerHeader" items="${bean.questionnaireHelper.answerHeaders}" varStatus="status">
+				<kra-questionnaire:questionnaireAnswersInnerTab 
+				parentTab="${tabTitle}" 
+				bean="${bean.questionnaireHelper}" 
+				answerHeaderIndex="${status.index}" 
+				property="actionHelper.${beanName}.questionnaireHelper"/>
+			</c:forEach>
                                                 
             <table cellpadding="0" cellspacing="0" summary="">                 
                  <tr>

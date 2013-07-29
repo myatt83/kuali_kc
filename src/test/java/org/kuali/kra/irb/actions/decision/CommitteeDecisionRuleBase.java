@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import org.kuali.kra.committee.service.CommitteeScheduleAttendanceService;
 import org.kuali.kra.irb.Protocol;
 import org.kuali.kra.irb.actions.reviewcomments.ReviewCommentsBean;
 import org.kuali.kra.meeting.CommitteeScheduleMinute;
-import org.kuali.kra.meeting.MinuteEntryType;
+import org.kuali.kra.common.committee.meeting.MinuteEntryType;
 import org.kuali.kra.test.infrastructure.KcUnitTestBase;
 
 public abstract class CommitteeDecisionRuleBase extends KcUnitTestBase {

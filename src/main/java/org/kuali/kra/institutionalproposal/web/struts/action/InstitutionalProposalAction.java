@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -297,7 +297,8 @@ public class InstitutionalProposalAction extends KraTransactionalDocumentActionB
     public ActionForward customData(ActionMapping mapping, ActionForm form
             , HttpServletRequest request, HttpServletResponse response) {     
         InstitutionalProposalForm institutionalProposalForm = (InstitutionalProposalForm) form;
-        return institutionalProposalForm.getCustomDataHelper().institutionalProposalCustomData(mapping, form, request, response);
+        institutionalProposalForm.getCustomDataHelper().prepareCustomData();
+        return mapping.findForward(Constants.MAPPING_INSTITUTIONAL_PROPOSAL_CUSTOM_DATA_PAGE);
     }
     
     /**
@@ -312,7 +313,6 @@ public class InstitutionalProposalAction extends KraTransactionalDocumentActionB
     ActionForward handleDocument(ActionMapping mapping, ActionForm form, HttpServletRequest request,
                                   HttpServletResponse response, InstitutionalProposalForm institutionalProposalForm) throws Exception {       
         ActionForward forward = super.docHandler(mapping, form, request, response);
-        institutionalProposalForm.getInstitutionalProposalDocument().populateCustomAttributes();
         return forward;
     }
     
@@ -386,6 +386,7 @@ public class InstitutionalProposalAction extends KraTransactionalDocumentActionB
        institutionalProposalForm.getMedusaBean().setMedusaViewRadio("0");
        institutionalProposalForm.getMedusaBean().setModuleName("IP");
        institutionalProposalForm.getMedusaBean().setModuleIdentifier(document.getInstitutionalProposal().getProposalId());
+       institutionalProposalForm.getMedusaBean().generateParentNodes();
        return mapping.findForward(Constants.MAPPING_INSTITUTIONAL_PROPOSAL_MEDUSA_PAGE);
    }
    

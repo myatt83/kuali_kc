@@ -1,5 +1,5 @@
 <%--
- Copyright 2005-2010 The Kuali Foundation
+ Copyright 2005-2013 The Kuali Foundation
 
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@
                         <c:set target="${paramMap}" property="protocolLeadUnit" value="${KualiForm.document.protocol.leadUnitNumber}" />	                
 	                    <c:set var="docNumber" value="${KualiForm.document.protocol.protocolNumber}" />
                         <html:select property="actionHelper.protocolAssignCmtBean.committeeId" >                               
-                            <c:forEach items="${krafn:getOptionList('org.kuali.kra.committee.lookup.keyvalue.IacucCommitteeIdByUnitValuesFinder', paramMap)}" var="option" >
+                            <c:forEach items="${krafn:getOptionList('org.kuali.kra.iacuc.committee.lookup.keyvalue.IacucCommitteeIdByUnitValuesFinder', paramMap)}" var="option" >
                                 <c:choose>                      
                                     <c:when test="${KualiForm.actionHelper.protocolAssignCmtBean.committeeId == option.key}">
                                         <option value="${option.key}" selected="selected">${option.value}</option>

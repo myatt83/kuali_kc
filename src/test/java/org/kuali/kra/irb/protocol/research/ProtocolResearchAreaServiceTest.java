@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.kuali.kra.bo.ResearchArea;
 import org.kuali.kra.irb.Protocol;
+import org.kuali.kra.irb.ResearchArea;
 
 
 public class ProtocolResearchAreaServiceTest {
@@ -60,18 +60,20 @@ public class ProtocolResearchAreaServiceTest {
         service = new ProtocolResearchAreaServiceImpl();
     }
     
+    @SuppressWarnings("unchecked")
     @Test
     public void testAddProtocolResearchArea() throws Exception {
                    
-        service.addProtocolResearchArea(protocol, listOfResearchArea);
+        service.addProtocolResearchArea(protocol, (List)listOfResearchArea);
         //Protocol must have 2 objects in ProtocolResearchArea
         assertEquals(2, protocol.getProtocolResearchAreas().size());
     }
     
+    @SuppressWarnings("unchecked")
     @Test
     public void testAddProtocolResearchAreaForDuplicate() throws Exception {
                    
-        service.addProtocolResearchArea(protocol, listOfResearchArea);
+        service.addProtocolResearchArea(protocol, (List)listOfResearchArea);
         //Protocol must have 2 objects in ProtocolResearchArea
         assertEquals(2, protocol.getProtocolResearchAreas().size());
         
@@ -81,7 +83,7 @@ public class ProtocolResearchAreaServiceTest {
         listOfResearchArea.add(bo3);
         
         //Duplicate insert test
-        service.addProtocolResearchArea(protocol, listOfResearchArea);
+        service.addProtocolResearchArea(protocol, (List)listOfResearchArea);
         //Size must be 3, only newer object is added to list
         assertEquals(3, protocol.getProtocolResearchAreas().size());
     }

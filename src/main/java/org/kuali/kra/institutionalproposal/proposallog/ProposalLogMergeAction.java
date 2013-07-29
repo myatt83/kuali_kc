@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,6 +44,13 @@ public class ProposalLogMergeAction extends KualiAction {
         request.getSession().removeAttribute("proposalLogNumber");
         getProposalLogService().mergeProposalLog(proposalLogNumber);
         return mapping.findForward("portal");
+    }
+    
+    //http://127.0.0.1:8080/kc-dev/mergeProposalLog.do?methodToCall=getMatchingTemporaryProposals&proposalLogTypeCode=1&piId=10000000002
+    public ActionForward getMatchingTemporaryProposals(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        ProposalLogMergeForm proposalLogMergeForm = (ProposalLogMergeForm) form;
+        proposalLogMergeForm.setMatchedProposalLogs(getProposalLogService().getMatchingTemporaryProposalLogs(proposalLogMergeForm.getProposalLogTypeCode(), proposalLogMergeForm.getPiId(), proposalLogMergeForm.getRolodexId()));
+        return mapping.findForward("temporaryList");
     }
     
     protected ProposalLogService getProposalLogService() {

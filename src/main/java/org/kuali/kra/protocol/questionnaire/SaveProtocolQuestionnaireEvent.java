@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ public class SaveProtocolQuestionnaireEvent extends KraDocumentEventBaseExtensio
     private List<AnswerHeader> answerHeaders;
 
     public SaveProtocolQuestionnaireEvent(Document document, List<AnswerHeader> answerHeaders) {
-        super("Saving Protocol Questionnaires (and answers) to document" + getDocumentId(document), Constants.EMPTY_STRING, document);        
+        super("Saving ProtocolBase Questionnaires (and answers) to document" + getDocumentId(document), Constants.EMPTY_STRING, document);        
         this.answerHeaders = answerHeaders;
     }
 

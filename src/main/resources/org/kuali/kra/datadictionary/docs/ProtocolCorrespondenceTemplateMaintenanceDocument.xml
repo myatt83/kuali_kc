@@ -1,5 +1,5 @@
 <!--
- Copyright 2005-2010 The Kuali Foundation
+ Copyright 2005-2013 The Kuali Foundation
 
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@
         http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
 
     <bean id="ProtoCorrespTemplMaintenanceDocument" parent="ProtoCorrespTemplMaintenanceDocument-parentBean" />
-    <bean id="ProtoCorrespTemplMaintenanceDocument-parentBean" abstract="true" parent="MaintenanceDocumentEntry">
+    <bean id="ProtoCorrespTemplMaintenanceDocument-parentBean" abstract="true" parent="KcMaintenanceDocumentEntry">
         <property name="businessObjectClass" value="org.kuali.kra.irb.correspondence.ProtocolCorrespondenceTemplate" />
         <property name="maintainableClass" value="org.kuali.kra.maintenance.KraMaintainableImpl" />
         <property name="maintainableSections" >

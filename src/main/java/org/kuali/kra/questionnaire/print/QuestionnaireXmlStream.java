@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,6 +45,7 @@ import org.kuali.kra.bo.KcPerson;
 import org.kuali.kra.bo.KraPersistableBusinessObjectBase;
 import org.kuali.kra.coi.CoiDisclosure;
 import org.kuali.kra.document.ResearchDocumentBase;
+import org.kuali.kra.iacuc.IacucProtocol;
 import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.irb.Protocol;
 import org.kuali.kra.maintenance.KraMaintenanceDocument;
@@ -152,23 +153,29 @@ public class QuestionnaireXmlStream implements XmlStream {
         
         String documentNumber = (String)params.get("documentNumber");
         Integer questionnaireId = (Integer)params.get("questionnaireId");
-        org.kuali.kra.questionnaire.Questionnaire questionnaire;
-        if(questionnaireId!=null){ 
-            Map<String,Integer> qParam = new HashMap<String,Integer>();
-            qParam.put("questionnaireId", questionnaireId);
-            List<org.kuali.kra.questionnaire.Questionnaire> questionnaires = 
-                (List)businessObjectService.findMatchingOrderBy(
-                        org.kuali.kra.questionnaire.Questionnaire.class, qParam, "questionnaireRefId", false);
-            questionnaire = questionnaires.get(0);
-            // not sure why need this.  If it is not refreshed, some may get empty Questions
-            questionnaire.refreshReferenceObject("questionnaireQuestions");
-        }else{
-            questionnaire = findQuestionnaireObject(documentNumber);
+        org.kuali.kra.questionnaire.Questionnaire questionnaire = 
+                (org.kuali.kra.questionnaire.Questionnaire)params.get("questionnaire");
+        if (questionnaire == null) {
+            if (questionnaireId != null) { 
+                Map<String,Integer> qParam = new HashMap<String,Integer>();
+                qParam.put("questionnaireId", questionnaireId);
+                List<org.kuali.kra.questionnaire.Questionnaire> questionnaires = 
+                    (List)businessObjectService.findMatchingOrderBy(
+                            org.kuali.kra.questionnaire.Questionnaire.class, qParam, "questionnaireRefId", false);
+                questionnaire = questionnaires.get(0);
+                // not sure why need this.  If it is not refreshed, some may get empty Questions
+                questionnaire.refreshReferenceObject("questionnaireQuestions");
+            } else {
+                questionnaire = findQuestionnaireObject(documentNumber);
+            }
         }
         
         Boolean questionnaireCompletionFlag = (Boolean)params.get("QUESTIONNAIRE_COMPLETION_FLAG");
         questionnaireCompletionFlag = questionnaireCompletionFlag==null?Boolean.FALSE:questionnaireCompletionFlag;
-        ModuleQuestionnaireBean moduleQuestionnaireBean = getQuestionnaireAnswerHeaderBean(printableBusinessObject, params);
+        ModuleQuestionnaireBean moduleQuestionnaireBean = null;
+        if (printableBusinessObject != null) {
+            moduleQuestionnaireBean = getQuestionnaireAnswerHeaderBean(printableBusinessObject, params);
+        }
         if(questionnaire != null) {
             Integer questId = questionnaire.getQuestionnaireIdAsInteger();
             if(questId!=null){
@@ -185,9 +192,9 @@ public class QuestionnaireXmlStream implements XmlStream {
             else{
                 setModuleUsageList(questionnaire,questionnaireType);
             }
-            String moduleCode = moduleQuestionnaireBean.getModuleItemCode();
-            String moduleSubcode = moduleQuestionnaireBean.getModuleSubItemCode();
-            if (moduleCode != null) {
+            if (moduleQuestionnaireBean != null && moduleQuestionnaireBean.getModuleItemCode() != null) {
+                String moduleCode = moduleQuestionnaireBean.getModuleItemCode();
+                String moduleSubcode = moduleQuestionnaireBean.getModuleSubItemCode();
                 if (moduleCode.equals(CoeusModule.PROPOSAL_DEVELOPMENT_MODULE_CODE)  && "0".equals(moduleSubcode)) {
                     setDevProposalInfo((DevelopmentProposal) printableBusinessObject,questionnaireType);
                 } else if (moduleCode.equals(CoeusModule.PROPOSAL_DEVELOPMENT_MODULE_CODE)  
@@ -269,9 +276,17 @@ public class QuestionnaireXmlStream implements XmlStream {
             ProposalPerson person = (ProposalPerson) printableBusinessObject;
             answerHeader.setModuleKey(person.getDevelopmentProposal().getProposalNumber());
         } else {
-            answerHeader.setModuleKey(moduleQuestionnaireBean.getModuleItemKey());
+            if (moduleQuestionnaireBean != null) {
+                answerHeader.setModuleKey(moduleQuestionnaireBean.getModuleItemKey());
+            } else {
+                answerHeader.setModuleKey(null);
+            }
         }
-        answerHeader.setSubModuleKey(moduleQuestionnaireBean.getModuleSubItemKey());
+        if (moduleQuestionnaireBean != null) {
+            answerHeader.setSubModuleKey(moduleQuestionnaireBean.getModuleSubItemKey());
+        } else {
+            answerHeader.setSubModuleKey("0");
+        }
     }
 
     /**
@@ -399,6 +414,22 @@ public class QuestionnaireXmlStream implements XmlStream {
                     moduleSubItemCode = (String)params.get("moduleSubItemCode");
                 }
             }
+        } else if(printableBusinessObject instanceof IacucProtocol){
+            IacucProtocol protocol = (IacucProtocol)printableBusinessObject;
+            moduleItemCode = CoeusModule.IACUC_PROTOCOL_MODULE_CODE;
+            moduleSubItemCode = getIacucProtocolSubItemCode(protocol);
+            if (params.get("protocolNumber") != null && params.get("submissionNumber") != null) {
+                moduleItemKey = (String)params.get("protocolNumber");
+                moduleSubItemKey = (String)params.get("submissionNumber");
+                moduleSubItemCode = CoeusSubModule.PROTOCOL_SUBMISSION;
+            } else {
+                moduleItemKey = protocol.getProtocolNumber();
+                moduleSubItemKey = protocol.getSequenceNumber().toString();
+                if (params.get("moduleSubItemCode") != null) {
+                    // for amendquestionnaire
+                    moduleSubItemCode = (String)params.get("moduleSubItemCode");
+                }
+            }
         } else if(printableBusinessObject instanceof DevelopmentProposal){
             DevelopmentProposal developmentProposal = (DevelopmentProposal)printableBusinessObject;
             moduleItemCode = CoeusModule.PROPOSAL_DEVELOPMENT_MODULE_CODE;
@@ -417,11 +448,20 @@ public class QuestionnaireXmlStream implements XmlStream {
             moduleItemKey = disclosure.getCoiDisclosureNumber();
             moduleSubItemCode = (String) params.get("coeusModuleSubItemCode");
         }
-        return new ModuleQuestionnaireBean(moduleItemCode,moduleItemKey,moduleSubItemCode,moduleSubItemKey, false);
+        return getQuestionnaireAnswerService().getModuleSpecificBean(moduleItemCode,moduleItemKey,moduleSubItemCode,moduleSubItemKey, false);
                 
     }
 
     private String getProtocolSubItemCode(Protocol protocol) {
+        // For now check renewal/amendment.  will add 'Protocol Submission' when it is cleared
+            String subModuleCode = "0";
+            if (protocol.isAmendment() || protocol.isRenewal()) {
+                subModuleCode = "1";
+            }
+            return subModuleCode;
+        }
+    
+    private String getIacucProtocolSubItemCode(IacucProtocol protocol) {
         // For now check renewal/amendment.  will add 'Protocol Submission' when it is cleared
             String subModuleCode = "0";
             if (protocol.isAmendment() || protocol.isRenewal()) {
@@ -701,7 +741,7 @@ public class QuestionnaireXmlStream implements XmlStream {
     private void setQuestionInfoData(org.kuali.kra.questionnaire.Questionnaire questionnaire,
             ModuleQuestionnaireBean moduleQuestionnaireBean, Questionnaire questionnaireType, boolean questionnaireCompletionFlag,
             KraPersistableBusinessObjectBase printableBusinessObject) throws PrintingException {
-        List<AnswerHeader> answerHeaders = null;
+        List<AnswerHeader> answerHeaders = new ArrayList<AnswerHeader>();
         org.kuali.kra.questionnaire.Questionnaire answeredQuestionnaire = null;
         if (moduleQuestionnaireBean != null) {
             answerHeaders = questionnaireAnswerService.getQuestionnaireAnswer(moduleQuestionnaireBean);
@@ -713,11 +753,9 @@ public class QuestionnaireXmlStream implements XmlStream {
 
         }
         org.kuali.kra.questionnaire.Questionnaire toSortQuestionnaire = null;
-        if (answerHeaders!=null && answerHeaders.size() > 0) {
-            for (AnswerHeader header : answerHeaders) {
-                if (header.getQuestionnaire().getQuestionnaireId().equals(questionnaire.getQuestionnaireId())) {
-                    toSortQuestionnaire = header.getQuestionnaire();
-                }
+        for (AnswerHeader header : answerHeaders) {
+            if (header.getQuestionnaire().getQuestionnaireId().equals(questionnaire.getQuestionnaireId())) {
+                toSortQuestionnaire = header.getQuestionnaire();
             }
         }
         

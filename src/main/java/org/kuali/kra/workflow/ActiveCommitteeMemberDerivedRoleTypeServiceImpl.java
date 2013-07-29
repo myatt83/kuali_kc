@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  *
  * Licensed under the Educational Community License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import org.apache.commons.lang.StringUtils;
 import org.kuali.kra.committee.bo.Committee;
 import org.kuali.kra.committee.bo.CommitteeMembership;
 import org.kuali.kra.committee.service.CommitteeService;
+import org.kuali.kra.common.committee.bo.CommitteeMembershipBase;
 import org.kuali.kra.kim.bo.KcKimAttributes;
 import org.kuali.rice.core.api.membership.MemberType;
 import org.kuali.rice.kim.api.role.RoleMembership;
@@ -66,7 +67,7 @@ public class ActiveCommitteeMemberDerivedRoleTypeServiceImpl extends DerivedRole
 	    boolean result = membership.isActive();
 	    if (qualifyingCommitteeMembershipTypeCodes.size()>0) {
 	        if (LOG.isDebugEnabled() && !qualifyingCommitteeMembershipTypeCodes.contains(membership.getMembershipTypeCode())) {
-	            LOG.debug(String.format("Membership %s does not have membership type code in the qualifying map."));
+	            LOG.debug(String.format("Membership %s does not have membership type code in the qualifying map.", membership));
 	        }
 	        result &= qualifyingCommitteeMembershipTypeCodes.contains(membership.getMembershipTypeCode());
 	    }
@@ -87,8 +88,8 @@ public class ActiveCommitteeMemberDerivedRoleTypeServiceImpl extends DerivedRole
 		if (!StringUtils.isEmpty(committeeId)) {
 		    Committee committee = committeeService.getCommitteeById(committeeId);
     		if (committee != null ) {
-    		    for (CommitteeMembership membership : committee.getCommitteeMemberships()) {
-    		        if (isQualified(membership,qualification)) {
+    		    for (CommitteeMembershipBase membership : committee.getCommitteeMemberships()) {
+    		        if (isQualified((CommitteeMembership) membership,qualification)) {
     		            members.add(RoleMembership.Builder.create(null, null, membership.getPersonId(), MemberType.PRINCIPAL, null).build());
     		            if (LOG.isDebugEnabled()) {
     		                LOG.debug(String.format("Adding %s for getRoleMembersFromDerivedRole for committee %s",committee));
@@ -112,8 +113,8 @@ public class ActiveCommitteeMemberDerivedRoleTypeServiceImpl extends DerivedRole
         if (!StringUtils.isEmpty(committeeId)) {
             Committee committee = committeeService.getCommitteeById(committeeId);
             if (committee != null) {
-                for (CommitteeMembership membership : committee.getCommitteeMemberships()) {
-                    if (isQualified(membership,qualification) && membership.getPersonId()!=null && StringUtils.equals(principalId, membership.getPersonId())) {
+                for (CommitteeMembershipBase membership : committee.getCommitteeMemberships()) {
+                    if (isQualified((CommitteeMembership) membership,qualification) && membership.getPersonId()!=null && StringUtils.equals(principalId, membership.getPersonId())) {
                         return true;
                     }
                 }

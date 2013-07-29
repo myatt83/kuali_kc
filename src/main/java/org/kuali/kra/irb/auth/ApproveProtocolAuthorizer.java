@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package org.kuali.kra.irb.auth;
 
-import org.kuali.kra.committee.bo.CommitteeDecisionMotionType;
+import org.kuali.kra.common.committee.bo.CommitteeDecisionMotionType;
 import org.kuali.kra.infrastructure.PermissionConstants;
 import org.kuali.kra.irb.actions.ProtocolAction;
 import org.kuali.kra.irb.actions.ProtocolActionType;
@@ -31,8 +31,8 @@ public class ApproveProtocolAuthorizer extends ProtocolAuthorizer {
      * @see org.kuali.kra.irb.auth.ProtocolAuthorizer#isAuthorized(java.lang.String, org.kuali.kra.irb.auth.ProtocolTask)
      */
     public boolean isAuthorized(String userId, ProtocolTask task) {
-        ProtocolAction lastAction = task.getProtocol().getLastProtocolAction();
-        ProtocolSubmission lastSubmission = task.getProtocol().getProtocolSubmission();
+        ProtocolAction lastAction = (ProtocolAction) task.getProtocol().getLastProtocolAction();
+        ProtocolSubmission lastSubmission = (ProtocolSubmission) task.getProtocol().getProtocolSubmission();
         
         return canPerform(lastAction, lastSubmission) && hasPermission(userId, task.getProtocol(), PermissionConstants.MAINTAIN_PROTOCOL_SUBMISSIONS);
     }

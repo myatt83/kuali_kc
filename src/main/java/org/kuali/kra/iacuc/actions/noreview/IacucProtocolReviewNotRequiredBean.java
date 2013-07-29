@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,22 +15,29 @@
  */
 package org.kuali.kra.iacuc.actions.noreview;
 
+import java.sql.Date;
+
 import org.kuali.kra.iacuc.IacucProtocol;
-import org.kuali.kra.protocol.actions.ActionHelper;
+import org.kuali.kra.iacuc.actions.IacucProtocolActionBean;
+import org.kuali.kra.protocol.actions.ActionHelperBase;
 import org.kuali.kra.protocol.actions.noreview.ProtocolReviewNotRequiredBean;
 
 /**
  * This class manages the HTML Elements needed for the review not required panel.
  */
-public class IacucProtocolReviewNotRequiredBean extends ProtocolReviewNotRequiredBean {
+public class IacucProtocolReviewNotRequiredBean extends IacucProtocolActionBean implements ProtocolReviewNotRequiredBean {
 
     private static final long serialVersionUID = -8686091412369007790L;
+    
+    private String comments = "";
+    private Date actionDate = new Date(System.currentTimeMillis());
+    private Date decisionDate = new Date(System.currentTimeMillis());
 
     /**
      * Constructs a ProtocolReviewNotRequiredBean.
      * @param actionHelper Reference back to the action helper for this bean
      */
-    public IacucProtocolReviewNotRequiredBean(ActionHelper actionHelper) {
+    public IacucProtocolReviewNotRequiredBean(ActionHelperBase actionHelper) {
         super(actionHelper);
     }
 
@@ -38,4 +45,28 @@ public class IacucProtocolReviewNotRequiredBean extends ProtocolReviewNotRequire
         return (IacucProtocol)getProtocol();
     }
     
+
+    public String getComments() {
+        return comments;
+    }
+
+    public void setComments(String comments) {
+        this.comments = comments;
+    }
+
+    public Date getActionDate() {
+        return actionDate;
+    }
+
+    public void setActionDate(Date actionDate) {
+        this.actionDate = actionDate;
+    }
+
+    public Date getDecisionDate() {
+        return decisionDate;
+    }
+
+    public void setDecisionDate(Date decisionDate) {
+        this.decisionDate = decisionDate;
+    }    
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,7 @@
  */
 package org.kuali.kra.irb.actions;
 
-import java.io.Serializable;
-
-public class ProtocolEditableBean extends ProtocolActionBean implements Serializable {
+public class ProtocolEditableBean extends ProtocolActionBean implements org.kuali.kra.protocol.actions.ProtocolEditableBean {
     
     private static final long serialVersionUID = 8009752803115791560L;
     

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,13 @@
 package org.kuali.kra.iacuc.actions.assignagenda;
 
 import org.kuali.kra.iacuc.IacucProtocolDocument;
-import org.kuali.kra.protocol.actions.assignagenda.ProtocolAssignToAgendaEvent;
+import org.kuali.kra.protocol.actions.assignagenda.ProtocolAssignToAgendaEventBase;
 import org.kuali.kra.rule.BusinessRuleInterface;
 
 /**
  * The event that occurs when the IRB Administrator assigns a protocol to an agenda.
  */
-public class IacucProtocolAssignToAgendaEvent extends ProtocolAssignToAgendaEvent {
+public class IacucProtocolAssignToAgendaEvent extends ProtocolAssignToAgendaEventBase {
 
 
     public IacucProtocolAssignToAgendaEvent(IacucProtocolDocument document, IacucProtocolAssignToAgendaBean protocolAssignToAgendaBean) {

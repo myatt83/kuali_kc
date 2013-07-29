@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.kuali.kra.budget.document;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,6 +24,7 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.kuali.kra.authorization.KraAuthorizationConstants;
 import org.kuali.kra.award.document.AwardDocument;
+import org.kuali.kra.bo.DocumentCustomData;
 import org.kuali.kra.bo.DocumentNextvalue;
 import org.kuali.kra.budget.core.Budget;
 import org.kuali.kra.budget.core.BudgetParent;
@@ -255,12 +257,16 @@ public class BudgetDocument<T extends BudgetParent> extends ResearchDocumentBase
     @Override
     public String getCustomLockDescriptor(Person user) {
         String activeLockRegion = (String) GlobalVariables.getUserSession().retrieveObject(KraAuthorizationConstants.ACTIVE_LOCK_REGION);
+        String updatedTimestamp = "";
+        if (this.getUpdateTimestamp() != null) {
+            updatedTimestamp = (new SimpleDateFormat("MM/dd/yyyy KK:mm a").format(this.getUpdateTimestamp()));
+        }
         if (StringUtils.isNotEmpty(activeLockRegion)) {
             BudgetParentDocument parent = this.getParentDocument();
             if (parent != null) {
-                return parent.getDocumentNumber() + "-" + activeLockRegion; 
+                return this.getBudget().getBudgetId() + "-" + activeLockRegion + "-" + activeLockRegion + "-" + GlobalVariables.getUserSession().getPrincipalName() + "-" + updatedTimestamp; 
             }
-            return this.getDocumentNumber() + "-" + activeLockRegion;
+            return this.getBudget().getBudgetId() + "-" + activeLockRegion + "-" + activeLockRegion + "-" + GlobalVariables.getUserSession().getPrincipalName() + "-" + updatedTimestamp;
         }
         
         return null;
@@ -333,5 +339,9 @@ public class BudgetDocument<T extends BudgetParent> extends ResearchDocumentBase
             AwardDocument ad = (AwardDocument) getParentDocument();
             return ad.getAward().getAwardAmountInfos().get(ad.getAward().getAwardAmountInfos().size() - 1).getObligationExpirationDate();
         }
+    }
+    @Override
+    public List<? extends DocumentCustomData> getDocumentCustomData() {
+        return new ArrayList();
     }    
 }

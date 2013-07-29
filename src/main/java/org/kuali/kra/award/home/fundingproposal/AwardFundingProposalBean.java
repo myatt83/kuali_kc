@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,6 @@ import org.kuali.kra.award.customdata.AwardCustomData;
 import org.kuali.kra.award.home.Award;
 import org.kuali.kra.award.home.AwardService;
 import org.kuali.kra.bo.CustomAttributeDocument;
-import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.infrastructure.PermissionConstants;
 import org.kuali.kra.institutionalproposal.InstitutionalProposalConstants;
@@ -36,8 +35,7 @@ import org.kuali.kra.institutionalproposal.home.InstitutionalProposal;
 import org.kuali.kra.institutionalproposal.proposaladmindetails.ProposalAdminDetails;
 import org.kuali.kra.institutionalproposal.service.InstitutionalProposalService;
 import org.kuali.kra.proposaldevelopment.bo.DevelopmentProposal;
-import org.kuali.rice.coreservice.framework.parameter.ParameterConstants;
-import org.kuali.rice.coreservice.framework.parameter.ParameterService;
+import org.kuali.rice.core.api.util.type.KualiDecimal;
 import org.kuali.rice.kim.api.identity.IdentityService;
 import org.kuali.rice.kim.api.permission.PermissionService;
 import org.kuali.rice.krad.service.BusinessObjectService;
@@ -110,6 +108,22 @@ public class AwardFundingProposalBean implements Serializable {
             }
         }
         return allAwardsForAwardNumber;
+    }
+    
+    /**
+     * This method calculates the total cost of all funding proposals
+     * @return
+     */
+    public KualiDecimal getTotalCostOfFundingProposals() {
+        KualiDecimal total = new KualiDecimal(0.00);
+        for (Award award : getAllAwardsForAwardNumber()) {
+            for (AwardFundingProposal afp : award.getFundingProposals()) {
+                if (afp.isActive()) {
+                    total = total.add(new KualiDecimal(afp.getProposal().getTotalCost().doubleValue()));
+                }
+            }
+        }
+        return total;
     }
 
     private void replaceThisAwardInListOfFoundAwards(Award thisAward) {
@@ -324,18 +338,12 @@ public class AwardFundingProposalBean implements Serializable {
     
     
     private boolean validProposalStatus() {
-        
         int proposalStatusCode = newFundingProposal.getProposalStatus().getProposalStatusCode();
-        List<String> validCodes= new ArrayList<String>( KraServiceLocator.getService(ParameterService.class).getParameterValuesAsString(Constants.MODULE_NAMESPACE_INSTITUTIONAL_PROPOSAL, ParameterConstants.DOCUMENT_COMPONENT, "validFundingProposalStatusCodes") );
-        ListIterator itr= validCodes.listIterator();
-        while(itr.hasNext()) {
-            Object currentCode= itr.next();
-            String[] codes= ((String) currentCode).split(","); 
-            for(int i=0; i < codes.length; i++) {
-                int code= Integer.parseInt(codes[i]);
-                if(proposalStatusCode == code) {
-                    return true;
-                }
+        Collection<String> validCodes = getInstitutionalProposalService().getValidFundingProposalStatusCodes();
+        for (String validCode : validCodes) {
+            int code = Integer.parseInt(validCode);
+            if(proposalStatusCode == code) {
+                return true;
             }
         }
         
@@ -365,7 +373,7 @@ public class AwardFundingProposalBean implements Serializable {
 
     private void initializeAwardCustomDataIfNecessary(Award award) {
         if (award.getAwardCustomDataList().isEmpty()) {
-            Map<String, CustomAttributeDocument> customAttributeDocuments = awardForm.getAwardDocument().getCustomAttributeDocuments();
+            Map<String, CustomAttributeDocument> customAttributeDocuments = awardForm.getCustomDataHelper().getCustomAttributeDocuments();
             for (Map.Entry<String, CustomAttributeDocument> entry : customAttributeDocuments.entrySet()) {
                 CustomAttributeDocument customAttributeDocument = entry.getValue();
                 AwardCustomData awardCustomData = new AwardCustomData();

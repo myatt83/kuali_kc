@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -102,6 +102,20 @@ public class FinancialEntityManagementAction extends FinancialEntityAction {
             recordSubmitActionSuccess("Reporter Units save ");
         }
         return mapping.findForward(Constants.MAPPING_BASIC);
+    }
+
+    /**
+     * 
+     * This method for 'close' button action.
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws Exception
+     */
+    public ActionForward close(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {      
+        return mapping.findForward("close");
     }
 
 }

@@ -1,5 +1,5 @@
 <%--
- Copyright 2005-2010 The Kuali Foundation
+ Copyright 2005-2013 The Kuali Foundation
 
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@
 <script type="text/javascript" src="scripts/jquery/jquery.treeview.js"></script>
 <script type="text/javascript" src="scripts/jquery/CalendarPopup.js"></script>
 
-
 <c:set var="proposalDevelopmentAttributes" value="${DataDictionary.DevelopmentProposal.attributes}" />
 <c:set var="proposalPersonAttributes" value="${DataDictionary.ProposalPerson.attributes}" />
 <c:set var="readOnly" value="${not KualiForm.editingMode['modifyProposal']}" scope="request" />
@@ -41,14 +40,33 @@
   	headerDispatch="${KualiForm.headerDispatch}"
   	headerTabActive="keyPersonnel">
   	
+  	<div id="workarea">
+  	<style>
+  		#addPersonDiv table {
+  			border-right: 0;
+  			display: table;
+  			width: auto;
+  		}
+  		#addPersonDiv td {
+  			padding: 0;
+  			border-left: 0;
+  			border-bottom: 0;
+  		}
+  		#addPersonDiv td.grid {
+  			border-bottom: 1px solid #999999;
+  			border-left: 1px solid #999999;
+  			padding: 2px;
+  		}
+  	</style>
   	<div align="right"><kul:help documentTypeName="ProposalDevelopmentDocument" pageName="Key Personnel" /></div>
 
 <c:set var="viewOnly" value="${not KualiForm.editingMode['modifyProposal']}" />
 <kra:section permission="modifyProposal">
 <c:if test="${not isHierarchyParent}">
-    <kra:uncollapsable tabTitle="Add Key Person" tabErrorKey="newProposalPerson*" auditCluster="keyPersonnelAuditErrors" tabAuditKey="newProposalPerson*">
+	<div id="addPersonDiv">
+    <kra:uncollapsable tabTitle="Add Key Person" tabErrorKey="newProposalPerson*" auditCluster="keyPersonnelAuditErrors" tabAuditKey="newProposalPerson*" styleClass="addline">
           <div align="center">
-            <table  cellpadding="0" cellspacing="0" class="grid" summary="">
+            <table  cellpadding="0" cellspacing="0" class="grid" summary="" style="border-right: 1px solid #999999;">
               <tr>
                 <th class="grid"><div align="right">*Person:</div></th>
 <c:choose>                  
@@ -114,7 +132,7 @@
            
             <br>
             <html:image property="methodToCall.clearProposalPerson" src="${ConfigProperties.kr.externalizable.images.url}tinybutton-clear1.gif" title="Clear Fields" alt="Clear Fields" styleClass="tinybutton"/>
-            <html:image property="methodToCall.insertProposalPerson" src="${ConfigProperties.kra.externalizable.images.url}tinybutton-addperson.gif" title="Add Proposal Person" alt="Add Proposal Person" styleClass="tinybutton"/>
+            <html:image property="methodToCall.insertProposalPerson" src="${ConfigProperties.kra.externalizable.images.url}tinybutton-addperson.gif" title="Add Proposal Person" alt="Add Proposal Person" styleClass="tinybutton addButton"/>
             <c:choose>
             <c:when test="${KualiForm.document.developmentProposalList[0].sponsorNihMultiplePi}">
             <br>
@@ -131,6 +149,7 @@
           </div>
     </kra:uncollapsable>
 </c:if>
+</div>
 </kra:section>
 
     <br/>
@@ -163,4 +182,54 @@ var kualiElements = kualiForm.elements;
 <script type="text/javascript">var $j = jQuery.noConflict();</script>
 <script language="javascript" src="dwr/interface/UnitService.js"></script>
 <script type="text/javascript" src="scripts/questionnaireAnswer.js"></script>
+
+<script language="JavaScript" type="text/javascript" src="${pageContext.request.contextPath}/dwr/util.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/dwr/interface/ProposalPersonService.js"></script>
+
+<script language="javascript" type="text/javascript">
+	<!--
+		function loadStates(newCountryCode, stateFieldName) {    
+			if (newCountryCode=='' || newCountryCode == "") {
+				//clearRecipients( frequencyCodeFieldName, "" );
+			} else {
+				var dwrReply = {
+					callback:function(data) {
+						if ( data != null ) {
+							for (var i = 0; i < document.KualiForm.elements.length; i++) {
+			  					var e = document.KualiForm.elements[i];
+			  					if(e.type == 'select-one' && e.name == stateFieldName) {
+			  						e.options.length=0;
+									if ( stateFieldName != null && stateFieldName != "" ) {
+										var option_array=data.split(",");
+										var optionNum=0;
+										var nameLabelPair;
+										while (optionNum < option_array.length)
+										{
+										   nameLabelPair = option_array[optionNum].split(";");
+										   e.options[optionNum]=new Option(nameLabelPair[1], nameLabelPair[0]);
+										   optionNum+=1;
+										}
+									}
+								}
+							}		
+						} else {
+							//if ( frequencyCodeFieldName != null && frequencyCodeFieldName != "" ) {
+								//setRecipientValue(  frequencyCodeFieldName, wrapError( "not found" ), true );
+							//}
+						}
+					},
+					errorHandler:function( errorMessage ) {
+						window.status = errorMessage;
+						setRecipientValue( stateFieldName, wrapError( "not found" ), true );
+					}
+				};
+				ProposalPersonService.getNewStateList(newCountryCode, dwrReply);
+			}
+		
+		}
+	
+		
+	-->
+</script>
+</div>
 </kul:documentPage>

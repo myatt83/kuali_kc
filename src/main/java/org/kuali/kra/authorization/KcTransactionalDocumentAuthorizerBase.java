@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import org.kuali.rice.coreservice.framework.CoreFrameworkServiceLocator;
 import org.kuali.rice.coreservice.framework.parameter.ParameterService;
 import org.kuali.rice.coreservice.impl.CoreServiceImplServiceLocator;
 import org.kuali.rice.kew.api.KewApiConstants;
+import org.kuali.rice.kew.api.KewApiServiceLocator;
 import org.kuali.rice.kew.api.WorkflowDocument;
 import org.kuali.rice.kew.api.WorkflowDocumentFactory;
 import org.kuali.rice.kew.api.action.ActionType;
@@ -148,9 +149,21 @@ public abstract class KcTransactionalDocumentAuthorizerBase extends BusinessObje
             documentActions.add(KRADConstants.KUALI_ACTION_CAN_FYI);
         }
         
+        if (canRecall(document, user)) {
+            documentActions.add(KRADConstants.KUALI_ACTION_CAN_RECALL);
+        }
+        
+        if (canComplete(document)) {
+            documentActions.add(KRADConstants.KUALI_ACTION_CAN_COMPLETE);
+        }
         return documentActions;
     }
     
+    /*Only enable the complete button if document is in EXCEPTION status.*/
+    protected boolean canComplete(Document document) {
+        return document.getDocumentHeader().getWorkflowDocument().isException();
+    }
+
     /**
      * Can the document be edited?
      * @param document the document
@@ -668,6 +681,6 @@ public abstract class KcTransactionalDocumentAuthorizerBase extends BusinessObje
     
     @Override
     public boolean canRecall(Document document, Person user) {
-        return true;
+        return false;
     }
 }

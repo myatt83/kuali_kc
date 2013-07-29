@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package org.kuali.kra.common.committee.meeting;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.kuali.kra.common.committee.bo.CommonCommitteeSchedule;
+import org.kuali.kra.common.committee.bo.CommitteeScheduleBase;
 import org.kuali.kra.common.committee.rules.CommitteeScheduleTimeRule;
 import org.kuali.kra.common.committee.web.struts.form.schedule.Time12HrFmt;
 import org.kuali.kra.infrastructure.KeyConstants;
@@ -64,7 +64,7 @@ public class MeetingSaveRule  extends ResearchDocumentRuleBase implements Busine
      * @param committeeSchedule
      * @return
      */
-    private boolean validateMeetingDetails(CommonCommitteeSchedule committeeSchedule) {
+    private boolean validateMeetingDetails(CommitteeScheduleBase committeeSchedule) {
 
         boolean rulePassed = true;
         errorReporter = new ErrorReporter();
@@ -197,7 +197,7 @@ public class MeetingSaveRule  extends ResearchDocumentRuleBase implements Busine
     /*
      * check if submitdeadline before scheduled date
      */
-    private boolean checkDeadlineBeforeScheduleDate(CommonCommitteeSchedule committeeSchedule) {
+    private boolean checkDeadlineBeforeScheduleDate(CommitteeScheduleBase committeeSchedule) {
         boolean rulePassed = true;
         if (committeeSchedule.getProtocolSubDeadline() != null && (committeeSchedule.getScheduledDate().before(committeeSchedule.getProtocolSubDeadline()))) {
             reportError("meetingHelper.committeeSchedule.protocolSubDeadline", KeyConstants.ERROR_COMMITTEESCHEDULE_DEADLINE, committeeSchedule.getProtocolSubDeadline().toString(), committeeSchedule.getScheduledDate().toString());

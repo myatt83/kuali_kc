@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import org.jmock.Mockery;
 import org.jmock.integration.junit4.JUnit4Mockery;
 import org.junit.Before;
 import org.junit.Test;
-import org.kuali.kra.committee.bo.CommitteeDecisionMotionType;
+import org.kuali.kra.common.committee.bo.CommitteeDecisionMotionType;
 import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.irb.Protocol;
 import org.kuali.kra.irb.ProtocolDao;
@@ -528,10 +528,10 @@ public class ProtocolActionServiceTest extends ProtocolActionServiceTestBase {
         assertTrue(protocolActionService.canPerformAction("305", protocol));
 
         protocol.setProtocolStatusCode("300");
-        assertTrue(protocolActionService.canPerformAction("305", protocol));
+        assertFalse(protocolActionService.canPerformAction("305", protocol));
 
         protocol.setProtocolStatusCode("301");
-        assertTrue(protocolActionService.canPerformAction("305", protocol));
+        assertFalse(protocolActionService.canPerformAction("305", protocol));
 
         protocol.setProtocolStatusCode("302");
         assertTrue(protocolActionService.canPerformAction("305", protocol));
@@ -714,13 +714,13 @@ public class ProtocolActionServiceTest extends ProtocolActionServiceTestBase {
         assertTrue(protocolActionService.canPerformAction("102", protocol));
 
         protocol.setProtocolStatusCode("203");
-        assertFalse(protocolActionService.canPerformAction("102", protocol));
+        assertTrue(protocolActionService.canPerformAction("102", protocol));
 
         protocol.setProtocolStatusCode("300");
-        assertTrue(protocolActionService.canPerformAction("102", protocol));
+        assertFalse(protocolActionService.canPerformAction("102", protocol));
 
         protocol.setProtocolStatusCode("301");
-        assertTrue(protocolActionService.canPerformAction("102", protocol));
+        assertFalse(protocolActionService.canPerformAction("102", protocol));
 
         protocol.setProtocolStatusCode("302");
         assertTrue(protocolActionService.canPerformAction("102", protocol));
@@ -735,6 +735,7 @@ public class ProtocolActionServiceTest extends ProtocolActionServiceTestBase {
         assertTrue(protocolActionService.canPerformAction("102", protocol));
     }
 
+    @SuppressWarnings("rawtypes")
     @Test
     public void testActionTypeCode205ReviewTypeCode2() {
         protocol.getProtocolSubmission().setSubmissionNumber(1); // Not null
@@ -744,7 +745,7 @@ public class ProtocolActionServiceTest extends ProtocolActionServiceTestBase {
         ProtocolReviewer reviewer = new ProtocolReviewer();
         review.setProtocolReviewer(reviewer);
         reviews.add(review);
-        protocol.getProtocolSubmission().setProtocolOnlineReviews(reviews);
+        protocol.getProtocolSubmission().setProtocolOnlineReviews((List)reviews);
 
         protocol.getProtocolSubmission().setProtocolReviewTypeCode("2");
 
@@ -755,6 +756,7 @@ public class ProtocolActionServiceTest extends ProtocolActionServiceTestBase {
         assertTrue(protocolActionService.canPerformAction("205", protocol));
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Test
     public void testActionTypeCode208ReviewTypeCode6() {
         protocol.getProtocolSubmission().setSubmissionNumber(1); // Not null
@@ -764,7 +766,7 @@ public class ProtocolActionServiceTest extends ProtocolActionServiceTestBase {
         ProtocolReviewer reviewer = new ProtocolReviewer();
         review.setProtocolReviewer(reviewer);
         reviews.add(review);
-        protocol.getProtocolSubmission().setProtocolOnlineReviews(reviews);
+        protocol.getProtocolSubmission().setProtocolOnlineReviews((List)reviews);
 
         protocol.getProtocolSubmission().setProtocolReviewTypeCode("6");
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,24 +16,14 @@
 package org.kuali.kra.irb.protocol.reference;
 
 import org.kuali.kra.irb.ProtocolDocument;
+import org.kuali.kra.protocol.protocol.reference.AddProtocolReferenceEventBase;
 import org.kuali.rice.krad.document.Document;
-import org.kuali.rice.krad.rules.rule.BusinessRule;
 
 /**
  * This class hooks Rule to Event in KNS
  */
-public class AddProtocolReferenceEvent extends ProtocolReferenceEventBase {
+public class AddProtocolReferenceEvent extends AddProtocolReferenceEventBase {
 
-    /*
-
-    public AddProtocolReferenceEvent(String errorPathPrefix, ProtocolDocument document, ProtocolReference protocolReference) {
-        super("adding ProtocolReference to document " + getDocumentId(document), errorPathPrefix, document, protocolReference);
-    }
-
-    public AddProtocolReferenceEvent(String errorPathPrefix, Document document, ProtocolReference protocolReference) {
-        this(errorPathPrefix, (ProtocolDocument)document, protocolReference);
-    }
-    */   
     
     /**
      * 
@@ -43,7 +33,7 @@ public class AddProtocolReferenceEvent extends ProtocolReferenceEventBase {
      * @param protocolReferenceBean
      */
     public AddProtocolReferenceEvent(String errorPathPrefix, ProtocolDocument document, ProtocolReferenceBean protocolReferenceBean) {
-        super("adding ProtocolReference to document " + getDocumentId(document), errorPathPrefix, document, protocolReferenceBean);
+        super(errorPathPrefix, document, protocolReferenceBean);
     }
     
     /**
@@ -56,19 +46,4 @@ public class AddProtocolReferenceEvent extends ProtocolReferenceEventBase {
     public AddProtocolReferenceEvent(String errorPathPrefix, Document document, ProtocolReferenceBean protocolReferenceBean) {
         this(errorPathPrefix, (ProtocolDocument)document, protocolReferenceBean);
     } 
-    
-    /**
-     * @see org.kuali.core.rule.event.KualiDocumentEvent#getRuleInterfaceClass()
-     */
-    public Class getRuleInterfaceClass() {
-        return AddProtocolReferenceRule.class;
-    }
-
-    /**
-     * @see org.kuali.core.rule.event.KualiDocumentEvent#invokeRuleMethod(org.kuali.core.rule.BusinessRule)
-     */
-    public boolean invokeRuleMethod(BusinessRule rule) {
-        return ((AddProtocolReferenceRule)rule).processAddProtocolReferenceBusinessRules(this);
-    }
-
 }

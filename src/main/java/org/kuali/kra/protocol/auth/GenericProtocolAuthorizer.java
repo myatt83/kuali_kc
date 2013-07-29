@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import org.kuali.kra.irb.actions.ProtocolActionType;
  * 
  * This class is the authorizer for all the generic actions.
  */
-public class GenericProtocolAuthorizer extends ProtocolAuthorizer {
+public class GenericProtocolAuthorizer extends ProtocolAuthorizerBase {
     
     /**
      * close protocol generic action.
@@ -78,14 +78,14 @@ public class GenericProtocolAuthorizer extends ProtocolAuthorizer {
 
     
     /** {@inheritDoc} */
-    public boolean isAuthorized(String userId, ProtocolTask task) {
+    public boolean isAuthorized(String userId, ProtocolTaskBase task) {
         return canExecuteAction(task.getProtocol(), convertGenericTaskNameToProtocolActionType()) 
             && hasPermission(userId, task.getProtocol(), PermissionConstants.MAINTAIN_PROTOCOL_SUBMISSIONS);
     }
     
     /**
      * 
-     * This method converts a Generic Task Name to a Protocol Action Type.
+     * This method converts a Generic Task Name to a ProtocolBase Action Type.
      * @return a ProtocolActionType String
      */
      protected String convertGenericTaskNameToProtocolActionType() {

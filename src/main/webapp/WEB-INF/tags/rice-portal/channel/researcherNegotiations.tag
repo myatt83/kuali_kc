@@ -1,5 +1,5 @@
 <%--
- Copyright 2005-2010 The Kuali Foundation
+ Copyright 2005-2013 The Kuali Foundation
  
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 <channel:portalChannelTop channelTitle="Negotiations" />
 <div class="body">
   <ul class="chan">
-    <li><portal:portalLink displayTitle="false" title='All My Negotiations' url='${ConfigProperties.kr.url}/lookup.do?methodToCall=search&businessObjectClassName=org.kuali.kra.negotiations.bo.Negotiation&docFormKey=88888888&includeCustomActionUrls=true&returnLocation=${ConfigProperties.application.url}/portal.do&hideReturnLink=true&associatedNegotiable.piName=${UserSession.person.firstName}*${UserSession.person.lastName}&searchCriteriaEnabled=true'>All My Negotiations</portal:portalLink></li>
+    <li><portal:portalLink displayTitle="false" title='All My Negotiations' url='${ConfigProperties.application.url}/kr/lookup.do?methodToCall=search&businessObjectClassName=org.kuali.kra.negotiations.bo.Negotiation&docFormKey=88888888&includeCustomActionUrls=true&returnLocation=${ConfigProperties.application.url}/portal.do&hideReturnLink=true&associatedNegotiable.piName=${UserSession.person.firstName}*${UserSession.person.lastName}&searchCriteriaEnabled=true'>All My Negotiations</portal:portalLink></li>
   </ul>
 </div>
 <channel:portalChannelBottom />

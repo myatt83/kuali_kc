@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -622,6 +622,23 @@ public class AwardPaymentReportsAndTermsAction extends AwardAction {
     public ActionForward save(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
         AwardForm awardForm = (AwardForm) form;
         AwardDocument awardDocument = awardForm.getAwardDocument();
+        
+        if (awardForm.getAwardDocument().getAward().getApprovedEquipmentItems() != null || awardForm.getAwardDocument().getAward().getApprovedEquipmentItems().isEmpty()) {
+            awardForm.getAwardDocument().getAward().setApprovedEquipmentIndicator(Constants.YES_FLAG);
+        } else {
+            awardForm.getAwardDocument().getAward().setApprovedEquipmentIndicator(Constants.NO_FLAG);
+        }
+        if (awardForm.getAwardDocument().getAward().getApprovedForeignTravelTrips() != null || awardForm.getAwardDocument().getAward().getApprovedForeignTravelTrips().isEmpty()) {
+            awardForm.getAwardDocument().getAward().setApprovedForeignTripIndicator(Constants.YES_FLAG);
+        } else {
+            awardForm.getAwardDocument().getAward().setApprovedForeignTripIndicator(Constants.NO_FLAG);
+        }
+        if (awardForm.getAwardDocument().getAward().getPaymentScheduleItems() != null || awardForm.getAwardDocument().getAward().getPaymentScheduleItems().isEmpty()) {
+            awardForm.getAwardDocument().getAward().setPaymentScheduleIndicator(Constants.YES_FLAG);
+        } else {
+            awardForm.getAwardDocument().getAward().setPaymentScheduleIndicator(Constants.NO_FLAG);
+        }
+        
         getAwardCloseoutService().updateCloseoutDueDatesBeforeSave(awardDocument.getAward());
         if (new AwardDocumentRule().processAwardReportTermBusinessRules(awardDocument)) {
             
@@ -819,7 +836,7 @@ public class AwardPaymentReportsAndTermsAction extends AwardAction {
         getReportTrackingService().updateMultipleReportTrackingRecords(reportTrackings, awardForm.getReportTrackingBeans().get(awardReportTermItemsIndex));
         getReportTrackingService().setReportTrackingListSelected(reportTrackings, false);
         }
-        awardForm.setReportTrackingBeans(awardForm.buildReportTrackingBeans());
+        awardForm.buildReportTrackingBeans();
         return mapping.findForward(Constants.MAPPING_AWARD_BASIC);
     }
     

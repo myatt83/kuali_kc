@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,34 +15,23 @@
  */
 package org.kuali.kra.irb.actions.genericactions;
 
-import org.kuali.kra.irb.ProtocolDocument;
+import org.kuali.kra.protocol.ProtocolDocumentBase;
+import org.kuali.kra.protocol.actions.genericactions.ProtocolGenericActionBean;
+import org.kuali.kra.protocol.actions.genericactions.ProtocolGenericActionEventBase;
 import org.kuali.kra.rule.BusinessRuleInterface;
-import org.kuali.kra.rule.event.KraDocumentEventBaseExtension;
 
 /**
  * Encapsulates the event that the user performs a generic action.
  */
-public class ProtocolGenericActionEvent extends KraDocumentEventBaseExtension {
-    
-    private ProtocolGenericActionBean protocolGenericActionBean;
+@SuppressWarnings("unchecked")
+public class ProtocolGenericActionEvent extends ProtocolGenericActionEventBase {
 
-    /**
-     * Constructs a ProtocolGenericActionEvent.
-     * @param document the document to validate
-     * @param protocolGenericActionBean the bean that keeps the comments and dates
-     */
-    public ProtocolGenericActionEvent(ProtocolDocument document, ProtocolGenericActionBean protocolGenericActionBean) {
-        super("Performing generic action on document " + getDocumentId(document), protocolGenericActionBean.getErrorPropertyKey(), document);
-        
-        this.protocolGenericActionBean = protocolGenericActionBean;
+    public ProtocolGenericActionEvent(ProtocolDocumentBase document, ProtocolGenericActionBean protocolGenericActionBean) {
+        super(document, protocolGenericActionBean);
     }
     
-    public ProtocolGenericActionBean getProtocolGenericActionBean() {
-        return protocolGenericActionBean;
-    }
-
     @Override
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public BusinessRuleInterface getRule() {
         return new ProtocolGenericActionRule();
     }

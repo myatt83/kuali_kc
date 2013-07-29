@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package org.kuali.kra.award.home;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -61,6 +62,7 @@ import org.kuali.kra.bo.ScienceKeyword;
 import org.kuali.kra.bo.Sponsor;
 import org.kuali.kra.bo.Unit;
 import org.kuali.kra.bo.UnitAdministrator;
+import org.kuali.kra.bo.versioning.VersionHistorySearchBo;
 import org.kuali.kra.bo.versioning.VersionStatus;
 import org.kuali.kra.budget.core.BudgetParent;
 import org.kuali.kra.budget.personnel.PersonRolodex;
@@ -72,6 +74,7 @@ import org.kuali.kra.infrastructure.KeyConstants;
 import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.infrastructure.RoleConstants;
 import org.kuali.kra.institutionalproposal.home.InstitutionalProposal;
+import org.kuali.kra.institutionalproposal.service.InstitutionalProposalService;
 import org.kuali.kra.negotiations.bo.Negotiable;
 import org.kuali.kra.negotiations.bo.NegotiationPersonDTO;
 import org.kuali.kra.proposaldevelopment.bo.ActivityType;
@@ -80,7 +83,11 @@ import org.kuali.kra.service.Sponsorable;
 import org.kuali.kra.service.SystemAuthorizationService;
 import org.kuali.kra.service.UnitService;
 import org.kuali.kra.subaward.bo.SubAward;
+import org.kuali.kra.timeandmoney.TimeAndMoneyDocumentHistory;
+import org.kuali.kra.timeandmoney.document.TimeAndMoneyDocument;
+import org.kuali.kra.timeandmoney.service.TimeAndMoneyHistoryService;
 import org.kuali.kra.timeandmoney.transactions.AwardTransactionType;
+import org.kuali.rice.core.api.CoreApiServiceLocator;
 import org.kuali.rice.core.api.util.type.KualiDecimal;
 import org.kuali.rice.kew.api.exception.WorkflowException;
 import org.kuali.rice.kim.api.role.Role;
@@ -108,6 +115,11 @@ public class Award extends KraPersistableBusinessObjectBase implements KeywordsM
     private static final int MAX_NBR_AWD_HIERARCHY_TEMP_OBJECTS = 100;
     private static final String DEFAULT_GROUP_CODE_FOR_CENTRAL_ADMIN_CONTACTS = "C";
 
+    public static final String NOTIFICATION_IRB_SPECIAL_REVIEW_LINK_ADDED = "552";
+    public static final String NOTIFICATION_IRB_SPECIAL_REVIEW_LINK_DELETED = "553";
+    public static final String NOTIFICATION_IACUC_SPECIAL_REVIEW_LINK_ADDED = "554";
+    public static final String NOTIFICATION_IACUC_SPECIAL_REVIEW_LINK_DELETED = "555";
+    
     private static final long serialVersionUID = 3797220122448310165L;
     private Long awardId;
     private AwardDocument awardDocument;
@@ -159,6 +171,8 @@ public class Award extends KraPersistableBusinessObjectBase implements KeywordsM
     private Date financialAccountCreationDate;
     private String financialChartOfAccountsCode;
     private String awardSequenceStatus;
+//    private String sequenceOwnerVersionNameValue;
+//    private Integer sequenceOwnerSequenceNumber;
 
 
     private static boolean newVersion;
@@ -250,10 +264,16 @@ public class Award extends KraPersistableBusinessObjectBase implements KeywordsM
 
     private transient String lookupOspAdministratorName;
     transient AwardAmountInfoService awardAmountInfoService;
+    transient TimeAndMoneyHistoryService timeAndMoneyHistoryService;
     private transient AwardHierarchyService awardHierarchyService;
 
     private transient List<AwardUnitContact> centralAdminContacts;
     private List<SubAward> subAwardList;
+    
+    private transient boolean allowUpdateTimestampToBeReset = true;
+    
+    private VersionHistorySearchBo versionHistory;
+
     /**
      * 
      * Constructs an Award BO.
@@ -460,6 +480,13 @@ public class Award extends KraPersistableBusinessObjectBase implements KeywordsM
             awardHierarchyService = KraServiceLocator.getService(AwardHierarchyService.class);
         }
         return awardHierarchyService;
+    }
+
+    public TimeAndMoneyHistoryService getTimeAndMoneyHistoryService() {
+        if (timeAndMoneyHistoryService == null) {
+            timeAndMoneyHistoryService = KraServiceLocator.getService(TimeAndMoneyHistoryService.class);
+        }
+        return timeAndMoneyHistoryService;
     }
 
     /**
@@ -1217,18 +1244,6 @@ public class Award extends KraPersistableBusinessObjectBase implements KeywordsM
     }
 
     /**
-     * This method calculates the total cost of all funding proposals
-     * @return
-     */
-    public KualiDecimal getTotalCostOfFundingProposals() {
-        KualiDecimal total = new KualiDecimal(0.00);
-        for (AwardFundingProposal afp : fundingProposals) {
-            total = total.add(new KualiDecimal(afp.getProposal().getTotalCost().doubleValue()));
-        }
-        return total;
-    }
-
-    /**
      * 
      * @param proposalNumber
      */
@@ -1449,6 +1464,10 @@ public class Award extends KraPersistableBusinessObjectBase implements KeywordsM
             this.refreshReferenceObject("awardDocument");
         }
         return awardDocument;
+    }
+    
+    public String getAwardDocumentUrl() {
+        return getAwardDocument().buildForwardUrl();
     }
 
     /**
@@ -2026,10 +2045,7 @@ public class Award extends KraPersistableBusinessObjectBase implements KeywordsM
     }
 
     public void initializeAwardHierarchyTempObjects() {
-        awardHierarchyTempObjects = new ArrayList<AwardHierarchyTempObject>();
-        for (int i = 0; i < MAX_NBR_AWD_HIERARCHY_TEMP_OBJECTS; i++) {
-            awardHierarchyTempObjects.add(new AwardHierarchyTempObject());
-        }
+        awardHierarchyTempObjects = new AutoPopulatingList<AwardHierarchyTempObject>(AwardHierarchyTempObject.class);
     }
 
     /**
@@ -2233,7 +2249,7 @@ public class Award extends KraPersistableBusinessObjectBase implements KeywordsM
      */
 
     public Sponsor getSponsor() {
-        if (sponsor == null && !StringUtils.isEmpty(sponsorCode)) {
+        if (!StringUtils.isEmpty(sponsorCode)) {
             this.refreshReferenceObject("sponsor");
         }
         return sponsor;
@@ -2310,7 +2326,7 @@ public class Award extends KraPersistableBusinessObjectBase implements KeywordsM
     // Note: following the pattern of Sponsor, this getter indirectly calls a service.
     // Is there a better way?
     public Sponsor getPrimeSponsor() {
-        if (primeSponsor == null && !StringUtils.isEmpty(getPrimeSponsorCode())) {
+        if (!StringUtils.isEmpty(getPrimeSponsorCode())) {
             this.refreshReferenceObject("primeSponsor");
         }
         return primeSponsor;
@@ -2505,7 +2521,7 @@ public class Award extends KraPersistableBusinessObjectBase implements KeywordsM
      * @see org.kuali.kra.common.permissions.Permissionable#getDocumentNumberForPermission()
      */
     public String getDocumentNumberForPermission() {
-        return awardNumber;
+        return awardId != null ? awardId.toString() : "";
     }
 
     /**
@@ -2621,7 +2637,13 @@ public class Award extends KraPersistableBusinessObjectBase implements KeywordsM
      */
     public String getPrincipalInvestigatorName() {
         AwardPerson pi = getPrincipalInvestigator();
-        principalInvestigatorName = pi != null ? pi.getFullName() : null;
+        if (pi != null) {
+            if (pi.getIsRolodexPerson()) {
+                principalInvestigatorName = pi.getRolodex().getOrganization();
+            } else {
+                principalInvestigatorName = pi.getFullName();
+            }
+        }
         return principalInvestigatorName;
     }
 
@@ -2676,7 +2698,9 @@ public class Award extends KraPersistableBusinessObjectBase implements KeywordsM
             for(int i = TOTAL_STATIC_REPORTS ;i < awardCloseoutItems.size() ; i++){
                 awardCloseoutNewItems.add(awardCloseoutItems.get(i));
             }
-            awardCloseoutItems.removeAll(awardCloseoutNewItems);
+            for (int i = awardCloseoutItems.size();i > TOTAL_STATIC_REPORTS; i--) {
+                awardCloseoutItems.remove(i - 1);
+            }
             Collections.sort(awardCloseoutNewItems, new Comparator(){
               public int compare(Object o1, Object o2) {
                   if(o1 instanceof AwardCloseout && o2 instanceof AwardCloseout) {
@@ -2879,11 +2903,17 @@ public class Award extends KraPersistableBusinessObjectBase implements KeywordsM
      */
     public AwardFundingProposal removeFundingProposal(int index) {
         AwardFundingProposal afp = (index >= 0) ? fundingProposals.remove(index) : null;
-        if (afp != null) {
-            afp.getProposal().remove(afp);
+        afp.getProposalId();
+        InstitutionalProposal proposal = getInstitutionalProposalService().getInstitutionalProposal(afp.getProposalId().toString());
+        if (proposal != null) {
+            proposal.remove(afp);
         }
         return afp;
     }
+    private InstitutionalProposalService getInstitutionalProposalService() {
+        return KraServiceLocator.getService(InstitutionalProposalService.class);
+    }
+
 
     /**
      * Given an AwardComment as a template, try to find an existing AwardComment of that type
@@ -3053,7 +3083,11 @@ public class Award extends KraPersistableBusinessObjectBase implements KeywordsM
     }
 
     public void populateAdditionalQualifiedRoleAttributes(Map<String, String> qualifiedRoleAttributes) {
-        qualifiedRoleAttributes.put("documentNumber", getAwardDocument().getDocumentNumber());
+        /**
+         * when we check to see if the logged in user can create an award account, this function is called, but awardDocument is null at that time.
+         */
+        String documentNumber = getAwardDocument() != null ? getAwardDocument().getDocumentNumber() : "";
+        qualifiedRoleAttributes.put("documentNumber", documentNumber);
     }
 
     protected BusinessObjectService getBusinessObjectService() {
@@ -3112,10 +3146,6 @@ public class Award extends KraPersistableBusinessObjectBase implements KeywordsM
     public AwardHierarchyTempObject getAwardHierarchyTempObject(int index) {
         if (awardHierarchyTempObjects == null) {
             initializeAwardHierarchyTempObjects();
-        }
-
-        while (awardHierarchyTempObjects.size() <= index) {
-            awardHierarchyTempObjects.add(new AwardHierarchyTempObject());
         }
 
         return awardHierarchyTempObjects.get(index);
@@ -3502,4 +3532,96 @@ public class Award extends KraPersistableBusinessObjectBase implements KeywordsM
         // TODO Auto-generated method stub
         return getAwardNumber();
     }
+    
+    public boolean isAllowUpdateTimestampToBeReset() {
+        return allowUpdateTimestampToBeReset;
+    }
+    
+    /**
+     * 
+     * Setting this value to false will prevent the update timestamp field from being upddate just once.  After that, the update timestamp field will update as regular.
+     * @param allowUpdateTimestampToBeReset
+     */
+    public void setAllowUpdateTimestampToBeReset(boolean allowUpdateTimestampToBeReset) {
+        this.allowUpdateTimestampToBeReset = allowUpdateTimestampToBeReset;
+    }
+
+    @Override
+    public void setUpdateTimestamp(Timestamp updateTimestamp) {
+        if (isAllowUpdateTimestampToBeReset()) {
+            super.setUpdateTimestamp(updateTimestamp);
+        } else {
+            setAllowUpdateTimestampToBeReset(true);
+        }
+    }
+    
+    public List<Award> getAwardVersions() {
+        Map<String, String> fieldValues = new HashMap<String,String>();
+        fieldValues.put("awardNumber", getAwardNumber());
+        BusinessObjectService businessObjectService =  KraServiceLocator.getService(BusinessObjectService.class);
+        List<Award> awards = (List<Award>)businessObjectService.findMatchingOrderBy(Award.class, fieldValues, "sequenceNumber", true);   
+        return awards;
+    }
+
+    public String getAwardDescriptionLine() {
+        AwardAmountInfo aai = getLastAwardAmountInfo();
+        String transactionTypeDescription;
+        String versionNumber;
+        if(aai == null || aai.getOriginatingAwardVersion() == null) {
+            versionNumber = getSequenceNumber().toString();
+        }else {
+            versionNumber = aai.getOriginatingAwardVersion().toString();
+        }
+        if(!(getAwardTransactionType() == null)) {
+            transactionTypeDescription = getAwardTransactionType().getDescription();
+        }else {
+            transactionTypeDescription = "None";
+        }
+        return "Award Version " + versionNumber + ", " + transactionTypeDescription + ", updated " + getUpdateTimeAndUser(); 
+    }
+
+    public String getUpdateTimeAndUser() {
+        String createDateStr = null;
+        String updateUser = null;
+        if (getUpdateTimestamp() != null) {
+            createDateStr = CoreApiServiceLocator.getDateTimeService().toString(getUpdateTimestamp(), "hh:mm a MM/dd/yyyy");
+            updateUser = getUpdateUser().length() > 30 ? getUpdateUser().substring(0, 30) : getUpdateUser(); 
+        }
+        return createDateStr + ", by " + updateUser;
+    }
+ 
+    public List<TimeAndMoneyDocumentHistory>getTimeAndMoneyDocumentHistoryList() throws WorkflowException {  
+        List<TimeAndMoneyDocument> tnmDocs = getTimeAndMoneyHistoryService().buildTimeAndMoneyListForAwardDisplay(this);
+        List<TimeAndMoneyDocumentHistory> timeAndMoneyHistoryList = 
+            getTimeAndMoneyHistoryService().getDocHistoryAndValidInfosAssociatedWithAwardVersion(tnmDocs,getAwardAmountInfos(), this);
+        return timeAndMoneyHistoryList;
+    }
+
+    public VersionHistorySearchBo getVersionHistory() {
+        return versionHistory;
+    }
+
+    public void setVersionHistory(VersionHistorySearchBo versionHistory) {
+        this.versionHistory = versionHistory;
+    }
+    public void setProjectPersons(List<AwardPerson> projectPersons) {
+        this.projectPersons = projectPersons;
+    }
+
+//    public String getSequenceOwnerVersionNameValue() {
+//        return sequenceOwnerVersionNameValue;
+//    }
+//
+//    public void setSequenceOwnerVersionNameValue(String sequenceOwnerVersionNameValue) {
+//        this.sequenceOwnerVersionNameValue = sequenceOwnerVersionNameValue;
+//    }
+//
+//    public Integer getSequenceOwnerSequenceNumber() {
+//        return sequenceOwnerSequenceNumber;
+//    }
+//
+//    public void setSequenceOwnerSequenceNumber(Integer sequenceOwnerSequenceNumber) {
+//        this.sequenceOwnerSequenceNumber = sequenceOwnerSequenceNumber;
+//    }
+    
 }

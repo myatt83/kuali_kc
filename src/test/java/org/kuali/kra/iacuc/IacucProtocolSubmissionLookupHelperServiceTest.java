@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,12 +25,12 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.kuali.kra.bo.KcPerson;
-import org.kuali.kra.common.committee.bo.CommonCommittee;
-import org.kuali.kra.common.committee.document.CommonCommitteeDocument;
 import org.kuali.kra.iacuc.actions.submit.IacucProtocolSubmission;
+import org.kuali.kra.iacuc.committee.bo.IacucCommittee;
+import org.kuali.kra.iacuc.committee.document.CommonCommitteeDocument;
 import org.kuali.kra.iacuc.personnel.IacucProtocolPerson;
 import org.kuali.kra.infrastructure.PermissionConstants;
-import org.kuali.kra.protocol.actions.submit.ProtocolSubmission;
+import org.kuali.kra.protocol.actions.submit.ProtocolSubmissionBase;
 import org.kuali.kra.service.KcPersonService;
 import org.kuali.kra.service.KraAuthorizationService;
 import org.kuali.kra.test.infrastructure.KcUnitTestBase;
@@ -144,9 +144,9 @@ public class IacucProtocolSubmissionLookupHelperServiceTest extends KcUnitTestBa
         protocolDocument.setDocumentNumber("101");
         protocol.setProtocolDocument(protocolDocument);
         IacucProtocolSubmission protocolSubmission = new IacucProtocolSubmission();
-        List<ProtocolSubmission> submissions = new ArrayList<ProtocolSubmission>();
+        List<ProtocolSubmissionBase> submissions = new ArrayList<ProtocolSubmissionBase>();
         protocolSubmission.setSubmissionId(102L);
-        CommonCommittee committee = new CommonCommittee();
+        IacucCommittee committee = new IacucCommittee();
         committee.setCommitteeId("100");
         CommonCommitteeDocument document = new CommonCommitteeDocument();
         document.setDocumentNumber("101");

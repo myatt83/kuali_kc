@@ -1,5 +1,5 @@
 <%--
- Copyright 2005-2010 The Kuali Foundation
+ Copyright 2005-2013 The Kuali Foundation
  
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@
 	<div class="tab-container"  align="center">
 		<h3> 
 			<span class="subhead-left">Available Actions</span>
-			<span class="subhead-right"><kul:help businessObjectClassName="org.kuali.kra.iacuc.actions.IacucProtocolAction" altText="help"/></span>
+			<span class="subhead-right"><kul:help parameterNamespace="KC-IACUC" parameterDetailType="Document" parameterName="protocolAvailableActionsHelpUrl" altText="help"/></span>
 		</h3>
 	
 		<c:if test="${KualiForm.document.protocol.active and showActions}">
@@ -182,12 +182,11 @@
                                           beanName="iacucProtocolLiftHoldRequestBean"
                                           actionTypeCode="108"
                                           tabTitle="Request to Lift Hold"/>
-                                      
             <kra-iacuc-action:requestAction bean="${KualiForm.actionHelper.iacucProtocolSuspendRequestBean}"
                                           permission="${KualiForm.actionHelper.canRequestSuspend}"
                                           beanName="iacucProtocolSuspendRequestBean"
                                           taskName="iacucProtocolRequestSuspension"
-                                          actionTypeCode="113"
+                                          actionTypeCode="311"
                                           tabTitle="Request for Suspension"/>
 <%--             <kra-iacuc-action:requestAction bean="${KualiForm.actionHelper.protocolTerminateRequestBean}"
                                           permission="${KualiForm.actionHelper.canRequestTerminate}"
@@ -414,7 +413,7 @@
 					                                         canPerformAction="${KualiForm.actionHelper.canNotifyIacucUnavailable}"
 				    	                                     reason="Protocol can not be an amendment or renewal.
 				        	                                         <p>
-				            	                                     Protocol status is In Progress, Submitted To IACUC, Minor Revisions Required, Deferred, Amendment In Progress, Administratively Approved or Renewal In Progress." />
+				            	                                     Protocol status is Withdrawn, Active, Active On Hold, Administratively Approved, Review Not Required, Administratively Withdrawn, Disapproved, Suspended, Deactivated, Administratively Deactivated, Terminated, or Expired." />
 		            <kra-iacuc-action:genericUnavailableAction tabTitle="Notify Committee"
 					                                         canPerformAction="${KualiForm.actionHelper.canNotifyCommitteeUnavailable}"
 					                                         reason="Protocol review type must be Expedited.
@@ -465,6 +464,11 @@
 					                                         reason="Protocol status must be Active, Active - On Hold.
 					                                         		<p/>
 					                                         		Submission Type must not be Request To Deactivate" />
+					                                         		
+		            <kra-iacuc-action:genericUnavailableAction tabTitle="Request for Suspension"
+		                                                     canPerformAction="${KualiForm.actionHelper.canRequestSuspendUnavailable}"
+					                                         reason="Protocol status must be Active - On Hold, Administratively Approved, Administratively Withdrawn, or Administratively Deactivatd." />
+					                                         		
 	            	<kra-iacuc-action:genericUnavailableAction tabTitle="Request for Termination"
 	                	                                     canPerformAction="${KualiForm.actionHelper.canRequestTerminateUnavailable}"
 				        	                                 reason="Protocol can not be an amendment or renewal.

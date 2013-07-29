@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ package org.kuali.kra.protocol.onlinereview.event;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.kuali.kra.protocol.ProtocolOnlineReviewDocument;
+import org.kuali.kra.protocol.ProtocolOnlineReviewDocumentBase;
 import org.kuali.kra.protocol.onlinereview.rules.RejectOnlineReviewCommentRule;
 import org.kuali.kra.rule.event.KraDocumentEventBase;
 import org.kuali.rice.krad.rules.rule.BusinessRule;
@@ -28,7 +28,7 @@ public class RejectProtocolOnlineReviewCommentEvent extends KraDocumentEventBase
     private String reason = null;
     private int maxLength;
        
-    public RejectProtocolOnlineReviewCommentEvent(final ProtocolOnlineReviewDocument document,
+    public RejectProtocolOnlineReviewCommentEvent(final ProtocolOnlineReviewDocumentBase document,
                                                          final String rejectReason,
                                                          final int reasonMaxLength) {
         super("return protocol online review comment to reviewer", "DocReject", document);

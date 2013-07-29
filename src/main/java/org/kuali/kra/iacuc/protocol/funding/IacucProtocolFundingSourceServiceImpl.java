@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,22 @@
  */
 package org.kuali.kra.iacuc.protocol.funding;
 
-import org.kuali.kra.protocol.protocol.funding.ProtocolFundingSource;
-import org.kuali.kra.protocol.protocol.funding.ProtocolFundingSourceServiceImpl;
+import org.kuali.kra.iacuc.IacucProtocolDocument;
+import org.kuali.kra.protocol.ProtocolDocumentBase;
+import org.kuali.kra.protocol.protocol.funding.ProtocolFundingSourceBase;
+import org.kuali.kra.protocol.protocol.funding.ProtocolFundingSourceServiceImplBase;
 
-public class IacucProtocolFundingSourceServiceImpl extends ProtocolFundingSourceServiceImpl implements IacucProtocolFundingSourceService {
+public class IacucProtocolFundingSourceServiceImpl extends ProtocolFundingSourceServiceImplBase implements IacucProtocolFundingSourceService {
 
     @Override
-    protected ProtocolFundingSource creatNewProtocolFundingSourceInstanceHook(String fundingSourceNumber,
+    protected ProtocolFundingSourceBase creatNewProtocolFundingSourceInstanceHook(String fundingSourceNumber,
             String fundingSourceTypeCode, String fundingSourceName, String fundingSourceTitle) {
         return new IacucProtocolFundingSource(fundingSourceNumber, fundingSourceTypeCode, fundingSourceName, fundingSourceTitle);
+    }
+
+    @Override
+    protected Class<? extends ProtocolDocumentBase> getProtocolDocumentBOClassHook() {
+        return IacucProtocolDocument.class;
     }
 
 }

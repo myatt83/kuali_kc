@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,7 @@ import org.kuali.kra.irb.actions.correspondence.ProtocolActionCorrespondenceGene
 import org.kuali.kra.irb.actions.submit.ProtocolActionService;
 import org.kuali.kra.irb.onlinereview.ProtocolOnlineReviewService;
 import org.kuali.kra.irb.test.ProtocolFactory;
+import org.kuali.kra.protocol.actions.ProtocolActionBase;
 import org.kuali.kra.test.infrastructure.KcUnitTestBase;
 import org.kuali.kra.util.DateUtils;
 import org.kuali.rice.coreservice.framework.parameter.ParameterService;
@@ -118,7 +119,7 @@ public class ProtocolApproveServiceImplTest extends KcUnitTestBase {
         newAction.setSequenceNumber(protocol.getSequenceNumber());
         newAction.setComments(COMMENTS);
         if (protocol.getProtocolActions() == null) {
-            protocol.setProtocolActions(new ArrayList<ProtocolAction>());
+            protocol.setProtocolActions(new ArrayList<ProtocolActionBase>());
         }
         protocol.getProtocolActions().add(newAction);
     }

@@ -1,5 +1,5 @@
 <%--
- Copyright 2005-2010 The Kuali Foundation
+ Copyright 2005-2013 The Kuali Foundation
  
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -22,14 +22,21 @@
 
 <link rel="stylesheet" href="css/award_hierarchy.css" type="text/css" />
 
-<kul:tab tabTitle="Award Hierarchy" defaultOpen="true" tabErrorKey="awardHierarchyNodeItems*,document.award.timeAndMoneyAwardAmountTransaction.newAwardAmountTransaction*,document.award.timeAndMoneyAwardDates*,totals*,timeAndMoneyTransaction*,newAwardAmountTransaction.transactionTypeCode,goToAwardNumber" auditCluster="reportsAuditErrors" tabAuditKey="document.reportTermsAuditRules*" useRiceAuditMode="true">
+<kul:tab tabTitle="Award Hierarchy" defaultOpen="true" 
+	tabErrorKey="awardAmountInfos*,awardHierarchyNodeItems*,document.award.timeAndMoneyAwardAmountTransaction.newAwardAmountTransaction*,document.award.timeAndMoneyAwardDates*,totals*,timeAndMoneyTransaction*,newAwardAmountTransaction.transactionTypeCode,goToAwardNumber,document.awardList[0].awardAmountInfos[0].*"
+	innerTabErrorKey="awardAmountInfos*,awardHierarchyNodeItems*" 
+	auditCluster="reportsAuditErrors" tabAuditKey="document.reportTermsAuditRules*" useRiceAuditMode="true">
+	
 	<div class="tab-container" align="right">
 		<h3>
     		<span class="subhead-left">Award Hierarchy</span>
     		<span class="subhead-right">
     			<kul:help businessObjectClassName="org.kuali.kra.timeandmoney.AwardHierarchyNode" altText="help"/>
 			</span>
-        </h3>   	        
+        </h3>          
+        
+     <input type="hidden" name="formFieldsInError" id="formFieldsInError" value="${KualiForm.fieldsInErrorList }"/>      
+    
     <table cellpadding="0" cellspacing="0" summary="">
     	<tr>
     		<kul:htmlAttributeHeaderCell attributeEntry="${awardAmountTransactionAttributes.transactionTypeCode}" scope="col" />
@@ -76,6 +83,8 @@
     		
     	</tr>
     </table>
+    <%-- following is used to pass readOnly value to JS, when displaying active/current values --%>
+    <input type="hidden" name="disableCurrentValues" id="disableCurrentValues" value="${KualiForm.disableCurrentValues || readOnly}" />						
 	<c:if test="${KualiForm.inMultipleNodeHierarchy}" >
 			
   			<table cellpadding="0" cellspacing="0" summary="">	
@@ -102,33 +111,34 @@
 		
 					<c:choose>				
 						<c:when test="${KualiForm.currentOrPendingView == '0'}" >						
-							<input class="nobord" type="radio" value="0" name="currentOrPendingView" checked="true" />
+							<input class="nobord" type="radio" value="0" name="currentOrPendingView" checked="true" onclick="javascript:clickViaRadioButton();"/>
 								current
-							<input class="nobord" type="radio" value="1" name="currentOrPendingView" />
-								pending						
+							<input class="nobord" type="radio" value="1" name="currentOrPendingView" onclick="javascript:clickViaRadioButton();" />
+								pending					
 						</c:when>
 						<c:when test="${KualiForm.currentOrPendingView == '1'}" >						
-							<input class="nobord" type="radio" value="0" name="currentOrPendingView"  />
+							<input class="nobord" type="radio" value="0" name="currentOrPendingView"  onclick="javascript:clickViaRadioButton();" />
 								current
-							<input class="nobord" type="radio" value="1" name="currentOrPendingView" checked="true" />
-					pending						
+							<input class="nobord" type="radio" value="1" name="currentOrPendingView" checked="true" onclick="javascript:clickViaRadioButton();" />
+								pending						
 						</c:when>
-						<c:otherwise>						
-							<input class="nobord" type="radio" value="0" name="currentOrPendingView" />
+						<c:otherwise>				
+							<input class="nobord" type="radio" value="0" name="currentOrPendingView" onclick="javascript:clickViaRadioButton();" />
 								current
-							<input class="nobord" type="radio" value="1" name="currentOrPendingView" />
-								pending					
+							<input class="nobord" type="radio" value="1" name="currentOrPendingView" onclick="javascript:clickViaRadioButton();" />
+								pending				
 						</c:otherwise>
 					</c:choose>				
 				</td>
 				<td style="text-align: center; background-color: rgb(195, 195, 195); font-weight: bold; width: 185px;">
-					<select id="controlForAwardHierarchyView" name="controlForAwardHierarchyView" >
+					<select id="controlForAwardHierarchyView" name="controlForAwardHierarchyView" onchange="javascript:clickViaRadioButton();" >
 						<option ${KualiForm.controlForAwardHierarchyView eq 0 ? 'selected="selected"' : ''} value="0">Dates Only</option>
 						<option ${KualiForm.controlForAwardHierarchyView eq 1 ? 'selected="selected"' : ''} value="1">Distributed/Distributable</option>
 						<option ${KualiForm.controlForAwardHierarchyView eq 2 ? 'selected="selected"' : ''} value="2">Totals</option>
 					</select>
 				</td>
-				<td style="text-align: center; background-color: rgb(195, 195, 195); width: 60px;">				
+				<%-- not showing the following any more. But we are keeping the element around so we can steal its click() method --%>
+				<td style="display:none">				
 					<html:image src="${ConfigProperties.kra.externalizable.images.url}tinybutton-refresh.gif" styleClass="tinybutton" alt="Refresh" property="methodToCall.refreshView" />
 				</td>			
 			</tr>
@@ -166,26 +176,27 @@
 		
 					<c:choose>				
 						<c:when test="${KualiForm.currentOrPendingView == '0'}" >						
-							<input class="nobord" type="radio" value="0" name="currentOrPendingView" checked="true" />
+							<input class="nobord" type="radio" value="0" name="currentOrPendingView" checked="true" onclick="javascript:clickViaRadioButton();" />
 								current
-							<input class="nobord" type="radio" value="1" name="currentOrPendingView" />
-								pending						
+							<input class="nobord" type="radio" value="1" name="currentOrPendingView" onclick="javascript:clickViaRadioButton();" />
+								pending					
 						</c:when>
 						<c:when test="${KualiForm.currentOrPendingView == '1'}" >						
-							<input class="nobord" type="radio" value="0" name="currentOrPendingView"  />
+							<input class="nobord" type="radio" value="0" name="currentOrPendingView" onclick="javascript:clickViaRadioButton();" />
 								current
-							<input class="nobord" type="radio" value="1" name="currentOrPendingView" checked="true" />
+							<input class="nobord" type="radio" value="1" name="currentOrPendingView" checked="true" onclick="javascript:clickViaRadioButton();" />
 					pending						
 						</c:when>
 						<c:otherwise>						
-							<input class="nobord" type="radio" value="0" name="currentOrPendingView" />
+							<input class="nobord" type="radio" value="0" name="currentOrPendingView" onclick="javascript:clickViaRadioButton();" />
 								current
-							<input class="nobord" type="radio" value="1" name="currentOrPendingView" />
-								pending					
+							<input class="nobord" type="radio" value="1" name="currentOrPendingView" onclick="javascript:clickViaRadioButton();" />
+								pending				
 						</c:otherwise>
 					</c:choose>				
 				</td>
-				<td style="text-align: center; background-color: rgb(195, 195, 195); width: 60px;">				
+				<%-- not showing the following any more. But we are keeping the element around so we can steal its click() method --%>
+				<td style="display:none">				
 					<html:image src="${ConfigProperties.kra.externalizable.images.url}tinybutton-refresh.gif" styleClass="tinybutton" alt="Refresh" property="methodToCall.refreshView" />
 				</td>	
 			</tr>
@@ -194,10 +205,6 @@
 		</c:if>
     
     <div align="left">    
-                                            <%-- <div id="treecontrol" style="display:inline;">
-                                                &nbsp;&nbsp;&nbsp;&nbsp;<a title="Collapse the entire tree below" href="#"><img src="static/images/jquery/minus.gif" /> Collapse All</a>
-                                                &nbsp;&nbsp;&nbsp;&nbsp;<a title="Expand the entire tree below" href="#"><img src="static/images/jquery/plus.gif" /> Expand All</a>
-                                            </div> --%>
 
 	<div style="position: relative; margin: 2px 0pt 0pt;">
 	  <div style="position:absolute; left:0px; height=285px; width:100%; text-align: center; z-index:100; display:none;" id="loading"><img style="margin-top: 90px;" src="static/images/awardHierarchy-loading.gif" alt="loading"/><span class="statusMessage"></span>

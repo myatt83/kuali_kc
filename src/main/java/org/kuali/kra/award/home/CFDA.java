@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,14 +25,14 @@ public class CFDA extends KraPersistableBusinessObjectBase {
 
     private String cfdaMaintenanceTypeId;
 
-    private Boolean activeFlag;
+    private Boolean active;
 
-    public Boolean getActiveFlag() {
-        return activeFlag;
+    public Boolean getActive() {
+        return active;
     }
 
-    public void setActiveFlag(Boolean activeFlag) {
-        this.activeFlag = activeFlag;
+    public void setActive(Boolean active) {
+        this.active = active;
     }
 
     public String getCfdaMaintenanceTypeId() {

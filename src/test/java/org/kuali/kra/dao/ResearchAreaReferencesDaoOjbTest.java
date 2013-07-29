@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,16 +22,17 @@ import java.util.List;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.kuali.kra.bo.ResearchArea;
+import org.kuali.kra.bo.ResearchAreaBase;
 import org.kuali.kra.committee.bo.Committee;
 import org.kuali.kra.committee.bo.CommitteeMembership;
-import org.kuali.kra.committee.bo.CommitteeMembershipRole;
 import org.kuali.kra.committee.document.CommitteeDocument;
 import org.kuali.kra.committee.service.CommitteeMembershipService;
 import org.kuali.kra.committee.service.CommitteeService;
 import org.kuali.kra.committee.test.CommitteeFactory;
+import org.kuali.kra.common.committee.bo.CommitteeMembershipRole;
 import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.irb.Protocol;
+import org.kuali.kra.irb.ResearchArea;
 import org.kuali.kra.irb.protocol.research.ProtocolResearchAreaService;
 import org.kuali.kra.irb.test.ProtocolFactory;
 import org.kuali.kra.test.infrastructure.KcUnitTestBase;
@@ -68,7 +69,7 @@ public class ResearchAreaReferencesDaoOjbTest extends KcUnitTestBase {
     private void createandSaveCommittee(String researchAreaCode) throws WorkflowException {        
         ResearchArea researchArea = new ResearchArea(researchAreaCode, "000001", "Sample research area", true);
         this.businessObjectService.save(researchArea);
-        List<ResearchArea> researchAreas = new ArrayList<ResearchArea>();
+        List<ResearchAreaBase> researchAreas = new ArrayList<ResearchAreaBase>();
         researchAreas.add(researchArea);
        
         CommitteeDocument committeeDocument = CommitteeFactory.createCommitteeDocument("444");
@@ -82,7 +83,7 @@ public class ResearchAreaReferencesDaoOjbTest extends KcUnitTestBase {
     private void createandSaveCommitteeWithMembershipExpertise(String researchAreaCode) throws WorkflowException {
         ResearchArea researchArea = new ResearchArea(researchAreaCode, "000001", "Sample research area", true);
         this.businessObjectService.save(researchArea);
-        List<ResearchArea> researchAreas = new ArrayList<ResearchArea>();
+        List<ResearchAreaBase> researchAreas = new ArrayList<ResearchAreaBase>();
         researchAreas.add(researchArea);
        
         CommitteeDocument committeeDocument = CommitteeFactory.createCommitteeDocument("555");
@@ -102,7 +103,7 @@ public class ResearchAreaReferencesDaoOjbTest extends KcUnitTestBase {
         
         ResearchArea researchArea = new ResearchArea(researchAreaCode, "000001", "Sample research area", true);
         this.businessObjectService.save(researchArea);
-        List<ResearchArea> researchAreas = new ArrayList<ResearchArea>();
+        List<ResearchAreaBase> researchAreas = new ArrayList<ResearchAreaBase>();
         researchAreas.add(researchArea);
         
         String newProtocolNumber = "123456132";

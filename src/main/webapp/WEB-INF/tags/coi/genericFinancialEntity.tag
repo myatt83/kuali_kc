@@ -1,5 +1,5 @@
 <%--
- Copyright 2005-2010 The Kuali Foundation
+ Copyright 2005-2013 The Kuali Foundation
 
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -53,10 +53,13 @@
 							src='${ConfigProperties.kra.externalizable.images.url}tinybutton-newfinancialentity.gif' styleClass="tinybutton"/>
            			</td>
            			<td style="text-align:center;" valign="middle"  class="infoline">
-						<html:image property="methodToCall.allConflict.anchor${tabKey}"
-							src='${ConfigProperties.kra.externalizable.images.url}tinybutton-all.gif' styleClass="conflict" onclick="$j('select.conflictClass${idx}').val('2');return false;" />
-						<html:image property="methodToCall.noneConflict.anchor${tabKey}"
-							src='${ConfigProperties.kra.externalizable.images.url}tinybutton-none.gif' styleClass="conflict" onclick="$j('select.conflictClass${idx}').val('1');return false;" />
+           				<c:if test="${not empty disclProject.coiDiscDetails}">
+						<select onchange="jQuery(this).parents('table').first().find('select.related').val(jQuery(this).val());">
+							<c:forEach items="${krafn:getOptionList('org.kuali.kra.coi.disclosure.CoiDispositionStatusValuesFinder', null)}" var="option">
+		                        <option value="${option.key}">${option.value}</option>
+				            </c:forEach>
+						</select>
+						</c:if>
 					</td>
             		<td align="left" valign="middle" class="infoline">&nbsp;</td>
         		</tr>
@@ -84,8 +87,8 @@
            				<kul:htmlControlAttribute property="document.coiDisclosureList[0].coiDisclProjects[${idx}].coiDiscDetails[${festatus.index}].personFinIntDisclosure.entityName" readOnly="true" attributeEntry="${financialEntityAttributes.entityName}" /> 
            			</td>
              		<td style="text-align: left;" valign="middle">
-           				<kul:htmlControlAttribute property="document.coiDisclosureList[0].coiDisclProjects[${idx}].coiDiscDetails[${festatus.index}].entityStatusCode" 
-  							readOnly="${readOnly}" attributeEntry="${coiDiscDetailAttributes.entityStatusCode}" styleClass="conflictClass${idx}" />
+           				<kul:htmlControlAttribute property="document.coiDisclosureList[0].coiDisclProjects[${idx}].coiDiscDetails[${festatus.index}].entityDispositionCode" 
+  							readOnly="${readOnly}" attributeEntry="${coiDiscDetailAttributes.entityDispositionCode}" styleClass="related" />
 					</td>
              		<td style="text-align: left;" valign="middle">
            				<kul:htmlControlAttribute property="document.coiDisclosureList[0].coiDisclProjects[${idx}].coiDiscDetails[${festatus.index}].comments" 

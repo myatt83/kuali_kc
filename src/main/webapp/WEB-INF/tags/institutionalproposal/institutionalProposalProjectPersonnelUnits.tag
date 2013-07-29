@@ -1,5 +1,5 @@
 <%--
- Copyright 2005-2010 The Kuali Foundation
+ Copyright 2005-2013 The Kuali Foundation
  
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -119,7 +119,7 @@
 		</c:if>
 		
 		<c:forEach var="institutionalProposalPersonUnit" items="${institutionalProposalContact.units}" varStatus="institutionalProposalPersonUnitRowStatus">
-		<input type="hidden" name="institutional_proposal_person_unit.identifier_${institutionalProposalContactRowStatus.index}" value="${institutionalProposalPersonUnit.unit.unitNumber}" />
+		<input type="hidden" name="institutional_proposal_person_unit.identifier_${institutionalProposalPersonIndex}_${institutionalProposalPersonUnitRowStatus.index}" value="${institutionalProposalPersonUnit.unit.unitNumber}" />
 		<c:choose>                  
 			<c:when test="${empty institutionalProposalPersonUnit.ospAdministrators}">
             <tr>
@@ -136,7 +136,7 @@
                 <td valign="middle">
                 	<div align="center">
                 		${institutionalProposalPersonUnit.unit.unitName}&nbsp;
-      	                <kul:directInquiry boClassName="org.kuali.kra.bo.Unit" inquiryParameters="institutional_proposal_person_unit.identifier_${institutionalProposalContactRowStatus.index}:unitNumber" anchor="${tabKey}" />
+      	                <kul:directInquiry boClassName="org.kuali.kra.bo.Unit" inquiryParameters="institutional_proposal_person_unit.identifier_${institutionalProposalPersonIndex}_${institutionalProposalPersonUnitRowStatus.index}:unitNumber" anchor="${tabKey}" />
                 	</div> 
 				</td>
 				<td valign="middle">
@@ -176,7 +176,7 @@
                 		<td valign="middle">
                 			<div align="center">
                 				${institutionalProposalPersonUnit.unit.unitName}&nbsp;
-        	                <kul:directInquiry boClassName="org.kuali.kra.bo.Unit" inquiryParameters="institutional_proposal_person_unit.identifier_${institutionalProposalContactRowStatus.index}:unitNumber" anchor="${tabKey}" />
+        	                <kul:directInquiry boClassName="org.kuali.kra.bo.Unit" inquiryParameters="institutional_proposal_person_unit.identifier_${institutionalProposalPersonIndex}_${institutionalProposalPersonUnitRowStatus.index}:unitNumber" anchor="${tabKey}" />
                 			</div> 
 						</td>
 						<td valign="middle">

@@ -1,5 +1,5 @@
   <%--
- Copyright 2005-2010 The Kuali Foundation
+ Copyright 2005-2013 The Kuali Foundation
 
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -30,13 +30,13 @@
                   </tr>
                   <kra:section permission="modifyProposal">
                   <c:if test="${ not isParent }">
-                  <tr>
+                  <tr class="addline">
                     <th scope="row" align="center">Add:</th>
                     <td class="infoline">
                     
                      <html:hidden property="newProposalPersonUnit[${personIndex}].unitName" />
                      
-   					<div id="newProposalPersonUnit[${personIndex}].unitName.div" class="same-line">
+   					<div id="newProposalPersonUnit[${personIndex}].unitName.div" class="same-line changedClearOnReset">
                      <c:choose>
                       <c:when test="${empty KualiForm.newProposalPersonUnit[personIndex].unitName}" >
                       (select)
@@ -58,7 +58,7 @@
                       	<%--   onblur="loadUnitName('newProposalPersonUnit[${personIndex}].unitNumber');" /> --%>
                       </div>
                         <span class="fineprint"></span> </td>
-                    <td class="infoline"><div align=center><html:image property="methodToCall.insertUnit.${proposalPerson}.line${status.index}" src="${ConfigProperties.kr.externalizable.images.url}tinybutton-add1.gif" title="Add Unit" alt="Add Unit" styleClass="tinybutton"/></div></td>
+                    <td class="infoline"><div align=center><html:image property="methodToCall.insertUnit.${proposalPerson}.line${status.index}" src="${ConfigProperties.kr.externalizable.images.url}tinybutton-add1.gif" title="Add Unit" alt="Add Unit" styleClass="tinybutton addButton"/></div></td>
                   </tr>
                   </c:if>
                   </kra:section>

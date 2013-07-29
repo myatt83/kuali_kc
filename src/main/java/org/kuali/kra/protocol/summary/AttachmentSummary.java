@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,21 +18,32 @@ package org.kuali.kra.protocol.summary;
 import java.io.Serializable;
 import java.sql.Timestamp;
 
+import org.apache.commons.lang.StringUtils;
+
 public class AttachmentSummary implements Serializable {
 
     private static final long serialVersionUID = -6058410492582759356L;
     
     private Long attachmentId;
     private String fileName;
+    private boolean fileNameChanged;
+
     private String fileType;
+    private boolean fileTypeChanged;
+    
     private long dataLength;
     
-    private boolean fileNameChanged;
     private String attachmentType;
+    private boolean attachmentTypeChanged;
+    
     private String description;
+    private boolean descriptionChanged;
     
     private String updateUser;
+    private boolean userChanged;
+    
     private Timestamp updateTimestamp;
+    private boolean dateChanged;
 
     public AttachmentSummary() {
         
@@ -76,7 +87,22 @@ public class AttachmentSummary implements Serializable {
 
     public void compare(ProtocolSummary other) {
         AttachmentSummary otherAttachment = other.findAttachment(fileName, fileType, dataLength);
-        fileNameChanged = (otherAttachment == null);
+        if (otherAttachment == null) {
+            fileNameChanged = true;
+            fileTypeChanged = true;
+            attachmentTypeChanged = true;
+            descriptionChanged = true;
+            dateChanged = true;
+            userChanged = true;
+        } else {
+            fileNameChanged = (!StringUtils.equals(fileName, otherAttachment.getFileName()));
+            fileTypeChanged = (!StringUtils.equals(fileType, otherAttachment.getFileType()));
+            attachmentTypeChanged = (!StringUtils.equals(attachmentType, otherAttachment.getAttachmentType()));
+            descriptionChanged = (!StringUtils.equals(description, otherAttachment.getDescription()));
+            dateChanged = !((updateTimestamp == otherAttachment.getUpdateTimestamp()) ||
+                            (updateTimestamp != null && updateTimestamp.equals(otherAttachment.getUpdateTimestamp())));
+            userChanged = (!StringUtils.equals(updateUser, otherAttachment.getUpdateUser()));
+        }
     }
 
     public String getAttachmentType() {
@@ -110,4 +136,49 @@ public class AttachmentSummary implements Serializable {
     public void setUpdateTimestamp(Timestamp updateTimestamp) {
         this.updateTimestamp = updateTimestamp;
     }
+
+    public boolean isFileTypeChanged() {
+        return fileTypeChanged;
+    }
+
+    public void setFileTypeChanged(boolean fileTypeChanged) {
+        this.fileTypeChanged = fileTypeChanged;
+    }
+
+    public boolean isAttachmentTypeChanged() {
+        return attachmentTypeChanged;
+    }
+
+    public void setAttachmentTypeChanged(boolean attachmentTypeChanged) {
+        this.attachmentTypeChanged = attachmentTypeChanged;
+    }
+
+    public boolean isDescriptionChanged() {
+        return descriptionChanged;
+    }
+
+    public void setDescriptionChanged(boolean descriptionChanged) {
+        this.descriptionChanged = descriptionChanged;
+    }
+
+    public void setFileNameChanged(boolean fileNameChanged) {
+        this.fileNameChanged = fileNameChanged;
+    }
+
+    public boolean isUserChanged() {
+        return userChanged;
+    }
+
+    public void setUserChanged(boolean userChanged) {
+        this.userChanged = userChanged;
+    }
+
+    public boolean isDateChanged() {
+        return dateChanged;
+    }
+
+    public void setDateChanged(boolean dateChanged) {
+        this.dateChanged = dateChanged;
+    }
+    
 }

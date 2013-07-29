@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,14 @@
  */
 package org.kuali.kra.iacuc.noteattachment;
 
-import org.kuali.kra.protocol.Protocol;
-import org.kuali.kra.protocol.noteattachment.ProtocolNotepad;
+import org.kuali.kra.protocol.ProtocolBase;
+import org.kuali.kra.protocol.noteattachment.ProtocolNotepadBase;
 
-public class IacucProtocolNotepad extends ProtocolNotepad {
+public class IacucProtocolNotepad extends ProtocolNotepadBase {
 
     private static final long serialVersionUID = 305642175397072637L;
 
-    public IacucProtocolNotepad(Protocol protocol) {
+    public IacucProtocolNotepad(ProtocolBase protocol) {
         super(protocol);
     }
     

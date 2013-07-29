@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-	Copyright 2005-2010 The Kuali Foundation.
+	Copyright 2005-2013 The Kuali Foundation.
 
 	Licensed under the Educational Community License, Version 1.0 (the "License");
 	you may not use this file except in compliance with the License.
@@ -70,6 +70,10 @@
     <bean id="businessObjectService" class="org.kuali.rice.krad.config.GlobalResourceLoaderServiceFactoryBean">
         <property name="serviceName" value="businessObjectService" />
     </bean>
+
+    <bean id="parameterService" class="org.kuali.rice.krad.config.GlobalResourceLoaderServiceFactoryBean">
+        <property name="serviceName" value="parameterService" />
+    </bean>    
     
     <bean id="businessObjectDictionaryService" class="org.kuali.rice.krad.config.GlobalResourceLoaderServiceFactoryBean">
         <property name="serviceName" value="businessObjectDictionaryService" />
@@ -165,9 +169,10 @@
     <bean id="proposalLogPiDerivedRoleTypeService" 
           class="org.kuali.kra.institutionalproposal.proposallog.service.impl.ProposalLogPiDerivedRoleTypeServiceImpl" />
     
-    <bean class="org.kuali.rice.ksb.api.bus.support.CallbackServiceExporter" p:serviceBus-ref="kc.import.serviceBus" 
-		p:callbackService-ref="proposalLogPiDerivedRoleTypeService" p:localServiceName="proposalLogPiDerivedRoleTypeService" 
-		p:serviceInterface="org.kuali.rice.kim.framework.role.RoleTypeService" p:serviceNameSpaceURI="" />
+    <bean id="proposalLogPiDerivedRoleTypeServiceCallback" parent="kcCallbackService" 
+		p:callbackService-ref="proposalLogPiDerivedRoleTypeService" 
+		p:localServiceName="proposalLogPiDerivedRoleTypeService" 
+		p:serviceInterface="org.kuali.rice.kim.framework.role.RoleTypeService"/>
     
     <!-- Proposal Log Printing Services -->
     
@@ -194,6 +199,7 @@
         <property name="versioningService" ref="versioningService" />
         <property name="institutionalProposalVersioningService" ref="institutionalProposalVersioningService" />
         <property name="sequenceAccessorService" ref="sequenceAccessorService" />
+        <property name="parameterService" ref="parameterService" />
     </bean>
     
     <bean id="institutionalProposalLookupable" class="org.kuali.rice.kns.lookup.KualiLookupableImpl" scope="prototype">
@@ -204,12 +210,9 @@
           class="org.kuali.kra.institutionalproposal.service.impl.InstitutionalProposalLookupableHelperServiceImpl" parent="parentLookupableHelperService" 
           scope="prototype">
         <property name="documentService" ref="documentService" />
+        <property name="institutionalProposalService" ref="institutionalProposalService" />
     </bean>
-    
-    <bean id="institutionalProposalCustomAttributeService" class="org.kuali.kra.service.impl.InstitutionalProposalCustomAttributeServiceImpl">
-        <property name="businessObjectService" ref="businessObjectService" />
-    </bean>
-    
+        
     <bean id="institutionalProposalLockService" class="org.kuali.kra.institutionalproposal.service.impl.InstitutionalProposalLockServiceImpl">
         <property name="businessObjectService" ref="businessObjectService" />
     </bean>
@@ -230,18 +233,20 @@
         <property name="unitService" ref="unitService"/>
     </bean>
   
-    <bean class="org.kuali.rice.ksb.api.bus.support.CallbackServiceExporter" p:serviceBus-ref="kc.import.serviceBus" 
-		p:callbackService-ref="institutionalProposalAllUnitAdministratorDerivedRoleTypeService" p:localServiceName="institutionalProposalAllUnitAdministratorDerivedRoleTypeService" 
-		p:serviceInterface="org.kuali.rice.kim.framework.role.RoleTypeService" p:serviceNameSpaceURI="" />
+    <bean id="institutionalProposalAllUnitAdministratorDerivedRoleTypeServiceCallback" parent="kcCallbackService"
+		p:callbackService-ref="institutionalProposalAllUnitAdministratorDerivedRoleTypeService" 
+		p:localServiceName="institutionalProposalAllUnitAdministratorDerivedRoleTypeService" 
+		p:serviceInterface="org.kuali.rice.kim.framework.role.RoleTypeService"/>
     
     <bean id="institutionalProposalInvestigatorsRoleTypeService" 
           class="org.kuali.kra.institutionalproposal.service.impl.InstitutionalProposalInvestigatorDerivedRoleTypeServiceImpl">
         <property name="institutionalProposalService" ref="institutionalProposalService"/>
     </bean>
     
-    <bean class="org.kuali.rice.ksb.api.bus.support.CallbackServiceExporter" p:serviceBus-ref="kc.import.serviceBus" 
-		p:callbackService-ref="institutionalProposalInvestigatorsRoleTypeService" p:localServiceName="institutionalProposalInvestigatorsRoleTypeService" 
-		p:serviceInterface="org.kuali.rice.kim.framework.role.RoleTypeService" p:serviceNameSpaceURI="" />
+    <bean id="institutionalProposalInvestigatorsRoleTypeServiceCallback" parent="kcCallbackService"
+		p:callbackService-ref="institutionalProposalInvestigatorsRoleTypeService" 
+		p:localServiceName="institutionalProposalInvestigatorsRoleTypeService" 
+		p:serviceInterface="org.kuali.rice.kim.framework.role.RoleTypeService"/>
     
     <bean id="institutionalProposalVersioningService" class="org.kuali.kra.institutionalproposal.service.impl.InstitutionalProposalVersioningServiceImpl">
         <property name="businessObjectService" ref="businessObjectService" />

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,5 +40,19 @@ public interface QuestionnaireService {
      * @return
      */
     public  List<String>  getAssociateModules();
+    
+    /**
+     * Returns true if the usage passed in is unique. Determined by checking for matching coeus module and coeus sub module codes.
+     * @param usage
+     * @return
+     */
+    public boolean isUniqueUsage(Questionnaire questionnaire, QuestionnaireUsage usage);
+    
+    /**
+     * Returns true of the questionnaire is the newest version of the questionnaire.
+     * @param questionnaire
+     * @return
+     */
+    public boolean isCurrentQuestionnaire(Questionnaire questionnaire);
 
 }

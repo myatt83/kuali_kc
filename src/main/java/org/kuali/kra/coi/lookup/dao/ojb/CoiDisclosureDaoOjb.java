@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,12 @@ import java.util.List;
 import org.apache.ojb.broker.query.Criteria;
 import org.apache.ojb.broker.query.QueryByCriteria;
 import org.apache.ojb.broker.query.QueryFactory;
+import org.kuali.kra.coi.CoiDisclProject;
+import org.kuali.kra.coi.CoiDisclosure;
+import org.kuali.kra.coi.CoiDisclosureEventType;
 import org.kuali.kra.coi.CoiDisclosureHistory;
 import org.kuali.kra.coi.CoiDisclosureStatus;
+import org.kuali.kra.coi.CoiReviewStatus;
 import org.kuali.kra.coi.lookup.dao.CoiDisclosureDao;
 import org.kuali.rice.core.framework.persistence.ojb.dao.PlatformAwareDaoBaseOjb;
 import org.kuali.rice.krad.util.OjbCollectionAware;
@@ -50,6 +54,43 @@ public class CoiDisclosureDaoOjb extends PlatformAwareDaoBaseOjb implements OjbC
         history = getPersistenceBrokerTemplate().getCollectionByQuery(query);
         
         return (List<CoiDisclosureHistory>) history;     
+    }
+        
+    public List<CoiDisclosure> getReviewsForReviewStatuses(Collection<String> reviewStatusCodes) {
+        if (reviewStatusCodes == null || reviewStatusCodes.isEmpty()) {
+            return new ArrayList<CoiDisclosure>();
+        }
+        Criteria crit1 = new Criteria();
+        for (String reviewCode : reviewStatusCodes) {
+            Criteria crit2 = new Criteria();
+            crit2.addEqualTo("reviewStatusCode", reviewCode);
+            crit1.addOrCriteria(crit2);
+        }
+        
+        QueryByCriteria query = QueryFactory.newQuery(CoiDisclosure.class, crit1);
+        query.addOrderByDescending("sequenceNumber");
+        
+        Collection<CoiDisclosure> disclosures = getPersistenceBrokerTemplate().getCollectionByQuery(query);
+        
+        for (CoiDisclosure disclosure : disclosures) {
+            List<CoiDisclProject> coiDisclProjects = disclosure.getCoiDisclProjects();
+    
+            CoiDisclosureEventType coiDisclosureEventType = disclosure.getCoiDisclosureEventType();
+            String coiDisclosureModuleItemKey = disclosure.getModuleItemKey();
+            for(CoiDisclProject coiDisclProject : coiDisclProjects)
+            {
+                if ( coiDisclosureEventType.getEventTypeCode().equals(coiDisclProject.getDisclosureEventType()) &&
+                            coiDisclosureModuleItemKey.equals(coiDisclProject.getModuleItemKey()) )
+                {
+                    disclosure.setCoiDisclProjectId(coiDisclProject.getProjectId());
+                    disclosure.setCoiDisclProjectTitle(coiDisclProject.getCoiProjectTitle());
+                    break;
+                }
+            }
+        }
+        
+        return new ArrayList<CoiDisclosure>(disclosures);     
+        
     }
     
     

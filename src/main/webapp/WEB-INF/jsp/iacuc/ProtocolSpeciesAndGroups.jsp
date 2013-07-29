@@ -1,5 +1,5 @@
 <%--
- Copyright 2005-2010 The Kuali Foundation
+ Copyright 2005-2013 The Kuali Foundation
 
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@
   	headerDispatch="${KualiForm.headerDispatch}"
   	headerTabActive="speciesAndGroups">
 
-  	<div align="right"><kul:help documentTypeName="${KualiForm.docTypeName}" pageName="Protocol Species" /></div>
+  	<div align="right"><kul:help documentTypeName="${KualiForm.docTypeName}" pageName="Species/Groups" /></div>
   	
 	<div id="workarea">
 		<kra-iacuc:speciesAndGroups businessObjectClassName="org.kuali.kra.iacuc.species.IacucProtocolSpecies"

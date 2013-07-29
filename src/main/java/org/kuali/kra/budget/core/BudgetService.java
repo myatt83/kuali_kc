@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -136,6 +136,10 @@ public interface BudgetService<T extends BudgetParent>  {
      * @return Non-Personnel Panel Name for the passed in Line Item
      */
     public String getBudgetExpensePanelName(BudgetPeriod budgetPeriod, BudgetLineItem budgetLineItem);
+    
+    public String getParticipantSupportCategoryCode();
+    
+    public List<BudgetLineItem> getMatchingLineItems(List<BudgetLineItem> lineItems, List<String> objectCodes);
 
     public Collection<BudgetRate> getSavedProposalRates(BudgetVersionOverview budgetToOpen);
 
@@ -169,14 +173,17 @@ public interface BudgetService<T extends BudgetParent>  {
     /**
      * Returns a new finalized BudgetDocument with the data from the given BudgetDocument copied over.
      * @param budgetDocument
+     * @param onlyOnePeriod
      * @return BudgetDocument
      * @throws WorkflowException
-     */
-    public BudgetDocument<T> copyBudgetVersion(BudgetDocument<T> budgetDocument) throws WorkflowException;
+     */    
+    public BudgetDocument<T> copyBudgetVersion(BudgetDocument<T> budgetDocument, boolean onlyOnePeriod) throws WorkflowException;
     
     
     public String populateBudgetPersonSalaryDetailsInPeriods(String budgetId, String personSequenceNumber, String personId);
     
     public BudgetDecimal getBaseSalaryByPeriod(Long budgetId, int budgetPeriod, KeyPersonInfo keyPerson );
+    
+    public void populateNewBudgetLineItem(BudgetLineItem newBudgetLineItem, BudgetPeriod budgetPeriod);
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,8 +41,8 @@ import org.kuali.kra.irb.protocol.participant.ProtocolParticipant;
 import org.kuali.kra.irb.protocol.research.ProtocolResearchArea;
 import org.kuali.kra.irb.specialreview.ProtocolSpecialReview;
 import org.kuali.kra.printing.xmlstream.PrintBaseXmlStream;
+import org.kuali.kra.protocol.actions.print.ProtocolXmlStreamBase;
 import org.kuali.kra.service.KcPersonService;
-
 import edu.mit.irb.irbnamespace.CorrespondentDocument.Correspondent;
 import edu.mit.irb.irbnamespace.InvestigatorDocument.Investigator;
 import edu.mit.irb.irbnamespace.KeyStudyPersonDocument.KeyStudyPerson;
@@ -60,7 +60,7 @@ import edu.mit.irb.irbnamespace.VulnerableSubjectDocument.VulnerableSubject;
 /**
  * This class is used to populate xmlbeans object for Protocol schema elements
  */
-public class ProtocolXmlStream extends PrintBaseXmlStream {
+public class ProtocolXmlStream extends ProtocolXmlStreamBase {
 
     private IrbPrintXmlUtilService irbPrintXmlUtilService;
     private KcPersonService kcPersonService;
@@ -179,7 +179,7 @@ public class ProtocolXmlStream extends PrintBaseXmlStream {
             submissionDetail.setProtocolReviewTypeCode(new BigInteger(submissionInfoBean.getProtocolReviewTypeCode()));
             submissionDetail.setProtocolReviewTypeDesc(submissionInfoBean.getProtocolReviewType().getDescription());
         }
-        List<ProtocolReviewer> vecReviewers = submissionInfoBean.getProtocolReviewers();
+        List<ProtocolReviewer> vecReviewers = (List) submissionInfoBean.getProtocolReviewers();
         for (ProtocolReviewer protocolReviewer : vecReviewers) {
             protocolReviewer.refreshNonUpdateableReferences();
             edu.mit.irb.irbnamespace.ProtocolReviewerDocument.ProtocolReviewer protocolReviewerType = submissionDetail
@@ -218,8 +218,8 @@ public class ProtocolXmlStream extends PrintBaseXmlStream {
             submissionDetail.setSubmissionTypeDesc(submissionInfoBean.getProtocolSubmissionType().getDescription());
         }
         if (submissionInfoBean.getProtocolSubmissionQualifierType() != null) {
-            submissionDetail.setSubmissionTypeQualifierCode(new BigInteger(String.valueOf(submissionInfoBean
-                    .getSubmissionTypeQualifierCode())));
+            String code = submissionInfoBean.getSubmissionTypeQualifierCode();
+            submissionDetail.setSubmissionTypeQualifierCode(code == null ? new BigInteger("0") : new BigInteger(code));
             submissionDetail.setSubmissionTypeQualifierDesc(submissionInfoBean.getProtocolSubmissionQualifierType()
                     .getDescription());
         }
@@ -232,13 +232,13 @@ public class ProtocolXmlStream extends PrintBaseXmlStream {
         submission.setCurrentSubmissionFlag(currentFlag);
         setMinutes(submissionInfoBean, submission);
         if (submissionInfoBean.getCommitteeId() != null) {
-            Committee committee = submissionInfoBean.getCommittee();
+            Committee committee = (Committee) submissionInfoBean.getCommittee();
             getCommitteeXmlStream().setCommitteeMasterData(committee, submission.addNewCommitteeMasterData());
             getCommitteeXmlStream().setCommitteeMembers(committee, submission);
         }
 
         if (submissionInfoBean.getScheduleId() != null) {
-            CommitteeSchedule committeeSchedule = submissionInfoBean.getCommitteeSchedule();
+            CommitteeSchedule committeeSchedule = (CommitteeSchedule) submissionInfoBean.getCommitteeSchedule();
             getScheduleXmlStream().setScheduleMasterData(committeeSchedule, submission.addNewScheduleMasterData());
             NextSchedule nextSchedule = submission.addNewNextSchedule();
             getScheduleXmlStream().setNextSchedule(committeeSchedule, nextSchedule.addNewScheduleMasterData());
@@ -253,14 +253,14 @@ public class ProtocolXmlStream extends PrintBaseXmlStream {
      */
     protected void setMinutes(org.kuali.kra.irb.actions.submit.ProtocolSubmission submissionInfoBean,
             Submissions submission) {
-        CommitteeSchedule committeeSchedule = submissionInfoBean.getCommitteeSchedule();
+        CommitteeSchedule committeeSchedule = (CommitteeSchedule) submissionInfoBean.getCommitteeSchedule();
         if (committeeSchedule != null) {
             getIrbPrintXmlUtilService().setProtocolReviewMinutes(committeeSchedule, submissionInfoBean, submission);
         }
     }
 
     private ProtocolSubmission findProtocolSubmission(org.kuali.kra.irb.Protocol protocol, Integer submissionNumber) {
-        List<ProtocolSubmission> protocolSubmissions = protocol.getProtocolSubmissions();
+        List<ProtocolSubmission> protocolSubmissions = (List) protocol.getProtocolSubmissions();
         for (ProtocolSubmission protocolSubmission : protocolSubmissions) {
             if(protocolSubmission.getSubmissionNumber().equals(submissionNumber)){
                 return protocolSubmission;
@@ -270,7 +270,7 @@ public class ProtocolXmlStream extends PrintBaseXmlStream {
     }
 
     private void addSpecialReview(org.kuali.kra.irb.Protocol protocol, Protocol protocolType) {
-        List<ProtocolSpecialReview> vecSpecialReview = protocol.getSpecialReviews();
+        List<ProtocolSpecialReview> vecSpecialReview = (List) protocol.getSpecialReviews();
         for (ProtocolSpecialReview specialReviewBean : vecSpecialReview) {
             specialReviewBean.refreshNonUpdateableReferences();
             SpecialReview specialReview = protocolType.addNewSpecialReview();
@@ -308,12 +308,6 @@ public class ProtocolXmlStream extends PrintBaseXmlStream {
         for (ProtocolParticipant protocolParticipant : protocolParticipants) {
             protocolParticipant.refreshNonUpdateableReferences();
             VulnerableSubject vulnerableSubject = protocolType.addNewVulnerableSubject();
-            // if(protocolVulnerableSubListsBean.getSubjectCount() == null){
-            // vulnerableSubject.setVulnerableSubjectCount(new BigInteger("0")) ;
-            // }else{
-            // vulnerableSubject.setVulnerableSubjectCount(new
-            // BigInteger(String.valueOf(protocolVulnerableSubListsBean.getSubjectCount()))) ;
-            // }
             if (protocolParticipant.getParticipantType() != null) {
                 vulnerableSubject.setVulnerableSubjectTypeCode(new BigInteger(protocolParticipant.getParticipantTypeCode()));
                 vulnerableSubject.setVulnerableSubjectTypeDesc(protocolParticipant.getParticipantType().getDescription());
@@ -325,7 +319,7 @@ public class ProtocolXmlStream extends PrintBaseXmlStream {
     private void addFundingSource(org.kuali.kra.irb.Protocol protocol, Protocol protocolType) {
         int fundingSourceTypeCode;
         String fundingSourceName, fundingSourceCode;
-        List<ProtocolFundingSource> vecFundingSource = protocol.getProtocolFundingSources();
+        List<ProtocolFundingSource> vecFundingSource = (List) protocol.getProtocolFundingSources();
         for (ProtocolFundingSource protocolFundingSourceBean : vecFundingSource) {
             FundingSource fundingSource = protocolType.addNewFundingSource();
             fundingSourceCode = protocolFundingSourceBean.getFundingSourceNumber();
@@ -356,7 +350,7 @@ public class ProtocolXmlStream extends PrintBaseXmlStream {
     }
 
     private void addResearchArea(org.kuali.kra.irb.Protocol protocol, Protocol protocolType) {
-        List<ProtocolResearchArea> researchAreas = protocol.getProtocolResearchAreas();
+        List<ProtocolResearchArea> researchAreas = (List) protocol.getProtocolResearchAreas();
         for (ProtocolResearchArea protocolReasearchAreasBean : researchAreas) {
             protocolReasearchAreasBean.refreshNonUpdateableReferences();
             edu.mit.irb.irbnamespace.ResearchAreaDocument.ResearchArea researchArea = protocolType.addNewResearchArea();
@@ -366,7 +360,7 @@ public class ProtocolXmlStream extends PrintBaseXmlStream {
     }
 
     private void addProtocolPersons(org.kuali.kra.irb.Protocol protocol, Protocol protocolType) {
-        List<ProtocolPerson> vecInvestigator = protocol.getProtocolPersons();
+        List<ProtocolPerson> vecInvestigator = (List) protocol.getProtocolPersons();
         for (ProtocolPerson protocolPerson : vecInvestigator) {
             protocolPerson.refreshNonUpdateableReferences();
             if (protocolPerson.getProtocolPersonRoleId().equals(ProtocolPersonRole.ROLE_PRINCIPAL_INVESTIGATOR)
@@ -383,7 +377,7 @@ public class ProtocolXmlStream extends PrintBaseXmlStream {
                     keyStudyPerson.setAffiliation(protocolPerson.getAffiliationType().getDescription());
                 }
                 if(protocolPerson.getRolodex()!=null){
-                    keyStudyPerson.setRole(protocolPerson.getRolodex().getPrimaryTitle());
+                    keyStudyPerson.setRole(((ProtocolPersonRolodex) protocolPerson.getRolodex()).getPrimaryTitle());
                 }else if(protocolPerson.getPerson()!=null){
                     keyStudyPerson.setRole(protocolPerson.getPerson().getDirectoryTitle());
                 }
@@ -392,8 +386,6 @@ public class ProtocolXmlStream extends PrintBaseXmlStream {
             else if (protocolPerson.getProtocolPersonRoleId().equals(ProtocolPersonRole.ROLE_CORRESPONDENT_CRC)
                     || (protocolPerson.getProtocolPersonRoleId().equals(ProtocolPersonRole.ROLE_CORRESPONDENT_ADMINISTRATOR))) {
                 Correspondent correspondent = protocolType.addNewCorrespondent();
-                // not sure where the comments should come from
-                // correspondent.setCorrespondentComments(protocolPerson.getComments()) ;
                 correspondent.setTypeOfCorrespondent(protocolPerson.getProtocolPersonRole().getDescription());
                 getIrbPrintXmlUtilService().setPersonRolodexType(protocolPerson, correspondent.addNewPerson());
             }
@@ -405,7 +397,6 @@ public class ProtocolXmlStream extends PrintBaseXmlStream {
         ProtocolMasterData protocolMaster = protocolType.addNewProtocolMasterData();
         if (protocol == null)
             return;
-//        protocol.refreshNonUpdateableReferences();
         protocolMaster.setProtocolNumber(protocol.getProtocolNumber());
         protocolMaster.setSequenceNumber(BigInteger.valueOf(protocol.getSequenceNumber()));
         protocolMaster.setProtocolTitle(protocol.getTitle());

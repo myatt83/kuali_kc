@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import org.kuali.kra.bo.CoeusModule;
 import org.kuali.kra.common.specialreview.lookup.keyvalue.SpecialReviewTypeValuesFinder;
 
 /**
- * Provides a value finder for the Protocol-specific Special Review Types.
+ * Provides a value finder for the ProtocolBase-specific Special Review Types.
  */
 public class ProtocolSpecialReviewTypeValuesFinder extends SpecialReviewTypeValuesFinder {
 

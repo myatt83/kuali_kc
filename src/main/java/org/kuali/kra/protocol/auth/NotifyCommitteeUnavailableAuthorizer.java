@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,29 +17,26 @@ package org.kuali.kra.protocol.auth;
 
 import org.apache.commons.lang.StringUtils;
 import org.kuali.kra.infrastructure.PermissionConstants;
-import org.kuali.kra.protocol.Protocol;
+import org.kuali.kra.protocol.ProtocolBase;
 import org.kuali.kra.irb.actions.ProtocolActionType;
 import org.kuali.kra.irb.actions.submit.ProtocolSubmissionStatus;
 
 /**
  * Is the user allowed to notify the IRB office and the action is currently not available?
  */
-public class NotifyCommitteeUnavailableAuthorizer extends ProtocolAuthorizer {
+public class NotifyCommitteeUnavailableAuthorizer extends ProtocolAuthorizerBase {
 
     /**
-     * @see org.kuali.kra.protocol.auth.ProtocolAuthorizer#isAuthorized(java.lang.String, org.kuali.kra.protocol.auth.ProtocolTask)
+     * @see org.kuali.kra.protocol.auth.ProtocolAuthorizerBase#isAuthorized(java.lang.String, org.kuali.kra.protocol.auth.ProtocolTaskBase)
      */
-    public boolean isAuthorized(String userId, ProtocolTask task) {
-//        return !isStatusValid(task.getProtocol()) ||
-//               !canExecuteAction(task.getProtocol(), ProtocolActionType.NOTIFIED_COMMITTEE) ||
-//               !hasPermission(userId, task.getProtocol(), PermissionConstants.PERFORM_IRB_ACTIONS_ON_PROTO);
+    public boolean isAuthorized(String userId, ProtocolTaskBase task) {
 boolean result = !isStatusValid(task.getProtocol()) ||
         !canExecuteAction(task.getProtocol(), ProtocolActionType.NOTIFIED_COMMITTEE) ||
         !hasPermission(userId, task.getProtocol(), PermissionConstants.PERFORM_IRB_ACTIONS_ON_PROTO);
 return result;
     }
 
-    private boolean isStatusValid(Protocol protocol) {
+    private boolean isStatusValid(ProtocolBase protocol) {
         String submissionStatusCode = protocol.getProtocolSubmission().getSubmissionStatus().getProtocolSubmissionStatusCode();
         return StringUtils.isNotBlank(submissionStatusCode) &&
               (ProtocolSubmissionStatus.SUBMITTED_TO_COMMITTEE.equals(submissionStatusCode));

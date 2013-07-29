@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,14 @@
  */
 package org.kuali.kra.irb.actions.submit;
 
-import org.kuali.kra.bo.KraPersistableBusinessObjectBase;
+import org.kuali.kra.protocol.actions.submit.ProtocolSubmissionQualifierTypeBase;
 
-public class ProtocolSubmissionQualifierType extends KraPersistableBusinessObjectBase {
+public class ProtocolSubmissionQualifierType extends ProtocolSubmissionQualifierTypeBase {
+
+    /**
+     * Comment for <code>serialVersionUID</code>
+     */
+    private static final long serialVersionUID = -8568514666944391924L;
 
     public static final String ANNUAL_SCHEDULED_BY_IRB = "2";
 
@@ -44,27 +49,4 @@ public class ProtocolSubmissionQualifierType extends KraPersistableBusinessObjec
     public static final String DSMB_REPORT = "13";
 
     public static final String ANNUAL_REPORT = "14";
-
-    private String submissionQualifierTypeCode;
-
-    private String description;
-
-    public ProtocolSubmissionQualifierType() {
-    }
-
-    public String getSubmissionQualifierTypeCode() {
-        return submissionQualifierTypeCode;
-    }
-
-    public void setSubmissionQualifierTypeCode(String submissionQualifierTypeCode) {
-        this.submissionQualifierTypeCode = submissionQualifierTypeCode;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
 }

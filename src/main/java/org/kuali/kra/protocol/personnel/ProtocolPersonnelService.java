@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,60 +17,59 @@ package org.kuali.kra.protocol.personnel;
 
 import java.util.List;
 
-import org.kuali.kra.protocol.Protocol;
-import org.kuali.kra.protocol.noteattachment.ProtocolAttachmentPersonnel;
+import org.kuali.kra.protocol.ProtocolBase;
+import org.kuali.kra.protocol.noteattachment.ProtocolAttachmentPersonnelBase;
 
 
 public interface ProtocolPersonnelService {
-
-// TODO *********uncomment the code below in increments as needed during refactoring********* 
+ 
     /**
-     * This method adds ProtocolPerson to the List of ProtocolPersons.
+     * This method adds ProtocolPersonBase to the List of ProtocolPersons.
      * @param protocol which contains list of ProtocolPersons.
-     * @param ProtocolPerson object is added to ProtocolPersons list.
+     * @param ProtocolPersonBase object is added to ProtocolPersons list.
      */
-    public abstract void addProtocolPerson(Protocol protocol, ProtocolPerson protocolPerson);
+    public abstract void addProtocolPerson(ProtocolBase protocol, ProtocolPersonBase protocolPerson);
     
     /**
-     * This method deletes ProtocolPerson(s) - those marked as delete
+     * This method deletes ProtocolPersonBase(s) - those marked as delete
      * @param protocol which contains list of ProtocolPersons
      */
-    public abstract void deleteProtocolPerson(Protocol protocol);
+    public abstract void deleteProtocolPerson(ProtocolBase protocol);
     
     /**
-     * This method add ProtocolPersonAttachment to a Person of the Protocol.
+     * This method add ProtocolPersonAttachment to a Person of the ProtocolBase.
      * @param protocol - the protocol 
      * @param newAttachment - the new attachment to be added
      * @param selectedPersonIndex - the attachment is added to the specific person in the list
      */
-    public abstract void addProtocolPersonAttachment(Protocol protocol, ProtocolAttachmentPersonnel newAttachment, int selectedPersonIndex);
+    public abstract void addProtocolPersonAttachment(ProtocolBase protocol, ProtocolAttachmentPersonnelBase newAttachment, int selectedPersonIndex);
     
     /**
-     * This method adds ProtocolUnit to the List of selected ProtocolPerson.
+     * This method adds ProtocolUnitBase to the List of selected ProtocolPersonBase.
      * @param protocolPersonUnits - New list of protocol units for each person
      * @param protocolPerson - Selected protocol person from the list
      * @param selectedPersonIndex - Unit is added to specific person in the list
      */
-    public abstract void addProtocolPersonUnit(List<ProtocolUnit> protocolPersonUnits, ProtocolPerson protocolPerson, int selectedPersonIndex);
+    public abstract void addProtocolPersonUnit(List<ProtocolUnitBase> protocolPersonUnits, ProtocolPersonBase protocolPerson, int selectedPersonIndex);
     
 
     /**
-     * This method will delete ProtocolUnit from the List of protocol person units at specified position(selectedPersonIndex)
+     * This method will delete ProtocolUnitBase from the List of protocol person units at specified position(selectedPersonIndex)
      * @param protocolPersonUnits - New list of protocol units for each person
      * @param selectedPersonIndex - Unit is removed from specific person in the list
      * @param lineNumber - deleted line number
      */
-    public abstract void deleteProtocolPersonUnit(Protocol protocol, int selectedPersonIndex, int lineNumber);
+    public abstract void deleteProtocolPersonUnit(ProtocolBase protocol, int selectedPersonIndex, int lineNumber);
 
     /**
      * This method is used to update selected protocol lead unit in the list.
-     * Each Protocol Person has index of selected lead unit
+     * Each ProtocolBase Person has index of selected lead unit
      * UI display is handled through selectedUnit index to group lead unit radio.
      * Update selected unit in the list based on selectedUnit indicator in each protocolPerson
      * Also update affiliation type which is linked to person role.
      * @param protocolPersons
      */
-    public void syncProtocolPersonRoleChanges(List<ProtocolPerson> protocolPersons);
+    public void syncProtocolPersonRoleChanges(List<ProtocolPersonBase> protocolPersons);
 
     /**
      * This method is to select protocol lead unit for each person.
@@ -78,7 +77,7 @@ public interface ProtocolPersonnelService {
      * So we need to set this indicator for each person once we fetch all protocolPersons.
      * @param protocolPersons
      */
-    public void selectProtocolUnit(List<ProtocolPerson> protocolPersons);
+    public void selectProtocolUnit(List<ProtocolPersonBase> protocolPersons);
     
     /**
      * This method is to check if Principal Investigator already exists.
@@ -86,9 +85,7 @@ public interface ProtocolPersonnelService {
      * @param protocolPersons
      * @return true / false
      */
-    public boolean isPIExists(List<ProtocolPerson> protocolPersons);
-// TODO **********************end************************
-    
+    public boolean isPIExists(List<ProtocolPersonBase> protocolPersons);    
     
     
     /**
@@ -98,7 +95,7 @@ public interface ProtocolPersonnelService {
      * @param newProtocolPerson
      * @return true / false
      */
-    public boolean isDuplicatePerson(List<ProtocolPerson> protocolPersons, ProtocolPerson newProtocolPerson);
+    public boolean isDuplicatePerson(List<ProtocolPersonBase> protocolPersons, ProtocolPersonBase newProtocolPerson);
 
  
     
@@ -108,9 +105,9 @@ public interface ProtocolPersonnelService {
      * This method also helps to check whether at least one investigator exists in person list
      * Return first found investigator so that we can check for duplicate if any
      * @param protocolPersons
-     * @return null if no investigator else ProtocolPerson as investigator
+     * @return null if no investigator else ProtocolPersonBase as investigator
      */
-    public ProtocolPerson getPrincipalInvestigator(List<ProtocolPerson> protocolPersons);
+    public ProtocolPersonBase getPrincipalInvestigator(List<ProtocolPersonBase> protocolPersons);
 
     
          
@@ -119,7 +116,7 @@ public interface ProtocolPersonnelService {
      * @param protocolPerson
      * @return
      */
-    public boolean isPrincipalInvestigator(ProtocolPerson protocolPerson);
+    public boolean isPrincipalInvestigator(ProtocolPersonBase protocolPerson);
         
       
     /**
@@ -127,7 +124,7 @@ public interface ProtocolPersonnelService {
      * @param newPrincipalInvestigator The new instance of the principal investigator
      * @param protocol The protocol that will contain the investigator
      */
-    public void setPrincipalInvestigator(ProtocolPerson newPrincipalInvestigator, Protocol protocol);
+    public void setPrincipalInvestigator(ProtocolPersonBase newPrincipalInvestigator, ProtocolBase protocol);
 
          
     /**
@@ -135,7 +132,7 @@ public interface ProtocolPersonnelService {
      * @param principalInvestigator The principal investigator to search
      * @return The lead unit associated with the principal investigator
      */
-    public ProtocolUnit getLeadUnit(ProtocolPerson principalInvestigator); 
+    public ProtocolUnitBase getLeadUnit(ProtocolPersonBase principalInvestigator); 
     
     
     /**
@@ -144,10 +141,9 @@ public interface ProtocolPersonnelService {
      * @param principalInvestigator The principal investigator to set
      * @param protocol The protocol that contains the principal investigator
      */
-    public void setLeadUnit(ProtocolUnit newLeadUnit, ProtocolPerson principalInvestigator, Protocol protocol);
+    public void setLeadUnit(ProtocolUnitBase newLeadUnit, ProtocolPersonBase principalInvestigator, ProtocolBase protocol);
 
-    
-// TODO *********uncomment the code below in increments as needed during refactoring*********     
+         
     /**
      * This method is to see if there is any change in the protocol person role.
      * swapping Investigator and Co-Investigator role is permitted.
@@ -155,7 +151,7 @@ public interface ProtocolPersonnelService {
      * and vice versa
      * @param protocolPersons
      */
-    public void switchInvestigatorCoInvestigatorRole(List<ProtocolPerson> protocolPersons);
+    public void switchInvestigatorCoInvestigatorRole(List<ProtocolPersonBase> protocolPersons);
     
     /**
      * This method is to get valid target person roles for a given source role.
@@ -163,14 +159,14 @@ public interface ProtocolPersonnelService {
      * @param sourceRoleId
      * @return
      */
-    public List<ProtocolPersonRoleMapping> getPersonRoleMapping(String sourceRoleId);
+    public List<ProtocolPersonRoleMappingBase> getPersonRoleMapping(String sourceRoleId);
     
     /**
      * This method returns the protocolPersonRole based on the sourceRoleId.
      * @param sourceRoleId
      * @return
      */
-    public ProtocolPersonRole getProtocolPersonRole(String sourceRoleId);
+    public ProtocolPersonRoleBase getProtocolPersonRole(String sourceRoleId);
 
     /**
      * This method is to check whether new unit already exists in the list
@@ -179,20 +175,20 @@ public interface ProtocolPersonnelService {
      * @param newProtocolUnit
      * @return true / false
      */
-    public boolean isDuplicateUnit(ProtocolPerson protocolPerson, ProtocolUnit newProtocolUnit);
+    public boolean isDuplicateUnit(ProtocolPersonBase protocolPerson, ProtocolUnitBase newProtocolUnit);
     
     
     /**
      * This method is to update person unit based on change in person role.
      * @param protocolPerson
      */
-    public void syncPersonRoleAndUnit(ProtocolPerson protocolPerson);
+    public void syncPersonRoleAndUnit(ProtocolPersonBase protocolPerson);
     
     /**
      * This method is to update person affiliation type based on change in person role.
      * @param protocolPerson
      */
-    public void syncPersonRoleAndAffiliation(ProtocolPerson protocolPerson);
+    public void syncPersonRoleAndAffiliation(ProtocolPersonBase protocolPerson);
     
     /**
      * This method is to check whether Student Investigator and Faculty Supervisor combination is valid.
@@ -203,21 +199,20 @@ public interface ProtocolPersonnelService {
      * @param protocolPersons
      * @return
      */
-    public boolean isValidStudentFacultyMatch(List<ProtocolPerson> protocolPersons);
+    public boolean isValidStudentFacultyMatch(List<ProtocolPersonBase> protocolPersons);
     
     /** This method is to check if the person playing the PI role is also being added as a CO-I 
      * @param protocolPersons
      * @param newProtocolPerson
      * @return 
      */
-    public boolean isPISameAsCoI(ProtocolPerson piProtocolPerson, ProtocolPerson newProtocolPerson);
+    public boolean isPISameAsCoI(ProtocolPersonBase piProtocolPerson, ProtocolPersonBase newProtocolPerson);
 
     /**
      * This method returns a list of affiliated students from a list of personnel.
      * @param protocolPersons
      * @return affiliatedStudents
      */
-    public List<Integer>getAffiliationStudentMap(List<ProtocolPerson> protocolPersons);
-// TODO **********************end************************    
+    public List<Integer>getAffiliationStudentMap(List<ProtocolPersonBase> protocolPersons);
     
 }

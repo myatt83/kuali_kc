@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,14 +22,13 @@ import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.StringUtils;
 import org.kuali.kra.authorization.ApplicationTask;
 import org.kuali.kra.authorization.KcTransactionalDocumentAuthorizerBase;
-import org.kuali.kra.common.committee.meeting.CommitteeScheduleMinute;
-import org.kuali.kra.common.committee.service.CommonCommitteeScheduleService;
 import org.kuali.kra.iacuc.IacucProtocolDocument;
 import org.kuali.kra.iacuc.IacucProtocolOnlineReviewDocument;
 import org.kuali.kra.iacuc.auth.IacucProtocolTask;
+import org.kuali.kra.iacuc.committee.meeting.IacucCommitteeScheduleMinute;
+import org.kuali.kra.iacuc.committee.service.IacucCommitteeScheduleService;
 import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.infrastructure.TaskName;
-import org.kuali.kra.protocol.ProtocolOnlineReviewDocument;
 import org.kuali.kra.service.KraWorkflowService;
 import org.kuali.kra.service.TaskAuthorizationService;
 import org.kuali.rice.kim.api.identity.Person;
@@ -38,13 +37,18 @@ import org.kuali.rice.krad.document.Document;
 import org.kuali.rice.krad.util.GlobalVariables;
 
 public class IacucProtocolOnlineReviewDocumentAuthorizer extends KcTransactionalDocumentAuthorizerBase {
+        
+    /**
+     * Comment for <code>serialVersionUID</code>
+     */
+    private static final long serialVersionUID = -5887926854171754314L;
     
     public static final String CAN_EDIT_REVIEW_TYPE = "canEditReviewType";
     public static final String CAN_EDIT_DETERMINATION = "canEditDetermination";
     public static final String CAN_SAVE = "canSave";
 
     private transient KraWorkflowService kraWorkflowService;
-    private transient CommonCommitteeScheduleService commonCommitteeScheduleService;
+    private transient IacucCommitteeScheduleService committeeScheduleService;
     
     public Set<String> getEditModes(Document document, Person user, Set<String> currentEditModes) {
         Set<String> editModes = new HashSet<String>();
@@ -79,7 +83,7 @@ public class IacucProtocolOnlineReviewDocumentAuthorizer extends KcTransactional
          * The service returns all the minutes for the assoicated Iacuc protocol, however, the permissions described above are only for the specific review being iterated 
          * at this time.  So, we set the minute's read only for the minutes associated with this online review.
          */
-        for (CommitteeScheduleMinute minute : this.getCommonCommitteeScheduleService().getMinutesByProtocol(protocolOnlineReviewDocument.getProtocolOnlineReview().getProtocolId())) {
+        for (IacucCommitteeScheduleMinute minute : this.getCommitteeScheduleService().getMinutesByProtocol(protocolOnlineReviewDocument.getProtocolOnlineReview().getProtocolId())) {
             Long minuteOnlineReviewId =  minute.getProtocolOnlineReviewIdFk();
             Long onlineReviewId = protocolOnlineReviewDocument.getProtocolOnlineReview().getProtocolOnlineReviewId();
             if (ObjectUtils.equals(minuteOnlineReviewId, onlineReviewId)) {
@@ -145,7 +149,6 @@ public class IacucProtocolOnlineReviewDocumentAuthorizer extends KcTransactional
         IacucProtocolOnlineReviewTask task = new IacucProtocolOnlineReviewTask(taskName, doc.getProtocolOnlineReview());       
         TaskAuthorizationService taskAuthenticationService = KraServiceLocator.getService(TaskAuthorizationService.class);
         return taskAuthenticationService.isAuthorized(userId, task);
-//          return true;
     }
     
     /**
@@ -155,7 +158,6 @@ public class IacucProtocolOnlineReviewDocumentAuthorizer extends KcTransactional
     public boolean canEdit(Document document, Person user) {
         return canExecuteProtocolOnlineReviewTask(user.getPrincipalId(), (IacucProtocolOnlineReviewDocument) document, TaskName.MODIFY_IACUC_PROTOCOL_ONLINEREVIEW) 
                || canExecuteProtocolOnlineReviewTask(user.getPrincipalId(), (IacucProtocolOnlineReviewDocument) document, TaskName.MAINTAIN_IACUC_PROTOCOL_ONLINEREVIEWS); 
-//        return true;
     }
     
     /**
@@ -203,7 +205,6 @@ public class IacucProtocolOnlineReviewDocumentAuthorizer extends KcTransactional
         boolean result = super.canDisapprove(document, user);
         result &= canExecuteProtocolOnlineReviewTask(user.getPrincipalId(), (IacucProtocolOnlineReviewDocument) document, TaskName.MAINTAIN_IACUC_PROTOCOL_ONLINEREVIEWS); 
         return result;
-//         return true;
     }
     
     private KraWorkflowService getKraWorkflowService() {
@@ -223,15 +224,15 @@ public class IacucProtocolOnlineReviewDocumentAuthorizer extends KcTransactional
         return false;
     }
 
-    public CommonCommitteeScheduleService getCommonCommitteeScheduleService() {
-        if (commonCommitteeScheduleService == null) {
-            commonCommitteeScheduleService = KraServiceLocator.getService(CommonCommitteeScheduleService.class);
+    public IacucCommitteeScheduleService getCommitteeScheduleService() {
+        if (committeeScheduleService == null) {
+            committeeScheduleService = KraServiceLocator.getService(IacucCommitteeScheduleService.class);
         }
-        return commonCommitteeScheduleService;
+        return committeeScheduleService;
     }
 
-    public void setCommonCommitteeScheduleService(CommonCommitteeScheduleService commonCommitteeScheduleService) {
-        this.commonCommitteeScheduleService = commonCommitteeScheduleService;
+    public void setCommitteeScheduleService(IacucCommitteeScheduleService committeeScheduleService) {
+        this.committeeScheduleService = committeeScheduleService;
     }
 
     

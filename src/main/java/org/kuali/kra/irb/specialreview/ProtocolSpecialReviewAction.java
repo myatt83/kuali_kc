@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,8 +61,8 @@ public class ProtocolSpecialReviewAction extends ProtocolAction {
     public ActionForward addSpecialReview(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
         ProtocolForm protocolForm = (ProtocolForm) form;
         ProtocolDocument document = protocolForm.getProtocolDocument();
-        ProtocolSpecialReview specialReview = protocolForm.getSpecialReviewHelper().getNewSpecialReview();
-        List<ProtocolSpecialReview> specialReviews = document.getProtocol().getSpecialReviews();
+        ProtocolSpecialReview specialReview = (ProtocolSpecialReview)protocolForm.getSpecialReviewHelper().getNewSpecialReview();
+        List<ProtocolSpecialReview> specialReviews = (List)document.getProtocol().getSpecialReviews();
         
         if (applyRules(new AddSpecialReviewEvent<ProtocolSpecialReview>(document, specialReview, specialReviews, false))) {
             specialReview.setSpecialReviewNumber(document.getDocumentNextValue(Constants.SPECIAL_REVIEW_NUMBER));

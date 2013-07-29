@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,24 +16,25 @@
 package org.kuali.kra.negotiations.document;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
-import org.kuali.kra.bo.CustomAttributeDocument;
+import org.kuali.kra.authorization.KraAuthorizationConstants;
+import org.kuali.kra.bo.DocumentCustomData;
 import org.kuali.kra.document.ResearchDocumentBase;
 import org.kuali.kra.infrastructure.Constants;
-import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.negotiations.bo.Negotiation;
 import org.kuali.kra.negotiations.bo.NegotiationActivity;
 import org.kuali.kra.negotiations.bo.NegotiationActivityAttachment;
-import org.kuali.kra.service.NegotiationCustomAttributeService;
 import org.kuali.rice.coreservice.framework.parameter.ParameterConstants;
 import org.kuali.rice.coreservice.framework.parameter.ParameterConstants.COMPONENT;
 import org.kuali.rice.coreservice.framework.parameter.ParameterConstants.NAMESPACE;
 import org.kuali.rice.kew.api.KewApiConstants;
 import org.kuali.rice.kew.framework.postprocessor.DocumentRouteStatusChange;
+import org.kuali.rice.kim.api.identity.Person;
+import org.kuali.rice.krad.util.GlobalVariables;
 import org.kuali.rice.krad.util.ObjectUtils;
 
 /**
@@ -61,17 +62,6 @@ public class NegotiationDocument extends ResearchDocumentBase implements Seriali
     public NegotiationDocument() {
         negotiationList = new ArrayList<Negotiation>();
         negotiationList.add(new Negotiation());
-        populateCustomAttributes();
-    }  
-    
-    /**
-     * This method populates the customAttributes for this document.
-     */
-    @Override
-    public void populateCustomAttributes() {
-        NegotiationCustomAttributeService negotiationCustomAttributeService = KraServiceLocator.getService(NegotiationCustomAttributeService.class);
-        Map<String, CustomAttributeDocument> customAttributeDocuments = negotiationCustomAttributeService.getDefaultNegotiationCustomAttributeDocuments();
-        setCustomAttributeDocuments(customAttributeDocuments);
     }
     
     /**
@@ -189,4 +179,30 @@ public class NegotiationDocument extends ResearchDocumentBase implements Seriali
         this.negotiationList = negotiationList;
     }
 
+    @Override
+    public List<? extends DocumentCustomData> getDocumentCustomData() {
+        return getNegotiation().getNegotiationCustomDataList();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public boolean useCustomLockDescriptors() {
+        return true;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public String getCustomLockDescriptor(Person user) {
+        String activeLockRegion = (String) GlobalVariables.getUserSession().retrieveObject(KraAuthorizationConstants.ACTIVE_LOCK_REGION);
+        String updatedTimestamp = "";
+        if (this.getUpdateTimestamp() != null) {
+            updatedTimestamp = (new SimpleDateFormat("MM/dd/yyyy KK:mm a").format(this.getUpdateTimestamp()));
+        }
+        if (StringUtils.isNotEmpty(activeLockRegion)) {
+            return this.getNegotiation().getNegotiationId() + "-" + activeLockRegion + "-" + GlobalVariables.getUserSession().getPrincipalName() + "-" + updatedTimestamp;  
+        }
+
+        return null;
+    }
+    
 }

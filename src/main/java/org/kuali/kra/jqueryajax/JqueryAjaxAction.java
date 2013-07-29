@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ import org.kuali.kra.award.home.AwardTemplate;
 import org.kuali.kra.bo.Unit;
 import org.kuali.kra.coi.CoiDispositionStatus;
 import org.kuali.kra.coi.disclosure.CoiDisclosureService;
-import org.kuali.kra.committee.bo.CommitteeType;
+import org.kuali.kra.common.committee.bo.CommitteeType;
 import org.kuali.kra.common.notification.service.NotificationRoleSubQualifierFinders;
 import org.kuali.kra.iacuc.IacucLocationName;
 import org.kuali.kra.iacuc.actions.IacucProtocolActionAjaxService;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -140,7 +140,7 @@ public class BatchCorrespondenceDetailAction extends KualiDocumentActionBase {
         int index = getSelectedBatchCorrespondenceDetail(request);
         BatchCorrespondenceDetailForm batchCorrespondenceDetailForm = (BatchCorrespondenceDetailForm) form;
         BatchCorrespondence batchCorrespondence = batchCorrespondenceDetailForm.getBatchCorrespondence();
-        BatchCorrespondenceDetail batchCorrespondenceDetail = batchCorrespondence.getBatchCorrespondenceDetails().get(index);
+        BatchCorrespondenceDetail batchCorrespondenceDetail = (BatchCorrespondenceDetail)batchCorrespondence.getBatchCorrespondenceDetails().get(index);
         
         // Add batch correspondence detail to database deletion list
         batchCorrespondenceDetailForm.getDeletedBatchCorrespondenceDetail().add(batchCorrespondenceDetail);

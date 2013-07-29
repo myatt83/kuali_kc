@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  *
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,41 +15,13 @@
  */
 package org.kuali.kra.irb.protocol.reference;
 
-import org.kuali.kra.bo.KraPersistableBusinessObjectBase;
-import org.kuali.rice.core.api.mo.common.active.MutableInactivatable;
+import org.kuali.kra.protocol.protocol.reference.ProtocolReferenceTypeBase;
 
-public class ProtocolReferenceType extends KraPersistableBusinessObjectBase implements MutableInactivatable {
+public class ProtocolReferenceType extends ProtocolReferenceTypeBase {
 
-    private Integer protocolReferenceTypeCode;
+    /**
+     * Comment for <code>serialVersionUID</code>
+     */
+    private static final long serialVersionUID = 6127401095168093096L;
 
-    private String description;
-
-    private boolean active;
-
-    public ProtocolReferenceType() {
-    }
-
-    public Integer getProtocolReferenceTypeCode() {
-        return protocolReferenceTypeCode;
-    }
-
-    public void setProtocolReferenceTypeCode(Integer protocolReferenceTypeCode) {
-        this.protocolReferenceTypeCode = protocolReferenceTypeCode;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public boolean isActive() {
-        return active;
-    }
-
-    public void setActive(boolean active) {
-        this.active = active;
-    }
 }

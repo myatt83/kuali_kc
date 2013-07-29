@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,10 @@
  */
 package org.kuali.kra.iacuc.actions.submit;
 
-import org.kuali.kra.common.committee.bo.CommitteeMembership;
-import org.kuali.kra.protocol.actions.submit.ProtocolReviewerBean;
+import org.kuali.kra.common.committee.bo.CommitteeMembershipBase;
+import org.kuali.kra.protocol.actions.submit.ProtocolReviewerBeanBase;
 
-public class IacucProtocolReviewerBean extends ProtocolReviewerBean {
+public class IacucProtocolReviewerBean extends ProtocolReviewerBeanBase {
 
     /**
      * Comment for <code>serialVersionUID</code>
@@ -29,7 +29,7 @@ public class IacucProtocolReviewerBean extends ProtocolReviewerBean {
         super();
     }
 
-    public IacucProtocolReviewerBean(CommitteeMembership member) {
+    public IacucProtocolReviewerBean(CommitteeMembershipBase member) {
         super(member);
     }
     

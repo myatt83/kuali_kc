@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@ package org.kuali.kra.common.committee.rule.event;
 
 import java.util.List;
 
-import org.kuali.kra.common.committee.bo.CommonCommitteeSchedule;
-import org.kuali.kra.common.committee.document.CommonCommitteeDocument;
+import org.kuali.kra.common.committee.bo.CommitteeScheduleBase;
+import org.kuali.kra.common.committee.document.CommitteeDocumentBase;
 import org.kuali.kra.common.committee.rules.CommitteeScheduleFilterDatesRule;
 import org.kuali.kra.common.committee.web.struts.form.schedule.ScheduleData;
 import org.kuali.kra.rule.BusinessRuleInterface;
@@ -26,14 +26,14 @@ import org.kuali.rice.krad.document.Document;
 
 public class CommitteeScheduleFilterEvent extends CommitteeScheduleEventBase<CommitteeScheduleFilterDatesRule> {
     
-    public static final String MSG = "adding CommitteeSchedule to document ";
+    public static final String MSG = "adding CommitteeScheduleBase to document ";
     
-    public CommitteeScheduleFilterEvent(String errorPathPrefix, CommonCommitteeDocument document, ScheduleData scheduleData, List<CommonCommitteeSchedule> committeeSchedules, ErrorType type) {
+    public CommitteeScheduleFilterEvent(String errorPathPrefix, CommitteeDocumentBase document, ScheduleData scheduleData, List<CommitteeScheduleBase> committeeSchedules, ErrorType type) {
         super(MSG + getDocumentId(document), errorPathPrefix, document, scheduleData, committeeSchedules, type);
     }
     
-    public CommitteeScheduleFilterEvent(String errorPathPrefix, Document document, ScheduleData scheduleData, List<CommonCommitteeSchedule> committeeSchedules, ErrorType type) {
-        this(errorPathPrefix, (CommonCommitteeDocument)document, scheduleData, committeeSchedules, type);
+    public CommitteeScheduleFilterEvent(String errorPathPrefix, Document document, ScheduleData scheduleData, List<CommitteeScheduleBase> committeeSchedules, ErrorType type) {
+        this(errorPathPrefix, (CommitteeDocumentBase)document, scheduleData, committeeSchedules, type);
     }
     
     @SuppressWarnings("unchecked")

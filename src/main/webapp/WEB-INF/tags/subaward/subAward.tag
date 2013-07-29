@@ -1,5 +1,5 @@
 <%--
- Copyright 2005-2010 The Kuali Foundation
+ Copyright 2005-2013 The Kuali Foundation
  
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -21,11 +21,11 @@
 <script language="javascript" src="dwr/interface/OrganizationService.js"></script>
 <script type='text/javascript' src='dwr/interface/RolodexService.js'></script>
 
-<kul:tab tabTitle="SubAward" defaultOpen="${KualiForm.document.subAwardList[0].defaultOpen}" tabErrorKey="document.subAwardList[0].statusCode*,document.subAwardList[0].requisitionerUserName*,document.subAwardList[0].siteInvestigatorId*,document.subAwardList[0].purchaseOrderNum*,document.subAwardList[0].organizationId*,document.subAwardList[0].subAwardTypeCode*,document.subAwardList[0].title*,document.subAwardList[0].startDate*,document.subAwardList[0].endDate*,document.subAwardList[0].accountNumber*,document.subAwardList[0].vendorNumber*,document.subAwardList[0].requisitionerUnit*,document.subAwardList[0].archiveLocation*,document.subAwardList[0].closeoutDate*,document.subAwardList[0].comments*,document.subAwardList[0].totalAnticipatedAmount*,document.subAwardList[0].totalObligatedAmount*"
+<kul:tab tabTitle="Subaward" defaultOpen="${KualiForm.document.subAwardList[0].defaultOpen}" tabErrorKey="document.subAwardList[0].statusCode*,document.subAwardList[0].requisitionerUserName*,document.subAwardList[0].siteInvestigatorId*,document.subAwardList[0].purchaseOrderNum*,document.subAwardList[0].organizationId*,document.subAwardList[0].subAwardTypeCode*,document.subAwardList[0].title*,document.subAwardList[0].startDate*,document.subAwardList[0].endDate*,document.subAwardList[0].accountNumber*,document.subAwardList[0].vendorNumber*,document.subAwardList[0].requisitionerUnit*,document.subAwardList[0].archiveLocation*,document.subAwardList[0].closeoutDate*,document.subAwardList[0].comments*,document.subAwardList[0].totalAnticipatedAmount*,document.subAwardList[0].totalObligatedAmount*"
  auditCluster="subawardFinancialdAuditErrors" tabAuditKey="document.subAwardList[0].totalAnticipatedAmount*,document.subAwardList[0].totalObligatedAmount*" useRiceAuditMode="true">
 	<div class="tab-container" align="center">
     	<h3>
-    		<span class="subhead-left"> SubAward</span>
+    		<span class="subhead-left"> Subaward</span>
     			<div align="right"><kul:help parameterNamespace="KC-SUBAWARD" parameterDetailType="Document" parameterName="subAwardHomeHelpUrl" altText="help"/></div>
         </h3>
         
@@ -50,8 +50,21 @@
           			  </c:if>			
           			  	<kul:directInquiry boClassName="org.kuali.kra.bo.NonOrganizationalRolodex" inquiryParameters="document.subAwardList[0].siteInvestigator:rolodexId" anchor="${tabKey}" />
           			  
-          			           			  
-          			  <div id="sub.fullName.div">${KualiForm.document.subAwardList[0].rolodex.fullName}&nbsp;</div> 
+          			  <div id="sub.fullName.div">
+          			      &nbsp; 
+          			      <c:if test="${!empty KualiForm.document.subAwardList[0].siteInvestigatorId}">
+					          <c:if test="${!empty KualiForm.document.subAwardList[0].rolodex}">
+						          <c:choose>
+						              <c:when test="${empty KualiForm.document.subAwardList[0].rolodex.fullName}">
+						                  <c:out value="${KualiForm.document.subAwardList[0].rolodex.organization}"/>
+                                      </c:when>
+                                      <c:otherwise>						                      
+							              <c:out value="${KualiForm.document.subAwardList[0].rolodex.fullName}" />
+							          </c:otherwise>
+							      </c:choose>
+				              </c:if>
+				          </c:if>
+				      </div>
           			  <html:hidden styleId ="sub.siteInvestigatorId.div" property="document.subAwardList[0].siteInvestigator" />  
           			   ${kfunc:registerEditableProperty(KualiForm, "document.subAwardList[0].siteInvestigator")} 
                 </td>
@@ -116,10 +129,8 @@
                 </td>
             </tr>
         	<tr>
-				<th><div align="right"><kul:htmlAttributeLabel attributeEntry="${subAwardAttributes.requisitionerUserName}" /></div></th>
-              
-                      
-             <td>
+				<th><div align="right"><kul:htmlAttributeLabel attributeEntry="${subAwardAttributes.requisitionerUserName}" forceRequired="true" /></div></th>
+                <td>
 			<c:if test="${!readOnly}">
 	                    <kul:htmlControlAttribute property="document.subAwardList[0].requisitionerUserName" readOnly="${readOnly}" 
 							onblur="loadContactPersonName('document.subAwardList[0].requisitionerUserName',

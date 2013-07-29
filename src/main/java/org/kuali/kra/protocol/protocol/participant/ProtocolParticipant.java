@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package org.kuali.kra.protocol.protocol.participant;
 
-import org.kuali.kra.protocol.ProtocolAssociate;
+import org.kuali.kra.protocol.ProtocolAssociateBase;
 
 /**
  * 
@@ -23,7 +23,7 @@ import org.kuali.kra.protocol.ProtocolAssociate;
  * 
  * @author Kuali Research Administration Team (kc.dev@kuali.org)
  */
-public class ProtocolParticipant extends ProtocolAssociate {
+public class ProtocolParticipant extends ProtocolAssociateBase {
 
     private Long protocolParticipantId;
 

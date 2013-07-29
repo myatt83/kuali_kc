@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation.
+ * Copyright 2005-2013 The Kuali Foundation.
  * 
  * Licensed under the Educational Community License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import gov.grants.apply.forms.rrOtherProjectInfo13V13.RROtherProjectInfo13Docume
 import gov.grants.apply.system.attachmentsV10.AttachedFileDataType;
 import gov.grants.apply.system.globalLibraryV20.YesNoDataType;
 
+import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -82,11 +83,7 @@ public class RROtherProjectInfoV1_3Generator extends
 		RROtherProjectInfo13Document.RROtherProjectInfo13 rrOtherProjectInfo = RROtherProjectInfo13Document.RROtherProjectInfo13.Factory
 				.newInstance();
 		rrOtherProjectInfo.setFormVersion(S2SConstants.FORMVERSION_1_3);
-		ModuleQuestionnaireBean moduleQuestionnaireBean = new ModuleQuestionnaireBean(
-                CoeusModule.PROPOSAL_DEVELOPMENT_MODULE_CODE, pdDoc.getDevelopmentProposal().getProposalNumber(), CoeusSubModule.ZERO_SUBMODULE ,
-                    CoeusSubModule.ZERO_SUBMODULE, true);
-        QuestionnaireAnswerService questionnaireAnswerService = KraServiceLocator.getService(QuestionnaireAnswerService.class);
-        answerHeaders = questionnaireAnswerService.getQuestionnaireAnswer(moduleQuestionnaireBean);
+		answerHeaders = getQuestionnaireAnswers(pdDoc.getDevelopmentProposal(), true);
 		rrOtherProjectInfo.
 		setHumanSubjectsIndicator(YesNoDataType.N_NO);
 		rrOtherProjectInfo.setVertebrateAnimalsIndicator(YesNoDataType.N_NO);
@@ -99,6 +96,8 @@ public class RROtherProjectInfoV1_3Generator extends
 		setInternationalActivities(rrOtherProjectInfo);
 		setAttachments(rrOtherProjectInfo);
 		rrOtherProjectInfoDocument.setRROtherProjectInfo13(rrOtherProjectInfo);
+		ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(rrOtherProjectInfoDocument.toString().getBytes());            
+        sortAttachments(byteArrayInputStream);
 		return rrOtherProjectInfoDocument;
 	}
 
@@ -398,7 +397,7 @@ public class RROtherProjectInfoV1_3Generator extends
 		}
 		if (KraServiceLocator.getService(ParameterService.class).getParameterValueAsBoolean(Constants.MODULE_NAMESPACE_IACUC, 
 		        Constants.PARAMETER_COMPONENT_DOCUMENT, Constants.IACUC_PROTOCOL_PROPOSAL_DEVELOPMENT_LINKING_ENABLED_PARAMETER)) {
-		    if (proposalSpecialReview.getApprovalDate() != null) {
+		    if (proposalSpecialReview.getApprovalDate() == null) {
 		        vertebrateAnimalsSupplement.setVertebrateAnimalsIACUCReviewIndicator(YesNoDataType.Y_YES);
 		    } else {
 		        vertebrateAnimalsSupplement.setVertebrateAnimalsIACUCReviewIndicator(YesNoDataType.N_NO);

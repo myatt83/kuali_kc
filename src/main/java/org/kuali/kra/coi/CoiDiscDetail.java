@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,14 +37,16 @@ public class CoiDiscDetail extends KraPersistableBusinessObjectBase implements C
     // TODO : since the synthetic key 'personFinIntDisclosureId' is added.  ok to remove entitynumber/entitysequence ?
     private String entityNumber; 
     private Integer entitySequenceNumber; 
-    private String entityStatusCode; 
+    private Integer entityDispositionCode; 
+    // Future: keeping track of old entity status, for when we track who changes it during reviews
+    private Integer oldEntityDispositionCode; 
     private String description; 
     private String comments; 
     private Long personFinIntDisclosureId;
     // for master disclosure.  if this is not null, then it is copied from previous master disclosure
     private Long copiedCoiDiscDetailId; 
     private PersonFinIntDisclosure personFinIntDisclosure;
-    private CoiEntityStatusCode coiEntityStatusCode; 
+    private CoiDispositionStatus coiEntityDispositionStatus; 
     private CoiDisclosure coiDisclosure; 
     // originalxxxx is for master disclosure ui bean
     private Long originalCoiDisclosureId;
@@ -156,12 +158,20 @@ public class CoiDiscDetail extends KraPersistableBusinessObjectBase implements C
         this.entitySequenceNumber = entitySequenceNumber;
     }
 
-    public String getEntityStatusCode() {
-        return entityStatusCode;
+    public Integer getEntityDispositionCode() {
+        return entityDispositionCode;
     }
 
-    public void setEntityStatusCode(String entityStatusCode) {
-        this.entityStatusCode = entityStatusCode;
+    public void setEntityDispositionCode(Integer entityDispositionCode) {
+        this.entityDispositionCode = entityDispositionCode;
+    }
+
+    public Integer getOldEntityDispositionCode() {
+        return oldEntityDispositionCode;
+    }
+
+    public void setOldEntityDispositionCode() {
+        oldEntityDispositionCode = entityDispositionCode;
     }
 
     public String getDescription() {
@@ -180,12 +190,12 @@ public class CoiDiscDetail extends KraPersistableBusinessObjectBase implements C
         this.comments = comments;
     }
 
-    public CoiEntityStatusCode getCoiEntityStatusCode() {
-        return coiEntityStatusCode;
+    public CoiDispositionStatus getCoiEntityDispositionStatus() {
+        return coiEntityDispositionStatus;
     }
 
-    public void setCoiEntityStatusCode(CoiEntityStatusCode coiEntityStatusCode) {
-        this.coiEntityStatusCode = coiEntityStatusCode;
+    public void setCoiEntityDispositionStatus(CoiDispositionStatus coiEntityDispositionStatus) {
+        this.coiEntityDispositionStatus = coiEntityDispositionStatus;
     }
 
     public CoiDisclosure getCoiDisclosure() {

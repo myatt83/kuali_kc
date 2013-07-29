@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,13 +27,14 @@ public class CommitteeReplacementParameters {
     public static final String ACTION_TAKEN = "{ACTION_TAKEN}";
     public static final String LAST_ACTION_DATE = "{LAST_ACTION_DATE}";
     public static final String OBJECT_INDEX = "{OBJECT_INDEX}";
-
+    public static final String SCHEDULE_ID = "{SCHEDULE_ID}";
     
     public static final String[] REPLACEMENT_PARAMETERS = new String[] { DOCUMENT_NUMBER,
                                                                          SEQUENCE_NUMBER, 
                                                                          COMMITTEE_NAME,
                                                                          ACTION_TAKEN, 
                                                                          LAST_ACTION_DATE,
-                                                                         OBJECT_INDEX
+                                                                         OBJECT_INDEX,
+                                                                         SCHEDULE_ID
                                                                        };
 }

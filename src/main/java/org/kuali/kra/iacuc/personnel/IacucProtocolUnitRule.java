@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@ package org.kuali.kra.iacuc.personnel;
 
 import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.protocol.personnel.ProtocolPersonnelService;
-import org.kuali.kra.protocol.personnel.ProtocolUnitRule;
+import org.kuali.kra.protocol.personnel.ProtocolUnitRuleBase;
 
-public class IacucProtocolUnitRule extends ProtocolUnitRule {
+public class IacucProtocolUnitRule extends ProtocolUnitRuleBase {
 
     @Override
     protected ProtocolPersonnelService getProtocolPersonnelService() {

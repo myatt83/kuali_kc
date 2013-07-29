@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,9 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 import org.kuali.kra.committee.bo.Committee;
 import org.kuali.kra.committee.document.CommitteeDocument;
-import org.kuali.kra.committee.document.authorization.CommitteeTask;
 import org.kuali.kra.committee.document.authorizer.ModifyCommitteeAuthorizer;
+import org.kuali.kra.common.committee.document.authorization.CommitteeTaskBase;
+import org.kuali.kra.infrastructure.TaskGroupName;
 import org.kuali.kra.infrastructure.TaskName;
 import org.kuali.kra.service.KraAuthorizationService;
 import org.kuali.kra.service.UnitAuthorizationService;
@@ -43,7 +44,7 @@ public class ModifyCommitteeAuthorizerTest {
         authorizer.setUnitAuthorizationService(unitAuthorizationService);
         
         Committee committee = createCommittee(null, false);
-        CommitteeTask task = new CommitteeTask(TaskName.MODIFY_COMMITTEE, committee);
+        CommitteeTaskBase<Committee> task = new CommitteeTaskBase<Committee>(TaskGroupName.COMMITTEE, TaskName.MODIFY_COMMITTEE, committee) {};
         assertEquals(true, authorizer.isAuthorized(USERNAME, task));
     }
     
@@ -55,7 +56,7 @@ public class ModifyCommitteeAuthorizerTest {
         authorizer.setUnitAuthorizationService(unitAuthorizationService);
         
         Committee committee = createCommittee(null, false);
-        CommitteeTask task = new CommitteeTask(TaskName.MODIFY_COMMITTEE, committee);
+        CommitteeTaskBase<Committee> task = new CommitteeTaskBase<Committee>(TaskGroupName.COMMITTEE, TaskName.MODIFY_COMMITTEE, committee) {};
         assertEquals(false, authorizer.isAuthorized(USERNAME, task));
     }
     
@@ -71,7 +72,7 @@ public class ModifyCommitteeAuthorizerTest {
         final KraAuthorizationService kraAuthorizationService = new KraAuthorizationServiceMock(true);
         authorizer.setKraAuthorizationService(kraAuthorizationService);
         
-        CommitteeTask task = new CommitteeTask(TaskName.MODIFY_COMMITTEE, committee);
+        CommitteeTaskBase<Committee> task = new CommitteeTaskBase<Committee>(TaskGroupName.COMMITTEE, TaskName.MODIFY_COMMITTEE, committee) {};
         assertEquals(true, authorizer.isAuthorized(USERNAME, task));
     }
     
@@ -87,7 +88,7 @@ public class ModifyCommitteeAuthorizerTest {
         final KraAuthorizationService kraAuthorizationService = new KraAuthorizationServiceMock(false);
         authorizer.setKraAuthorizationService(kraAuthorizationService);
         
-        CommitteeTask task = new CommitteeTask(TaskName.MODIFY_COMMITTEE, committee);
+        CommitteeTaskBase<Committee> task = new CommitteeTaskBase<Committee>(TaskGroupName.COMMITTEE, TaskName.MODIFY_COMMITTEE, committee) {};
         assertEquals(false, authorizer.isAuthorized(USERNAME, task));
     }
     
@@ -103,7 +104,7 @@ public class ModifyCommitteeAuthorizerTest {
         final KraAuthorizationService kraAuthorizationService = new KraAuthorizationServiceMock(true);
         authorizer.setKraAuthorizationService(kraAuthorizationService);
         
-        CommitteeTask task = new CommitteeTask(TaskName.MODIFY_COMMITTEE, committee);
+        CommitteeTaskBase<Committee> task = new CommitteeTaskBase<Committee>(TaskGroupName.COMMITTEE, TaskName.MODIFY_COMMITTEE, committee) {};
         assertEquals(false, authorizer.isAuthorized(USERNAME, task));
     }
     

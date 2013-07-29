@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import static org.apache.commons.lang.StringUtils.replace;
 import static org.kuali.rice.krad.util.KRADConstants.CONFIRMATION_QUESTION;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -67,6 +67,7 @@ import org.kuali.kra.award.paymentreports.awardreports.AwardReportTermRecipient;
 import org.kuali.kra.award.paymentreports.awardreports.reporting.service.ReportTrackingService;
 import org.kuali.kra.award.paymentreports.closeout.CloseoutReportTypeValuesFinder;
 import org.kuali.kra.award.version.service.AwardVersionService;
+import org.kuali.kra.bo.versioning.VersionHistory;
 import org.kuali.kra.bo.versioning.VersionStatus;
 import org.kuali.kra.budget.web.struts.action.BudgetParentActionBase;
 import org.kuali.kra.common.notification.service.KcNotificationService;
@@ -135,7 +136,12 @@ public class AwardAction extends BudgetParentActionBase {
     private static final String REPORTS_PROPERTY_NAME = "Reports";
     private static final String PAYMENT_INVOICES_PROPERTY_NAME = "Payments and Invoices";
     private static final String COMFIRMATION_PARAM_STRING = "After Award {0} information is synchronized, make sure that the Award Sponsor Contacts information is also synchronized with the same sponsor template. Failing to do so will result in data inconsistency. Are you sure you want to replace current {0} information with selected {1} template information?";
-
+    private static final String SUPER_USER_ACTION_REQUESTS = "superUserActionRequests";
+    
+    private enum SuperUserAction {
+        SUPER_USER_APPROVE, TAKE_SUPER_USER_ACTIONS
+    }
+    
     private ParameterService parameterService;
     private transient AwardBudgetService awardBudgetService;
     private transient AwardService awardService;
@@ -149,6 +155,8 @@ public class AwardAction extends BudgetParentActionBase {
     //question constants
     private static final String QUESTION_VERIFY_SYNC="VerifySync";
     private static final String QUESTION_VERIFY_EMPTY_SYNC="VerifyEmptySync";
+    
+   
     
     private static final AwardTemplateSyncScope[] DEFAULT_SCOPES_REQUIRE_VERIFY_FOR_EMPTY = new AwardTemplateSyncScope[] {
             AwardTemplateSyncScope.PAYMENTS_AND_INVOICES_TAB,
@@ -266,29 +274,24 @@ public class AwardAction extends BudgetParentActionBase {
         Map<String, AwardHierarchy> awardHierarchyNodes = helperBean.getAwardHierarchy(rootNode, order);
         Map<String,AwardHierarchyNode> awardHierarchyNodesMap = new HashMap<String, AwardHierarchyNode>();
         Award currentAward = awardDocument.getAward();
-        getAwardHierarchyService().populateAwardHierarchyNodes(awardHierarchyNodes, awardHierarchyNodesMap, currentAward.getAwardNumber(), currentAward.getSequenceNumber().toString());
-        awardForm.setAwardHierarchyNodes(awardHierarchyNodes);
         awardForm.setRootAwardNumber(rootNode.getRootAwardNumber());
-        awardForm.setOrder(order);
         StringBuilder sb1 = new StringBuilder();
         StringBuilder sb2 = new StringBuilder();
         for(String str:order){
-            AwardHierarchyNode tempAwardNode = awardHierarchyNodesMap.get(str);
+            AwardHierarchy tempAwardNode = awardHierarchyNodes.get(str);
             sb1.append(tempAwardNode.getAwardNumber());
             sb1.append(KRADConstants.BLANK_SPACE).append("%3A");
-            if(tempAwardNode.isAwardDocumentFinalStatus()) {
+            if (getVersionHistoryService().findActiveVersion(Award.class, tempAwardNode.getAwardNumber()) != null) {
                 sb2.append(tempAwardNode.getAwardNumber());
                 sb2.append(KRADConstants.BLANK_SPACE).append("%3A");
             }
         }
         
-        if(CollectionUtils.isNotEmpty(awardForm.getAwardHierarchyTempObjects())) {
-            for(AwardHierarchyTempObject temp: awardForm.getAwardHierarchyTempObjects()){
-                temp.setSelectBox1(sb1.toString());
-                temp.setSelectBox2(sb2.toString());
-            }
+        for(int i = 0; i < helperBean.getMaxAwardNumber(); i++){
+            AwardHierarchyTempObject temp = awardForm.getAwardHierarchyTempObjects().get(i);
+            temp.setSelectBox1(sb1.toString());
+            temp.setSelectBox2(sb2.toString());
         }
-
     }
     
 
@@ -301,7 +304,7 @@ public class AwardAction extends BudgetParentActionBase {
         ActionForward forward = null;
         AwardForm awardForm = (AwardForm) form;
 
-        if(getTimeAndMoneyExistenceService().validateTimeAndMoneyRule(awardForm.getAwardDocument().getAward(), awardForm.getAwardHierarchyNodes())){
+        if(getTimeAndMoneyExistenceService().validateTimeAndMoneyRule(awardForm.getAwardDocument().getAward(), awardForm.getAwardHierarchyBean().getRootNode().getAwardNumber())){
             forward = super.approve(mapping, form, request, response);
         }else{
             getTimeAndMoneyExistenceService().addAwardVersionErrorMessage();
@@ -320,7 +323,7 @@ public class AwardAction extends BudgetParentActionBase {
         AwardForm awardForm = (AwardForm) form;
         ActionForward forward = mapping.findForward(Constants.MAPPING_BASIC);
         
-        if(getTimeAndMoneyExistenceService().validateTimeAndMoneyRule(awardForm.getAwardDocument().getAward(), awardForm.getAwardHierarchyNodes())){
+        if(getTimeAndMoneyExistenceService().validateTimeAndMoneyRule(awardForm.getAwardDocument().getAward(), awardForm.getAwardHierarchyBean().getRootNode().getAwardNumber())){
             forward = super.route(mapping, form, request, response);
             populateAwardHierarchy(awardForm);
         }else{
@@ -344,7 +347,6 @@ public class AwardAction extends BudgetParentActionBase {
         Object question = request.getParameter(KRADConstants.QUESTION_INST_ATTRIBUTE_NAME);
         Object buttonClicked = request.getParameter(KRADConstants.QUESTION_CLICKED_BUTTON);
         String methodToCall = ((KualiForm) form).getMethodToCall();
-        
         ValidationState status = new AuditActionHelper().isValidSubmission(awardForm, true);
         
         if (status == ValidationState.WARNING) {
@@ -373,7 +375,7 @@ public class AwardAction extends BudgetParentActionBase {
         AwardForm awardForm = (AwardForm) form;
 
         if (getTimeAndMoneyExistenceService().validateTimeAndMoneyRule(awardForm.getAwardDocument().getAward(),
-                awardForm.getAwardHierarchyNodes())) {
+                awardForm.getAwardHierarchyBean().getRootNode().getAwardNumber())) {
             awardForm.setAuditActivated(true);
             ValidationState status = new AuditActionHelper().isValidSubmission(awardForm, true);
             if (status == ValidationState.ERROR) {
@@ -408,6 +410,22 @@ public class AwardAction extends BudgetParentActionBase {
         Award award = awardForm.getAwardDocument().getAward();
         checkAwardNumber(award);
         String userId = GlobalVariables.getUserSession().getPrincipalName();
+        
+        if (award.getAwardApprovedSubawards() != null || !award.getAwardApprovedSubawards().isEmpty()) {
+            award.setSubContractIndicator(Constants.YES_FLAG);
+        } else {
+            award.setSubContractIndicator(Constants.NO_FLAG);
+        }
+        if (award.getAwardTransferringSponsors() != null || !award.getAwardTransferringSponsors().isEmpty()) {
+            award.setTransferSponsorIndicator(Constants.YES_FLAG);
+        } else {
+            award.setTransferSponsorIndicator(Constants.NO_FLAG);
+        }
+        if (award.getKeywords() != null || !award.getKeywords().isEmpty()) {
+            award.setScienceCodeIndicator(Constants.YES_FLAG);
+        } else {
+            award.setScienceCodeIndicator(Constants.NO_FLAG);
+        }
 
         forward = super.save(mapping, form, request, response);
         if (awardForm.getMethodToCall().equals("save") && awardForm.isAuditActivated()) {
@@ -418,7 +436,6 @@ public class AwardAction extends BudgetParentActionBase {
         if (bean.saveHierarchyChanges()) {
             List<String> order = new ArrayList<String>();
             awardForm.setAwardHierarchyNodes(bean.getAwardHierarchy(bean.getRootNode().getAwardNumber(), order));
-            awardForm.setOrder(order);
         }
         // generate hierarchy sync changes after save so all BOs have ids and parent ids set
         for (AwardSyncPendingChangeBean pendingChange : awardForm.getAwardSyncBean().getConfirmedPendingChanges()) {
@@ -534,39 +551,24 @@ public class AwardAction extends BudgetParentActionBase {
         String userId = GlobalVariables.getUserSession().getPrincipalName();
         Award award = awardDocument.getAward();
         getAwardService().updateAwardSequenceStatus(award, VersionStatus.PENDING);
-        getVersionHistoryService().createVersionHistory(award, VersionStatus.PENDING, userId);
+        getVersionHistoryService().updateVersionHistory(award, VersionStatus.PENDING, userId);
         
         // set awardDirectFandADistributions on award
         if(isNewAward(awardForm) && !(award.getAwardEffectiveDate() == null)){
-            AwardDirectFandADistributionService awardDirectFandADistributionService = getAwardDirectFandADistributionService();
-            awardForm.getAwardDocument().getAward().setAwardDirectFandADistributions
-                                (awardDirectFandADistributionService.
-                                        generateDefaultAwardDirectFandADistributionPeriods(awardForm.getAwardDocument().getAward()));
+            String autoGenerate = getParameterService().getParameterValueAsString(Constants.PARAMETER_MODULE_AWARD, ParameterConstants.DOCUMENT_COMPONENT, KeyConstants.AUTO_GENERATE_TIME_MONEY_FUNDS_DIST_PERIODS); 
+            if (!StringUtils.equalsIgnoreCase(autoGenerate, "N")) {
+                AwardDirectFandADistributionService awardDirectFandADistributionService = getAwardDirectFandADistributionService();
+                awardForm.getAwardDocument().getAward().setAwardDirectFandADistributions
+                                    (awardDirectFandADistributionService.
+                                            generateDefaultAwardDirectFandADistributionPeriods(awardForm.getAwardDocument().getAward()));
+            }
         }
         
         if(!awardForm.getAwardDocument().isDocumentSaveAfterVersioning()) {
-            createDefaultAwardHierarchy(awardForm);
+            awardForm.getAwardHierarchyBean().createDefaultAwardHierarchy();
             awardForm.getAwardHierarchyBean().saveHierarchyChanges();            
         }
     }
-
-    // TODO JF: Integrate behavior into bean; i.e. bean should create the new node
-    protected void createDefaultAwardHierarchy(AwardForm awardForm) {
-        String awardNumber = awardForm.getAwardDocument().getAward().getAwardNumber();
-        AwardHierarchy newNode = new AwardHierarchy();
-        newNode.setAwardNumber(awardNumber);
-        newNode.setParentAwardNumber(determineParentAwardNumber(awardForm));
-        newNode.setRootAwardNumber(determineRootAwardNumber(awardForm));
-        newNode.setOriginatingAwardNumber(awardNumber);
-        newNode.setAward(awardForm.getAwardDocument().getAward());        
-        if(newNode.isRootNode()) {
-            awardForm.getAwardHierarchyBean().setRootNode(newNode);
-        }
-    }
-    
-    //protected void populateDefaultUnitContactsFromLeadUnit(AwardForm awardForm) {
-        //awardForm.getUnitContactsBean().fi
-    //}
 
     /**
      * Create the original set of Award Users for a new Award Document.
@@ -729,22 +731,16 @@ public class AwardAction extends BudgetParentActionBase {
      */
     public void setBooleanAwardHasTandMOrIsVersioned (Award award) {
         boolean previousVersionHasBeenEditedInTandMDocument = false;
-        List<Award> awards = getAwardVersions(award.getAwardNumber());
-        if(awards.size() > 1) {
-            previousVersionHasBeenEditedInTandMDocument = true;
-        }else if(awards.size() == 1 && awards.get(0).getAwardAmountInfos().size() > 1){
-            previousVersionHasBeenEditedInTandMDocument = true;
+        // what we really want to do is check to see if latest version of Awards has a T&M doc associated with it.
+        // If it's versioned, that's OK, we still want to allow editing of the amounts and dates.
+        List<VersionHistory> awardHistory = getVersionHistoryService().findVersionHistory(Award.class, award.getAwardNumber());
+        if(awardHistory.size() > 1) {
+            if (award.getSequenceNumber() == 1 && award.getAwardAmountInfos().size() > 2) {
+                previousVersionHasBeenEditedInTandMDocument = true;
+            } else if (award.getSequenceNumber() > 1 && award.getAwardAmountInfos().size() > 1) {
+                previousVersionHasBeenEditedInTandMDocument = true;
+            }
         }
-//        for(Award awardVersion : awards) {
-//            if(awardVersion.getSequenceNumber() == 1 && awardVersion.getAwardAmountInfos().size() > 2){
-//                previousVersionHasBeenEditedInTandMDocument = true;
-//                break;
-//            }else if(awardVersion.getSequenceNumber() > 1 && awardVersion.getAwardAmountInfos().size() > 1){
-//                previousVersionHasBeenEditedInTandMDocument = true;
-//                break;
-//            }
-//        }
-//        
         award.setAwardHasAssociatedTandMOrIsVersioned(previousVersionHasBeenEditedInTandMDocument);
     }
     
@@ -788,14 +784,16 @@ public class AwardAction extends BudgetParentActionBase {
     @SuppressWarnings({ "deprecation", "unchecked" })
     public ActionForward timeAndMoney(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
         AwardForm awardForm = (AwardForm) form;
+        AwardDocument awardDocument = awardForm.getAwardDocument();
         ActionForward actionForward;
         //if award document is view only then we don't need to save document before opening T&M document.
-        if(!awardForm.getEditingMode().containsKey("viewOnly") || awardForm.getEditingMode().containsKey("fullEntry")){
+        if ((!awardForm.getEditingMode().containsKey("viewOnly") || awardForm.getEditingMode().containsKey("fullEntry")) &&
+                !awardDocument.getDocumentHeader().getWorkflowDocument().isFinal()) {
             this.save(mapping, form, request, response);
         }
         //if T&M document is created, there must be a project start date on the award.
         timeAndMoneyAwardDateSaveRuleImpl = new TimeAndMoneyAwardDateSaveRuleImpl();
-        timeAndMoneyAwardDateSaveRuleImpl.enforceAwardStartDatePopulated(awardForm.getAwardDocument().getAward());
+        timeAndMoneyAwardDateSaveRuleImpl.enforceAwardStartDatePopulated(awardDocument.getAward());
         
         
         if(GlobalVariables.getMessageMap().hasNoErrors()){
@@ -806,21 +804,21 @@ public class AwardAction extends BudgetParentActionBase {
     
             populateAwardHierarchy(form);
     
-            Award award = awardForm.getAwardDocument().getAward();
-           
+            Award currentAward = awardDocument.getAward();
     
             Map<String, Object> fieldValues = new HashMap<String, Object>();
-            String rootAwardNumber = awardForm.getAwardHierarchyNodes().get(award.getAwardNumber()).getRootAwardNumber();
+            String rootAwardNumber = awardForm.getAwardHierarchyNodes().get(currentAward.getAwardNumber()).getRootAwardNumber();
             fieldValues.put("rootAwardNumber", rootAwardNumber);
             BusinessObjectService businessObjectService =  KraServiceLocator.getService(BusinessObjectService.class);
 
             List<TimeAndMoneyDocument> timeAndMoneyDocuments = 
-                (List<TimeAndMoneyDocument>)businessObjectService.findMatchingOrderBy(TimeAndMoneyDocument.class, fieldValues, "documentNumber", true);
+                (List<TimeAndMoneyDocument>)businessObjectService.findMatching(TimeAndMoneyDocument.class, fieldValues);
+            Collections.sort(timeAndMoneyDocuments);
             
             Award rootAward = getAwardVersionService().getWorkingAwardVersion(rootAwardNumber);   
+            AwardAmountInfo rootAAI = rootAward.getLastAwardAmountInfo();
             //this logic so we set Transaction Type on new T&M doc.  Defaults to "new" on first creation of T&M doc of a Root Award.
             TimeAndMoneyDocument timeAndMoneyDocument = getLastFinalTandMDocument(timeAndMoneyDocuments);
-            //if timeAndMoneyDocument is null then either it is first creation or all the previous T&M docs have a route status of 'canceled'.
             if(timeAndMoneyDocuments.size() > 0 && timeAndMoneyDocument != null) {
                 firstTimeAndMoneyDocCreation = Boolean.FALSE;
             }
@@ -853,11 +851,11 @@ public class AwardAction extends BudgetParentActionBase {
             String routeHeaderId = timeAndMoneyDocument.getDocumentHeader().getWorkflowDocument().getDocumentId();
             String forward = buildForwardUrl(routeHeaderId);
             actionForward = new ActionForward(forward, true);
+            //add this to session and leverage in T&M for return to award action.
+            GlobalVariables.getUserSession  ().addObject(Constants.AWARD_DOCUMENT_STRING_FOR_SESSION + "-" + timeAndMoneyDocument.getDocumentNumber(), awardDocument.getDocumentNumber());            
         } else {
             actionForward = mapping.findForward(Constants.MAPPING_AWARD_BASIC);
         }
-        //add this to session and leverage in T&M for return to award action.
-        GlobalVariables.getUserSession  ().addObject(GlobalVariables.getUserSession().getKualiSessionId()+Constants.AWARD_DOCUMENT_STRING_FOR_SESSION, awardForm.getAwardDocument());
         return actionForward;
 
     }
@@ -946,12 +944,13 @@ public class AwardAction extends BudgetParentActionBase {
      */
     private void addNewAwardAmountInfoForInitialTransaction(Award rootAward, String documentNumber) {
         
+        AwardAmountInfo rootAwardAmountInfo = rootAward.getLastAwardAmountInfo();
         AwardAmountInfo newAwardAmountInfo = new AwardAmountInfo();
         newAwardAmountInfo.setAwardNumber(rootAward.getAwardNumber());
         newAwardAmountInfo.setSequenceNumber(rootAward.getSequenceNumber());
-        newAwardAmountInfo.setFinalExpirationDate(rootAward.getLastAwardAmountInfo().getFinalExpirationDate());
-        newAwardAmountInfo.setCurrentFundEffectiveDate(rootAward.getLastAwardAmountInfo().getCurrentFundEffectiveDate());
-        newAwardAmountInfo.setObligationExpirationDate(rootAward.getLastAwardAmountInfo().getObligationExpirationDate());
+        newAwardAmountInfo.setFinalExpirationDate(rootAwardAmountInfo.getFinalExpirationDate());
+        newAwardAmountInfo.setCurrentFundEffectiveDate(rootAwardAmountInfo.getCurrentFundEffectiveDate());
+        newAwardAmountInfo.setObligationExpirationDate(rootAwardAmountInfo.getObligationExpirationDate());
         newAwardAmountInfo.setTimeAndMoneyDocumentNumber(documentNumber);
         newAwardAmountInfo.setTransactionId(null);
         newAwardAmountInfo.setAward(rootAward);
@@ -960,30 +959,30 @@ public class AwardAction extends BudgetParentActionBase {
             newAwardAmountInfo.setAmountObligatedToDate(rootAward.getObligatedTotalDirect().add(rootAward.getObligatedTotalIndirect()));
             newAwardAmountInfo.setObligatedTotalDirect(rootAward.getObligatedTotalDirect());
             newAwardAmountInfo.setObligatedTotalIndirect(rootAward.getObligatedTotalIndirect());
-            newAwardAmountInfo.setObligatedChange(rootAward.getObligatedTotalDirect().add(rootAward.getObligatedTotalIndirect()));
-            newAwardAmountInfo.setObligatedChangeDirect(rootAward.getObligatedTotalDirect());
-            newAwardAmountInfo.setObligatedChangeIndirect(rootAward.getObligatedTotalIndirect());
-            newAwardAmountInfo.setAnticipatedChange(rootAward.getAnticipatedTotalDirect().add(rootAward.getAnticipatedTotalIndirect()));
+            newAwardAmountInfo.setObligatedChange(rootAwardAmountInfo.getObligatedChange());
+            newAwardAmountInfo.setObligatedChangeDirect(rootAwardAmountInfo.getObligatedTotalDirect());
+            newAwardAmountInfo.setObligatedChangeIndirect(rootAwardAmountInfo.getObligatedTotalIndirect());
+            newAwardAmountInfo.setAnticipatedChange(rootAwardAmountInfo.getAnticipatedChange());
             newAwardAmountInfo.setAnticipatedTotalAmount(rootAward.getAnticipatedTotalDirect().add(rootAward.getAnticipatedTotalIndirect()));
             newAwardAmountInfo.setAnticipatedTotalDirect(rootAward.getAnticipatedTotalDirect());
             newAwardAmountInfo.setAnticipatedTotalIndirect(rootAward.getAnticipatedTotalIndirect());
-            newAwardAmountInfo.setAnticipatedChangeDirect(rootAward.getAnticipatedTotalDirect());
-            newAwardAmountInfo.setAnticipatedChangeIndirect(rootAward.getAnticipatedTotalIndirect());
+            newAwardAmountInfo.setAnticipatedChangeDirect(rootAwardAmountInfo.getAnticipatedTotalDirect());
+            newAwardAmountInfo.setAnticipatedChangeIndirect(rootAwardAmountInfo.getAnticipatedTotalIndirect());
             newAwardAmountInfo.setObliDistributableAmount(rootAward.getObligatedTotalDirect().add(rootAward.getObligatedTotalIndirect()));
             newAwardAmountInfo.setAntDistributableAmount(rootAward.getAnticipatedTotalDirect().add(rootAward.getAnticipatedTotalIndirect()));
         } else {
-            newAwardAmountInfo.setAmountObligatedToDate(rootAward.getLastAwardAmountInfo().getAmountObligatedToDate());
+            newAwardAmountInfo.setAmountObligatedToDate(rootAwardAmountInfo.getAmountObligatedToDate());
             newAwardAmountInfo.setObligatedTotalDirect(rootAward.getObligatedTotalDirect());
             newAwardAmountInfo.setObligatedTotalIndirect(rootAward.getObligatedTotalIndirect());
-            newAwardAmountInfo.setObligatedChange(rootAward.getObligatedTotal());
-            newAwardAmountInfo.setObligatedChangeDirect(new KualiDecimal(0));
-            newAwardAmountInfo.setObligatedChangeIndirect(new KualiDecimal(0));
-            newAwardAmountInfo.setAnticipatedChange(rootAward.getAnticipatedTotal());
-            newAwardAmountInfo.setAnticipatedTotalAmount(rootAward.getLastAwardAmountInfo().getAnticipatedTotalAmount());
+            newAwardAmountInfo.setObligatedChange(rootAwardAmountInfo.getObligatedChange());
+            newAwardAmountInfo.setObligatedChangeDirect(rootAwardAmountInfo.getObligatedChangeDirect());
+            newAwardAmountInfo.setObligatedChangeIndirect(rootAwardAmountInfo.getObligatedChangeIndirect());
+            newAwardAmountInfo.setAnticipatedChange(rootAwardAmountInfo.getAnticipatedChange());
+            newAwardAmountInfo.setAnticipatedTotalAmount(rootAward.getAnticipatedTotal());
             newAwardAmountInfo.setAnticipatedTotalDirect(rootAward.getAnticipatedTotalDirect());
             newAwardAmountInfo.setAnticipatedTotalIndirect(rootAward.getAnticipatedTotalIndirect());
-            newAwardAmountInfo.setAnticipatedChangeDirect(new KualiDecimal(0));
-            newAwardAmountInfo.setAnticipatedChangeIndirect(new KualiDecimal(0));
+            newAwardAmountInfo.setAnticipatedChangeDirect(rootAwardAmountInfo.getAnticipatedChangeDirect());
+            newAwardAmountInfo.setAnticipatedChangeIndirect(rootAwardAmountInfo.getAnticipatedChangeIndirect());
             newAwardAmountInfo.setObliDistributableAmount(rootAward.getObligatedTotal());
             newAwardAmountInfo.setAntDistributableAmount(rootAward.getAnticipatedTotal());
         }
@@ -1030,20 +1029,36 @@ public class AwardAction extends BudgetParentActionBase {
 //        return award;
 //    }
     
+    public ActionForward openWindow(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+        String documentNumber = request.getParameter("awardDocumentNumber");
+        String awardNumber = request.getParameter("awardNumber");
+        Award award = getActiveAwardVersion(awardNumber);
+        AwardForm awardForm = (AwardForm)form;
+        awardForm.setCurrentAwardNumber(awardNumber);
+        awardForm.setCurrentSeqNumber(award.getSequenceNumber().toString());
+        DocumentService documentService = KraServiceLocator.getService(DocumentService.class);
+        AwardDocument awardDocument = (AwardDocument)documentService.getByDocumentHeaderId(documentNumber);
+        awardDocument.setAward(award);
+        awardForm.setDocument(awardDocument);
+        populateAwardHierarchy(awardForm);
+        return mapping.findForward("basic");
+    }  
    
-//    private Award getActiveAwardVersion(String goToAwardNumber) {
-//        VersionHistoryService vhs = KraServiceLocator.getService(VersionHistoryService.class);  
-//        VersionHistory vh = vhs.findActiveVersion(Award.class, goToAwardNumber);
-//        Award award = null;
-//        
-//        if(vh!=null){
-//            award = (Award) vh.getSequenceOwner();
-//        }else{
-//            BusinessObjectService businessObjectService =  KraServiceLocator.getService(BusinessObjectService.class);
-//            award = ((List<Award>)businessObjectService.findMatching(Award.class, getHashMapToFindActiveAward(goToAwardNumber))).get(0);              
-//        }
-//        return award;
-//    }
+    protected Award getActiveAwardVersion(String goToAwardNumber) {
+        VersionHistoryService vhs = KraServiceLocator.getService(VersionHistoryService.class);  
+        VersionHistory vh = vhs.findActiveVersion(Award.class, goToAwardNumber);
+        Award award = null;
+        
+        if(vh!=null){
+            award = (Award) vh.getSequenceOwner();
+        }else{
+            BusinessObjectService businessObjectService =  KraServiceLocator.getService(BusinessObjectService.class);
+            award = ((List<Award>)businessObjectService.findMatching(Award.class, getHashMapToFindActiveAward(goToAwardNumber))).get(0);              
+        }
+        return award;
+    }
+
     private Map<String, String> getHashMapToFindActiveAward(String goToAwardNumber) {
         Map<String, String> map = new HashMap<String,String>();
         map.put("awardNumber", goToAwardNumber);
@@ -1110,6 +1125,7 @@ public class AwardAction extends BudgetParentActionBase {
                                                     Constants.NEW_AWARD_REPORT_TERM_RECIPIENTS_LIST_KEY_FOR_INITIALIZE_OBJECTS));
         awardForm.setReportClassForPaymentsAndInvoices((ReportClass) initializedObjects.get(
                                                         Constants.REPORT_CLASS_FOR_PAYMENTS_AND_INVOICES_PANEL));
+        awardForm.buildReportTrackingBeans();
 
     }
 
@@ -1149,7 +1165,8 @@ public class AwardAction extends BudgetParentActionBase {
     public ActionForward customData(ActionMapping mapping, ActionForm form
             , HttpServletRequest request, HttpServletResponse response) {
         AwardForm awardForm = (AwardForm) form;
-        return awardForm.getCustomDataHelper().awardCustomData(mapping, form, request, response);
+        awardForm.getCustomDataHelper().prepareCustomData();
+        return mapping.findForward(Constants.MAPPING_AWARD_CUSTOM_DATA_PAGE);
     }
 
     /**
@@ -1216,6 +1233,7 @@ public class AwardAction extends BudgetParentActionBase {
        awardForm.getMedusaBean().setMedusaViewRadio("0");
        awardForm.getMedusaBean().setModuleName("award");
        awardForm.getMedusaBean().setModuleIdentifier(awardForm.getAwardDocument().getAward().getAwardId());
+       awardForm.getMedusaBean().generateParentNodes();
        return mapping.findForward(Constants.MAPPING_AWARD_MEDUSA_PAGE);
    }
 
@@ -1288,9 +1306,7 @@ public class AwardAction extends BudgetParentActionBase {
         } else {
             forward = super.docHandler(mapping, form, request, response);
         }
-        
-        awardForm.getAwardDocument().populateCustomAttributes();
-        
+
         if (Constants.MAPPING_AWARD_ACTIONS_PAGE.equals(command)) {
             forward = awardActions(mapping, awardForm, request, response);
         }
@@ -1659,16 +1675,6 @@ public class AwardAction extends BudgetParentActionBase {
     protected VersionHistoryService getVersionHistoryService() {
         return KraServiceLocator.getService(VersionHistoryService.class);
     }
-
-    private String determineRootAwardNumber(AwardForm awardForm) {
-        String prevRootAwardNumber = awardForm.getPrevRootAwardNumber();
-        return prevRootAwardNumber != null ? prevRootAwardNumber : awardForm.getAwardDocument().getAward().getAwardNumber();
-    }
-
-    private String determineParentAwardNumber(AwardForm awardForm) {
-        String prevAwardNumber = awardForm.getPrevAwardNumber();
-        return prevAwardNumber != null ? prevAwardNumber : Constants.AWARD_HIERARCHY_DEFAULT_PARENT_OF_ROOT;
-    }
     
     protected String getModuleIdentifierForOpeningDocument(HttpServletRequest request) {
         String moduleIdentifier = "";
@@ -1905,5 +1911,73 @@ public class AwardAction extends BudgetParentActionBase {
 
     public void setSubAwardService(SubAwardService subAwardService) {
         this.subAwardService = subAwardService;
+    }
+    
+    public ActionForward superUserActionHelper(SuperUserAction actionName, ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+        ActionForward forward = mapping.findForward(Constants.MAPPING_BASIC);
+        AwardForm awardForm = (AwardForm) form;
+        Object question = request.getParameter(KRADConstants.QUESTION_INST_ATTRIBUTE_NAME);
+        Object buttonClicked = request.getParameter(KRADConstants.QUESTION_CLICKED_BUTTON);
+        String methodToCall = ((KualiForm) form).getMethodToCall();
+        awardForm.setAuditActivated(true);
+
+        ValidationState status = ValidationState.OK;
+        if (!awardForm.getDocument().getDocumentHeader().getWorkflowDocument().isEnroute()) {
+            status = new AuditActionHelper().isValidSubmission(awardForm, true);
+        }
+        if (status == ValidationState.WARNING) {
+
+            if(question == null){
+                List<String>  selectedActionRequests = awardForm.getSelectedActionRequests();
+                // Need to add the super user requests to user session because they are wiped out by 
+                //the KualiRequestProcessor reset on 
+                //clicking yes to the question. Retrieve again during actual routing and add to form.
+                GlobalVariables.getUserSession().addObject(SUPER_USER_ACTION_REQUESTS, selectedActionRequests);
+                try {
+                    return this.performQuestionWithoutInput(mapping, form, request, response, DOCUMENT_ROUTE_QUESTION, 
+                            "Validation Warning Exists. Are you sure want to submit to workflow routing.", 
+                            KRADConstants.CONFIRMATION_QUESTION, methodToCall, "");
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } else if(DOCUMENT_ROUTE_QUESTION.equals(question) && ConfirmationQuestion.YES.equals(buttonClicked)) {   
+                awardForm.setSelectedActionRequests((List<String>)GlobalVariables.getUserSession().retrieveObject(SUPER_USER_ACTION_REQUESTS));
+                GlobalVariables.getUserSession().removeObject(SUPER_USER_ACTION_REQUESTS);
+                switch (actionName) {
+                    case SUPER_USER_APPROVE: 
+                        return super.superUserApprove(mapping, awardForm, request, response);
+                    case TAKE_SUPER_USER_ACTIONS:
+                        return super.takeSuperUserActions(mapping, awardForm, request, response);
+                }
+            }  else {
+                return forward;
+            }
+        }
+
+        else if(status == ValidationState.OK){
+            switch (actionName) {
+                case SUPER_USER_APPROVE: 
+                    return super.superUserApprove(mapping, awardForm, request, response);
+                case TAKE_SUPER_USER_ACTIONS:
+                    return super.takeSuperUserActions(mapping, awardForm, request, response);
+            }
+        } else {
+            GlobalVariables.getMessageMap().clearErrorMessages(); 
+            GlobalVariables.getMessageMap().putError("datavalidation",KeyConstants.ERROR_WORKFLOW_SUBMISSION,  new String[] {});
+            return forward;
+        }
+        return forward;
+    } 
+    
+    
+    @Override
+    public ActionForward superUserApprove(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+        return superUserActionHelper(SuperUserAction.SUPER_USER_APPROVE, mapping, form, request, response);
+    }
+    
+    @Override
+    public ActionForward takeSuperUserActions(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+        return superUserActionHelper(SuperUserAction.TAKE_SUPER_USER_ACTIONS, mapping, form, request, response);
     }
 }

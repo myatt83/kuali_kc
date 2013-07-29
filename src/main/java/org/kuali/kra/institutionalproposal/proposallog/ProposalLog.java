@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  *
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.kuali.kra.bo.KcPerson;
 import org.kuali.kra.bo.KraPersistableBusinessObjectBase;
 import org.kuali.kra.bo.NonOrganizationalRolodex;
@@ -58,6 +59,7 @@ public class ProposalLog extends KraPersistableBusinessObjectBase implements Neg
     private String logStatus; 
     private String comments; 
     private Date deadlineDate; 
+    private String deadlineTime;
     private String proposalLogTypeCode;
     private Integer fiscalMonth;
     private Integer fiscalYear;
@@ -71,9 +73,8 @@ public class ProposalLog extends KraPersistableBusinessObjectBase implements Neg
     private Unit unit;
     private ProposalLogType proposalLogType;
     
-    private String proposalLogToMerge;
-    
     private String mergedWith;
+    private ProposalLog mergedWithProposal;
     private String instProposalNumber;
     
     private transient KcPersonService kcPersonService;
@@ -227,6 +228,14 @@ public class ProposalLog extends KraPersistableBusinessObjectBase implements Neg
         this.deadlineDate = deadlineDate;
     }
     
+    public String getDeadlineTime() {
+        return deadlineTime;
+    }
+
+    public void setDeadlineTime(String deadlineTime) {
+        this.deadlineTime = deadlineTime;
+    }
+
     public String getProposalLogTypeCode() {
         return proposalLogTypeCode;
     }
@@ -329,14 +338,6 @@ public class ProposalLog extends KraPersistableBusinessObjectBase implements Neg
         this.createTimestamp = createTimestamp;
     }
     
-    public String getProposalLogToMerge() {
-        return proposalLogToMerge;
-    }
-
-    public void setProposalLogToMerge(String proposalLogToMerge) {
-        this.proposalLogToMerge = proposalLogToMerge;
-    }
-    
     public String getMergedWith()
     {
         return mergedWith;
@@ -371,20 +372,7 @@ public class ProposalLog extends KraPersistableBusinessObjectBase implements Neg
         super.prePersist();
         setSponsorName();
         mergeTemporaryLog();
-    }
-
-    @Override
-    protected void postPersist() {
-        // this will update the associated temporary log to indicate that it was
-        // merged with the current permanent log
-        if (getMergedWith() != null)
-        {
-            super.postPersist();
-            KraServiceLocator.getService(ProposalLogService.class).updateMergedTempLog(getMergedWith(), getProposalNumber() );
-        }
-        return;
-    }
-    
+    }    
     
     /**
      * @see org.kuali.core.bo.PersistableBusinessObjectBase#beforeInsert()
@@ -412,8 +400,8 @@ public class ProposalLog extends KraPersistableBusinessObjectBase implements Neg
     }
     
     private void mergeTemporaryLog() {
-        if (this.getProposalLogToMerge() != null) {
-            KraServiceLocator.getService(ProposalLogService.class).mergeProposalLog(this.getProposalLogToMerge());
+        if (StringUtils.isNotBlank(getMergedWith()) && StringUtils.equals(getProposalLogTypeCode(), ProposalLogUtils.getProposalLogPermanentTypeCode())) {
+            KraServiceLocator.getService(ProposalLogService.class).mergeProposalLog(this, this.getMergedWith());
         }
     }
     
@@ -528,5 +516,13 @@ public class ProposalLog extends KraPersistableBusinessObjectBase implements Neg
     @Override
     public String getSubAwardRequisitionerId() {
         return EMPTY_STRING;
+    }
+
+    public ProposalLog getMergedWithProposal() {
+        return mergedWithProposal;
+    }
+
+    public void setMergedWithProposal(ProposalLog mergedWithProposal) {
+        this.mergedWithProposal = mergedWithProposal;
     }    
 }

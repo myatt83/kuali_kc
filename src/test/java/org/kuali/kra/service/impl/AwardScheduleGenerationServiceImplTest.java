@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,6 +62,7 @@ public class AwardScheduleGenerationServiceImplTest {
     private static final String ZERO_HOURS = "00:00";
     private static final String REPORT_CLASS_CODE_CODE_SIX = "6";    
     private static final String PERIOD_IN_YEARS = "1";
+    private static final String SF_269_EXPENDITURE_REPORT_CODE = "33";
     
     Award award;
     List<AwardReportTerm> awardReportTerms;
@@ -311,6 +312,7 @@ public class AwardScheduleGenerationServiceImplTest {
         newAwardReportTerm.setFrequency(frequency);
         newAwardReportTerm.setReportClassCode(REPORT_CLASS_CODE_CODE_SIX);
         newAwardReportTerm.setFrequencyBaseCode(FrequencyBaseConstants.FINAL_EXPIRATION_DATE.getfrequencyBase());
+        newAwardReportTerm.setReportCode(SF_269_EXPENDITURE_REPORT_CODE);
         
         final ScheduleService scheduleService = context.mock(ScheduleService.class);
         final ParameterService parameterService = context.mock(ParameterService.class);
@@ -349,6 +351,7 @@ public class AwardScheduleGenerationServiceImplTest {
         newAwardReportTerm.setFrequency(frequency);
         newAwardReportTerm.setReportClassCode(REPORT_CLASS_CODE_CODE_SIX);
         newAwardReportTerm.setFrequencyBaseCode(FrequencyBaseConstants.AWARD_EXECUTION_DATE.getfrequencyBase());
+        newAwardReportTerm.setReportCode(SF_269_EXPENDITURE_REPORT_CODE);
         
         final ScheduleService scheduleService = context.mock(ScheduleService.class);
         

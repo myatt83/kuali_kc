@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import org.kuali.rice.krad.util.GlobalVariables;
  * 
  * This class implements the business rule when adding new review attachment.  ie, validate description and file are entered.
  */
-public class ProtocolAddReviewAttachmentRule<E extends ProtocolAddReviewAttachmentEvent<?>> extends ResearchDocumentRuleBase implements BusinessRuleInterface<E> {
+public class ProtocolAddReviewAttachmentRule<E extends ProtocolAddReviewAttachmentEventBase<?>> extends ResearchDocumentRuleBase implements BusinessRuleInterface<E> {
     
     /**
      * {@inheritDoc}

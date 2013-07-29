@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,45 +35,24 @@ public abstract class ProtocolAttachmentBaseRuleHelper {
     
     private String propertyPrefix;
  
-// TODO *********commented the code below during IACUC refactoring*********   
-//    
-//    /**
-//     * Creates helper deferring the setting of the prefix to later.
-//     */
-//    ProtocolAttachmentBaseRuleHelper() {
-//        this(KraServiceLocator.getService(ProtocolAttachmentService.class),
-//            KNSServiceLocator.getKNSDictionaryValidationService());
-//    }
-//    
-//    /**
-//     * Creates helper using prefix provided.
-//     *  
-//     * @param aPropertyPrefix the prefix (ex: notesAttachmentsHelper.newAttachmentProtocol)
-//     * @throws IllegalArgumentException if the propertyPrefix is null
-//     */
-//    ProtocolAttachmentBaseRuleHelper(final String aPropertyPrefix) {
-//        this();
-//        this.resetPropertyPrefix(aPropertyPrefix);
-//    }
-//    
-//    /**
-//     * Creates helper deferring the setting of the prefix to later and setting used services.
-//     * @param attachmentService the Attachment Service
-//     * @throws IllegalArgumentException if the attachmentService is null
-//     */
-//    ProtocolAttachmentBaseRuleHelper(final ProtocolAttachmentService attachmentService,
-//        final DictionaryValidationService validationService) {
-//        if (attachmentService == null) {
-//            throw new IllegalArgumentException("the attachmentService is null");
-//        }
-//        
-//        if (validationService == null) {
-//            throw new IllegalArgumentException("the validationService is null");
-//        }
-//        
-//        this.attachmentService = attachmentService;
-//        this.validationService = validationService;
-//    }
+    /**
+     * Creates helper deferring the setting of the prefix to later and setting used services.
+     * @param attachmentService the Attachment Service
+     * @throws IllegalArgumentException if the attachmentService is null
+     */
+    protected ProtocolAttachmentBaseRuleHelper(final ProtocolAttachmentService attachmentService,
+        final DictionaryValidationService validationService) {
+        if (attachmentService == null) {
+            throw new IllegalArgumentException("the attachmentService is null");
+        }
+        
+        if (validationService == null) {
+            throw new IllegalArgumentException("the validationService is null");
+        }
+        
+        this.attachmentService = attachmentService;
+        this.validationService = validationService;
+    }
     
     protected ProtocolAttachmentBaseRuleHelper(final String aPropertyPrefix,
             final ProtocolAttachmentService attachmentService,
@@ -97,7 +76,7 @@ public abstract class ProtocolAttachmentBaseRuleHelper {
      * @param aPropertyPrefix the prefix (ex: notesAttachmentsHelper.newAttachmentProtocol)
      * @throws IllegalArgumentException if the propertyPrefix is null
      */
-    void resetPropertyPrefix(final String aPropertyPrefix) {
+    public void resetPropertyPrefix(final String aPropertyPrefix) {
         if (aPropertyPrefix == null) {
             throw new IllegalArgumentException("propertyPrefix is null");
         }
@@ -111,14 +90,14 @@ public abstract class ProtocolAttachmentBaseRuleHelper {
      * @param attachment the attachment.
      * @return true is valid.
      */
-    <T extends ProtocolAttachmentBase & TypedAttachment> boolean validDescriptionWhenRequired(final T attachment) {
+    public <T extends ProtocolAttachmentBase & TypedAttachment> boolean validDescriptionWhenRequired(final T attachment) {
         
         if (attachment.getType() == null || attachment.getType().getCode() == null) {
             return true;
         }
         
         if (StringUtils.isBlank(attachment.getDescription()) && OTHER_TYPE_CODE.equals(attachment.getType().getCode())) {
-            final ProtocolAttachmentType type = this.attachmentService.getTypeFromCode(attachment.getType().getCode());
+            final ProtocolAttachmentTypeBase type = this.attachmentService.getTypeFromCode(attachment.getType().getCode());
             this.errorReporter.reportError(this.propertyPrefix + "." + TypedAttachment.PropertyName.DESCRIPTION,
                 KeyConstants.ERROR_PROTOCOL_ATTACHMENT_MISSING_DESC, (type != null) ? type.getDescription(): "");
             return false;
@@ -139,19 +118,19 @@ public abstract class ProtocolAttachmentBaseRuleHelper {
      * @param attachment the attachment.
      * @return true is valid.
      */
-    <T extends ProtocolAttachmentBase & TypedAttachment> boolean validTypeForGroup(final T attachment) {
+    public <T extends ProtocolAttachmentBase & TypedAttachment> boolean validTypeForGroup(final T attachment) {
         
         if (attachment.getType() == null || attachment.getType().getCode() == null) {
             return true;
         }
         
-        for (ProtocolAttachmentType type : this.attachmentService.getTypesForGroup(attachment.getGroupCode())) {
+        for (ProtocolAttachmentTypeBase type : this.attachmentService.getTypesForGroup(attachment.getGroupCode())) {
             if (type != null && attachment.getType().getCode().equals(type.getCode())) {
                 return true;
             }
         }
         
-        final ProtocolAttachmentType type = this.attachmentService.getTypeFromCode(attachment.getType().getCode());
+        final ProtocolAttachmentTypeBase type = this.attachmentService.getTypeFromCode(attachment.getType().getCode());
         this.errorReporter.reportError(this.propertyPrefix + "." + TypedAttachment.PropertyName.TYPE_CODE,
             KeyConstants.ERROR_PROTOCOL_ATTACHMENT_INVALID_TYPE, (type != null) ? type.getDescription(): "");
         
@@ -210,7 +189,7 @@ public abstract class ProtocolAttachmentBaseRuleHelper {
      * @param attachmentBase the attachment
      * @return true if valid.
      */
-    boolean validPrimitiveFields(final ProtocolAttachmentBase attachmentBase) {
+    public boolean validPrimitiveFields(final ProtocolAttachmentBase attachmentBase) {
         
         final Long oldFileId = attachmentBase.getFileId();
         try {

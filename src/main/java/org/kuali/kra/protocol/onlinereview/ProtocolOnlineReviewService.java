@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,16 +18,16 @@ package org.kuali.kra.protocol.onlinereview;
 import java.sql.Date;
 import java.util.List;
 
-import org.kuali.kra.common.committee.bo.CommitteeMembership;
-import org.kuali.kra.protocol.Protocol;
-import org.kuali.kra.protocol.ProtocolOnlineReviewDocument;
+import org.kuali.kra.common.committee.bo.CommitteeMembershipBase;
+import org.kuali.kra.protocol.ProtocolBase;
+import org.kuali.kra.protocol.ProtocolOnlineReviewDocumentBase;
 import org.kuali.kra.protocol.actions.submit.ProtocolReviewer;
-import org.kuali.kra.protocol.actions.submit.ProtocolSubmission;
+import org.kuali.kra.protocol.actions.submit.ProtocolSubmissionBase;
 
 
 
 /**
- * Protocol Online Review service provides all necessary functionality to manage the online reviews.
+ * ProtocolBase Online Review service provides all necessary functionality to manage the online reviews.
  */
 public interface ProtocolOnlineReviewService {
     
@@ -37,16 +37,7 @@ public interface ProtocolOnlineReviewService {
      * Document type code for online review.
      */
     String PROTOCOL_ONLINE_REVIEW_DOCUMENT_TYPE_CODE = "PTRV";
-    
-    /**
-     * Name of the online review document.
-     */
-    String PROTOCOL_ONLINE_REVIEW_DOCUMENT_TYPE = "ProtocolOnlineReviewDocument";
-
-    List<CommitteeMembership> getAvailableCommitteeMembersForCurrentSubmission(Protocol protocol);
-    List<ProtocolOnlineReviewDocument> getProtocolReviewDocumentsForCurrentSubmission(Protocol protocol);
-    String getProtocolOnlineReviewDocumentDescription( String protocolNumber, String piName );
-    
+        
     /**
      * Assign an online review to a reviewer.  Reviewers must be a member of the committee.
      * This method will create a new ProtocolReviewDocument, and the associated BO and return it.
@@ -64,7 +55,7 @@ public interface ProtocolOnlineReviewService {
      * @param principalId The principalId to use when creating the document, and routing it into workflow.
      * @return The ProtocolReviewDocument that was created.
      */
-    ProtocolOnlineReviewDocument createAndRouteProtocolOnlineReviewDocument(ProtocolSubmission protocolSubmission, ProtocolReviewer protocolReviewer, 
+    ProtocolOnlineReviewDocumentBase createAndRouteProtocolOnlineReviewDocument(ProtocolSubmissionBase protocolSubmission, ProtocolReviewer protocolReviewer, 
             String documentDescription, String documentExplanation, String documentOrganizationDocumentNumber, String documentRouteAnnotation, 
             boolean approveDocument, Date dateRequested, Date dateDue, String principalId);
     
@@ -76,35 +67,35 @@ public interface ProtocolOnlineReviewService {
      * @param protocolSubmission The submission which the user will review
      * @return the ProtocolReviewer that was created
      */
-    ProtocolReviewer createProtocolReviewer(String principalId, boolean nonEmployeeFlag, String reviewerTypeCode, ProtocolSubmission protocolSubmission);
+    ProtocolReviewer createProtocolReviewer(String principalId, boolean nonEmployeeFlag, String reviewerTypeCode, ProtocolSubmissionBase protocolSubmission);
     
     /**
      * Get a list of current ProtocolReview documents associated with the protocol and current submission.
      * @param protocol 
      * @return
      */
-//    List<ProtocolOnlineReviewDocument> getProtocolReviewDocumentsForCurrentSubmission(Protocol protocol);
+    List<ProtocolOnlineReviewDocumentBase> getProtocolReviewDocumentsForCurrentSubmission(ProtocolBase protocol);
    
     /**
      * This method...
      * @param protocol
      * @return
      */
-//    List<CommitteeMembership> getAvailableCommitteeMembersForCurrentSubmission(Protocol protocol);
+    List<CommitteeMembershipBase> getAvailableCommitteeMembersForCurrentSubmission(ProtocolBase protocol);
 
     /**
      * Get a list of current ProtocolReview documents associated with the protocol and current submission.
      * @param protocolNumber 
      * @return
      */
-    List<ProtocolOnlineReview> getProtocolReviews(String protocolNumber);
+    List<ProtocolOnlineReviewBase> getProtocolReviews(String protocolNumber);
     
     /**
-     * This method returns a list of ProtocolOnlineReview BOs that are associated with submission.
+     * This method returns a list of ProtocolOnlineReviewBase BOs that are associated with submission.
      * @param submissionId the submissionId for which you want the ProtocolOnlineReviews.
      * @return
      */
-    List<ProtocolOnlineReview> getProtocolReviews(Long submissionId);
+    List<ProtocolOnlineReviewBase> getProtocolReviews(Long submissionId);
     
     /**
      * Returns the online reviewer for the protocol submission corresponding to the principal id, if one exists.
@@ -113,7 +104,7 @@ public interface ProtocolOnlineReviewService {
      * @param protocolSubmission The protocol submission
      * @return
      */
-    ProtocolReviewer getProtocolReviewer(String personId, boolean nonEmployeeFlag, ProtocolSubmission protocolSubmission);
+    ProtocolReviewer getProtocolReviewer(String personId, boolean nonEmployeeFlag, ProtocolSubmissionBase protocolSubmission);
     
     /**
      * Returns true if the principal has an online review for the protocol submission.
@@ -122,31 +113,31 @@ public interface ProtocolOnlineReviewService {
      * @param protocolSubmission The protocolSubmission
      * @return
      */
-    boolean isProtocolReviewer(String principalId, boolean nonEmployeeFlag, ProtocolSubmission protocolSubmission);
+    boolean isProtocolReviewer(String principalId, boolean nonEmployeeFlag, ProtocolSubmissionBase protocolSubmission);
     
     /**
-     * Returns the ProtocolOnlineReviewDocument associated with the 
+     * Returns the ProtocolOnlineReviewDocumentBase associated with the 
      * @param personId The personId (Rolodex or principal) we are checking
      * @param nonEmployeeFlag Is the person an employee or not?  Determines if the personId is treated as a KIM principal or a rolodex id.
      * @param protocolSubmission The protocolSubmission
      * @return
      */
-    ProtocolOnlineReviewDocument getProtocolOnlineReviewDocument(String principalId, boolean nonEmployeeFlag, ProtocolSubmission protocolSubmission);
+    ProtocolOnlineReviewDocumentBase getProtocolOnlineReviewDocument(String principalId, boolean nonEmployeeFlag, ProtocolSubmissionBase protocolSubmission);
     
     /**
      * Determine if the protocol is in a state that can be reviewed.  Right now checks to see if there is an active submission.
      * @param protocol
      * @return
      */
-    boolean isProtocolInStateToBeReviewed(Protocol protocol);
+    boolean isProtocolInStateToBeReviewed(ProtocolBase protocol);
     
     
     /**
-     * Return the ProtocolOnlineReview document to the reviewer.
+     * Return the ProtocolOnlineReviewBase document to the reviewer.
      * 
      * @param review
      */
-    void returnProtocolOnlineReviewDocumentToReviewer(ProtocolOnlineReviewDocument reviewDocument,String reason,String principalId);
+    void returnProtocolOnlineReviewDocumentToReviewer(ProtocolOnlineReviewDocumentBase reviewDocument,String reason,String principalId);
     
     /**
      * Sets the status to Cancelled/Removed.  If the review document is enroute, then we do a superuser disapprove on it.  If it is in saved or initiated
@@ -158,7 +149,7 @@ public interface ProtocolOnlineReviewService {
      * @param submission
      * @param annotation
      */
-    void removeOnlineReviewDocument(String personId, boolean nonEmployeeFlag, ProtocolSubmission submission, String annotation);
+    void removeOnlineReviewDocument(String personId, boolean nonEmployeeFlag, ProtocolSubmissionBase submission, String annotation);
     
     /**
      * Cancels all online review documents associated with the submission.
@@ -166,7 +157,7 @@ public interface ProtocolOnlineReviewService {
      * @param submission
      * @param annotation
      */
-//    void cancelOnlineReviews(ProtocolSubmission submission, String annotation);
+    void cancelOnlineReviews(ProtocolSubmissionBase submission, String annotation);
     
     /*
      * Remove all online reviews associated with the submission.
@@ -174,11 +165,11 @@ public interface ProtocolOnlineReviewService {
      * If an online review is final no action will be taken on the document.
      * In both cases, the status will be set to X and the comments ( if any ) will be removed.
      * 
-     * @param ProtocolSubmission the submission you want to remove all of the online reviews on.
+     * @param ProtocolSubmissionBase the submission you want to remove all of the online reviews on.
      * @param annotation  The annotation to be applied to the workflow document when we cancel.
      *  
      */
-//    void removeOnlineReviews(ProtocolSubmission submission, String annotation);
+    void removeOnlineReviews(ProtocolSubmissionBase submission, String annotation);
     
     /**
      * Finalizes all online review documents associated with the submission.
@@ -187,7 +178,7 @@ public interface ProtocolOnlineReviewService {
      * @param submission
      * 
      */
-    void finalizeOnlineReviews(ProtocolSubmission submission, String annotation);
+    void finalizeOnlineReviews(ProtocolSubmissionBase submission, String annotation);
     
     /**
      * Generate the standard document description for OLR documents.
@@ -198,7 +189,7 @@ public interface ProtocolOnlineReviewService {
      * @param piName The name of the pi to add to the description.
      * @return String to be used in the description.
      */
-//    String getProtocolOnlineReviewDocumentDescription( String protocolNumber, String piName );
+    String getProtocolOnlineReviewDocumentDescription( String protocolNumber, String piName );
     
     /**
      * 
@@ -207,6 +198,6 @@ public interface ProtocolOnlineReviewService {
      * @param submission
      * @param newSubmission
      */
-//    void moveOnlineReviews(ProtocolSubmission submission, ProtocolSubmission newSubmission);
+    void moveOnlineReviews(ProtocolSubmissionBase submission, ProtocolSubmissionBase newSubmission);
 
 }

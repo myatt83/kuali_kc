@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,6 +44,7 @@ public class ProposalRoleValuesFinder extends KeyValuesBase {
         List<Role> proposalRoles = proposalRoleService.getRolesForDisplay();
         List<KeyValue> keyValues = new ArrayList<KeyValue>();
 
+        keyValues.add(new ConcreteKeyValue("", "select"));
         for (Role role : proposalRoles) {
             KeyValue pair = new ConcreteKeyValue(role.getName(), role.getName());
             keyValues.add(pair);

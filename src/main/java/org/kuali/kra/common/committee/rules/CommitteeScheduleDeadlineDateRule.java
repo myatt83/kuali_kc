@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package org.kuali.kra.common.committee.rules;
 import java.sql.Date;
 import java.util.List;
 
-import org.kuali.kra.common.committee.bo.CommonCommitteeSchedule;
+import org.kuali.kra.common.committee.bo.CommitteeScheduleBase;
 import org.kuali.kra.common.committee.rule.event.CommitteeScheduleDeadlineEvent;
 import org.kuali.kra.infrastructure.KeyConstants;
 import org.kuali.kra.rule.BusinessRuleInterface;
@@ -35,9 +35,9 @@ public class CommitteeScheduleDeadlineDateRule extends ResearchDocumentRuleBase 
         
         boolean rulePassed = true;
         
-        List<CommonCommitteeSchedule> committeeSchedules = deadlineCommitteeScheduleEvent.getCommitteeSchedules();
+        List<CommitteeScheduleBase> committeeSchedules = deadlineCommitteeScheduleEvent.getCommitteeSchedules();
         int count = 0;
-        for(CommonCommitteeSchedule committeeSchedule : committeeSchedules) {
+        for(CommitteeScheduleBase committeeSchedule : committeeSchedules) {
             
             Date deadline = committeeSchedule.getProtocolSubDeadline();
             Date schedule = committeeSchedule.getScheduledDate();

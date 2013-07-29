@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import org.kuali.kra.irb.correspondence.BatchCorrespondence;
 import org.kuali.kra.irb.correspondence.BatchCorrespondenceDetail;
 import org.kuali.kra.irb.correspondence.ProtocolCorrespondence;
 import org.kuali.kra.irb.correspondence.ProtocolCorrespondenceType;
+import org.kuali.kra.protocol.correspondence.BatchCorrespondenceDetailBase;
 import org.kuali.kra.service.impl.adapters.BusinessObjectServiceAdapter;
 import org.kuali.rice.krad.bo.PersistableBusinessObject;
 
@@ -44,7 +45,7 @@ public class CommitteeTestHelper {
         private BatchCorrespondence getBatchCorrespondence(String batchCorrespondenceTypeCode) {    
             BatchCorrespondence batchCorrespondence = new BatchCorrespondence();
             batchCorrespondence.setBatchCorrespondenceTypeCode(batchCorrespondenceTypeCode);
-            batchCorrespondence.setBatchCorrespondenceDetails(new ArrayList<BatchCorrespondenceDetail>());
+            batchCorrespondence.setBatchCorrespondenceDetails(new ArrayList<BatchCorrespondenceDetailBase>());
             if (StringUtils.equals(batchCorrespondenceTypeCode, Constants.PROTOCOL_RENEWAL_REMINDERS)) {
                 batchCorrespondence.setDescription("Protocol Renewal Reminders");
                 batchCorrespondence.setSendCorrespondence(BatchCorrespondence.SEND_CORRESPONDENCE_BEFORE_EVENT);

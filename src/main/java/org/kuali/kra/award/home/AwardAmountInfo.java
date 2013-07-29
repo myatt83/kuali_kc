@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  *
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -337,4 +337,33 @@ public class AwardAmountInfo extends AwardAssociate {
     public void setTimeAndMoneyDocumentNumber(String timeAndMoneyDocumentNumber) {
         this.timeAndMoneyDocumentNumber = timeAndMoneyDocumentNumber;
     }
+    
+    public void resetChangeValues() {
+        setObligatedChange(new KualiDecimal(0));
+        setObligatedChangeDirect(new KualiDecimal(0));
+        setObligatedChangeIndirect(new KualiDecimal(0));
+        setAnticipatedChange(new KualiDecimal(0));
+        setAnticipatedChangeDirect(new KualiDecimal(0));
+        setAnticipatedChangeIndirect(new KualiDecimal(0));
+    }
+
+//TODO: For debugging, to be taken out eventually
+public String toString() {
+  return 
+  "anticipatedTotalAmount = " +      anticipatedTotalAmount +         
+  ", antDistributableAmount = " +      antDistributableAmount +         
+  ", amountObligatedToDate = " +       amountObligatedToDate +          
+  ", obliDistributableAmount = " +     obliDistributableAmount +        
+  ", anticipatedChange = " +           anticipatedChange +              
+  ", obligatedChange = " +             obligatedChange +                
+  ", obligatedChangeDirect = " +       obligatedChangeDirect +          
+  ", obligatedChangeIndirect = " +     obligatedChangeIndirect +        
+  ", anticipatedChangeDirect = " +     anticipatedChangeDirect +        
+  ", anticipatedChangeIndirect = " +   anticipatedChangeIndirect +      
+  ", anticipatedTotalDirect = " +      anticipatedTotalDirect +         
+  ", anticipatedTotalIndirect = " +    anticipatedTotalIndirect +       
+  ", obligatedTotalDirect = " +        obligatedTotalDirect +           
+  ", obligatedTotalIndirect = " +      obligatedTotalIndirect;
+}
+
 }

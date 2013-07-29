@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  *
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import org.apache.commons.lang.StringUtils;
 import org.kuali.kra.SkipVersioning;
 import org.kuali.kra.award.home.Award;
 import org.kuali.kra.bo.KraPersistableBusinessObjectBase;
+import org.kuali.kra.iacuc.IacucProtocol;
 import org.kuali.kra.iacuc.protocol.IacucProtocolType;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.institutionalproposal.home.InstitutionalProposal;
@@ -69,17 +70,19 @@ public class CoiDisclProject extends KraPersistableBusinessObjectBase implements
     private String shortTextField3;
     private String longTextField3;
     private String selectBox1;
-    private String disclosureDispositionCode; 
+    private Integer disclosureDispositionCode; 
     private String disclosureStatusCode;  
     private ProposalType proposalType;
     private ProtocolType protocolType;
     private IacucProtocolType iacucProtocolType;
     private Protocol protocol;
+    private IacucProtocol iacucProtocol;
     private DevelopmentProposal proposal;
     private InstitutionalProposal institutionalProposal;
     private Award award;
     private CoiDisclosureEventType coiDisclosureEventType;
     private Long originalCoiDisclosureId; 
+    private CoiDisclosure originalCoiDisclosure; 
 
     @SkipVersioning
     private CoiDisclosure coiDisclosure; 
@@ -260,8 +263,10 @@ public class CoiDisclProject extends KraPersistableBusinessObjectBase implements
         String label = "Project Id";
         if (isAwardEvent()) {
             label = "Award Number";
-        } else if (isProtocolEvent() || isIacucProtocolEvent()) {
+        } else if (isProtocolEvent()) {
             label = "Protocol Number";
+        } else if (isIacucProtocolEvent()) {
+            label = "IACUC Protocol Number";
         } else if (this.isProposalEvent()) {
             label = "Proposal Number";
         }
@@ -302,6 +307,8 @@ public class CoiDisclProject extends KraPersistableBusinessObjectBase implements
             description = "Protocol";
         } else if (isIacucProtocolEvent() || isManualIacucProtocolEvent()) {
             description = "IACUC Protocol";
+        } else if (isManualTravelEvent()) {
+            description = "Travel";
         }
         return description;
 
@@ -332,7 +339,7 @@ public class CoiDisclProject extends KraPersistableBusinessObjectBase implements
         int completeCount = 0;
         if (CollectionUtils.isNotEmpty(this.getCoiDiscDetails())) {
             for (CoiDiscDetail coiDiscDetail : this.getCoiDiscDetails()) {
-                if (StringUtils.isNotBlank(coiDiscDetail.getEntityStatusCode())) {
+                if (coiDiscDetail.getEntityDispositionCode() != null && coiDiscDetail.getEntityDispositionCode() > 0) {
                     completeCount ++;
                 }
                 
@@ -347,7 +354,7 @@ public class CoiDisclProject extends KraPersistableBusinessObjectBase implements
         boolean isComplete = true;
         if (CollectionUtils.isNotEmpty(this.getCoiDiscDetails())) {
             for (CoiDiscDetail coiDiscDetail : this.getCoiDiscDetails()) {
-                if (StringUtils.isBlank(coiDiscDetail.getEntityStatusCode())) {
+                if (coiDiscDetail.getEntityDispositionCode() == null || coiDiscDetail.getEntityDispositionCode() == 0) {
                     isComplete = false;
                     break;
                 }
@@ -412,17 +419,28 @@ public class CoiDisclProject extends KraPersistableBusinessObjectBase implements
         return isManualAwardEvent() || isManualProposalEvent() || isManualProtocolEvent() || isManualIacucProtocolEvent() || isManualTravelEvent();
     }
 
-
-    
     public Protocol getProtocol() {
         if (protocol == null) {
             this.refreshReferenceObject("protocol");
         }
         return protocol;
     }
+    
     public void setProtocol(Protocol protocol) {
         this.protocol = protocol;
     }
+    
+    public IacucProtocol getIacucProtocol() {
+        if (iacucProtocol == null) {
+            this.refreshReferenceObject("iacucProtocol");
+        }
+        return iacucProtocol;
+    }
+    
+    public void setIacucProtocol(IacucProtocol iacucProtocol) {
+        this.iacucProtocol = iacucProtocol;
+    }
+    
     public DevelopmentProposal getProposal() {
         if (proposal == null) {
             this.refreshReferenceObject("proposal");
@@ -479,6 +497,9 @@ public class CoiDisclProject extends KraPersistableBusinessObjectBase implements
     }
 
     public List<LabelValuePair> getHeaderItems() {
+        if (headerItems == null && coiProjectId != null) {
+            initHeaderItems();
+        }
         return headerItems;
     }
     public void setHeaderItems(List<LabelValuePair> headerItems) {
@@ -488,7 +509,6 @@ public class CoiDisclProject extends KraPersistableBusinessObjectBase implements
     public void initHeaderItems() {
         DateFormat df = new SimpleDateFormat("MM/dd/yyyyy");
         headerItems = new ArrayList<LabelValuePair>();
-//        headerItems.add(new LabelValuePair(coiDisclosureEventType.getProjectIdLabel(), coiProjectId));
         if (coiDisclosureEventType == null) {
            this.refreshReferenceObject("coiDisclosureEventType");
         }
@@ -515,16 +535,16 @@ public class CoiDisclProject extends KraPersistableBusinessObjectBase implements
             headerItems.add(new LabelValuePair(coiDisclosureEventType.getShortTextField3Label(), shortTextField3));
         }
         if (coiDisclosureEventType.isUseNumberField1()) {            
-            headerItems.add(new LabelValuePair(coiDisclosureEventType.getNumberField1Label(), numberField1.toString()));
+            headerItems.add(new LabelValuePair(coiDisclosureEventType.getNumberField1Label(), numberField1 == null ? "" : numberField1.toString()));
         }
         if (coiDisclosureEventType.isUseNumberField2()) {            
-            headerItems.add(new LabelValuePair(coiDisclosureEventType.getNumberField2Label(), numberField2.toString()));
+            headerItems.add(new LabelValuePair(coiDisclosureEventType.getNumberField2Label(), numberField2 == null ? "" : numberField2.toString()));
         }
         if (coiDisclosureEventType.isUseDateField1()) {            
-            headerItems.add(new LabelValuePair(coiDisclosureEventType.getDateField1Label(), df.format(dateField1)));
+            headerItems.add(new LabelValuePair(coiDisclosureEventType.getDateField1Label(), dateField1 == null ? "" : df.format(dateField1)));
         }
         if (coiDisclosureEventType.isUseDateField2()) {            
-            headerItems.add(new LabelValuePair(coiDisclosureEventType.getDateField2Label(), df.format(dateField2)));
+            headerItems.add(new LabelValuePair(coiDisclosureEventType.getDateField2Label(), dateField2 == null ? "" : df.format(dateField2)));
         }
     }
     
@@ -558,11 +578,14 @@ public class CoiDisclProject extends KraPersistableBusinessObjectBase implements
     public void setOriginalCoiDisclosureId(Long originalCoiDisclosureId) {
         this.originalCoiDisclosureId = originalCoiDisclosureId;
     }
-    public String getDisclosureDispositionCode() {
+    public Integer getDisclosureDispositionCode() {
         return disclosureDispositionCode;
     }
-    public void setDisclosureDispositionCode(String disclosureDispositionCode) {
+    public void setDisclosureDispositionCode(Integer disclosureDispositionCode) {
         this.disclosureDispositionCode = disclosureDispositionCode;
+    }
+    public void setDisclosureDispositionCode(String disclosureDispositionCode) {
+        this.disclosureDispositionCode = Integer.valueOf(disclosureDispositionCode);
     }
     public String getDisclosureStatusCode() {
         return disclosureStatusCode;
@@ -574,6 +597,21 @@ public class CoiDisclProject extends KraPersistableBusinessObjectBase implements
         this.coiDispositionStatus = coiDispositionStatus;
     }
     public CoiDispositionStatus getCoiDispositionStatus() {
+        if (disclosureDispositionCode != null &&
+                (coiDispositionStatus == null || !StringUtils.equals(coiDispositionStatus.getCoiDispositionCode(), disclosureDispositionCode.toString()))) {
+            this.refreshReferenceObject("coiDispositionStatus");
+        }
         return coiDispositionStatus;
     }
+
+    public CoiDisclosure getOriginalCoiDisclosure() {
+        if (originalCoiDisclosureId != null && originalCoiDisclosure ==null) {
+            this.refreshReferenceObject("originalCoiDisclosure");
+        }
+        return originalCoiDisclosure;
+    }
+    public void setOriginalCoiDisclosure(CoiDisclosure originalCoiDisclosure) {
+        this.originalCoiDisclosure = originalCoiDisclosure;
+    }
+    
 }

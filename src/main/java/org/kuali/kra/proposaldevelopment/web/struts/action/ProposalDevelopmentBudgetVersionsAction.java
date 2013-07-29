@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -290,6 +290,13 @@ public class ProposalDevelopmentBudgetVersionsAction extends ProposalDevelopment
                 GlobalVariables.getMessageMap().putError(
                         "document.budgetDocumentVersion[" + (errorBudgetVersion - 1) + "].budgetVersionOverview.budgetStatus",
                         KeyConstants.CLEAR_AUDIT_ERRORS_BEFORE_CHANGE_STATUS_TO_COMPLETE);
+                for (BudgetDocumentVersion budgetDocumentVersion: pdDoc.getBudgetDocumentVersions()) {
+                    BudgetVersionOverview budgetVersion =  budgetDocumentVersion.getBudgetVersionOverview();
+
+                        String budgetStatusIncompleteCode = getParameterService().getParameterValueAsString(
+                                BudgetDocument.class, Constants.BUDGET_STATUS_INCOMPLETE_CODE);
+                        budgetVersion.setBudgetStatus(budgetStatusIncompleteCode);
+                }
             }
             return mapping.findForward(Constants.MAPPING_BASIC);
         }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 package org.kuali.kra.common.committee.service.impl;
 
 import org.apache.commons.lang.StringUtils;
-import org.kuali.kra.common.committee.bo.CommonCommitteeSchedule;
-import org.kuali.kra.common.committee.meeting.CommScheduleMinuteDoc;
-import org.kuali.kra.common.committee.meeting.ScheduleAgenda;
+import org.kuali.kra.common.committee.bo.CommitteeScheduleBase;
+import org.kuali.kra.common.committee.meeting.CommScheduleMinuteDocBase;
+import org.kuali.kra.common.committee.meeting.ScheduleAgendaBase;
 import org.kuali.kra.common.committee.notification.AgendaCreatedNotificationRenderer;
 import org.kuali.kra.common.committee.notification.CommitteeNotificationContext;
 import org.kuali.kra.common.committee.notification.MinutesCreatedNotificationRenderer;
@@ -48,10 +48,10 @@ public class CommitteeNotificationServiceImpl implements CommonCommitteeNotifica
      * This method generates Agenda Generated notifications for a committee.
      * @throws Exception 
      */
-    public void generateNotification(String notificationType, ScheduleAgenda agenda) {
+    public void generateNotification(String notificationType, ScheduleAgendaBase agenda) {
         
         if (StringUtils.equals(notificationType, Constants.COMMITTEE_AGENDA_NOTIFICATION)) {
-            CommonCommitteeSchedule committeeSchedule = agenda.getCommitteeSchedule();
+            CommitteeScheduleBase committeeSchedule = agenda.getCommitteeSchedule();
             AgendaCreatedNotificationRenderer renderer = new AgendaCreatedNotificationRenderer(agenda, "action taken");
             CommitteeNotificationContext context = new CommitteeNotificationContext(committeeSchedule, 
                                                     notificationType, "Agenda Generated Notification", renderer);
@@ -66,13 +66,13 @@ public class CommitteeNotificationServiceImpl implements CommonCommitteeNotifica
      * This method generates Minutes Generated notifications for a committee.
      * @throws Exception 
      */
-    public void generateNotification(String notificationType, CommScheduleMinuteDoc minuteDoc) {
+    public void generateNotification(String notificationType, CommScheduleMinuteDocBase minuteDoc) {
         
         if (StringUtils.equals(notificationType, Constants.COMMITTEE_MINUTES_NOTIFICATION)) {
-            CommonCommitteeSchedule committeeSchedule = minuteDoc.getCommitteeSchedule();
+            CommitteeScheduleBase committeeSchedule = minuteDoc.getCommitteeSchedule();
             MinutesCreatedNotificationRenderer renderer = new MinutesCreatedNotificationRenderer(minuteDoc, "action taken");
             CommitteeNotificationContext context = new CommitteeNotificationContext(committeeSchedule, 
-                                                    notificationType, "Agenda Generated Notification", renderer);
+                                                    notificationType, "Minutes Generated Notification", renderer);
             kcNotificationService.sendNotification(context);
         } else {
             throw new IllegalArgumentException(committeeNotificationType);

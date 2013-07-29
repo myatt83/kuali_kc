@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -100,4 +100,13 @@ public interface FinancialEntityService {
     List<PersonFinIntDisclosure> getFinDisclosureVersions(String entityNumber);
     
     PersonFinIntDisclosure getCurrentFinancialEntities(String entityNumber);
+    
+    /**
+     * 
+     * This method returns the current list of FinancialEntityAttachment objects for the specified FE
+     * and null when input parameter is null.
+     * @param entityId
+     * @return null when input parameter is null; otherwise list of FinancialEntityAttachment objects 
+     */   
+    public List<FinancialEntityAttachment> retrieveFinancialEntityAttachmentsFor(Long entityId);
 }

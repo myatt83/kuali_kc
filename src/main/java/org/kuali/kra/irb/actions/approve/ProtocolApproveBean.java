@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import org.kuali.kra.irb.actions.risklevel.ProtocolRiskLevelBean;
 /**
  * This class is really just a "form" for approving a protocol.
  */
-public class ProtocolApproveBean extends ProtocolGenericActionBean implements ProtocolRiskLevelCommentable {
+public class ProtocolApproveBean extends ProtocolGenericActionBean implements org.kuali.kra.protocol.actions.approve.ProtocolApproveBean, ProtocolRiskLevelCommentable {
 
     private static final long serialVersionUID = 8022339401747868812L;
     

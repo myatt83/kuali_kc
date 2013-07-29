@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,6 +42,7 @@ public interface PermissionConstants {
     public static final String MAINTAIN_PROPOSAL_HIERARCHY = "Maintain ProposalHierarchy";
     public static final String DELETE_PROPOSAL = "Delete Proposal";
     public static final String VIEW_SALARIES = "View Personnel Salaries";
+    public static final String RECALL_DOCUMENT = "Recall Document";
         
     /* IRB Permissions */
     
@@ -169,7 +170,7 @@ public interface PermissionConstants {
     public static final String APPROVE_COI_DISCLOSURE = "Approve Coi Disclosure";
     public static final String REPORT_COI_DISCLOSURE = "Report Coi Disclosure";
     public static final String PERFORM_COI_DISCLOSURE_ACTIONS = "Perform Coi Disclosure Actions";
-
+    public static final String UPDATE_FE_STATUS_ADMIN = "Maintain Coi FE Status Admin";
     
     /*
      * Subaward
@@ -246,5 +247,11 @@ public interface PermissionConstants {
      public static final String SPONSOR_HIERARCHY_MODIFY = "Modify Sponsor Hierarchy";
      public static final String SPONSOR_HIERARCHY_DELETE = "Delete Sponsor Hierarchy";
      
+     /* Research Areas */
+     public static final String MAINTAIN_AREA_OF_RESEARCH = "Create or Modify Research Areas";
+     public static final String MAINTAIN_IACUC_AREA_OF_RESEARCH = "Create or Modify Iacuc Research Areas";
      
+     /* COI Undisclosed events */
+     public static final String VIEW_COI_UNDISCLOSED_EVENTS = "View COI Undisclosed Events";
+
 }

@@ -1,5 +1,5 @@
 <%--
- Copyright 2005-2010 The Kuali Foundation
+ Copyright 2005-2013 The Kuali Foundation
 
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -23,16 +23,12 @@
 <%@ attribute name="bean" required="true" type="org.kuali.kra.questionnaire.QuestionnaireHelperBase" %>
 <%@ attribute name="property" required="true" %>
 <%@ attribute name="answerValidationError" required = "true" %>
-                        
-<div class="Qresponsediv">
-    <span class="Qresponse">
-        
-        <c:set var="prop" value="${property}.answerHeaders[${answerHeaderIndex}].answers[${questionIndex}].answer"/>
-        ${kfunc:registerEditableProperty(KualiForm, prop)}
-        
-        <input type="text" class="Qanswer" id="${prop}" name="${prop}" maxlength="${question.answerMaxLength}" size="${question.answerMaxLength}" 
-                value="${bean.answerHeaders[answerHeaderIndex].answers[questionIndex].answer}" readonly = "true"/>
-		<kul:lookup boClassName="${question.lookupClass}" 
-	                         fieldConversions="${question.lookupReturn}:${prop}" />
-    </span>
-</div>
+                               
+<c:set var="prop" value="${property}.answerHeaders[${answerHeaderIndex}].answers[${questionIndex}].answer"/>
+${kfunc:registerEditableProperty(KualiForm, prop)}
+
+<input type="text" class="Qanswer answer questionnaireAnswer" id="${prop}" name="${prop}" 
+	maxlength="${question.answerMaxLength}" size="${question.answerMaxLength}" 
+	value="${bean.answerHeaders[answerHeaderIndex].answers[questionIndex].answer}" readonly = "true"/>
+<kul:lookup boClassName="${question.lookupClass}" 
+	fieldConversions="${question.lookupReturn}:${prop}" />

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package org.kuali.kra.protocol.actions.submit;
 import java.io.Serializable;
 import java.util.List;
 
-import org.kuali.kra.common.committee.service.CommonCommitteeService;
+import org.kuali.kra.common.committee.service.CommitteeServiceBase;
 import org.kuali.kra.protocol.actions.ProtocolActionBean;
 
 /**
@@ -30,7 +30,7 @@ public interface ProtocolSubmitAction extends ProtocolActionBean, Serializable {
 
     public void setNumberOfReviewers(int numberOfReviewers);
 
-    public CommonCommitteeService getCommitteeService();
+    public CommitteeServiceBase getCommitteeService();
 
     public String getSubmissionTypeCode();
 
@@ -63,25 +63,25 @@ public interface ProtocolSubmitAction extends ProtocolActionBean, Serializable {
 
     public boolean isReviewerListAvailable();
 
-    public List<ProtocolReviewerBean> getReviewers();
+    public List<ProtocolReviewerBeanBase> getReviewers();
 
-    public ProtocolReviewerBean getReviewer(int i);
+    public ProtocolReviewerBeanBase getReviewer(int i);
 
     /**
      * We display the reviewers in two columns. These are the reviewers in the left column.
      * 
      * @return
      */
-    public List<ProtocolReviewerBean> getLeftReviewers();
+    public List<ProtocolReviewerBeanBase> getLeftReviewers();
     
     /**
      * We display the reviewers in two columns. These are the reviewers in the right column.
      * 
      * @return
      */
-    public List<ProtocolReviewerBean> getRightReviewers();
+    public List<ProtocolReviewerBeanBase> getRightReviewers();
 
-    public void setReviewers(List<ProtocolReviewerBean> reviewerBeans);
+    public void setReviewers(List<ProtocolReviewerBeanBase> reviewerBeans);
     
     public boolean getJavascriptEnabled();
 

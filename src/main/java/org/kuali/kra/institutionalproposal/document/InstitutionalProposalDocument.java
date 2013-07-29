@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.kuali.kra.institutionalproposal.document;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.kuali.kra.authorization.KraAuthorizationConstants;
 import org.kuali.kra.bo.CustomAttributeDocument;
+import org.kuali.kra.bo.DocumentCustomData;
 import org.kuali.kra.bo.versioning.VersionStatus;
 import org.kuali.kra.document.ResearchDocumentBase;
 import org.kuali.kra.infrastructure.KraServiceLocator;
@@ -35,7 +37,7 @@ import org.kuali.kra.institutionalproposal.home.InstitutionalProposal;
 import org.kuali.kra.institutionalproposal.service.InstitutionalProposalVersioningService;
 import org.kuali.kra.institutionalproposal.specialreview.InstitutionalProposalSpecialReview;
 import org.kuali.kra.institutionalproposal.specialreview.InstitutionalProposalSpecialReviewExemption;
-import org.kuali.kra.service.InstitutionalProposalCustomAttributeService;
+import org.kuali.kra.service.CustomAttributeService;
 import org.kuali.rice.coreservice.framework.parameter.ParameterConstants;
 import org.kuali.rice.coreservice.framework.parameter.ParameterConstants.COMPONENT;
 import org.kuali.rice.coreservice.framework.parameter.ParameterConstants.NAMESPACE;
@@ -127,7 +129,6 @@ public class InstitutionalProposalDocument extends ResearchDocumentBase {
     protected void init() {
         institutionalProposalList = new ArrayList<InstitutionalProposal>();
         institutionalProposalList.add(new InstitutionalProposal());
-        populateCustomAttributes();
     }
     
     /**
@@ -166,16 +167,6 @@ public class InstitutionalProposalDocument extends ResearchDocumentBase {
         managedLists.add(institutionalProposal.getProjectPersons());
 
         return managedLists;
-    }
-    
-    /**
-     * This method populates the customAttributes for this document.
-     */
-    @Override
-    public void populateCustomAttributes() {
-        InstitutionalProposalCustomAttributeService institutionalProposalCustomAttributeService = KraServiceLocator.getService(InstitutionalProposalCustomAttributeService.class);
-        Map<String, CustomAttributeDocument> customAttributeDocuments = institutionalProposalCustomAttributeService.getDefaultInstitutionalProposalCustomAttributeDocuments();
-        setCustomAttributeDocuments(customAttributeDocuments);
     }
     
     /**
@@ -221,8 +212,12 @@ public class InstitutionalProposalDocument extends ResearchDocumentBase {
     @Override
     public String getCustomLockDescriptor(Person user) {
         String activeLockRegion = (String) GlobalVariables.getUserSession().retrieveObject(KraAuthorizationConstants.ACTIVE_LOCK_REGION);
+        String updatedTimestamp = "";
+        if (this.getUpdateTimestamp() != null) {
+            updatedTimestamp = (new SimpleDateFormat("MM/dd/yyyy KK:mm a").format(this.getUpdateTimestamp()));
+        }
         if (StringUtils.isNotEmpty(activeLockRegion)) {
-            return this.getDocumentNumber() + "-" + activeLockRegion; 
+            return this.getInstitutionalProposal().getInstProposalNumber() + "-" + activeLockRegion + "-" + GlobalVariables.getUserSession().getPrincipalName() + "-" + updatedTimestamp;  
         }
 
         return null;
@@ -246,6 +241,11 @@ public class InstitutionalProposalDocument extends ResearchDocumentBase {
         }
            
         return isComplete;
+    }
+
+    @Override
+    public List<? extends DocumentCustomData> getDocumentCustomData() {
+        return getInstitutionalProposal().getInstitutionalProposalCustomDataList();
     }
     
 }

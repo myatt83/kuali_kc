@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,14 +51,14 @@ public class VersionHistoryServiceImplTest extends KcUnitTestBase {
     @Test
     public void testSavingAVersionHistory() {
         Award award = createAward(AWARD_VERSION_NAME, 1);
-        VersionHistory vh = versioningHistoryService.createVersionHistory(award, VersionStatus.ACTIVE, "jtester");
+        VersionHistory vh = versioningHistoryService.updateVersionHistory(award, VersionStatus.ACTIVE, "jtester");
         Assert.assertNotNull("VersionHistory was null", vh);
     }
 
     @Test
     public void testSavingVersionHistories() {
-        versioningHistoryService.createVersionHistory(createAward(AWARD_VERSION_NAME, 1), VersionStatus.ACTIVE, "u1");
-        versioningHistoryService.createVersionHistory(createProtocol(PROTOCOL_VERSION_NAME, 1), VersionStatus.ACTIVE, "u2");
+        versioningHistoryService.updateVersionHistory(createAward(AWARD_VERSION_NAME, 1), VersionStatus.ACTIVE, "u1");
+        versioningHistoryService.updateVersionHistory(createProtocol(PROTOCOL_VERSION_NAME, 1), VersionStatus.ACTIVE, "u2");
         
         List<VersionHistory> list = versioningHistoryService.loadVersionHistory(Award.class, AWARD_VERSION_NAME); 
         Assert.assertEquals(1, list.size());

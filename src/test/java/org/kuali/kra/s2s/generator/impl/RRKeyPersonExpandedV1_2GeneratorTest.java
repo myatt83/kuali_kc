@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation.
+ * Copyright 2005-2013 The Kuali Foundation.
  * 
  * Licensed under the Educational Community License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -135,7 +135,7 @@ public class RRKeyPersonExpandedV1_2GeneratorTest extends
 		keyPerson.setOptInCertificationStatus("Y");
 		keyPerson.setOptInUnitStatus("Y");
 		keyPerson.setProposalPersonNumber(1002);
-		keyPerson.setRolodexId(2);
+		keyPerson.setRolodexId(1);
 
 		ProposalPersonBiography kpBiography = new ProposalPersonBiography();
 		kpBiography.setBiographyNumber(1);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,22 +15,22 @@
  */
 package org.kuali.kra.iacuc.personnel;
 
-import org.kuali.kra.protocol.ProtocolDocument;
-import org.kuali.kra.protocol.personnel.SaveProtocolPersonnelEvent;
+import org.kuali.kra.protocol.ProtocolDocumentBase;
+import org.kuali.kra.protocol.personnel.SaveProtocolPersonnelEventBase;
 import org.kuali.kra.rule.BusinessRuleInterface;
 import org.kuali.kra.rule.event.KraDocumentEventBaseExtension;
 
 /**
  * Represents the event to save a ProtocolPersonnel.
  */
-public class SaveIacucProtocolPersonnelEvent extends SaveProtocolPersonnelEvent {
+public class SaveIacucProtocolPersonnelEvent extends SaveProtocolPersonnelEventBase {
 
     /**
-     * Constructs an SaveProtocolPersonnelEvent.
+     * Constructs an SaveProtocolPersonnelEventBase.
      * @param errorPathPrefix The error path prefix
      * @param document The document to validate
      */
-    public SaveIacucProtocolPersonnelEvent(String errorPathPrefix, ProtocolDocument document) {
+    public SaveIacucProtocolPersonnelEvent(String errorPathPrefix, ProtocolDocumentBase document) {
         super(errorPathPrefix, document);
     }
 

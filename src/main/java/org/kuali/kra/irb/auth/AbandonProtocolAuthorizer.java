@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import org.kuali.kra.infrastructure.PermissionConstants;
 import org.kuali.kra.irb.Protocol;
 import org.kuali.kra.irb.actions.ProtocolAction;
 import org.kuali.kra.irb.actions.ProtocolActionType;
+import org.kuali.kra.protocol.actions.ProtocolActionBase;
 import org.kuali.rice.kim.api.identity.Person;
 import org.kuali.rice.krad.util.GlobalVariables;
 
@@ -46,8 +47,6 @@ public class AbandonProtocolAuthorizer extends ProtocolAuthorizer {
     public boolean isAuthorized(String userId, ProtocolTask task) {
         // TODO : permission : PI and protocol has never been approved. protocol status is SRR/SMR
         return canExecuteAction(task.getProtocol(), ProtocolActionType.ABANDON_PROTOCOL) 
-            //&& isInitialProtocol(task.getProtocol())
-            //&& isPrincipalInvestigator(task.getProtocol()) ;
             && (hasPermission(userId, task.getProtocol(), PermissionConstants.SUBMIT_PROTOCOL)
                     || hasPermission(userId, task.getProtocol(), PermissionConstants.MODIFY_ANY_PROTOCOL));
     }
@@ -57,7 +56,7 @@ public class AbandonProtocolAuthorizer extends ProtocolAuthorizer {
      */
     private boolean isInitialProtocol(Protocol protocol) {
         boolean initialProtocol = true;
-        for (ProtocolAction action : protocol.getProtocolActions()) {
+        for (ProtocolActionBase action : protocol.getProtocolActions()) {
             if (APPROVE_ACTION_TYPES.contains(action.getProtocolActionTypeCode())) {
                 initialProtocol = false;
                 break;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,40 +15,53 @@
  */
 package org.kuali.kra.meeting;
 
-import java.io.Serializable;
+import org.kuali.kra.common.committee.meeting.CommitteeScheduleAttendanceBase;
+import org.kuali.kra.common.committee.meeting.OtherPresentBeanBase;
 
 /**
  * 
  * This class is form data for other present.
  */
-public class OtherPresentBean implements Serializable, Comparable<OtherPresentBean> {
+public class OtherPresentBean extends OtherPresentBeanBase {
 
-    private static final long serialVersionUID = 4831035284455868528L;
-    private CommitteeScheduleAttendance attendance;
-    private boolean member;
+    /**
+     * Comment for <code>serialVersionUID</code>
+     */
+    private static final long serialVersionUID = -2827619336606027054L;
 
-    public CommitteeScheduleAttendance getAttendance() {
-        if(attendance == null) {
-            attendance = new CommitteeScheduleAttendance();
-        }
-        return attendance;
+    @Override
+    protected CommitteeScheduleAttendanceBase getNewCommitteeScheduleAttendanceInstanceHook() {
+        return new CommitteeScheduleAttendance();
     }
 
-    public void setAttendance(CommitteeScheduleAttendance attendance) {
-        this.attendance = attendance;
-    }
-
-    public boolean isMember() {
-        return member;
-    }
-
-    public void setMember(boolean member) {
-        this.member = member;
-    }
-
-    public int compareTo(OtherPresentBean arg) {
-        return this.getAttendance().getPersonName().compareTo(arg.getAttendance().getPersonName());
-
-    }
+    
+// TODO ********************** commented out during IRB backfit ************************    
+//    private static final long serialVersionUID = 4831035284455868528L;
+//    private CommitteeScheduleAttendance attendance;
+//    private boolean member;
+//
+//    public CommitteeScheduleAttendance getAttendance() {
+//        if(attendance == null) {
+//            attendance = new CommitteeScheduleAttendance();
+//        }
+//        return attendance;
+//    }
+//
+//    public void setAttendance(CommitteeScheduleAttendance attendance) {
+//        this.attendance = attendance;
+//    }
+//
+//    public boolean isMember() {
+//        return member;
+//    }
+//
+//    public void setMember(boolean member) {
+//        this.member = member;
+//    }
+//
+//    public int compareTo(OtherPresentBean arg) {
+//        return this.getAttendance().getPersonName().compareTo(arg.getAttendance().getPersonName());
+//
+//    }
 
 }

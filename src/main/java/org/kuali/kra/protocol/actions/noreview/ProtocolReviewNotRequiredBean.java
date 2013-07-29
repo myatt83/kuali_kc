@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,72 +18,23 @@ package org.kuali.kra.protocol.actions.noreview;
 import java.io.Serializable;
 import java.sql.Date;
 
-import org.kuali.kra.protocol.Protocol;
-import org.kuali.kra.protocol.actions.ActionHelper;
 import org.kuali.kra.protocol.actions.ProtocolActionBean;
 
 /**
  * This class manages the HTML Elements needed for the review not required panel.
  */
-public class ProtocolReviewNotRequiredBean implements ProtocolActionBean, Serializable {
+public interface ProtocolReviewNotRequiredBean extends ProtocolActionBean, Serializable {
 
-    private static final long serialVersionUID = -5865035287789746024L;
+    public String getComments();
 
-    private String comments = "";
-    private Date actionDate = new Date(System.currentTimeMillis());
-    private Date decisionDate = new Date(System.currentTimeMillis());
+    public void setComments(String comments);
 
-    private Protocol protocol;
-    private ActionHelper actionHelper;
-    
-    /**
-     * Constructs a ProtocolReviewNotRequiredBean.
-     * @param actionHelper Reference back to the action helper for this bean
-     */
-    public ProtocolReviewNotRequiredBean(ActionHelper actionHelper) {
-        this.actionHelper = actionHelper;
-    }
+    public Date getActionDate();
 
-    public String getComments() {
-        return comments;
-    }
+    public void setActionDate(Date actionDate);
 
-    public void setComments(String comments) {
-        this.comments = comments;
-    }
+    public Date getDecisionDate();
 
-    public Date getActionDate() {
-        return actionDate;
-    }
-
-    public void setActionDate(Date actionDate) {
-        this.actionDate = actionDate;
-    }
-
-    public Date getDecisionDate() {
-        return decisionDate;
-    }
-
-    public void setDecisionDate(Date decisionDate) {
-        this.decisionDate = decisionDate;
-    }
-
-    public Protocol getProtocol() {
-        return protocol;
-    }
-    
-    public void setProtocol(Protocol protocol) {
-        this.protocol = protocol;
-    }
-    
-    public ActionHelper getActionHelper() {
-        return actionHelper;
-    }
-
-    @Override
-    public void setActionHelper(ActionHelper actionHelper) {
-        this.actionHelper = actionHelper;
-        this.protocol = actionHelper.getProtocol();
-    }
+    public void setDecisionDate(Date decisionDate);
 
 }

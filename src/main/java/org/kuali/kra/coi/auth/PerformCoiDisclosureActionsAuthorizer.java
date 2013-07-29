@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import org.kuali.kra.infrastructure.PermissionConstants;
 
 public class PerformCoiDisclosureActionsAuthorizer extends CoiDisclosureAuthorizer {
     public boolean isAuthorized(String userId, CoiDisclosureTask task) {
-        return hasPermission(userId, task.getCoiDisclosure(), PermissionConstants.PERFORM_COI_DISCLOSURE_ACTIONS);
+        return hasPermission(userId, task.getCoiDisclosure(), PermissionConstants.PERFORM_COI_DISCLOSURE_ACTIONS)
+                && isEditableByAdminReviewer(task.getCoiDisclosure());
     }
 }

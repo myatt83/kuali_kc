@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,10 +30,10 @@ import javax.xml.ws.WebServiceException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.kuali.kfs.integration.cg.budgetDto.BudgetAdjustmentCreationStatusDTO;
-import org.kuali.kfs.integration.cg.budgetDto.BudgetAdjustmentParametersDTO;
-import org.kuali.kfs.integration.cg.budgetDto.Details;
-import org.kuali.kfs.integration.cg.budgetService.BudgetAdjustmentService;
+import org.kuali.kfs.integration.cg.dto.BudgetAdjustmentCreationStatusDTO;
+import org.kuali.kfs.integration.cg.dto.BudgetAdjustmentParametersDTO;
+import org.kuali.kfs.integration.cg.dto.Details;
+import org.kuali.kfs.module.external.kc.service.BudgetAdjustmentService;
 import org.kuali.kra.award.budget.AwardBudgetExt;
 import org.kuali.kra.award.budget.AwardBudgetVersionOverviewExt;
 import org.kuali.kra.award.budget.document.AwardBudgetDocument;
@@ -70,7 +70,7 @@ import org.kuali.rice.krad.util.ObjectUtils;
 public abstract class BudgetAdjustmentClientBase implements BudgetAdjustmentClient {
 
     protected static final String SOAP_SERVICE_NAME = "budgetAdjustmentServiceSOAP";
-    protected static final QName SERVICE_NAME = new QName("KFS", SOAP_SERVICE_NAME);
+    protected static final QName SERVICE_NAME = new QName(Constants.FINANCIAL_SYSTEM_SERVICE_NAMESPACE, SOAP_SERVICE_NAME);
    
     private static final Log LOG = LogFactory.getLog(BudgetAdjustmentClientBase.class);
 
@@ -124,7 +124,7 @@ public abstract class BudgetAdjustmentClientBase implements BudgetAdjustmentClie
                             completeErrorMessage += errorMessage;
                         }
                         GlobalVariables.getMessageMap().putError(KRADConstants.GLOBAL_ERRORS, 
-                                                                 KeyConstants.DOCUMENT_SAVED_WITH_ERRORS,
+                                                                 KeyConstants.BUDGET_DOCUMENT_SAVED_WITH_ERRORS,
                                                                  completeErrorMessage);
                     }
                 } else {

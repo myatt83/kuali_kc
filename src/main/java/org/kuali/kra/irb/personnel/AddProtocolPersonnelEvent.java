@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,31 +16,23 @@
 package org.kuali.kra.irb.personnel;
 
 import org.kuali.kra.irb.ProtocolDocument;
+import org.kuali.kra.protocol.personnel.AddProtocolPersonnelEventBase;
 import org.kuali.kra.rule.BusinessRuleInterface;
-import org.kuali.kra.rule.event.KraDocumentEventBaseExtension;
-import org.kuali.rice.krad.util.ObjectUtils;
 
 /**
  * Represents the event to add a ProtocolPersonnel.
  */
-public class AddProtocolPersonnelEvent extends KraDocumentEventBaseExtension {
-    
-    private ProtocolPerson protocolPerson;
+public class AddProtocolPersonnelEvent extends AddProtocolPersonnelEventBase {
     
     /**
      * Constructs a AddProtocolPersonnelEvent.
+     * 
      * @param errorPathPrefix The error path prefix
      * @param document The document to validate
      * @param protocolPerson the person to add
      */
     public AddProtocolPersonnelEvent(String errorPathPrefix, ProtocolDocument document, ProtocolPerson protocolPerson) {
-        super("Adding ProtocolPerson to document " + getDocumentId(document), errorPathPrefix, document);
-    
-        this.protocolPerson = (ProtocolPerson) ObjectUtils.deepCopy(protocolPerson);
-    }
-    
-    public ProtocolPerson getProtocolPerson() {
-        return protocolPerson;
+        super(errorPathPrefix, document, protocolPerson);
     }
 
     @Override

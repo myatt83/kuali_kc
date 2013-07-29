@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -100,6 +100,7 @@ public class RRBudget10V1_1Generator extends RRBudgetBaseGenerator {
         List<BudgetPeriodInfo> budgetperiodList;
         BudgetSummaryInfo budgetSummary = null;
         try {
+            validateBudgetForForm(pdDoc);
             budgetperiodList = s2sBudgetCalculatorService.getBudgetPeriods(pdDoc);
             budgetSummary = s2sBudgetCalculatorService.getBudgetInfo(pdDoc,budgetperiodList);
         } catch (S2SException e) {

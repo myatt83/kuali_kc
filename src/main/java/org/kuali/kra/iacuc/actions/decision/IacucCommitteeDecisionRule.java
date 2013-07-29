@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,26 +15,21 @@
  */
 package org.kuali.kra.iacuc.actions.decision;
 
-import org.kuali.kra.iacuc.actions.submit.IacucProtocolReviewType;
+import org.kuali.kra.common.committee.service.CommitteeScheduleAttendanceServiceBase;
+import org.kuali.kra.iacuc.committee.service.IacucCommitteeScheduleAttendanceService;
 import org.kuali.kra.infrastructure.KeyConstants;
-import org.kuali.kra.protocol.actions.decision.CommitteeDecisionRule;
-import org.kuali.kra.protocol.actions.submit.ProtocolSubmission;
+import org.kuali.kra.protocol.actions.decision.CommitteeDecisionRuleBase;
 
-public class IacucCommitteeDecisionRule extends CommitteeDecisionRule<IacucCommitteeDecision> {
+public class IacucCommitteeDecisionRule extends CommitteeDecisionRuleBase<IacucCommitteeDecision> {
 
     @Override
     protected String getNoCommentsForRevisionsErrorMessageHook() {
         return KeyConstants.ERROR_PROTOCOL_RECORD_COMMITEE_NO_MINOR_MAJOR_DISAPPROVE_REVIEWER_COMMENTS;
     }
-    
 
     @Override
-    protected boolean processCounts(ProtocolSubmission submission, IacucCommitteeDecision committeeDecision) {
-        boolean retVal = true;
-        if(!submission.getProtocolReviewTypeCode().equals(IacucProtocolReviewType.DESIGNATED_MEMBER_REVIEW)) {
-            retVal = super.processCounts(submission, committeeDecision);
-        }
-        return retVal;
+    protected Class<? extends CommitteeScheduleAttendanceServiceBase> getCommitteeScheduleAttendanceServiceClassHook() {
+        return IacucCommitteeScheduleAttendanceService.class;
     }
     
 }

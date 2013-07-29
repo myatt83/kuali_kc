@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,8 +27,10 @@ import org.kuali.kra.common.notification.bo.KcNotification;
 import org.kuali.kra.common.notification.bo.NotificationTypeRecipient;
 import org.kuali.kra.common.notification.rule.event.AddNotificationRecipientEvent;
 import org.kuali.kra.common.notification.rule.event.SendNotificationEvent;
+import org.kuali.kra.iacuc.notification.IacucProtocolNotification;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.negotiations.document.NegotiationDocument;
+import org.kuali.kra.negotiations.notifications.NegotiationNotification;
 import org.kuali.kra.negotiations.web.struts.form.NegotiationForm;
 
 public class NegotiationNotificationAction extends NegotiationAction {
@@ -112,7 +114,7 @@ public class NegotiationNotificationAction extends NegotiationAction {
         List<NotificationTypeRecipient> notificationRecipients = negotiationForm.getNotificationHelper().getNotificationRecipients();
         
         if (applyRules(new SendNotificationEvent(document, notification, notificationRecipients))) {
-            negotiationForm.getNotificationHelper().sendNotification();
+            negotiationForm.getNotificationHelper().sendNotificationAndPersist(new NegotiationNotification(), document.getNegotiation());
             negotiationForm.getNotificationHelper().setNotificationContext(null);
             
             actionForward = mapping.findForward("negotiation");

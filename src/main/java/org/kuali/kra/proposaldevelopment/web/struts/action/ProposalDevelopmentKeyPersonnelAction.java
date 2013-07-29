@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,7 +52,6 @@ import org.kuali.kra.bo.KcPersonExtendedAttributes;
 import org.kuali.kra.bo.Unit;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.KraServiceLocator;
-import org.kuali.kra.irb.ProtocolForm;
 import org.kuali.kra.proposaldevelopment.bo.AttachmentDataSource;
 import org.kuali.kra.proposaldevelopment.bo.DevelopmentProposal;
 import org.kuali.kra.proposaldevelopment.bo.ProposalPerson;
@@ -147,6 +146,11 @@ public class ProposalDevelopmentKeyPersonnelAction extends ProposalDevelopmentAc
             ProposalPerson person=(ProposalPerson) iter.next();
             if (person.getRole() != null) {
                 person.getRole().setReadOnly(getKeyPersonnelService().isRoleReadOnly(person.getRole()));
+            }
+        }
+        for (ProposalPersonQuestionnaireHelper helper : pdform.getProposalPersonQuestionnaireHelpers()) {
+            for (int i = 0; i < helper.getAnswerHeaders().size(); i++) {
+                helper.updateChildIndicator(i);
             }
         }
         
@@ -552,6 +556,7 @@ public class ProposalDevelopmentKeyPersonnelAction extends ProposalDevelopmentAc
             for (ProposalPersonQuestionnaireHelper helper : pdform.getProposalPersonQuestionnaireHelpers()) {
                 //doing this check to make sure the person wasn't automatically deleted after adding.
                 if (pdform.getProposalDevelopmentDocument().getDevelopmentProposal().getProposalPersons().contains(helper.getProposalPerson())) {
+                    helper.preSave();
                     answerHeadersToSave.addAll(helper.getAnswerHeaders());
                 }
             }
@@ -851,12 +856,12 @@ public class ProposalDevelopmentKeyPersonnelAction extends ProposalDevelopmentAc
             int selectedPersonIndex = Integer.parseInt(formProperty.substring(36, formProperty.length()-1));
             
             ProposalPerson person = document.getDevelopmentProposal().getProposalPerson(selectedPersonIndex);
-            ProposalPersonQuestionnaireHelper helper = new ProposalPersonQuestionnaireHelper(pdform, person);
+            ProposalPersonQuestionnaireHelper helper = pdform.getProposalPersonQuestionnaireHelpers().get(selectedPersonIndex);
             
             helper.updateQuestionnaireAnswer(getLineToDelete(request));
             getBusinessObjectService().save(helper.getAnswerHeaders().get(getLineToDelete(request)));
             
-            return this.reload(mapping, pdform, request, response);
+            return mapping.findForward(MAPPING_BASIC);
             
         } else {
             throw new RuntimeException(String.format("Do not know how to process updateAnswerToNewVersion for formProperty %s",formProperty));

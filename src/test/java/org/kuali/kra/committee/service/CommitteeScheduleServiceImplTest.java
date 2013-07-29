@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,18 +39,19 @@ import org.junit.Before;
 import org.junit.Test;
 import org.kuali.kra.committee.bo.Committee;
 import org.kuali.kra.committee.bo.CommitteeSchedule;
-import org.kuali.kra.committee.bo.ScheduleStatus;
+import org.kuali.kra.common.committee.bo.ScheduleStatus;
 import org.kuali.kra.committee.service.impl.CommitteeScheduleServiceImpl;
-import org.kuali.kra.committee.web.struts.form.schedule.DailyScheduleDetails;
-import org.kuali.kra.committee.web.struts.form.schedule.DayOfWeek;
-import org.kuali.kra.committee.web.struts.form.schedule.MonthlyScheduleDetails;
-import org.kuali.kra.committee.web.struts.form.schedule.ScheduleData;
-import org.kuali.kra.committee.web.struts.form.schedule.StyleKey;
-import org.kuali.kra.committee.web.struts.form.schedule.Time12HrFmt;
-import org.kuali.kra.committee.web.struts.form.schedule.WeeklyScheduleDetails;
-import org.kuali.kra.committee.web.struts.form.schedule.YearlyScheduleDetails;
-import org.kuali.kra.committee.web.struts.form.schedule.Time12HrFmt.MERIDIEM;
+import org.kuali.kra.common.committee.web.struts.form.schedule.DailyScheduleDetails;
+import org.kuali.kra.common.committee.web.struts.form.schedule.DayOfWeek;
+import org.kuali.kra.common.committee.web.struts.form.schedule.MonthlyScheduleDetails;
+import org.kuali.kra.common.committee.web.struts.form.schedule.ScheduleData;
+import org.kuali.kra.common.committee.web.struts.form.schedule.StyleKey;
+import org.kuali.kra.common.committee.web.struts.form.schedule.Time12HrFmt;
+import org.kuali.kra.common.committee.web.struts.form.schedule.WeeklyScheduleDetails;
+import org.kuali.kra.common.committee.web.struts.form.schedule.YearlyScheduleDetails;
+import org.kuali.kra.common.committee.web.struts.form.schedule.Time12HrFmt.MERIDIEM;
 import org.kuali.kra.irb.Protocol;
+import org.kuali.kra.protocol.ProtocolBase;
 import org.kuali.kra.scheduling.expr.util.CronSpecialChars;
 import org.kuali.kra.scheduling.sequence.DefaultScheduleSequence;
 import org.kuali.kra.scheduling.sequence.ScheduleSequence;
@@ -437,7 +438,7 @@ public class CommitteeScheduleServiceImplTest  {
     public void testIsCommitteeScheduleDeletableWithProtocol() throws Exception {
         boolean flag = false;  
         Protocol protocol = context.mock(Protocol.class);       
-        committeeSchedule.setProtocols(new ArrayList<Protocol>());
+        committeeSchedule.setProtocols(new ArrayList<ProtocolBase>());
         committeeSchedule.getProtocols().add(protocol);
         flag = service.isCommitteeScheduleDeletable(committeeSchedule);
         assertFalse(flag);

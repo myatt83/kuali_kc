@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,10 @@
  */
 package org.kuali.kra.iacuc.protocol.funding;
 
-import org.kuali.kra.protocol.protocol.funding.ProtocolFundingSource;
+import org.kuali.kra.protocol.protocol.funding.ProtocolFundingSourceBase;
 import org.kuali.kra.protocol.protocol.funding.ProtocolFundingSourceService;
 
-public class IacucProtocolFundingSource extends ProtocolFundingSource {
+public class IacucProtocolFundingSource extends ProtocolFundingSourceBase {
 
     /**
      * Comment for <code>serialVersionUID</code>
@@ -26,7 +26,7 @@ public class IacucProtocolFundingSource extends ProtocolFundingSource {
     private static final long serialVersionUID = -7739447137061210927L;
     
     /**
-     * Constructs a ProtocolFundingSource.
+     * Constructs a ProtocolFundingSourceBase.
      * @param fundingSourceNumber The user-readable number of the funding source (often the same as fundingSource)
      * @param fundingSourceTypeCode The type code of the funding source
      * @param fundingSourceName The name of the funding source

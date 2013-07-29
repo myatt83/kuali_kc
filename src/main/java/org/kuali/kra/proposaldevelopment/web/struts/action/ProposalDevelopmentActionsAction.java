@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -106,6 +106,7 @@ import org.kuali.rice.coreservice.framework.parameter.ParameterService;
 import org.kuali.rice.kew.api.KewApiConstants;
 import org.kuali.rice.kew.api.WorkflowDocument;
 import org.kuali.rice.kew.api.action.ActionRequest;
+import org.kuali.rice.kew.api.action.ActionRequestType;
 import org.kuali.rice.kew.api.action.RoutingReportCriteria;
 import org.kuali.rice.kew.api.action.WorkflowDocumentActionsService;
 import org.kuali.rice.kew.api.document.DocumentDetail;
@@ -113,6 +114,7 @@ import org.kuali.rice.kim.api.permission.PermissionService;
 import org.kuali.rice.kim.api.services.KimApiServiceLocator;
 import org.kuali.rice.kns.question.ConfirmationQuestion;
 import org.kuali.rice.kns.util.AuditCluster;
+import org.kuali.rice.kns.util.AuditError;
 import org.kuali.rice.kns.util.KNSGlobalVariables;
 import org.kuali.rice.kns.util.WebUtils;
 import org.kuali.rice.kns.web.struts.action.AuditModeAction;
@@ -150,20 +152,29 @@ public class ProposalDevelopmentActionsAction extends ProposalDevelopmentAction 
     
     private static final String CONFIRM_SUBMISSION_WITH_WARNINGS_KEY = "submitApplication";
     private static final String EMPTY_STRING = "";
-    
+    private static final String SUPER_USER_ACTION_REQUESTS = "superUserActionRequests";
+
     private static final int OK = 0;
     private static final int WARNING = 1;
     private static final int ERROR = 2;
-    
     /**
      * Struts mapping for the Proposal web page.  
      */
     private static final String MAPPING_PROPOSAL = "proposal";
+    private static final String ROUTING_WARNING_MESSAGE = "Validation Warning Exists.Are you sure want to submit to workflow routing."; 
     
+    private enum SuperUserAction {
+        SUPER_USER_APPROVE, TAKE_SUPER_USER_ACTIONS
+    }
+   
     private transient KraWorkflowService kraWorkflowService;
     
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        if (!StringUtils.equals((String) request.getAttribute("methodToCallAttribute"), "methodToCall.route")){
+            
+        }
+            
         ActionForward actionForward = super.execute(mapping, form, request, response);
         if (!StringUtils.equals((String) request.getAttribute("methodToCallAttribute"), "methodToCall.reload"))
             this.populateSponsorForms(form);
@@ -190,7 +201,7 @@ public class ProposalDevelopmentActionsAction extends ProposalDevelopmentAction 
         proposalDevelopmentForm.setAuditActivated(true);        
         ActionForward forward = mapping.findForward(Constants.MAPPING_BASIC);
         boolean forwardToSubmitToSponsor = false;
-        int status = isValidSubmission(pdDoc);
+        int status = isValidSubmission(proposalDevelopmentForm);
 
         if (status == ERROR) {
             GlobalVariables.getMessageMap().clearErrorMessages(); // clear error from isValidSubmission()    
@@ -260,12 +271,13 @@ public class ProposalDevelopmentActionsAction extends ProposalDevelopmentAction 
             workflowDoc.setReceiveFutureRequests();  
         }
         
-        if( StringUtils.equals(action, "approve"))
+        if( StringUtils.equals(action, "approve")){
             return super.approve(mapping, form, request, response);
-        else if ( StringUtils.equals(action, "route"))
+        }else if ( StringUtils.equals(action, "route")){
             return super.route(mapping, form, request, response);
-        else 
-            throw new UnsupportedOperationException( String.format( "promptUserForInput does not know how to forward for action %s.", action )); 
+        }else {
+            throw new UnsupportedOperationException( String.format( "promptUserForInput does not know how to forward for action %s.", action ));
+        }
     }   
 
     private boolean canGenerateRequestsInFuture(WorkflowDocument workflowDoc, String principalId) throws Exception {
@@ -631,7 +643,7 @@ public class ProposalDevelopmentActionsAction extends ProposalDevelopmentAction 
         String methodToCall = ((KualiForm) form).getMethodToCall();
         
         ActionForward forward = mapping.findForward(Constants.MAPPING_BASIC);
-        int status = isValidSubmission(pdDoc);
+        int status = isValidSubmission(proposalDevelopmentForm);
         boolean userSaysOk = false;
 
        //if((map.size()==1) &&  map.containsKey("sponsorProgramInformationAuditWarnings"))
@@ -716,7 +728,7 @@ public class ProposalDevelopmentActionsAction extends ProposalDevelopmentAction 
         proposalDevelopmentForm.setAuditActivated(true);
         ActionForward forward = mapping.findForward(Constants.MAPPING_BASIC);
         
-        int status = isValidSubmission(proposalDevelopmentDocument);
+        int status = isValidSubmission(proposalDevelopmentForm);
         
         Object question = request.getParameter(KRADConstants.QUESTION_INST_ATTRIBUTE_NAME);
         Object buttonClicked = request.getParameter(KRADConstants.QUESTION_CLICKED_BUTTON);
@@ -799,17 +811,23 @@ public class ProposalDevelopmentActionsAction extends ProposalDevelopmentAction 
      * @param proposalDevelopmentDocument
      * @return OK, WARNING or ERROR
      */
-    private int isValidSubmission(ProposalDevelopmentDocument proposalDevelopmentDocument) {
+    private int isValidSubmission(ProposalDevelopmentForm proposalDevelopmentForm) {
+        ProposalDevelopmentDocument proposalDevelopmentDocument = proposalDevelopmentForm.getProposalDevelopmentDocument();
         int state = OK;
         
         /*
          * If this proposal is a continuation from another proposal, it is illegal for
          * it to have a New Proposal Type and Application Submission Type.
          */
+        if (!proposalDevelopmentForm.isUnitRulesErrorsExist() && proposalDevelopmentForm.isAuditActivated()){
+            proposalDevelopmentForm.setUnitRulesMessages(getUnitRulesMessages(proposalDevelopmentForm.getProposalDevelopmentDocument()));
+        }
         if ((proposalDevelopmentDocument.getDevelopmentProposal().getContinuedFrom() != null) && isNewProposalType(proposalDevelopmentDocument) && isSubmissionApplication(proposalDevelopmentDocument)) {
             state = ERROR;
             //GlobalVariables.getMessageMap().putError("someKey", KeyConstants.ERROR_RESUBMISSION_INVALID_PROPOSALTYPE_SUBMISSIONTYPE);
-        } else {
+        } else if(proposalDevelopmentForm.isUnitRulesErrorsExist()){
+            state = ERROR;
+        }else{
             /* 
              * Don't know what to do about the Audit Rules.  The parent class invokes the Audit rules
              * from its execute() method.  It will stay this way for the time being because I this is
@@ -1839,6 +1857,116 @@ public class ProposalDevelopmentActionsAction extends ProposalDevelopmentAction 
 
         return ++changeNumber;
     }
+    
+    @Override
+    public ActionForward takeSuperUserActions(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+        return superUserActionHelper(SuperUserAction.TAKE_SUPER_USER_ACTIONS, mapping, form, request, response);
+    }
 
+    /**
+     * 
+     * This method enable the ability to save the generated system to system XML
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     * @throws Exception
+     */
+    public ActionForward saveXml(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        ProposalDevelopmentForm proposalDevelopmentForm = (ProposalDevelopmentForm) form;
+        ProposalDevelopmentDocument proposalDevelopmentDocument = (ProposalDevelopmentDocument)proposalDevelopmentForm.getDocument();
+        proposalDevelopmentDocument.getDevelopmentProposal().setGrantsGovSelectFlag(true);
+        proposalDevelopmentForm.setDocument(proposalDevelopmentDocument);
+        return super.printForms(mapping, proposalDevelopmentForm, request, response);
+       
+    }
+   
+    @Override
+    public ActionForward superUserApprove(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+        return superUserActionHelper(SuperUserAction.SUPER_USER_APPROVE, mapping, form, request, response);
+    }
+    
+    protected ActionForward superUserActionHelper(SuperUserAction actionName, ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+        boolean success;
+
+        ProposalDevelopmentForm proposalDevelopmentForm = (ProposalDevelopmentForm) form;
+        ProposalDevelopmentDocument pdDoc = proposalDevelopmentForm.getProposalDevelopmentDocument();
+
+        Object question = request.getParameter(KRADConstants.QUESTION_INST_ATTRIBUTE_NAME);
+        Object buttonClicked = request.getParameter(KRADConstants.QUESTION_CLICKED_BUTTON);
+        String methodToCall = ((KualiForm) form).getMethodToCall();
+
+        ActionForward forward = mapping.findForward(Constants.MAPPING_BASIC);
+        
+        if (!pdDoc.getDocumentHeader().getWorkflowDocument().isEnroute()) {
+            proposalDevelopmentForm.setAuditActivated(true);
+            int status = isValidSubmission(proposalDevelopmentForm);
+            boolean userSaysOk = false;
+
+            if (status == WARNING) {
+                if(question == null){
+                    List<String>  selectedActionRequests = proposalDevelopmentForm.getSelectedActionRequests();
+                    // Need to add the super user requests to user session because they are wiped out by 
+                    //the KualiRequestProcessor reset on 
+                    //clicking yes to the question. Retrieve again during actual routing and add to form.
+                    GlobalVariables.getUserSession().addObject(SUPER_USER_ACTION_REQUESTS, selectedActionRequests);
+                    try {
+                        forward =  this.performQuestionWithoutInput(mapping, form, request, response, 
+                                                                    DOCUMENT_ROUTE_QUESTION, ROUTING_WARNING_MESSAGE,
+                                                                    KRADConstants.CONFIRMATION_QUESTION, methodToCall, "");
+                    }
+                    catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                } 
+                else if(DOCUMENT_ROUTE_QUESTION.equals(question) && ConfirmationQuestion.YES.equals(buttonClicked)) {
+                    proposalDevelopmentForm.setSelectedActionRequests((List<String>)GlobalVariables.getUserSession().retrieveObject(SUPER_USER_ACTION_REQUESTS));
+                    GlobalVariables.getUserSession().removeObject(SUPER_USER_ACTION_REQUESTS);
+                    //status is OK now since the user said it was :)
+                    userSaysOk = true;
+                } else if( DOCUMENT_APPROVE_QUESTION.equals(question)) {
+                    //user said ok in the past since we got to this question.
+                    userSaysOk = true;
+                }
+            }
+
+            if(status == OK || userSaysOk ) {
+                switch (actionName) {
+                    case SUPER_USER_APPROVE: 
+                        forward = super.superUserApprove(mapping, proposalDevelopmentForm, request, response);
+                        break;
+                    case TAKE_SUPER_USER_ACTIONS:
+                        forward = super.takeSuperUserActions(mapping, proposalDevelopmentForm, request, response);      
+                        break;
+                }
+
+            } else if ( status == WARNING ) { 
+
+            } else {
+                GlobalVariables.getMessageMap().clearErrorMessages(); // clear error from isValidSubmission()    
+                GlobalVariables.getMessageMap().putError("datavalidation",KeyConstants.ERROR_WORKFLOW_SUBMISSION,  new String[] {});
+
+                if ((pdDoc.getDevelopmentProposal().getContinuedFrom() != null) && isNewProposalType(pdDoc) && isSubmissionApplication(pdDoc)) {
+                    GlobalVariables.getMessageMap().putError("someKey", KeyConstants.ERROR_RESUBMISSION_INVALID_PROPOSALTYPE_SUBMISSIONTYPE);
+                }
+
+                forward = mapping.findForward((Constants.MAPPING_BASIC));
+            }
+        }
+        else {
+            switch (actionName) {
+                case SUPER_USER_APPROVE: 
+                    forward = super.superUserApprove(mapping, proposalDevelopmentForm, request, response);
+                    break;
+                case TAKE_SUPER_USER_ACTIONS:
+                    forward = super.takeSuperUserActions(mapping, proposalDevelopmentForm, request, response);
+                    break;
+            }
+        }
+        return forward;
+    }
+
+    
 
 }

@@ -1,5 +1,5 @@
 <%--
- Copyright 2005-2010 The Kuali Foundation
+ Copyright 2005-2013 The Kuali Foundation
 
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@
     <script type="text/javascript" src="scripts/jquery/jquery.treeview.js"></script>
     <script type="text/javascript" src="scripts/jquery/CalendarPopup.js"></script>
     
-  	<div align="right"><kul:help documentTypeName="ProtocolDocument" pageName="Questionnaire" /></div>
+  	<div align="right"><kul:help documentTypeName="IacucProtocolDocument" pageName="Questionnaire" /></div>
 	<kra-iacuc:protocolQuestionnaireAnswers property = "questionnaireHelper" bean = "${KualiForm.questionnaireHelper}"/>
 	<kul:documentControls transactionalDocument="true" suppressRoutingControls="true" />
    	

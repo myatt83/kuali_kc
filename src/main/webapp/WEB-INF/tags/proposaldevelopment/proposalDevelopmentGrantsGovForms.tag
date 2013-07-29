@@ -1,5 +1,5 @@
 <%--
- Copyright 2005-2010 The Kuali Foundation
+ Copyright 2005-2013 The Kuali Foundation
  
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -111,12 +111,12 @@
                 </c:when>        
                 <c:when test="${empty KualiForm.document.developmentProposalList[0].s2sOpportunity}" >
                     <tr><td>
-                        No Grants.gov opportunity has been selected
+                        No S2S opportunity has been selected
                     </td></tr>     
                 </c:when>
                 <c:when test="${empty KualiForm.document.developmentProposalList[0].s2sOpportunity.s2sOppForms}" >
                     <tr><td>
-                        No forms are currently available for the Grants.gov opportunity selected.
+                        No forms are currently available for the S2S opportunity selected.
                     </td></tr> 
                </c:when>    
             </c:choose>               

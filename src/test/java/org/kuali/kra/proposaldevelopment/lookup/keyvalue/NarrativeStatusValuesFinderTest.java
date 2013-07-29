@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  *
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@ public class NarrativeStatusValuesFinderTest extends ValuesFinderTestBase {
     protected List<KeyValue> getKeyValues() {
         final List<KeyValue> keylabel = new ArrayList<KeyValue>();
         
+        keylabel.add(new ConcreteKeyValue("", "select"));
         keylabel.add(new ConcreteKeyValue("I","Incomplete"));
         keylabel.add(new ConcreteKeyValue("C","Complete"));
         

@@ -1,5 +1,5 @@
 <%--
- Copyright 2005-2010 The Kuali Foundation
+ Copyright 2005-2013 The Kuali Foundation
  
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  limitations under the License.
 --%>
 <%@ include file="/WEB-INF/jsp/kraTldHeader.jsp"%>
-
+<%@ attribute name="transparentBackground" required="false" %>
 <c:set var="budgetAttributes"
 	value="${DataDictionary.Budget.attributes}" />
 <c:set var="budgetPeriodAttributes"
@@ -36,7 +36,7 @@
 <c:set var="budgetRatesAttributes"
 	value="${DataDictionary.BudgetRate.attributes}" />
 
-<kul:tab tabTitle="Budget Summary" defaultOpen="false">
+<kul:tab tabTitle="Budget Summary" defaultOpen="false" transparentBackground="${transparentBackground }">
 	<kul:innerTab tabTitle="Budget Periods" parentTab=""
 		defaultOpen="false">
 		<div class="tab-container" align="center">

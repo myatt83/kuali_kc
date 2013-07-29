@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,14 @@
  */
 package org.kuali.kra.irb.actions;
 
-import org.kuali.kra.bo.KraPersistableBusinessObjectBase;
+import org.kuali.kra.protocol.actions.ProtocolActionTypeBase;
 
 /**
  * A Protocol Action Type refers to the type of actions that an
  * that can be performed against a Protocol document.
  */
 @SuppressWarnings("serial")
-public class ProtocolActionType extends KraPersistableBusinessObjectBase {
+public class ProtocolActionType extends ProtocolActionTypeBase {
 
     public static final String PROTOCOL_CREATED = "100";
 
@@ -116,6 +116,10 @@ public class ProtocolActionType extends KraPersistableBusinessObjectBase {
 
     //No corresponding actionTypeCode for this in Coeus  
     public static final String MODIFY_PROTOCOL_SUBMISISON = "309";
+    
+    // action type to be used only by workflow disapproval post-processpor
+    public static final String REJECTED_IN_ROUTING = "404";
+    public static final String RECALLED_IN_ROUTING = "405";
 
     public static final String ASSIGN_REVIEWER = "901";
     public static final String REVIEW_COMPLETE = "902";

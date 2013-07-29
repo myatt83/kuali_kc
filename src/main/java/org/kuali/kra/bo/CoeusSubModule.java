@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  *
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,7 @@ public class CoeusSubModule extends KraPersistableBusinessObjectBase {
     public static final String COI_EVENT_IRB_PROTOCOL_DISCL_SUBMODULE = "5";
     public static final String COI_EVENT_IACUC_PROTOCOL_DISCL_SUBMODULE = "6";
     public static final String COI_EVENT_TRAVEL_DISCL_SUBMODULE = "7";
+    public static final String COI_SCREENING_SUBMODULE = "8";
 
     public static final String AMENDMENT = "4";
 
@@ -53,6 +54,8 @@ public class CoeusSubModule extends KraPersistableBusinessObjectBase {
     private String description;
 
     private CoeusModule coeusModule;
+    
+    private boolean requireUniqueQuestionnareUsage;
 
     public CoeusSubModule() {
     }
@@ -95,5 +98,13 @@ public class CoeusSubModule extends KraPersistableBusinessObjectBase {
 
     public void setCoeusModule(CoeusModule coeusModule) {
         this.coeusModule = coeusModule;
+    }
+
+    public boolean isRequireUniqueQuestionnareUsage() {
+        return requireUniqueQuestionnareUsage;
+    }
+
+    public void setRequireUniqueQuestionnareUsage(boolean requireUniqueQuestionnareUsage) {
+        this.requireUniqueQuestionnareUsage = requireUniqueQuestionnareUsage;
     }
 }

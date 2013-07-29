@@ -1,5 +1,5 @@
 <%--
- Copyright 2005-2010 The Kuali Foundation
+ Copyright 2005-2013 The Kuali Foundation
  
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -16,17 +16,18 @@
 <%@ include file="/WEB-INF/jsp/kraTldHeader.jsp"%>
 
 
+<c:set var="disclosureReviewCompleted" value="${KualiForm.disclosureActionHelper.disclosureReviewComplete}" />
 <kul:tab tabTitle="Administrator Actions" defaultOpen="false" tabErrorKey="coiAdminActionErrors">
-	<div class="tab-container"  align="center">
-		<h3> 
-			<span class="subhead-left">Administrator Actions</span>
-            <span class="subhead-right"><kul:help parameterNamespace="KC-COIDISCLOSURE" parameterDetailType="Document" parameterName="coiAdministratorActionHelp" altText="help"/></span>
- 		</h3>
 		<c:if test="${not KualiForm.document.coiDisclosureList[0].currentDisclosure}">
+            <kra-coi:addCoiReviewerAction />
+            <kra:permission value="${KualiForm.disclosureHelper.canUpdateFEStatusAdmin}">
+            	<kra-coi:coiProjectsFinancialEntity/>
+            </kra:permission>
+            <c:if test="${disclosureReviewCompleted}">
+	            <kra-coi:disclosureReviewStatusAction/>
+            </c:if>
+            <c:if test="${!KualiForm.document.viewOnly}">
             <kra-coi:approveAction />
+            </c:if>
         </c:if>    
-	</div>
-
-
-      
 </kul:tab>

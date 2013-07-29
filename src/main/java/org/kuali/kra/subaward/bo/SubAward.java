@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,7 +54,8 @@ implements Permissionable, SequenceOwner<SubAward>, Negotiable {
 
     private static final long serialVersionUID = 1L;
     private static final String ROLODEX_ID_FIELD_NAME = "rolodexId";
-
+    public static final String NOTIFICATION_TYPE_SUBMIT = "501";
+ 
     private Long subAwardId;
     private String subAwardCode;
 
@@ -249,6 +250,8 @@ implements Permissionable, SequenceOwner<SubAward>, Negotiable {
 	 * @return Returns the requisitionerName.
 	 */
 	public String getRequisitionerName() {
+	    //calling getRequisitionerUserName() as that function sets the requestionsitioner name
+	    getRequisitionerUserName();
 		return requisitionerName;
 	}
 
@@ -1160,7 +1163,7 @@ implements Permissionable, SequenceOwner<SubAward>, Negotiable {
 
     @Override
     public String getAssociatedDocumentId() {
-        return this.getSubAwardId().toString();
+        return this.getSubAwardCode();
     }
 
     @Override

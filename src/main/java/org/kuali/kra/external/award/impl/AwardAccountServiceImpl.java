@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.kuali.kra.award.document.AwardDocument;
 import org.kuali.kra.award.home.Award;
+import org.kuali.kra.award.home.AwardStatus;
+import org.kuali.kra.bo.versioning.VersionStatus;
 import org.kuali.kra.external.award.AwardAccountDTO;
 import org.kuali.kra.external.award.AwardAccountService;
 import org.kuali.kra.infrastructure.Constants;
@@ -170,17 +172,20 @@ public class AwardAccountServiceImpl implements AwardAccountService {
      * @return
      */
     protected List<Award> getAwards(String financialAccountNumber, String chartOfAccounts) {
-        List<Award> awards;
+        List<Award> awards = new ArrayList<Award>();
         HashMap<String, String> searchCriteria =  new HashMap<String, String>();
-        searchCriteria.put("accountNumber", financialAccountNumber);  
-        searchCriteria.put("financialChartOfAccountsCode", chartOfAccounts);
-        awards = new ArrayList<Award>(businessObjectService.findMatching(Award.class, searchCriteria));
-        if (ObjectUtils.isNotNull(awards) && !awards.isEmpty()) {
-            return awards;
-        } else {
+        // It is possible to have a null chart of accounts code
+        if (ObjectUtils.isNotNull(financialAccountNumber)) {
+            searchCriteria.put("accountNumber", financialAccountNumber);  
+            searchCriteria.put("financialChartOfAccountsCode", chartOfAccounts);
+            // use the awardSequenceStatus to return the latest active award
+            searchCriteria.put("awardSequenceStatus", VersionStatus.ACTIVE.name());
+            awards = new ArrayList<Award>(businessObjectService.findMatching(Award.class, searchCriteria));
+        }
+        if (ObjectUtils.isNull(awards) || awards.isEmpty()) {           
             LOG.warn("No award found for the account number " + financialAccountNumber + " and chart " + "chartOfAccounts");            
-            return null;
-        }   
+        }  
+        return awards;
     }
 
     

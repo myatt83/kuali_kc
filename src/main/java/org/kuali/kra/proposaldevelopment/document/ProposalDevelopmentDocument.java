@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  *
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,17 @@
  */
 package org.kuali.kra.proposaldevelopment.document;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.kuali.kra.authorization.KraAuthorizationConstants;
 import org.kuali.kra.authorization.Task;
+import org.kuali.kra.bo.CustomAttributeDocValue;
+import org.kuali.kra.bo.DocumentCustomData;
 import org.kuali.kra.budget.core.Budget;
 import org.kuali.kra.budget.document.BudgetDocument;
 import org.kuali.kra.budget.document.BudgetParentDocument;
@@ -36,16 +40,17 @@ import org.kuali.kra.institutionalproposal.service.InstitutionalProposalService;
 import org.kuali.kra.kew.KraDocumentRejectionService;
 import org.kuali.kra.krms.KcKrmsConstants;
 import org.kuali.kra.krms.KrmsRulesContext;
+import org.kuali.kra.krms.service.impl.KcKrmsFactBuilderServiceHelper;
 import org.kuali.kra.proposaldevelopment.bo.DevelopmentProposal;
 import org.kuali.kra.proposaldevelopment.document.authorization.ProposalTask;
 import org.kuali.kra.proposaldevelopment.hierarchy.ProposalHierarchyException;
 import org.kuali.kra.proposaldevelopment.hierarchy.service.ProposalHierarchyService;
-import org.kuali.kra.proposaldevelopment.service.ProposalDevelopmentFactBuilderService;
 import org.kuali.kra.proposaldevelopment.service.ProposalStateService;
 import org.kuali.kra.proposaldevelopment.service.ProposalStatusService;
 import org.kuali.kra.service.KraAuthorizationService;
 import org.kuali.kra.workflow.KraDocumentXMLMaterializer;
 import org.kuali.rice.core.api.config.property.ConfigurationService;
+import org.kuali.rice.core.api.datetime.DateTimeService;
 import org.kuali.rice.coreservice.framework.parameter.ParameterConstants;
 import org.kuali.rice.coreservice.framework.parameter.ParameterConstants.COMPONENT;
 import org.kuali.rice.coreservice.framework.parameter.ParameterConstants.NAMESPACE;
@@ -96,6 +101,8 @@ public class ProposalDevelopmentDocument extends BudgetParentDocument<Developmen
      * If it becomes part of the domain, it should probably move to DevelopmentProposal.java
      */
     private String institutionalProposalNumber;
+    private String saveXmlFolderName;
+    private List<CustomAttributeDocValue> customDataList;
 
     public ProposalDevelopmentDocument() {
         super();
@@ -105,6 +112,7 @@ public class ProposalDevelopmentDocument extends BudgetParentDocument<Developmen
         newProposal.setProposalDocument(this);
         developmentProposalList.add(newProposal);
         budgetDocumentVersions = new ArrayList<BudgetDocumentVersion>();
+        customDataList = new ArrayList<CustomAttributeDocValue>();
     }
 
     public List<DevelopmentProposal> getDevelopmentProposalList() {
@@ -267,6 +275,9 @@ public class ProposalDevelopmentDocument extends BudgetParentDocument<Developmen
     protected ParameterService getParameterService() {
         return KraServiceLocator.getService(ParameterService.class);
     }
+    protected DateTimeService getDateTimeService() {
+        return KraServiceLocator.getService(DateTimeService.class);
+    }
     
     public Budget getFinalBudgetForThisProposal() {
         BudgetDocumentVersion budgetDocumentVersion = this.getFinalBudgetVersion();
@@ -274,6 +285,15 @@ public class ProposalDevelopmentDocument extends BudgetParentDocument<Developmen
             return budgetDocumentVersion.getFinalBudget();
         }
         return null;
+    }
+    
+    public String getFinalrateClassCode() {
+        String retVal = "";
+        Budget finalBudget =  getFinalBudgetForThisProposal();
+        if (finalBudget != null && finalBudget.getRateClass().getRateClassCode() != null) {
+            retVal = finalBudget.getRateClass().getRateClassCode();
+        }
+        return retVal;
     }
 
 
@@ -290,27 +310,9 @@ public class ProposalDevelopmentDocument extends BudgetParentDocument<Developmen
     @Override
     // This method should go away in favor of using DD workflowProperties bean to serialize properties
     public KualiDocumentXmlMaterializer wrapDocumentWithMetadataForXmlSerialization() {
-        KraAuthorizationService kraauthservice = KraServiceLocator.getService(KraAuthorizationService.class);
-        KualiTransactionalDocumentInformation transInfo = new KualiTransactionalDocumentInformation();
-        DocumentInitiator initiatior = new DocumentInitiator();
-        // String initiatorNetworkId = getDocumentHeader().getWorkflowDocument().getInitiatorPrincipalId();
-        // try {
-        // UniversalUser initiatorUser = KRADServiceLocator.getUniversalUserService().getUniversalUser(new
-        // PrincipalName(initiatorNetworkId));
-        // initiatorUser.getModuleUsers(); // init the module users map for serialization
-        // initiatior.setUniversalUser(initiatorUser);
-        // }
-        // catch (UserNotFoundException e) {
-        // throw new RuntimeException(e);
-        // }
-        transInfo.setDocumentInitiator(initiatior);
-        KraDocumentXMLMaterializer xmlWrapper = new KraDocumentXMLMaterializer();
-        // KualiDocumentXmlMaterializer xmlWrapper = new KualiDocumentXmlMaterializer();
-        xmlWrapper.setDocument(this);
-        xmlWrapper.setKualiTransactionalDocumentInformation(transInfo);
-        xmlWrapper.setRolepersons(kraauthservice.getAllRolePersons(this));
+        KraDocumentXMLMaterializer xmlWrapper = (KraDocumentXMLMaterializer) super.wrapDocumentWithMetadataForXmlSerialization();
+        xmlWrapper.setRolepersons(getAllRolePersons());
         return xmlWrapper;
-
     }
 
     @Override
@@ -479,8 +481,12 @@ public class ProposalDevelopmentDocument extends BudgetParentDocument<Developmen
     @Override
     public String getCustomLockDescriptor(Person user) {
         String activeLockRegion = (String) GlobalVariables.getUserSession().retrieveObject(KraAuthorizationConstants.ACTIVE_LOCK_REGION);
+        String updatedTimestamp = "";
+        if (this.getUpdateTimestamp() != null) {
+            updatedTimestamp = (new SimpleDateFormat("MM/dd/yyyy KK:mm a").format(this.getUpdateTimestamp()));
+        }
         if (StringUtils.isNotEmpty(activeLockRegion)) {
-            return this.getDocumentNumber() + "-" + activeLockRegion; 
+            return this.getDevelopmentProposal().getProposalNumber() + "-" + activeLockRegion + "-" + GlobalVariables.getUserSession().getPrincipalName() + "-" + updatedTimestamp; 
         }
 
         return null;
@@ -591,10 +597,57 @@ public class ProposalDevelopmentDocument extends BudgetParentDocument<Developmen
     }
     
     public void addFacts(Facts.Builder factsBuilder) {
-        
-//        String docContent = this.getDocumentHeader().getWorkflowDocument().getDocumentContent().getFullContent();
-        ProposalDevelopmentFactBuilderService fbService = KraServiceLocator.getService(ProposalDevelopmentFactBuilderService.class);
+        KcKrmsFactBuilderServiceHelper fbService = KraServiceLocator.getService("proposalDevelopmentFactBuilderService");
         fbService.addFacts(factsBuilder, this);
     }
     
+    public void populateAgendaQualifiers(Map<String, String> qualifiers) {
+        qualifiers.put(KcKrmsConstants.UNIT_NUMBER, getLeadUnitNumber());
+    }
+
+    public void defaultDocumentDescription() {
+        DevelopmentProposal proposal = getDevelopmentProposal();
+        String desc = String.format("%s; Proposal No: %s; PI: %s; Sponsor: %s; Due Date: %s",
+                proposal.getTitle() != null ? proposal.getTitle().substring(0, Math.min(proposal.getTitle().length(), 19)) : "null",
+                proposal.getProposalNumber(),
+                proposal.getPrincipalInvestigatorName(),
+                proposal.getSponsorName(),
+                proposal.getDeadlineDate() != null ? getDateTimeService().toDateString(proposal.getDeadlineDate()) : "null"); 
+        getDocumentHeader().setDocumentDescription(desc);
+    }
+
+    @Override
+    public List<? extends DocumentCustomData> getDocumentCustomData() {
+        return getCustomDataList();
+    }
+
+    public List<CustomAttributeDocValue> getCustomDataList() {
+        return customDataList;
+    }
+
+    public void setCustomDataList(List<CustomAttributeDocValue> customDataList) {
+        this.customDataList = customDataList;
+    }
+    
+    public String getSaveXmlFolderName() {
+        return saveXmlFolderName;
+    }
+
+    public void setSaveXmlFolderName(String saveXmlFolderName) {
+        this.saveXmlFolderName = saveXmlFolderName;
+    }
+    
+    public boolean isDefaultDocumentDescription() {
+        return getParameterService().getParameterValueAsBoolean(ProposalDevelopmentDocument.class, Constants.HIDE_AND_DEFAULT_PROP_DEV_DOC_DESC_PARAM);
+    }
+    
+    @Override
+    public String getDocumentTitle() {
+        if (isDefaultDocumentDescription()) {
+            return this.getDocumentHeader().getDocumentDescription();
+        } else {
+            return super.getDocumentTitle();
+        }
+    }
+
 }

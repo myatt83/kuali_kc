@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,9 +22,9 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 import org.kuali.kra.coi.CoiDisclosure;
 import org.kuali.kra.coi.CoiDisclosureEventType;
-import org.kuali.kra.coi.personfinancialentity.PersonFinIntDisclosure;
 import org.kuali.rice.krad.bo.BusinessObject;
 
+@SuppressWarnings("unchecked")
 public class CoiEventDisclosureLookupableHelper extends CoiDisclosureLookupableHelperBase {
 
     /**
@@ -35,7 +35,8 @@ public class CoiEventDisclosureLookupableHelper extends CoiDisclosureLookupableH
     /*
      * Returns only those project event disclosures, manual and non-manual, that have been submitted / routed
      */
-    public List<? extends BusinessObject> getSearchResults(Map<String, String> fieldValues) {
+    @Override
+    public List<? extends BusinessObject> getLookupSpecificSearchResults(Map<String, String> fieldValues) {
         List<CoiDisclosure> allDisclosures = (List<CoiDisclosure>) super.getResults(fieldValues);
         List<CoiDisclosure> submittedEventDisclosures = new ArrayList<CoiDisclosure>();
         for (CoiDisclosure coiDisclosure : allDisclosures) {

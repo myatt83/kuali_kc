@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ import org.kuali.rice.core.api.util.type.KualiDecimal;
 public class AwardTest { 
     private static final double DELTA = 0.001;
 
-    private static final int AWARD_ATTRIBUTES_COUNT = 122;
+    private static final int AWARD_ATTRIBUTES_COUNT = 129;
     private static final String PERSON_ID = "1001";
     private static final String KP_PERSON_ID = "1002";
     private static final int ROLODEX_ID = 1002;

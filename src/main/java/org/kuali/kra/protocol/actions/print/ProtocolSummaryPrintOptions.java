@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,7 @@ public class ProtocolSummaryPrintOptions implements Serializable {
     private boolean protocolDetails = true;
     private boolean references = true;
     private boolean riskLevel = true;
+    private boolean exception = true;
     private boolean specialReview = true;
     private boolean roles = true;
     private boolean studyPersonnels = true;
@@ -244,6 +245,20 @@ public class ProtocolSummaryPrintOptions implements Serializable {
      */
     public void setRiskLevel(boolean riskLevel) {
         this.riskLevel = riskLevel;
+    }
+    /**
+     * Gets the exception attribute. 
+     * @return Returns the exception.
+     */
+    public boolean isException() {
+        return exception;
+    }
+    /**
+     * Sets the exception attribute value.
+     * @param exception The exception to set.
+     */
+    public void setException(boolean exception) {
+        this.exception = exception;
     }
     /**
      * Gets the specialReview attribute. 

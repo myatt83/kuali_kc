@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ public class ProtocolMedusaAction extends ProtocolAction {
         protocolForm.getMedusaBean().setMedusaViewRadio("0");
         protocolForm.getMedusaBean().setModuleName("irb");
         protocolForm.getMedusaBean().setModuleIdentifier(protocolForm.getProtocolDocument().getProtocol().getProtocolId());
+        protocolForm.getMedusaBean().generateParentNodes();
         return mapping.findForward("basic");
     }
     

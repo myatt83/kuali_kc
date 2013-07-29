@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,12 @@ import org.kuali.kra.SkipVersioning;
 import org.kuali.kra.coi.CoiDisclProject;
 import org.kuali.kra.coi.CoiDisclosure;
 import org.kuali.kra.coi.CoiDisclosureAssociate;
+import org.kuali.kra.coi.CoiNoteType;
 import org.kuali.kra.coi.personfinancialentity.PersonFinIntDisclosure;
+import org.kuali.kra.infrastructure.Constants;
+import org.kuali.kra.infrastructure.KraServiceLocator;
+import org.kuali.rice.core.api.datetime.DateTimeService;
+import org.kuali.rice.krad.util.GlobalVariables;
 import org.kuali.rice.krad.util.ObjectUtils;
 
 public class CoiDisclosureNotepad extends CoiDisclosureAssociate implements Comparable<CoiDisclosureNotepad> {
@@ -44,9 +49,18 @@ public class CoiDisclosureNotepad extends CoiDisclosureAssociate implements Comp
     private transient String updateUserFullName;
     private String projectId;
     private Long originalCoiDisclosureId; 
+    private String noteTypeCode;
     @SkipVersioning
     private CoiDisclosure originalCoiDisclosure; 
     private Long financialEntityId;
+    private String createUser;
+    private Timestamp createTimestamp;
+    private transient String createUserFullName;
+    private CoiNoteType noteType;
+
+    private String usageSectionId;
+    
+    
     @SkipVersioning
     private PersonFinIntDisclosure financialEntity;
     private String eventTypeCode;
@@ -107,7 +121,7 @@ public class CoiDisclosureNotepad extends CoiDisclosureAssociate implements Comp
         }
         return "";
     }
-  
+      
     public String getUpdateUserFullName() {
         return updateUserFullName;
     }
@@ -268,7 +282,11 @@ public class CoiDisclosureNotepad extends CoiDisclosureAssociate implements Comp
     
     @Override
     public int compareTo(CoiDisclosureNotepad coiDisclosureNotepad) {
-        return this.getUpdateTimestamp().compareTo(coiDisclosureNotepad.getUpdateTimestamp());
+        if (this.getCreateTimestamp() == null || coiDisclosureNotepad.getCreateTimestamp() == null) {
+            return this.getUpdateTimestamp().compareTo(coiDisclosureNotepad.getUpdateTimestamp());
+        } else {
+            return this.getCreateTimestamp().compareTo(coiDisclosureNotepad.getCreateTimestamp());
+        }
 
     }
 
@@ -299,5 +317,76 @@ public class CoiDisclosureNotepad extends CoiDisclosureAssociate implements Comp
     public void setOriginalCoiDisclosure(CoiDisclosure originalCoiDisclosure) {
         this.originalCoiDisclosure = originalCoiDisclosure;
     }
+    
+    public String getCreateUser() {
+        return createUser;
+    }
 
+    public void setCreateUser(String createUser) {
+        this.createUser = createUser;
+    }
+
+    public Timestamp getCreateTimestamp() {
+        return createTimestamp;
+    }
+
+    public void setCreateTimestamp(Timestamp createTimestamp) {
+        this.createTimestamp = createTimestamp;
+    }
+    
+    public String getCreateUserFullName() {
+        return createUserFullName;
+    }
+
+    public void setCreateUserFullName(String createUserFullName) {
+        this.createUserFullName = createUserFullName;
+    }
+    /*
+    @Override
+    protected void prePersist() {
+        super.prePersist();
+        this.setCreateUser(GlobalVariables.getUserSession().getPrincipalName());
+        this.setCreateTimestamp(((DateTimeService) KraServiceLocator.getService(Constants.DATE_TIME_SERVICE_NAME)).getCurrentTimestamp());
+    }
+    */
+
+    public String getUsageSectionId() {
+        return usageSectionId;
+    }
+
+    public void setUsageSectionId(String usageSectionId) {
+        this.usageSectionId = usageSectionId;
+    }
+    
+    /**
+     * Gets the noteType attribute. 
+     * @return Returns the noteType.
+     */
+    public CoiNoteType getNoteType() {
+        return noteType;
+    }
+
+    /**
+     * Sets the noteType attribute value.
+     * @param noteType The noteType to set.
+     */
+    public void setNoteType(CoiNoteType noteType) {
+        this.noteType = noteType;
+    }
+    
+    /**
+     * Gets the noteTypeCode attribute. 
+     * @return Returns the noteTypeCode.
+     */
+    public String getNoteTypeCode() {
+        return noteTypeCode;
+    }
+
+    /**
+     * Sets the noteTypeCode attribute value.
+     * @param noteTypeCode The noteTypeCode to set.
+     */
+    public void setNoteTypeCode(String noteTypeCode) {
+        this.noteTypeCode = noteTypeCode;
+    }
 }

@@ -1,5 +1,5 @@
  <%--
- Copyright 2005-2010 The Kuali Foundation
+ Copyright 2005-2013 The Kuali Foundation
 
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@
 
 	<c:set var="personDetailsTabErrorKey" value="${proposalPerson}.projectRole*,${proposalPerson}.percentageEffort,${proposalPerson}.pagerNumber*,${proposalPerson}.userName,${proposalPerson}.emailAddress,${proposalPerson}.officePhone,${proposalPerson}.officePhone,${proposalPerson}.eraCommonsUserName,${proposalPerson}.primaryTitle,${proposalPerson}.directoryTitle,${proposalPerson}.faxNumber,${proposalPerson}.mobilePhoneNumber,${proposalPerson}.officeLocation,${proposalPerson}.addressLine1,${proposalPerson}.addressLine2,${proposalPerson}.addressLine3,${proposalPerson}.city,${proposalPerson}.county,${proposalPerson}.state,${proposalPerson}.postalCode,${proposalPerson}.countryCode,${proposalPerson}.facultyFlag" />				
               
-	<kul:innerTab tabTitle="Person Details" parentTab="${parentTabName}" defaultOpen="false" tabErrorKey="${personDetailsTabErrorKey}">
+	<kul:innerTab tabTitle="Person Details" parentTab="${parentTabName}" defaultOpen="false" tabErrorKey="${personDetailsTabErrorKey}" auditCluster="keyPersonnelAuditErrors" tabAuditKey="document.developmentProposalList[0].proposalPersons[${personIndex}]*">
 			<div class="innerTab-container" align="left">
               <table class=tab cellpadding=0 cellspacing="0" summary=""> 
                 <tbody id="G1">
@@ -83,6 +83,26 @@
                                                                            readOnly="${!personEditableFields['userName'] }"/>
                     </td>
                   </tr>
+                  <tr>
+                  <th align="left" nowrap="nowrap"> <div align="right"><kul:htmlAttributeLabel attributeEntry="${proposalPersonAttributes.firstName}"  /></div></th>
+                  <td>                 
+                      <kul:htmlControlAttribute property="${proposalPerson}.firstName" attributeEntry="${proposalPersonAttributes.firstName}" 
+                                                readOnly="${personEditableFields['firstName'] }"/>
+                  </td>
+                  <th align="left" width="15%"><div align="right"><kul:htmlAttributeLabel attributeEntry="${proposalPersonAttributes.lastName}"  /></div></th>
+                   <td>
+                      <kul:htmlControlAttribute property="${proposalPerson}.lastName" attributeEntry="${proposalPersonAttributes.lastName}" 
+                                                readOnly="${personEditableFields['lastName'] }"/>
+                  </td>
+                  </tr>
+                  <tr>
+                   <th align="left" width="15%"><div align="right"><kul:htmlAttributeLabel attributeEntry="${proposalPersonAttributes.middleName}"  /></div></th>
+                   <td>                   
+                      <kul:htmlControlAttribute property="${proposalPerson}.middleName" attributeEntry="${proposalPersonAttributes.middleName}" 
+                                                readOnly="${personEditableFields['middleName'] }"/>
+                   
+                  </td>
+                  <tr>
                   <tr>
                     <th colspan="4">Organization</th>
                   </tr>
@@ -200,23 +220,27 @@
                                             attributeEntry="${proposalPersonAttributes.addressLine3}" 
                                                   readOnly="${!personEditableFields['addressLine3'] || addressLine3}" />
                     </td>
-                    <th align="left" nowrap="nowrap" width="15%"> <div align="right"><kul:htmlAttributeLabel attributeEntry="${proposalPersonAttributes.state}"  /></div></th>
-                    <td align="left" width="30%"><kul:htmlControlAttribute property="${proposalPerson}.state" 
-                                                                     attributeEntry="${proposalPersonAttributes.state}" 
-                                                                           readOnly="${!personEditableFields['state'] }" />
+                    <th align="left" nowrap="nowrap"> <div align="right"><kul:htmlAttributeLabel attributeEntry="${proposalPersonAttributes.countryCode}"  /></div></th>
+                    <td align="left"><kul:htmlControlAttribute property="${proposalPerson}.countryCode" attributeEntry="${proposalPersonAttributes.countryCode}"  
+                    	readOnly="${!personEditableFields['countryCode'] }"
+                    	onchange="javascript: loadStates(this.options[this.selectedIndex].value, '${proposalPerson}.state');return false" />
+                    	
+                    	<c:set var="currentCountryCode" value="${KualiForm.document.developmentProposalList[0].proposalPersons[personIndex].countryCode}"/>
+                    	<jsp:setProperty name="KualiForm" property="currentPersonCountryCode" value="${currentCountryCode }"  />  
                     </td>
+                    
                   </tr>
                   
                   <tr>
                     <th align="left" nowrap="nowrap"> <div align="right"><kul:htmlAttributeLabel attributeEntry="${proposalPersonAttributes.postalCode}"  /></div></th>
-                    <td align="left"><kul:htmlControlAttribute property="${proposalPerson}.postalCode" 
-                                                                     attributeEntry="${proposalPersonAttributes.postalCode}" 
-                                                                           readOnly="${!personEditableFields['postalCode'] }" />
+                    <td align="left"><kul:htmlControlAttribute property="${proposalPerson}.postalCode" attributeEntry="${proposalPersonAttributes.postalCode}" 
+                    	readOnly="${!personEditableFields['postalCode'] }" />
                     </td>
-                    <th align="left" nowrap="nowrap"> <div align="right"><kul:htmlAttributeLabel attributeEntry="${proposalPersonAttributes.countryCode}"  /></div></th>
-                    <td align="left"><kul:htmlControlAttribute property="${proposalPerson}.countryCode" 
-                                                                     attributeEntry="${proposalPersonAttributes.countryCode}" 
-                                                                           readOnly="${!personEditableFields['countryCode'] }" />
+                    <th align="left" nowrap="nowrap" width="15%"> <div align="right"><kul:htmlAttributeLabel attributeEntry="${proposalPersonAttributes.state}"  /></div></th>
+                    <td align="left" width="30%">
+                    	${KualiForm.valueFinderResultDoNotCache}
+                    	<kul:htmlControlAttribute property="${proposalPerson}.state"  attributeEntry="${proposalPersonAttributes.state}" 
+                    		readOnly="${!personEditableFields['state'] }" />
                     </td>
                   </tr>
                   <tr>
@@ -692,11 +716,8 @@
        value = "${bean.ruleReferenced}" />
 			
 			<kra-questionnaire:questionnaireAnswersInnerTab bean = "${bean}" property = "${property}" 
-				answerHeaderIndex = "${answerHeaderIndex}" parentTab="${parentTabName}" completed="${completed }"
-				personIndex="${personIndex }"/>
-				
-				
-			<%--<kra-questionnaire:questionnaireAnswers bean = "${bean}" property = "${property}" answerHeaderIndex = "${answerHeaderIndex}"/> --%>
+				answerHeaderIndex = "${answerHeaderIndex}" parentTab="${parentTabName}"
+				printLineIndex="${personIndex }"/>
 		</td>
 	</tr>
   </c:when>
@@ -736,8 +757,8 @@
 			
 			
 			<kra-questionnaire:questionnaireAnswersInnerTab bean = "${bean}" property = "${property}" 
-				answerHeaderIndex = "${answerHeaderIndex}" parentTab="${parentTabName}" completed="${completed}" 
-				personIndex="${personIndex }"/>
+				answerHeaderIndex = "${answerHeaderIndex}" parentTab="${parentTabName}" 
+				printLineIndex="${personIndex }"/>
 				
 			<%--<kra-questionnaire:questionnaireAnswers bean = "${bean}" property = "${property}" answerHeaderIndex = "${answerHeaderIndex}"/>--%>
 		</td>

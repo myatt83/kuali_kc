@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ package org.kuali.kra.iacuc.auth;
 
 import org.apache.commons.lang.StringUtils;
 import org.kuali.kra.infrastructure.PermissionConstants;
-import org.kuali.kra.protocol.auth.ProtocolTask;
+import org.kuali.kra.protocol.auth.ProtocolTaskBase;
 
 /**
  * 
@@ -26,11 +26,7 @@ import org.kuali.kra.protocol.auth.ProtocolTask;
 public class IacucGenericProtocolUnavailableAuthorizer extends IacucGenericProtocolAuthorizer {
     /** {@inheritDoc} */
     @Override
-    public boolean isAuthorized(String userId, ProtocolTask task) {
+    public boolean isAuthorized(String userId, ProtocolTaskBase task) {
         return !super.isAuthorized(userId, task) && hasPermission(userId, task.getProtocol(), PermissionConstants.MAINTAIN_IACUC_PROTOCOL_SUBMISSIONS);
-        /*
-        return !canExecuteAction(task.getProtocol(), super.convertGenericTaskNameToProtocolActionType()) 
-            && hasPermission(userId, task.getProtocol(), PermissionConstants.MAINTAIN_IACUC_PROTOCOL_SUBMISSIONS);
-            */
     }    
 }

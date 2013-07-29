@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@ package org.kuali.kra.protocol.onlinereview.event;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.kuali.kra.common.committee.meeting.CommitteeScheduleMinute;
-import org.kuali.kra.protocol.ProtocolOnlineReviewDocument;
+import org.kuali.kra.common.committee.meeting.CommitteeScheduleMinuteBase;
+import org.kuali.kra.protocol.ProtocolOnlineReviewDocumentBase;
 import org.kuali.kra.protocol.onlinereview.rules.AddOnlineReviewCommentRule;
 import org.kuali.kra.rule.event.KraDocumentEventBase;
 import org.kuali.rice.krad.rules.rule.BusinessRule;
@@ -28,7 +28,7 @@ public class AddProtocolOnlineReviewCommentEvent extends KraDocumentEventBase {
     
     
     private static final Log LOG = LogFactory.getLog(AddProtocolOnlineReviewCommentEvent.class);
-    private final CommitteeScheduleMinute committeeScheduleMinute;
+    private final CommitteeScheduleMinuteBase committeeScheduleMinute;
     private final long onlineReviewIndex;
   
     /**
@@ -36,8 +36,8 @@ public class AddProtocolOnlineReviewCommentEvent extends KraDocumentEventBase {
      * @param document the document.
      * @param newProtocolNotepad the new attachment to be added.
      */
-    public AddProtocolOnlineReviewCommentEvent(final ProtocolOnlineReviewDocument document,
-        final CommitteeScheduleMinute newCommitteeScheduleMinute, final long onlineReviewIndex ) {
+    public AddProtocolOnlineReviewCommentEvent(final ProtocolOnlineReviewDocumentBase document,
+        final CommitteeScheduleMinuteBase newCommitteeScheduleMinute, final long onlineReviewIndex ) {
         super("adding new protocol notepad", "notesAttachmentsHelper", document);
         this.onlineReviewIndex = onlineReviewIndex;
         if (document == null) {
@@ -72,12 +72,12 @@ public class AddProtocolOnlineReviewCommentEvent extends KraDocumentEventBase {
      * Gets the committeeScheduleMinute attribute. 
      * @return Returns the committeeScheduleMinute.
      */
-    public CommitteeScheduleMinute getCommitteeScheduleMinute() {
+    public CommitteeScheduleMinuteBase getCommitteeScheduleMinute() {
         return committeeScheduleMinute;
     }
 
-    public ProtocolOnlineReviewDocument getProtocolOnlineReviewDocument() {
-        return (ProtocolOnlineReviewDocument)getDocument();
+    public ProtocolOnlineReviewDocumentBase getProtocolOnlineReviewDocument() {
+        return (ProtocolOnlineReviewDocumentBase)getDocument();
     }
 
 

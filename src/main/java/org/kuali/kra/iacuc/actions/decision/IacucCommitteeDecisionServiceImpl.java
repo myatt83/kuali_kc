@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,18 +19,21 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+import org.kuali.kra.common.committee.meeting.ProtocolVoteAbstaineeBase;
+import org.kuali.kra.common.committee.meeting.ProtocolVoteRecusedBase;
 import org.kuali.kra.iacuc.IacucProtocol;
 import org.kuali.kra.iacuc.actions.IacucProtocolAction;
 import org.kuali.kra.iacuc.actions.IacucProtocolActionType;
-import org.kuali.kra.iacuc.actions.submit.IacucProtocolReviewType;
 import org.kuali.kra.iacuc.actions.submit.IacucProtocolSubmission;
 import org.kuali.kra.iacuc.actions.submit.IacucProtocolSubmissionStatus;
-import org.kuali.kra.protocol.Protocol;
-import org.kuali.kra.protocol.actions.ProtocolAction;
-import org.kuali.kra.protocol.actions.decision.CommitteeDecisionServiceImpl;
-import org.kuali.kra.protocol.actions.submit.ProtocolSubmission;
+import org.kuali.kra.iacuc.committee.meeting.IacucProtocolVoteAbstainee;
+import org.kuali.kra.iacuc.committee.meeting.IacucProtocolVoteRecused;
+import org.kuali.kra.protocol.ProtocolBase;
+import org.kuali.kra.protocol.actions.ProtocolActionBase;
+import org.kuali.kra.protocol.actions.decision.CommitteeDecisionServiceImplBase;
+import org.kuali.kra.protocol.actions.submit.ProtocolSubmissionBase;
 
-public class IacucCommitteeDecisionServiceImpl extends CommitteeDecisionServiceImpl<IacucCommitteeDecision> implements IacucCommitteeDecisionService {
+public class IacucCommitteeDecisionServiceImpl extends CommitteeDecisionServiceImplBase<IacucCommitteeDecision> implements IacucCommitteeDecisionService {
 
     @Override
     protected String getProtocolActionTypeCodeForRecordCommitteeDecisionHook() {
@@ -38,24 +41,19 @@ public class IacucCommitteeDecisionServiceImpl extends CommitteeDecisionServiceI
     }
 
     @Override
-    protected ProtocolAction getNewProtocolActionInstanceHook(Protocol protocol, ProtocolSubmission submission, String recordCommitteeDecisionActionCode) {
+    protected ProtocolActionBase getNewProtocolActionInstanceHook(ProtocolBase protocol, ProtocolSubmissionBase submission, String recordCommitteeDecisionActionCode) {
         return new IacucProtocolAction((IacucProtocol) protocol, (IacucProtocolSubmission) submission,
             recordCommitteeDecisionActionCode);
     }
 
     @Override
-    protected ProtocolSubmission getSubmission(Protocol protocol) {
+    protected ProtocolSubmissionBase getSubmission(ProtocolBase protocol) {
         // There are 'findCommission' in other classes. Consider to create a utility static method for this
         // need to loop thru to find the last submission.
         // it may have submit/Wd/notify irb/submit, and this will cause problem if don't loop thru.
-        ProtocolSubmission protocolSubmission = null;
-        for (ProtocolSubmission submission : protocol.getProtocolSubmissions()) {
-            if ((StringUtils.equals(submission.getSubmissionStatusCode(), IacucProtocolSubmissionStatus.IN_AGENDA)) ||
-                    (StringUtils.equals(submission.getSubmissionStatusCode(), IacucProtocolSubmissionStatus.SUBMITTED_TO_COMMITTEE) && 
-                    submission.getProtocolReviewTypeCode().equals(IacucProtocolReviewType.DESIGNATED_MEMBER_REVIEW))) {
-            
-//                    || 
-//              StringUtils.equals(submission.getSubmissionStatusCode(), IacucProtocolSubmissionStatus.SUBMITTED_TO_COMMITTEE))
+        ProtocolSubmissionBase protocolSubmission = null;
+        for (ProtocolSubmissionBase submission : protocol.getProtocolSubmissions()) {
+            if (StringUtils.equals(submission.getSubmissionStatusCode(), IacucProtocolSubmissionStatus.IN_AGENDA)) {
                 protocolSubmission = submission;
             }
         }
@@ -66,12 +64,31 @@ public class IacucCommitteeDecisionServiceImpl extends CommitteeDecisionServiceI
     protected Map<String, Object> getFieldValuesMap(Long protocolId, Long scheduleIdFk, String personId, Integer rolodexId, Long submissionIdFk) {
       Map<String, Object> fieldValues = new HashMap<String, Object>();
       fieldValues.put("protocolIdFk", protocolId.toString());
-      //fieldValues.put("SCHEDULE_ID_FK", scheduleIdFk.toString());
       fieldValues.put("personId", personId);
       fieldValues.put("rolodexId", rolodexId);
       fieldValues.put("submissionIdFk", submissionIdFk.toString());
       return fieldValues;
   }
+
+    @Override
+    protected Class<? extends ProtocolVoteAbstaineeBase> getProtocolVoteAbstaineeBOClassHook() {
+        return IacucProtocolVoteAbstainee.class;
+    }
+
+    @Override
+    protected ProtocolVoteAbstaineeBase getNewProtocolVoteAbstaineeInstanceHook() {
+        return new IacucProtocolVoteAbstainee();
+    }
+
+    @Override
+    protected Class<? extends ProtocolVoteRecusedBase> getProtocolVoteRecusedBOClassHook() {
+        return IacucProtocolVoteRecused.class;
+    }
+
+    @Override
+    protected ProtocolVoteRecusedBase getNewProtocolVoteRecusedInstanceHook() {
+        return new IacucProtocolVoteRecused();
+    }
 
 
 }

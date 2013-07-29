@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ public class NewProtocolPersonRoleValuesFinder extends KeyValuesBase {
     KeyValueFinderService keyValueFinderService= (KeyValueFinderService)KraServiceLocator.getService("keyValueFinderService");
     
     /**
-     * Constructs the list of Protocol Person Roles.  Each entry
+     * Constructs the list of ProtocolBase Person Roles.  Each entry
      * in the list is a &lt;key, value&gt; pair, where the "key" is the unique
      * status code and the "value" is the textual description that is viewed
      * by a user.  The list is obtained from the PROTOCOL_PERSON_ROLES database table
@@ -45,11 +45,11 @@ public class NewProtocolPersonRoleValuesFinder extends KeyValuesBase {
      */
     public List<KeyValue> getKeyValues() {
         KeyValuesService keyValuesService = (KeyValuesService) KraServiceLocator.getService("keyValuesService");
-        Collection protocolPersonRoles = keyValuesService.findAllOrderBy(ProtocolPersonRole.class,"description",true);
+        Collection protocolPersonRoles = keyValuesService.findAllOrderBy(ProtocolPersonRoleBase.class,"description",true);
         List<KeyValue> keyValues = new ArrayList<KeyValue>();
         keyValues.add(0, new ConcreteKeyValue(PrefixValuesFinder.getPrefixKey(), PrefixValuesFinder.getDefaultPrefixValue()));    
         for (Iterator iter = protocolPersonRoles.iterator(); iter.hasNext();) {
-            ProtocolPersonRole protocolPersonRole = (ProtocolPersonRole) iter.next();
+            ProtocolPersonRoleBase protocolPersonRole = (ProtocolPersonRoleBase) iter.next();
             keyValues.add(new ConcreteKeyValue(protocolPersonRole.getProtocolPersonRoleId(), protocolPersonRole.getDescription()));                            
         }
         return keyValues;

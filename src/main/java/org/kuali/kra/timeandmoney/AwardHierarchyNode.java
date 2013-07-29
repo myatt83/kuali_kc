@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  *
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,6 +44,9 @@ public class AwardHierarchyNode extends AwardHierarchy {
     private Boolean awardDocumentFinalStatus;
     private String awardDocumentNumber;
     private Boolean hasChildren;
+    
+    //transient
+    private boolean populatedFromClient;
     
 
     public AwardHierarchyNode() {
@@ -273,7 +276,7 @@ public class AwardHierarchyNode extends AwardHierarchy {
      * @return Returns the anticipatedTotalDirect.
      */
     public KualiDecimal getAnticipatedTotalDirect() {
-        return anticipatedTotalDirect;
+        return (anticipatedTotalDirect != null) ? anticipatedTotalDirect : new KualiDecimal(0.0);
     }
 
     /**
@@ -289,7 +292,7 @@ public class AwardHierarchyNode extends AwardHierarchy {
      * @return Returns the anticipatedTotalIndirect.
      */
     public KualiDecimal getAnticipatedTotalIndirect() {
-        return anticipatedTotalIndirect;
+        return (anticipatedTotalIndirect != null) ? anticipatedTotalIndirect : new KualiDecimal(0.0);
     }
 
     /**
@@ -305,7 +308,7 @@ public class AwardHierarchyNode extends AwardHierarchy {
      * @return Returns the obligatedTotalDirect.
      */
     public KualiDecimal getObligatedTotalDirect() {
-        return obligatedTotalDirect;
+        return (obligatedTotalDirect != null) ? obligatedTotalDirect : new KualiDecimal(0.0);
     }
 
     /**
@@ -321,7 +324,7 @@ public class AwardHierarchyNode extends AwardHierarchy {
      * @return Returns the obligatedTotalIndirect.
      */
     public KualiDecimal getObligatedTotalIndirect() {
-        return obligatedTotalIndirect;
+        return (obligatedTotalIndirect != null) ? obligatedTotalIndirect : new KualiDecimal(0.0);
     }
 
     /**
@@ -425,5 +428,13 @@ public class AwardHierarchyNode extends AwardHierarchy {
             && ObjectUtils.equals(awardDocumentNumber, other.getAwardDocumentNumber())
             && ObjectUtils.equals(getHasChildren(), other.getHasChildren());
         return retVal;
+    }
+
+    public boolean isPopulatedFromClient() {
+        return populatedFromClient;
+    }
+
+    public void setPopulatedFromClient(boolean populatedFromClient) {
+        this.populatedFromClient = populatedFromClient;
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -167,7 +167,6 @@ import org.junit.runners.Suite.SuiteClasses;
     org.kuali.kra.award.AwardAmountInfoServiceImplTest.class,
     org.kuali.kra.award.paymentreports.specialapproval.approvedequipment.AwardApprovedEquipmentRuleHelperIntegrationTest.class,
     org.kuali.kra.lookup.keyvalue.NsfCodeValuesFinderTest.class,
-    org.kuali.kra.service.impl.AwardCustomAttributeServiceImplTest.class,
     org.kuali.kra.budget.bo.BudgetUnrecoveredFandATest.class,
     org.kuali.kra.rules.KraMaintenanceDocumentRuleBaseTest.class,
     org.kuali.kra.institutionalproposal.InstitutionalProposalVersioningTest.class,
@@ -214,7 +213,6 @@ import org.junit.runners.Suite.SuiteClasses;
     org.kuali.kra.committee.keyvalue.MonthsWeekTest.class,
     org.kuali.kra.proposaldevelopment.lookup.keyvalue.NarrativeTypeTest.class,
     org.kuali.kra.proposaldevelopment.lookup.keyvalue.LeadUnitValuesFinderTest.class,
-    org.kuali.kra.service.impl.InstitutionalProposalCustomAttributeServiceImplTest.class,
     org.kuali.kra.infrastructure.BudgetDecimalFormatterTest.class,
     org.kuali.kra.irb.actions.assignreviewers.ProtocolAssignReviewersServiceTest.class,
     org.kuali.kra.committee.service.CommitteeScheduleLookupableHelperServiceTest.class,
@@ -475,7 +473,12 @@ import org.junit.runners.Suite.SuiteClasses;
     org.kuali.kra.service.impl.FiscalYearMonthServiceImplTest.class,
     org.kuali.kra.coi.disclosure.AddManualProjectRuleTest.class,
     org.kuali.kra.timeandmoney.service.impl.AwardFnaDistributionServiceImplTest.class,
-    org.kuali.kra.award.paymentreports.awardreports.reporting.service.ReportTrackingNotificationServiceTest.class
+    org.kuali.kra.award.paymentreports.awardreports.reporting.service.ReportTrackingNotificationServiceTest.class,
+    org.kuali.kra.proposaldevelopment.budget.service.impl.BudgetSubAwardServiceTest.class,
+    org.kuali.kra.award.subcontracting.goalsAndExpenditures.AwardSubcontractingGoalsExpendituresServiceTest.class,
+    org.kuali.kra.award.subcontracting.goalsAndExpenditures.AwardSubcontractingGoalsExpendituresRuleTest.class,
+    org.kuali.kra.infrastructure.TimeFormatterTest.class,
+    org.kuali.kra.reporting.service.impl.BirtReportServiceImplTest.class
 })
 /** these are all the test class where all the test methods are currently passing. */
 public class PassSuite {

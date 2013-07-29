@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,10 +21,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.kuali.kra.bo.KcPerson;
 import org.kuali.kra.coi.CoiDisclosure;
 import org.kuali.kra.coi.CoiDisclosureDocument;
 import org.kuali.kra.coi.CoiDisclosureForm;
+import org.kuali.kra.coi.CoiDispositionStatus;
 import org.kuali.kra.coi.CoiReviewer;
 import org.kuali.kra.coi.CoiUserRole;
 import org.kuali.kra.coi.auth.CoiDisclosureTask;
@@ -56,10 +58,8 @@ public class DisclosureActionHelper implements Serializable {
     private transient ParameterService parameterService;
     private transient TaskAuthorizationService taskAuthorizationService;
     private transient KcPersonService kcPersonService;
-    private boolean disapproveDisclosure;
     private boolean approveDisclosure;
     private boolean maintainReviewers;
-
 
     public DisclosureActionHelper(CoiDisclosureForm coiDisclosureForm) {
         this.coiDisclosureForm = coiDisclosureForm;
@@ -83,14 +83,7 @@ public class DisclosureActionHelper implements Serializable {
      */
     private void initializePermissions() {
         approveDisclosure = canApproveCoiDisclosure();
-        disapproveDisclosure = canDisapproveCoiDisclosure();
         maintainReviewers = canMaintainReviewers();
-    }
-    
-
-    private boolean canDisapproveCoiDisclosure() {
-        CoiDisclosureTask task = new CoiDisclosureTask(TaskName.DISAPPROVE_COI_DISCLOSURE, getCoiDisclosure());
-        return getTaskAuthorizationService().isAuthorized(getUserIdentifier(), task);
     }
 
     private boolean canApproveCoiDisclosure() {
@@ -121,14 +114,6 @@ public class DisclosureActionHelper implements Serializable {
     
     protected String getUserIdentifier() {
         return GlobalVariables.getUserSession().getPrincipalId();
-    }
-    
-    public boolean getDisapproveDisclosure() {
-        return disapproveDisclosure;
-    }
-
-    public void setDisapproveDisclosure(boolean disapproveDisclosure) {
-        this.disapproveDisclosure = disapproveDisclosure;
     }
 
     public boolean getApproveDisclosure() {
@@ -179,15 +164,15 @@ public class DisclosureActionHelper implements Serializable {
         this.coiDisclosureForm = coiDisclosureForm;
     }
 
-    public void approveDisclosure() throws WorkflowException {
+    public void approveDisclosure(String coiDispositionCode) throws WorkflowException {
         CoiDisclosureDocument coiDisclosureDocument = coiDisclosureForm.getCoiDisclosureDocument();
                  
-            getCoiDisclosureActionService().approveDisclosure(coiDisclosureForm.getCoiDisclosureDocument().getCoiDisclosure(), coiDisclosureForm.getCoiDispositionCode());
-            coiDisclosureForm.getDisclosureHelper().setMasterDisclosureBean(
-                    getCoiDisclosureService().getMasterDisclosureDetail(coiDisclosureDocument.getCoiDisclosure()));
-            coiDisclosureForm.getDisclosureQuestionnaireHelper().setAnswerHeaders(coiDisclosureForm.getDisclosureHelper().getMasterDisclosureBean().getAnswerHeaders());
-            coiDisclosureForm.getDisclosureQuestionnaireHelper().resetHeaderLabels();
-            coiDisclosureForm.getDisclosureQuestionnaireHelper().setAnswerQuestionnaire(false);
+        getCoiDisclosureActionService().approveDisclosure(coiDisclosureForm.getCoiDisclosureDocument().getCoiDisclosure(), coiDispositionCode);
+        coiDisclosureForm.getDisclosureHelper().setMasterDisclosureBean(
+                  getCoiDisclosureService().getMasterDisclosureDetail(coiDisclosureDocument.getCoiDisclosure()));
+        coiDisclosureForm.getDisclosureQuestionnaireHelper().setAnswerHeaders(coiDisclosureForm.getDisclosureHelper().getMasterDisclosureBean().getAnswerHeaders());
+        coiDisclosureForm.getDisclosureQuestionnaireHelper().resetHeaderLabels();
+        coiDisclosureForm.getDisclosureQuestionnaireHelper().setAnswerQuestionnaire(false);
     }
 
     
@@ -196,17 +181,11 @@ public class DisclosureActionHelper implements Serializable {
      * the master.
      * @throws Exception
      */
-    public void disapproveDisclosure() throws Exception {
+    public void disapproveDisclosure(String coiDispositionCode) throws Exception {
         CoiDisclosureDocument coiDisclosureDocument = coiDisclosureForm.getCoiDisclosureDocument();
-            getCoiDisclosureActionService().disapproveDisclosure(coiDisclosureForm.getCoiDisclosureDocument().getCoiDisclosure(), coiDisclosureForm.getCoiDispositionCode());
+            getCoiDisclosureActionService().disapproveDisclosure(coiDisclosureForm.getCoiDisclosureDocument().getCoiDisclosure(), coiDispositionCode);
             coiDisclosureForm.getDisclosureHelper().setMasterDisclosureBean(
                     getCoiDisclosureService().getMasterDisclosureDetail(coiDisclosureDocument.getCoiDisclosure()));
-    }
-    
-    public void setStatus() {
-       CoiDisclosureDocument coiDisclosureDocument = coiDisclosureForm.getCoiDisclosureDocument();
-           getCoiDisclosureActionService().setStatus(coiDisclosureForm.getCoiDisclosureDocument().getCoiDisclosure(), coiDisclosureForm.getCoiDispositionCode());
-         
     }
 
     public SubmitDisclosureAction getSubmitDisclosureAction() {
@@ -215,13 +194,15 @@ public class DisclosureActionHelper implements Serializable {
 
     private void populateCoiUserRoleData() {
         List<CoiUserRole> userRoles = coiDisclosureForm.getCoiDisclosureDocument().getCoiDisclosure().getCoiUserRoles();
-        
+        syncUserRolesData(userRoles);
+    }
+    
+    private void syncUserRolesData(List<CoiUserRole> userRoles) {
         if (CollectionUtils.isNotEmpty(userRoles)) {
             for (CoiUserRole userRole : userRoles) {
                 userRole.setPerson(getKcPerson(userRole.getUserId()));
                 userRole.setCoiReviewer(getCoiReviewer(userRole.getReviewerCode()));
             }
-            
         }
     }
     
@@ -231,9 +212,12 @@ public class DisclosureActionHelper implements Serializable {
 
     public List<CoiUserRole> getCoiUserRoles() {
         this.populateCoiUserRoleData();
+        if(!canMaintainReviewers()) {
+            getCoiDisclosureActionService().tagUserRolesToCompleteReview(coiDisclosureForm.getCoiDisclosureDocument().getCoiDisclosure().getCoiUserRoles());
+        }
         return coiDisclosureForm.getCoiDisclosureDocument().getCoiDisclosure().getCoiUserRoles();
     }
-    
+
     public KcPerson getKcPerson(String userName) {
         return getKcPersonService().getKcPersonByUserName(userName);
     }
@@ -259,5 +243,27 @@ public class DisclosureActionHelper implements Serializable {
         this.kcPersonService = kcPersonService;
     }
 
-   
+    public boolean isDisclosureReviewComplete() {
+        return getCoiDisclosureActionService().isDisclosureReviewComplete(coiDisclosureForm.getCoiDisclosureDocument().getCoiDisclosure().getCoiUserRoles());
+    }
+
+    public boolean isDisclosureAssignedToReviewer() {
+        return coiDisclosureForm.getCoiDisclosureDocument().getCoiDisclosure().getCoiUserRoles().size() > 0;
+    }
+
+    /**
+     * This method returns true when the disclosure reporter and the current user are the same; otherwise false is returned.
+     */
+    public boolean isUserDisclosureReporter() {
+        String currentUser = this.getUserIdentifier();
+        String disclosureReporter = this.getCoiDisclosure().getDisclosureReporter().getReporter().getPersonId();
+        if (StringUtils.isNotBlank(currentUser) && StringUtils.isNotBlank(disclosureReporter)){
+            return currentUser.equalsIgnoreCase(disclosureReporter);
+        }
+        return false;
+    }
+    
+    public CoiDispositionStatus getMaximumDispositionStatus() {
+        return getCoiDisclosureService().calculateMaximumDispositionStatus(getCoiDisclosure());
+    }
 }

@@ -1726,7 +1726,7 @@ buffer := '60;</fo:inline>
                                 <fo:table-row>
                                     <fo:table-cell font-size="7pt" padding-start="6pt" number-columns-spanned="5" width=".5in" padding-end="3pt" padding-before="3pt" padding-after="3pt" display-align="center" text-align="start" border-style="solid" border-width="1pt" border-color="black">
                                         <fo:block>
-                                            <fo:inline font-size="7pt">&#160; PARITICIPANT SUPPORT&#160; </fo:inline>
+                                            <fo:inline font-size="7pt">F. PARTICIPANT SUPPORT</fo:inline>
                                             <fo:block space-before.optimum="1pt" space-after.optimum="2pt">
                                                 <fo:block font-size="7pt">
                                                     <fo:inline font-size="7pt">&#160;&#160;&#160;&#160; 1. STIPENDS&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; $</fo:inline>
@@ -1765,7 +1765,11 @@ buffer := '" />
                                 <fo:table-row>
                                     <fo:table-cell padding-start="6pt" number-columns-spanned="5" width=".5in" padding-end="3pt" padding-before="3pt" padding-after="3pt" display-align="center" text-align="start" border-style="solid" border-width="1pt" border-color="black">
                                         <fo:block>
-                                            <fo:inline font-size="7pt">TOTAL NUMBER OF PARTICIPANTS(&#160;&#160; )&#160;&#160;&#160; TOTAL PARTICIPANT COSTS</fo:inline>
+                                            <fo:inline font-size="7pt">TOTAL NUMBER OF PARTICIPANTS(&#160;</fo:inline>
+                                            <fo:inline font-size="7pt">
+                                                <xsl:value-of select="sum( n1:ResearchAndRelatedProject/BudgetSummary/BudgetPeriod[BudgetPeriodID=4]/NumberOfParticipants )" />
+                	                        </fo:inline>
+										    <fo:inline>&#160; )&#160;&#160;&#160; TOTAL PARTICIPANT COSTS</fo:inline>
                                         </fo:block>
                                     </fo:table-cell>
                                     <fo:table-cell font-size="7pt" text-align="right" width="1in" padding-start="3pt" padding-end="3pt" padding-before="3pt" padding-after="3pt" display-align="center" border-style="solid" border-width="1pt" border-color="black">

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,12 +21,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.kuali.kra.infrastructure.RoleConstants;
+import org.kuali.kra.kim.service.ProposalRoleService;
 import org.kuali.kra.proposaldevelopment.document.ProposalDevelopmentDocument;
 import org.kuali.kra.proposaldevelopment.service.ProposalRoleTemplateService;
 import org.kuali.kra.service.KraAuthorizationService;
-import org.kuali.kra.service.SystemAuthorizationService;
+import org.kuali.rice.core.api.membership.MemberType;
 import org.kuali.rice.kim.api.role.Role;
 import org.kuali.rice.kim.api.role.RoleMembership;
 import org.kuali.rice.kim.api.role.RoleService;
@@ -38,7 +39,7 @@ import org.kuali.rice.krad.util.GlobalVariables;
 public class ProposalRoleTemplateServiceImpl implements ProposalRoleTemplateService {
     private KraAuthorizationService kraAuthorizationService;
     private RoleService roleManagementService;
-    private SystemAuthorizationService systemAuthorizationService;
+    private ProposalRoleService proposalRoleService;
     
     /**
      * Set the Proposal Authorization Service.  Injected by the Spring Framework.
@@ -52,8 +53,9 @@ public class ProposalRoleTemplateServiceImpl implements ProposalRoleTemplateServ
         this.roleManagementService = roleManagementService;
     }
 
-    public void setSystemAuthorizationService(SystemAuthorizationService systemAuthorizationService) {
-        this.systemAuthorizationService = systemAuthorizationService;
+
+    public void setProposalRoleService(ProposalRoleService proposalRoleService) {
+        this.proposalRoleService = proposalRoleService;
     }
 
     /**
@@ -97,12 +99,21 @@ public class ProposalRoleTemplateServiceImpl implements ProposalRoleTemplateServ
     protected Collection<RoleMembership> getRoleTemplates(String unitNumber) {
         Map<String, String> qualifiedRoleAttributes = new HashMap<String, String>();
         qualifiedRoleAttributes.put("unitNumber", unitNumber);
-        List<String> roleIds = new ArrayList<String>();
-        List<Role> proposalRoles = systemAuthorizationService.getRoles(RoleConstants.PROPOSAL_ROLE_TYPE);
+        List<Role> proposalRoles = proposalRoleService.getRolesForDisplay();
+        Collection<RoleMembership> membershipInfoList = new ArrayList<RoleMembership>();
+        Collection<String> memberIds = null;
+        RoleMembership.Builder roleMembershipBuilder = null;
         for(Role role : proposalRoles) {
-            roleIds.add(role.getId());
+            memberIds = roleManagementService.getRoleMemberPrincipalIds(role.getNamespaceCode(), role.getName(), qualifiedRoleAttributes);
+            if(CollectionUtils.isNotEmpty(memberIds)) {
+                for(String memberId : memberIds) {
+                    roleMembershipBuilder = RoleMembership.Builder.create(role.getId(), null, memberId, MemberType.PRINCIPAL, null);
+                    membershipInfoList.add(roleMembershipBuilder.build());
+                }
+                roleMembershipBuilder = null;
+                memberIds = null;
+            }
         }
-        List<RoleMembership> membershipInfoList = roleManagementService.getRoleMembers(roleIds,new HashMap<String,String>(qualifiedRoleAttributes));
         return membershipInfoList;
     }
 

@@ -1,5 +1,5 @@
 <%--
- Copyright 2005-2010 The Kuali Foundation
+ Copyright 2005-2013 The Kuali Foundation
  
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@
         <h3>
             <span class="subhead-left">Principles</span>
             <span class="subhead-right">
-                <kul:help parameterNamespace="KC-IACUC" parameterDetailType="Document" parameterName="iacucProtocolPrinciplesHelp" altText="help"/>                
+                <kul:help parameterNamespace="KC-IACUC" parameterDetailType="Document" parameterName="iacucProtocolThreeRsPrinciplesHelp" altText="help"/>                
             </span>
         </h3>
         <table cellpadding="4" cellspacing="0" summary="">

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import java.net.URLEncoder;
 import java.util.List;
 
 import org.kuali.kra.committee.print.CommitteeFutureScheduledMeetingsPrint;
-import org.kuali.kra.committee.print.CommitteeReportType;
+import org.kuali.kra.common.committee.print.CommitteeReportType;
 import org.kuali.kra.committee.print.CommitteeRosterPrint;
 import org.kuali.kra.committee.print.CommitteeTemplatePrint;
 import org.kuali.kra.committee.print.ProtocolBatchCorrespondencePrint;

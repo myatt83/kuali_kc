@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,28 +26,22 @@ import org.kuali.kra.coi.CoiDisclosure;
 import org.kuali.kra.coi.CoiDisclosureEventType;
 import org.kuali.kra.coi.auth.CoiDisclosureTask;
 import org.kuali.kra.infrastructure.KeyConstants;
-import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.infrastructure.TaskName;
-import org.kuali.kra.service.TaskAuthorizationService;
 import org.kuali.rice.core.api.CoreApiServiceLocator;
-import org.kuali.rice.kns.lookup.HtmlData;
-import org.kuali.rice.kns.lookup.HtmlData.AnchorHtmlData;
-import org.kuali.rice.kns.service.DictionaryValidationService;
-import org.kuali.rice.kns.service.KNSServiceLocator;
 import org.kuali.rice.krad.bo.BusinessObject;
 import org.kuali.rice.krad.util.GlobalVariables;
 
+@SuppressWarnings("unchecked")
 public class CoiDisclosureLookupableHelperServiceImpl extends CoiDisclosureLookupableHelperBase {
 
-    private DictionaryValidationService dictionaryValidationService;
-    private TaskAuthorizationService taskAuthorizationService;
+    /**
+     * Comment for <code>serialVersionUID</code>
+     */
+    private static final long serialVersionUID = 7142988696939655833L;
     
     //field names
     private static final String LEAD_UNIT = "leadUnitNumber";
 
-    protected String getUserIdentifier() {
-        return GlobalVariables.getUserSession().getPrincipalId();
-    }
 
     protected boolean validateDate(String dateFieldName, String dateFieldValue) {
         try{
@@ -63,6 +57,7 @@ public class CoiDisclosureLookupableHelperServiceImpl extends CoiDisclosureLooku
         }
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void validateSearchParameters(Map<String,String> fieldValues) {
         super.validateSearchParameters(fieldValues);
@@ -80,7 +75,7 @@ public class CoiDisclosureLookupableHelperServiceImpl extends CoiDisclosureLooku
     }
 
     @Override
-    public List<? extends BusinessObject> getSearchResults(Map<String, String> fieldValues) {
+    public List<? extends BusinessObject> getLookupSpecificSearchResults(Map<String, String> fieldValues) {
         validateSearchParameters(fieldValues);
         List<CoiDisclosure> results;
         // need to set backlocation & docformkey here. Otherwise, they are empty
@@ -124,12 +119,11 @@ public class CoiDisclosureLookupableHelperServiceImpl extends CoiDisclosureLooku
         }
         return finalResults;
     }
-
-    private TaskAuthorizationService getTaskAuthorizationService() {
-        if (taskAuthorizationService == null) {
-            taskAuthorizationService = KraServiceLocator.getService(TaskAuthorizationService.class);
-        }
-        return taskAuthorizationService;
+    
+    @Override
+    protected boolean isAuthorizedForCoiLookups() {
+        return true;
     }
+
 
 }

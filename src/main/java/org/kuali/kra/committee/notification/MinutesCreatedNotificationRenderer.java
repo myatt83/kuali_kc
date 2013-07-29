@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ public class MinutesCreatedNotificationRenderer extends CommitteeNotificationRen
      * @param actionTaken
      */
     public MinutesCreatedNotificationRenderer(CommScheduleMinuteDoc minuteDoc, String actionTaken) {
-        super(minuteDoc.getCommitteeSchedule().getCommittee());
+        super((Committee)minuteDoc.getCommitteeSchedule().getParentCommittee());
         this.commScheduleMinuteDoc = minuteDoc;
         this.actionTaken = actionTaken;
     }

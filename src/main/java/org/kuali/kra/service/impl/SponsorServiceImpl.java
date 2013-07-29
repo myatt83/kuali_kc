@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  *
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -541,5 +541,13 @@ public class SponsorServiceImpl implements SponsorService, Constants {
        List<String> result = getSponsorHierarchyDao().getUniqueNamesAtLevel(hierarchyName, level);
        Collections.sort(result);
        return result;
+    }
+    
+    public boolean validateSponsor(Sponsor sponsor) {
+        boolean valid = true;
+        if (sponsor == null || !sponsor.isActive()) {
+            valid = false;
+        }
+        return valid;
     }
 }

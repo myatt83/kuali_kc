@@ -1,5 +1,5 @@
 <%--
- Copyright 2005-2010 The Kuali Foundation
+ Copyright 2005-2013 The Kuali Foundation
  
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@
 <c:set var="targetAwardPersonUnit" value="${newAwardPersonUnits[awardPersonIndex]}" />
 
 <kul:innerTab tabTitle="Unit Details" parentTab="${awardContact.fullName}" defaultOpen="false" 
-				tabErrorKey="document.award[${awardPersonUnitRowStatus.index}].awardContact*,projectPersonnelBean.newAwardPersonUnit[${ awardPersonIndex }]*">
+				tabErrorKey="document.awardList[0].projectPersons[${ awardPersonIndex }].personUnitNumber,document.award[${awardPersonUnitRowStatus.index}].awardContact*,projectPersonnelBean.newAwardPersonUnit[${ awardPersonIndex }]*">
 	<c:choose><c:when test="${awardContact.keyPerson && !awardContact.optInUnitStatus}">
      <p><html:image property="methodToCall.addUnitDetails.line${awardPersonIndex}" src="${ConfigProperties.kra.externalizable.images.url}tinybutton-addunitdet.gif" title="Add Unit Details" alt="Add Unit Details" styleClass="tinybutton"/>
      You have the option to add unit details for a key person.</p>
@@ -110,7 +110,7 @@
 		</c:if>
 		
 		<c:forEach var="awardPersonUnit" items="${awardContact.units}" varStatus="awardPersonUnitRowStatus">
-		<input type="hidden" name="award_person_unit.identifier_${awardPersonUnitRowStatus.index}" value="${awardPersonUnit.unit.unitNumber}" />
+		<input type="hidden" name="award_person_unit.identifier_${awardPersonIndex}_${awardPersonUnitRowStatus.index}" value="${awardPersonUnit.unit.unitNumber}" />
 		<c:choose>                  
 			<c:when test="${empty awardPersonUnit.ospAdministrators}">
             <tr>
@@ -127,7 +127,7 @@
                 <td valign="middle">
                 	<div align="center">
                 		${awardPersonUnit.unit.unitName}&nbsp;
-                		<kul:directInquiry boClassName="org.kuali.kra.bo.Unit" inquiryParameters="award_person_unit.identifier_${awardPersonUnitRowStatus.index}:unitNumber" anchor="${tabKey}" />
+                		<kul:directInquiry boClassName="org.kuali.kra.bo.Unit" inquiryParameters="award_person_unit.identifier_${awardPersonIndex}_${awardPersonUnitRowStatus.index}:unitNumber" anchor="${tabKey}" />
                 	</div> 
 				</td>
 				<td valign="middle">
@@ -171,7 +171,7 @@
                 		<td valign="middle">
                 			<div align="center">
                 				${awardPersonUnit.unit.unitName}&nbsp;
-                				<kul:directInquiry boClassName="org.kuali.kra.bo.Unit" inquiryParameters="award_person_unit.identifier_${awardPersonUnitRowStatus.index}:unitNumber" anchor="${tabKey}" />
+                				<kul:directInquiry boClassName="org.kuali.kra.bo.Unit" inquiryParameters="award_person_unit.identifier_${awardPersonIndex}_${awardPersonUnitRowStatus.index}:unitNumber" anchor="${tabKey}" />
                 			</div> 
 						</td>
 						<td valign="middle">

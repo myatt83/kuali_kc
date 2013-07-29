@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,14 +24,12 @@ import org.apache.commons.lang.StringUtils;
 import org.kuali.kra.award.home.Award;
 import org.kuali.kra.common.specialreview.rule.event.SaveSpecialReviewEvent;
 import org.kuali.kra.infrastructure.Constants;
+import org.kuali.kra.infrastructure.KeyConstants;
 import org.kuali.kra.infrastructure.KraServiceLocator;
-import org.kuali.kra.institutionalproposal.InstitutionalProposalCustomDataAuditRule;
 import org.kuali.kra.institutionalproposal.contacts.InstitutionalProposalCreditSplitBean;
 import org.kuali.kra.institutionalproposal.contacts.InstitutionalProposalPersonAuditRule;
 import org.kuali.kra.institutionalproposal.contacts.InstitutionalProposalPersonSaveRuleEvent;
 import org.kuali.kra.institutionalproposal.contacts.InstitutionalProposalPersonSaveRuleImpl;
-import org.kuali.kra.institutionalproposal.customdata.InstitutionalProposalCustomDataRuleImpl;
-import org.kuali.kra.institutionalproposal.customdata.InstitutionalProposalSaveCustomDataRuleEvent;
 import org.kuali.kra.institutionalproposal.document.InstitutionalProposalDocument;
 import org.kuali.kra.institutionalproposal.home.InstitutionalProposal;
 import org.kuali.kra.institutionalproposal.home.InstitutionalProposalCostShare;
@@ -40,7 +38,9 @@ import org.kuali.kra.institutionalproposal.home.InstitutionalProposalUnrecovered
 import org.kuali.kra.institutionalproposal.specialreview.InstitutionalProposalSpecialReview;
 import org.kuali.kra.rule.BusinessRuleInterface;
 import org.kuali.kra.rule.event.KraDocumentEventBaseExtension;
+import org.kuali.kra.rule.event.SaveCustomDataEvent;
 import org.kuali.kra.rules.ResearchDocumentRuleBase;
+import org.kuali.kra.service.SponsorService;
 import org.kuali.rice.krad.document.Document;
 import org.kuali.rice.krad.service.BusinessObjectService;
 import org.kuali.rice.krad.util.GlobalVariables;
@@ -78,7 +78,6 @@ public class InstitutionalProposalDocumentRule extends ResearchDocumentRuleBase 
         errorMap.removeFromErrorPath(DOCUMENT_ERROR_PATH);
         
         
-        retval &= processSaveInstitutionalProposalCustomDataBusinessRules(document);
         retval &= processUnrecoveredFandABusinessRules(document);
         retval &= processSponsorProgramBusinessRule(document);
         retval &= processInstitutionalProposalBusinessRules(document);
@@ -90,29 +89,24 @@ public class InstitutionalProposalDocumentRule extends ResearchDocumentRuleBase 
         retval &= processKeywordBusinessRule(document);
         retval &= processAccountIdBusinessRule(document);
         retval &= processCostShareRules(document);
+        retval &= validateSponsors(document);
         return retval;
     }    
-    
-    /**
-    *
-    * process save Custom Data Business Rules.
-    * @param institutionalProposalDocument
-    * @return
-    */
-    private boolean processSaveInstitutionalProposalCustomDataBusinessRules(Document document) {
+        
+    private boolean validateSponsors(Document document) {
         boolean valid = true;
         MessageMap errorMap = GlobalVariables.getMessageMap();
         InstitutionalProposalDocument institutionalProposalDocument = (InstitutionalProposalDocument) document;
-        errorMap.addToErrorPath(DOCUMENT_ERROR_PATH);
-        errorMap.addToErrorPath(INSTITUTIONAL_PROPOSAL_ERROR_PATH);
-        String errorPath = "institutionalProposalCustomData";
-        errorMap.addToErrorPath(errorPath);
-        InstitutionalProposalSaveCustomDataRuleEvent event = new InstitutionalProposalSaveCustomDataRuleEvent(errorPath, 
-                                                               institutionalProposalDocument);
-        valid &= new InstitutionalProposalCustomDataRuleImpl().processSaveInstitutionalProposalCustomDataBusinessRules(event);
-        errorMap.removeFromErrorPath(errorPath);
-        errorMap.removeFromErrorPath(INSTITUTIONAL_PROPOSAL_ERROR_PATH);
-        errorMap.removeFromErrorPath(DOCUMENT_ERROR_PATH);
+        SponsorService ss = this.getSponsorService();
+        if (!ss.validateSponsor(institutionalProposalDocument.getInstitutionalProposal().getSponsor())) {
+            errorMap.putError("document.institutionalProposalList[0].sponsorCode", KeyConstants.ERROR_INVALID_SPONSOR_CODE);
+            valid = false;
+        }
+        if (!StringUtils.isEmpty(institutionalProposalDocument.getInstitutionalProposal().getPrimeSponsorCode()) &&
+                !ss.validateSponsor(institutionalProposalDocument.getInstitutionalProposal().getPrimeSponsor())) {
+            errorMap.putError("document.institutionalProposalList[0].primeSponsorCode", KeyConstants.ERROR_INVALID_SPONSOR_CODE);
+            valid = false;
+        }
         return valid;
     }
     
@@ -153,8 +147,7 @@ public class InstitutionalProposalDocumentRule extends ResearchDocumentRuleBase 
     public boolean processRunAuditBusinessRules(Document document){
         boolean retval = true;
         
-        //retval &= super.processRunAuditBusinessRules(document);
-        retval &= new InstitutionalProposalCustomDataAuditRule().processRunAuditBusinessRules(document);
+        retval &= super.processRunAuditBusinessRules(document);
         retval &= new InstitutionalProposalPersonAuditRule().processRunAuditBusinessRules(document);
         retval &= processInstitutionalProposalPersonCreditSplitBusinessRules(document);
         retval &= processInstitutionalProposalPersonUnitCreditSplitBusinessRules(document);
@@ -292,5 +285,7 @@ public class InstitutionalProposalDocumentRule extends ResearchDocumentRuleBase 
         return valid;
     }
     
-
+    private SponsorService getSponsorService() {
+        return KraServiceLocator.getService(SponsorService.class);
+    }
 }

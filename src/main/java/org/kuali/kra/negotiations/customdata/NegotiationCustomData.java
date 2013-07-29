@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  *
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,14 @@ package org.kuali.kra.negotiations.customdata;
 
 import org.kuali.kra.SequenceOwner;
 import org.kuali.kra.bo.CustomAttribute;
+import org.kuali.kra.bo.DocumentCustomData;
 import org.kuali.kra.negotiations.NegotiationAssociate;
 import org.kuali.kra.negotiations.bo.Negotiation;
 
 /**
  * This is Business Object class for IP custom data BO.
  */
-public class NegotiationCustomData extends NegotiationAssociate {
+public class NegotiationCustomData extends NegotiationAssociate implements DocumentCustomData {
 
     private static final long serialVersionUID = 1L;
 

@@ -1,5 +1,5 @@
 <%--
-Copyright 2005-2010 The Kuali Foundation
+Copyright 2005-2013 The Kuali Foundation
 
 Licensed under the Educational Community License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ http://www.osedu.org/licenses/ECL-2.0
 		</c:when>
 		<c:otherwise>
 			<c:choose>
-				<c:when test="${KualiForm.hierarchyProposalSummaries[status.index].synced}">
+				<c:when test="${summary.synced && summary.budgetSynced}">
 					<c:set var="syncLabel" value="Synced" />
 				</c:when>
 				<c:otherwise>

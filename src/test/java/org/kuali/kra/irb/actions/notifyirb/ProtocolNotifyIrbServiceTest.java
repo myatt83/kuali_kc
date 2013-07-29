@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ import org.kuali.kra.committee.bo.Committee;
 import org.kuali.kra.committee.bo.CommitteeSchedule;
 import org.kuali.kra.committee.document.CommitteeDocument;
 import org.kuali.kra.committee.test.CommitteeFactory;
-import org.kuali.kra.committee.web.struts.form.schedule.Time12HrFmt;
+import org.kuali.kra.common.committee.web.struts.form.schedule.Time12HrFmt;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.irb.Protocol;
@@ -50,7 +50,9 @@ import org.kuali.kra.irb.actions.submit.ProtocolSubmission;
 import org.kuali.kra.irb.actions.submit.ProtocolSubmissionQualifierType;
 import org.kuali.kra.irb.actions.submit.ProtocolSubmissionStatus;
 import org.kuali.kra.irb.actions.submit.ProtocolSubmissionType;
+import org.kuali.kra.irb.questionnaire.IrbSubmissionQuestionnaireHelper;
 import org.kuali.kra.irb.test.ProtocolFactory;
+import org.kuali.kra.protocol.actions.notify.ProtocolActionAttachment;
 import org.kuali.kra.questionnaire.answer.AnswerHeader;
 import org.kuali.kra.test.infrastructure.KcUnitTestBase;
 import org.kuali.rice.kew.api.exception.WorkflowException;
@@ -235,6 +237,8 @@ public class ProtocolNotifyIrbServiceTest extends KcUnitTestBase {
     
     private ProtocolNotifyIrbBean getMockProtocolNotifyIrbBean(final String committeeId, final ProtocolActionAttachment... attachments) {
         final ProtocolNotifyIrbBean bean = context.mock(ProtocolNotifyIrbBean.class);
+        final Protocol protocol = new Protocol();
+        protocol.setProtocolNumber("13049581");
         
         context.checking(new Expectations() {{
             allowing(bean).getSubmissionQualifierTypeCode();
@@ -252,8 +256,8 @@ public class ProtocolNotifyIrbServiceTest extends KcUnitTestBase {
             allowing(bean).getActionAttachments();
             will(returnValue(Arrays.asList(attachments)));
             
-            allowing(bean).getAnswerHeaders();
-            will(returnValue(new ArrayList<AnswerHeader>()));
+            allowing(bean).getQuestionnaireHelper();
+            will(returnValue(new IrbSubmissionQuestionnaireHelper(protocol, ProtocolActionType.NOTIFY_IRB, null, false)));
         }});
         
         return bean;

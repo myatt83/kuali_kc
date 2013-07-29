@@ -1,5 +1,5 @@
 <%--
- Copyright 2005-2010 The Kuali Foundation
+ Copyright 2005-2013 The Kuali Foundation
 
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -35,6 +35,15 @@ ${kfunc:registerEditableProperty(KualiForm, "actionHelper.protocolSubmitAction.n
 
 <kra:permission value="${KualiForm.actionHelper.canSubmitProtocol}">
 
+<c:choose>
+	<c:when test="${KualiForm.actionHelper.canAssignReviewersCmtSel}">
+		<c:set var="displayReviewersInvocation" value=" displayReviewers(${KualiForm.document.protocol.protocolId});" />
+	</c:when>
+	<c:otherwise>
+		<c:set var="displayReviewersInvocation" value=" ;" />
+	</c:otherwise>
+</c:choose>
+
 <kul:innerTab tabTitle="Submit for Review" parentTab="" defaultOpen="false" tabErrorKey="actionHelper.protocolSubmitAction*">
     <div class="innerTab-container" align="left">
         <table class="tab" cellpadding="0" cellspacing="0" summary=""> 
@@ -61,7 +70,7 @@ ${kfunc:registerEditableProperty(KualiForm, "actionHelper.protocolSubmitAction.n
                         <nobr>
                         <kul:htmlControlAttribute property="actionHelper.protocolSubmitAction.protocolReviewTypeCode" 
                                                   attributeEntry="${attributes.protocolReviewTypeCode}" 
-                                                  onchange="updateCheckList('actionHelper.protocolSubmitAction.protocolReviewTypeCode')" />
+                                                  onchange="protocolReviewTypeChanged()" />
                         </nobr>
                     </td>
                 </tr>
@@ -95,8 +104,8 @@ ${kfunc:registerEditableProperty(KualiForm, "actionHelper.protocolSubmitAction.n
 	                    <c:set var="docNumber" value="${KualiForm.document.protocol.protocolNumber}" />
 	                    <c:choose>
 	                        <c:when test="${KualiForm.actionHelper.showCommittee}">
-	                            <td>
-				                    <html:select property="actionHelper.protocolSubmitAction.committeeId" onchange="loadScheduleDates('actionHelper.protocolSubmitAction.committeeId', '${docNumber}', 'actionHelper.protocolSubmitAction.scheduleId');" >                               
+	                            <td>	                            		
+				                    <html:select property="actionHelper.protocolSubmitAction.committeeId" onchange="loadScheduleDates('actionHelper.protocolSubmitAction.committeeId', '${docNumber}', 'actionHelper.protocolSubmitAction.scheduleId'); ${displayReviewersInvocation}" >                               
 				                        <c:forEach items="${krafn:getOptionList('org.kuali.kra.committee.lookup.keyvalue.IrbCommitteeIdByUnitValuesFinder', paramMap)}" var="option">   
 				                            <c:choose>                      
 				                                <c:when test="${KualiForm.actionHelper.protocolSubmitAction.committeeId == option.key}">
@@ -140,31 +149,24 @@ ${kfunc:registerEditableProperty(KualiForm, "actionHelper.protocolSubmitAction.n
 		                    </th>
 		                    <td>
 		                        <nobr>
-		                        <c:choose>		                     
-		                            <c:when test="${KualiForm.actionHelper.showCommittee}">
-		                            	<c:choose>
-		                                	<c:when test="${KualiForm.actionHelper.canAssignReviewersCmtSel}">
-				                            	<kul:htmlControlAttribute property="actionHelper.protocolSubmitAction.scheduleId" 
-				                                	                      attributeEntry="${attributes.scheduleId}"
-				                                    	                  onchange="displayReviewers(${KualiForm.document.protocol.protocolId})" />
-				                        	</c:when>
-				                        	<c:otherwise>
-				                            	<kul:htmlControlAttribute property="actionHelper.protocolSubmitAction.scheduleId" 
-				                                	                      attributeEntry="${attributes.scheduleId}" />
-    				                    	</c:otherwise>
-						                </c:choose>
-				                    </c:when>
-				                    <c:otherwise>
-				                        <kul:htmlControlAttribute property="actionHelper.protocolSubmitAction.scheduleId" 
-				                                                  attributeEntry="${attributes.scheduleId}" />
-				                    </c:otherwise>
-				                </c:choose>
+			                        <c:choose>		                     
+			                            <c:when test="${KualiForm.actionHelper.showCommittee}">
+			                            	<kul:htmlControlAttribute property="actionHelper.protocolSubmitAction.scheduleId" 
+					                         	                      attributeEntry="${attributes.scheduleId}"
+					                               	                  onchange="${displayReviewersInvocation}" />
+					                        	
+					                    </c:when>
+					                    <c:otherwise>
+					                        <kul:htmlControlAttribute property="actionHelper.protocolSubmitAction.scheduleId" 
+					                                                  attributeEntry="${attributes.scheduleId}" />
+					                    </c:otherwise>
+					                </c:choose>
 		                        </nobr>
 		                    </td>
 	                    </tr>
                 
                         <c:choose>
-		                    <c:when test="${empty KualiForm.actionHelper.protocolSubmitAction.scheduleId}">
+		                    <c:when test="${KualiForm.actionHelper.reviewersDisplayToBeSuppressed}">
 		                        <tr id="reviewers" style="display: none">
 		                    </c:when>
 		                    <c:otherwise>
@@ -303,8 +305,23 @@ ${kfunc:registerEditableProperty(KualiForm, "actionHelper.protocolSubmitAction.n
         </table>
     </div>
     
-    <script>
-        updateCheckList('actionHelper.protocolSubmitAction.protocolReviewTypeCode');
+    <script>        
+        
+	    function protocolReviewTypeChanged() {
+	    	// we will update the review listing only if a committee was chosen but a schedule was not
+	    	if( ($j(jq_escape("actionHelper.protocolSubmitAction.scheduleId")).val() == "") && 
+		    	($j(jq_escape("actionHelper.protocolSubmitAction.committeeId")).val() != "")) {
+	    		
+	    		${displayReviewersInvocation}
+	    		
+	    	}
+	    	updateCheckList('actionHelper.protocolSubmitAction.protocolReviewTypeCode');
+		}
+    	
+        $j(document).ready(function() { 
+        	updateCheckList('actionHelper.protocolSubmitAction.protocolReviewTypeCode');
+        });
+        
     </script>
 </kul:innerTab>
 

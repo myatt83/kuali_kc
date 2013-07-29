@@ -1,5 +1,5 @@
 <%--
- Copyright 2005-2010 The Kuali Foundation
+ Copyright 2005-2013 The Kuali Foundation
 
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -34,10 +34,15 @@ $j(document).ready(
 function enableDisableCheckbox() {
 	var choice = document.getElementById("${property}.assignToAgenda");
 	var sched = document.getElementById("${property}.scheduleId");
-	if (choice.checked) {
-		sched.disabled = false;
-	} else {
-		sched.disabled = true;
+	var schedChoice = true;
+	if (choice != null && choice.checked) {
+		//sched.disabled = false;
+		schedChoice = false;
+	//} else {
+	//	sched.disabled = true;
+	}
+	if(sched != null) {
+		sched.disabled = schedChoice;
 	}
 }
 </script>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,43 +18,43 @@ package org.kuali.kra.protocol.noteattachment;
 import java.util.Collection;
 import java.util.List;
 
-import org.kuali.kra.protocol.personnel.ProtocolPerson;
+import org.kuali.kra.protocol.personnel.ProtocolPersonBase;
 
 
 /**
- * Contains the methods used for Protocol Notes and Attachments.
+ * Contains the methods used for ProtocolBase Notes and Attachments.
  */
 public interface ProtocolAttachmentService {
 
     /**
-     * Gets a {@link ProtocolAttachmentType ProtocolAttachmentType} from a code.
+     * Gets a {@link ProtocolAttachmentTypeBase ProtocolAttachmentType} from a code.
      * 
      * @param code the code.
-     * @return the {@link ProtocolAttachmentType ProtocolAttachmentType}.  If the code is not
+     * @return the {@link ProtocolAttachmentTypeBase ProtocolAttachmentType}.  If the code is not
      * found then null is returned.
      * @throws IllegalArgumentException if the code is null
      */
-    ProtocolAttachmentType getTypeFromCode(String code);
+    ProtocolAttachmentTypeBase getTypeFromCode(String code);
     
     /**
-     * Gets a Collection of {@link ProtocolAttachmentType ProtocolAttachmentType} from a group code.
+     * Gets a Collection of {@link ProtocolAttachmentTypeBase ProtocolAttachmentType} from a group code.
      * 
      * @param code the group code.
-     * @return a Collection of {@link ProtocolAttachmentType ProtocolAttachmentType}.  If no codes are
+     * @return a Collection of {@link ProtocolAttachmentTypeBase ProtocolAttachmentType}.  If no codes are
      * found then an empty Collection is returned.
      * @throws IllegalArgumentException if the code is null
      */
-    Collection<ProtocolAttachmentType> getTypesForGroup(String code);
+    Collection<ProtocolAttachmentTypeBase> getTypesForGroup(String code);
     
     /**
-     * Gets a {@link ProtocolAttachmentStatus ProtocolAttachmentStatus} from a code.
+     * Gets a {@link ProtocolAttachmentStatusBase ProtocolAttachmentStatus} from a code.
      * 
      * @param code the code.
-     * @return the {@link ProtocolAttachmentStatus ProtocolAttachmentStatus}.    If the code is not
+     * @return the {@link ProtocolAttachmentStatusBase ProtocolAttachmentStatus}.    If the code is not
      * found then null is returned.
      * @throws IllegalArgumentException if the code is null
      */
-    ProtocolAttachmentStatus getStatusFromCode(String code);
+    ProtocolAttachmentStatusBase getStatusFromCode(String code);
       
     /**
      * Saves (persists) an {@link ProtocolAttachmentBase ProtocolAttachmentBase}.
@@ -92,7 +92,7 @@ public interface ProtocolAttachmentService {
      * @return the BO
      * @throws IllegalArgumentException if the code or type is null.
      */
-    ProtocolPerson getPerson(Integer personId);
+    ProtocolPersonBase getPerson(Integer personId);
     
     /**
      * Deletes an existing {@link ProtocolAttachmentBase ProtocolAttachmentBase}. It will also
@@ -115,7 +115,7 @@ public interface ProtocolAttachmentService {
      * @param attachment
      * @return
      */
-    boolean isNewAttachmentVersion(ProtocolAttachmentProtocol attachment);
+    boolean isNewAttachmentVersion(ProtocolAttachmentProtocolBase attachment);
      
     
     /**
@@ -124,7 +124,7 @@ public interface ProtocolAttachmentService {
      * @param attachment
      * @return
      */
-    boolean isAttachmentActive(ProtocolAttachmentProtocol attachment);
+    boolean isAttachmentActive(ProtocolAttachmentProtocolBase attachment);
     
      /**
       * 
@@ -132,7 +132,7 @@ public interface ProtocolAttachmentService {
       * @param attachment
       * @return
       */
-    boolean isSharedFile(ProtocolAttachmentPersonnel attachment);
+    boolean isSharedFile(ProtocolAttachmentPersonnelBase attachment);
 
      
      /**

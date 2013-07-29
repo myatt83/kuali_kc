@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package org.kuali.kra.common.committee.meeting;
 
-import org.kuali.kra.common.committee.document.CommonCommitteeDocument;
+import org.kuali.kra.common.committee.document.CommitteeDocumentBase;
 import org.kuali.kra.rule.BusinessRuleInterface;
 import org.kuali.rice.krad.document.Document;
 
@@ -28,12 +28,12 @@ public class MeetingPresentOtherOrVotingEvent extends MeetingEventBase<MeetingPr
     private static final String MSG = "Present other or voting ";
     
     private MemberAbsentBean memberAbsentBean;
-    public MeetingPresentOtherOrVotingEvent(String errorPathPrefix, CommonCommitteeDocument document, MeetingHelper meetingHelper, ErrorType type) {
+    public MeetingPresentOtherOrVotingEvent(String errorPathPrefix, CommitteeDocumentBase document, MeetingHelperBase meetingHelper, ErrorType type) {
         super(MSG + getDocumentId(document), errorPathPrefix, document, meetingHelper, type);
     }
     
-    public MeetingPresentOtherOrVotingEvent(String errorPathPrefix, Document document, MeetingHelper meetingHelper, MemberAbsentBean memberAbsentBean, ErrorType type) {
-        this(errorPathPrefix, (CommonCommitteeDocument)document, meetingHelper, type);
+    public MeetingPresentOtherOrVotingEvent(String errorPathPrefix, Document document, MeetingHelperBase meetingHelper, MemberAbsentBean memberAbsentBean, ErrorType type) {
+        this(errorPathPrefix, (CommitteeDocumentBase)document, meetingHelper, type);
         this.memberAbsentBean = memberAbsentBean;
     }
     

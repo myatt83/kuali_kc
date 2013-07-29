@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@
  */
 package org.kuali.kra.iacuc.actions.submit;
 
-import org.kuali.kra.protocol.actions.submit.ProtocolSubmissionStatus;
+import org.kuali.kra.protocol.actions.submit.ProtocolSubmissionStatusBase;
 
-public class IacucProtocolSubmissionStatus extends ProtocolSubmissionStatus {
+public class IacucProtocolSubmissionStatus extends ProtocolSubmissionStatusBase {
 
     private static final long serialVersionUID = 7346700694406537435L;
 
@@ -63,5 +63,6 @@ public class IacucProtocolSubmissionStatus extends ProtocolSubmissionStatus {
 
     public static final String ADMINISTRATIVELY_INCOMPLETE = "214";
     
+    public static final String REJECTED_IN_ROUTING = "401";
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,24 +15,10 @@
  */
 package org.kuali.kra.irb;
 
+
 /**
  * The Protocol Version Service.
  */
-public interface ProtocolVersionService {
+public interface ProtocolVersionService extends org.kuali.kra.protocol.ProtocolVersionService {
 
-    /**
-     * Create a new version of a protocol document. 
-     * @param protocolDocument the protocol document to version
-     * @return the new versioned protocol document
-     * @throws Exception
-     */
-    public ProtocolDocument versionProtocolDocument(ProtocolDocument protocolDocument) throws Exception;
-    
-    /**
-     * Get a particular version of a protocol.
-     * @param protocolNumber
-     * @param sequenceNumber
-     * @return
-     */
-    public Protocol getProtocolVersion(String protocolNumber, Integer sequenceNumber);
 }

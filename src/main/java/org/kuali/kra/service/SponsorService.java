@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -176,4 +176,12 @@ public interface SponsorService {
      * @return
      */
     List<String> getUniqueGroupingNames(String hierarchyName, Integer level);
+    
+    /**
+     * 
+     * This method returns true if the passed in Sponsor is valid, returns false if it is not.
+     * @param sponsor
+     * @return
+     */
+    public boolean validateSponsor(Sponsor sponsor);
 }

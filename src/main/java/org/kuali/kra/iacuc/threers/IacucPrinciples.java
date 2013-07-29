@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,14 @@
  */
 package org.kuali.kra.iacuc.threers;
 
-import org.kuali.kra.protocol.ProtocolAssociate;
+import org.kuali.kra.protocol.ProtocolAssociateBase;
 
 /**
  * 
  * This class represents the "Three R's" or principles of IACUC,
  * (Reduction, Refinement, & Replacement).
  */
-public class IacucPrinciples extends ProtocolAssociate {
+public class IacucPrinciples extends ProtocolAssociateBase {
 
     private static final long serialVersionUID = 580264349919894175L;
     

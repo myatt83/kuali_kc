@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import java.sql.Date;
 
 import org.kuali.kra.service.KcAttachmentService;
 import org.kuali.rice.core.api.util.type.KualiDecimal;
+import org.kuali.rice.krad.util.ObjectUtils;
 /**
  * This class represents a subAwardAmountInfo. It describes the amount
  * released and allowed for the subAward.
@@ -219,6 +220,7 @@ public class SubAwardAmountInfo extends
             if (newFileData.length > 0) {
                 setContentType(newFile.getContentType());
                 setFileName(newFile.getFileName());
+                setMimeType(contentType);
             }
         } catch (FileNotFoundException e) {
         } catch (IOException e) {
@@ -337,7 +339,7 @@ public class SubAwardAmountInfo extends
 
     @Override
     public String getType() {
-        return getContentType();
+        return getMimeType();
     }
 
     @Override

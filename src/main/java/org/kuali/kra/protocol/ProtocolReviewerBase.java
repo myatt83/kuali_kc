@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,9 @@ import org.apache.commons.lang.StringUtils;
 import org.kuali.kra.bo.KcPerson;
 import org.kuali.kra.bo.KraPersistableBusinessObjectBase;
 import org.kuali.kra.bo.Rolodex;
-import org.kuali.kra.common.committee.bo.CommitteeMembership;
+import org.kuali.kra.common.committee.bo.CommitteeMembershipBase;
 import org.kuali.kra.infrastructure.KraServiceLocator;
-import org.kuali.kra.protocol.actions.submit.ProtocolSubmission;
+import org.kuali.kra.protocol.actions.submit.ProtocolSubmissionBase;
 import org.kuali.kra.service.KcPersonService;
 
 public class ProtocolReviewerBase extends KraPersistableBusinessObjectBase {
@@ -39,9 +39,9 @@ public class ProtocolReviewerBase extends KraPersistableBusinessObjectBase {
 
     private Rolodex rolodex;
 
-    private Protocol protocol;
+    private ProtocolBase protocol;
 
-    private ProtocolSubmission protocolSubmission;
+    private ProtocolSubmissionBase protocolSubmission;
 
     //transient fields for the services, and the  
     //kcPerson.  
@@ -97,19 +97,19 @@ public class ProtocolReviewerBase extends KraPersistableBusinessObjectBase {
         this.rolodex = rolodex;
     }
 
-    public Protocol getProtocol() {
+    public ProtocolBase getProtocol() {
         return protocol;
     }
 
-    public void setProtocol(Protocol protocol) {
+    public void setProtocol(ProtocolBase protocol) {
         this.protocol = protocol;
     }
 
-    public ProtocolSubmission getProtocolSubmission() {
+    public ProtocolSubmissionBase getProtocolSubmission() {
         return protocolSubmission;
     }
 
-    public void setProtocolSubmission(ProtocolSubmission protocolSubmission) {
+    public void setProtocolSubmission(ProtocolSubmissionBase protocolSubmission) {
         this.protocolSubmission = protocolSubmission;
     }
 
@@ -132,13 +132,13 @@ public class ProtocolReviewerBase extends KraPersistableBusinessObjectBase {
     }
 
     /**
-     * Convenience method - is the CommitteeMembership and this ProtocolReviewerBase the
+     * Convenience method - is the CommitteeMembershipBase and this ProtocolReviewerBase the
      * same person?  Does the check properly against the person or rolodex as required.
      * 
      * @param member
      * @return
      */
-    public boolean isProtocolReviewerFromCommitteeMembership(CommitteeMembership member) {
+    public boolean isProtocolReviewerFromCommitteeMembership(CommitteeMembershipBase member) {
         boolean isMatched = false;
         if (!getNonEmployeeFlag() && StringUtils.equals(member.getPersonId(), getPersonId())) {
             isMatched = true;

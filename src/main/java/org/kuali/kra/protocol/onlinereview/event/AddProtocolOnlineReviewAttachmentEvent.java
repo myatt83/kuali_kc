@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  */
 package org.kuali.kra.protocol.onlinereview.event;
 
-import org.kuali.kra.protocol.ProtocolOnlineReviewDocument;
-import org.kuali.kra.protocol.onlinereview.ProtocolReviewAttachment;
+import org.kuali.kra.protocol.ProtocolOnlineReviewDocumentBase;
+import org.kuali.kra.protocol.onlinereview.ProtocolReviewAttachmentBase;
 import org.kuali.kra.protocol.onlinereview.rules.AddOnlineReviewAttachmentRule;
 import org.kuali.kra.rule.BusinessRuleInterface;
 import org.kuali.kra.rule.event.KraDocumentEventBaseExtension;
@@ -28,7 +28,7 @@ import org.kuali.kra.rule.event.KraDocumentEventBaseExtension;
 public class AddProtocolOnlineReviewAttachmentEvent extends KraDocumentEventBaseExtension {
     
     private String propertyName;
-    private ProtocolReviewAttachment reviewAttachment;
+    private ProtocolReviewAttachmentBase reviewAttachment;
 
     /**
      * Constructs a AddProtocolOnlineReviewAttachmentEvent.
@@ -37,21 +37,21 @@ public class AddProtocolOnlineReviewAttachmentEvent extends KraDocumentEventBase
      * @param propertyName The error path property prefix
      * @param reviewComment The added Reviewer Attachment
      */
-    public AddProtocolOnlineReviewAttachmentEvent(ProtocolOnlineReviewDocument document, String propertyName, ProtocolReviewAttachment reviewAttachment) {
+    public AddProtocolOnlineReviewAttachmentEvent(ProtocolOnlineReviewDocumentBase document, String propertyName, ProtocolReviewAttachmentBase reviewAttachment) {
         super("Enter reviewer attachment", "", document);
         this.propertyName = propertyName;
         this.reviewAttachment = reviewAttachment;
     }
     
-    public ProtocolOnlineReviewDocument getProtocolDocument() {
-        return (ProtocolOnlineReviewDocument) getDocument();
+    public ProtocolOnlineReviewDocumentBase getProtocolDocument() {
+        return (ProtocolOnlineReviewDocumentBase) getDocument();
     }
     
     public String getPropertyName() {
         return propertyName;
     }
     
-    public ProtocolReviewAttachment getReviewAttachment() {
+    public ProtocolReviewAttachmentBase getReviewAttachment() {
         return reviewAttachment;
     }
 

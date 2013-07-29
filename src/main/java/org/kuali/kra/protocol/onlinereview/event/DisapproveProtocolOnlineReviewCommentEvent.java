@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ package org.kuali.kra.protocol.onlinereview.event;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.kuali.kra.protocol.ProtocolOnlineReviewDocument;
+import org.kuali.kra.protocol.ProtocolOnlineReviewDocumentBase;
 import org.kuali.kra.protocol.onlinereview.rules.DisapproveOnlineReviewCommentRule;
 import org.kuali.kra.rule.event.KraDocumentEventBase;
 import org.kuali.rice.krad.rules.rule.BusinessRule;
@@ -30,7 +30,7 @@ public class DisapproveProtocolOnlineReviewCommentEvent extends KraDocumentEvent
     private String noteText = null;
     private int maxLength;
        
-    public DisapproveProtocolOnlineReviewCommentEvent(final ProtocolOnlineReviewDocument document,
+    public DisapproveProtocolOnlineReviewCommentEvent(final ProtocolOnlineReviewDocumentBase document,
                                                          final String disapprovalReason,
                                                          final String disapprovalNoteText,
                                                          final int reasonMaxLength) {

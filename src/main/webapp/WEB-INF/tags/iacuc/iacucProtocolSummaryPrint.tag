@@ -1,5 +1,5 @@
 <%--
- Copyright 2005-2010 The Kuali Foundation
+ Copyright 2005-2013 The Kuali Foundation
  
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@
 	<h3>
    			<span class="subhead-left">Print</span>
    			<span class="subhead-right">
-   				<kul:help parameterNamespace="KC-PROTOCOL" parameterDetailType="Document" parameterName="protocolPrintHelp" altText="help"/>
+   				<kul:help parameterNamespace="KC-IACUC" parameterDetailType="Document" parameterName="protocolPrintHelp" altText="help"/>
 			</span>
        </h3>
         <kul:innerTab tabTitle="Protocol Details" parentTab="" defaultOpen="false">
@@ -139,9 +139,9 @@
                         </td>
                         <td>
                            <div align="left">
-                                <kul:htmlControlAttribute property="actionHelper.protocolPrintOption.riskLevel" 
+                                <kul:htmlControlAttribute property="actionHelper.protocolPrintOption.exception" 
                                                           attributeEntry="${kraAttributeReferenceDummyAttributes.checkBox}" 
-                                                          readOnly="false" styleClass="printOptions"/>Risk Levels
+                                                          readOnly="false" styleClass="printOptions"/>Exemption
                             </div>
                         </td>
                            <kra:section permission="${canViewReviewComments}">
@@ -177,6 +177,17 @@
 	                                                          readOnly="false" styleClass="printOptions"/>Three R's
 	                            </div>
                         </td>
+                    </tr>
+                    <tr>
+                    	<td>
+                    		<div align="left">
+	                                <kul:htmlControlAttribute property="actionHelper.protocolPrintOption.protocolDetails" 
+	                                                          attributeEntry="${kraAttributeReferenceDummyAttributes.checkBox}" 
+	                                                          readOnly="false" styleClass="printOptions"/>Protocol Required Fields
+	                            </div>
+                    	</td>
+                    	<td></td>
+                    	<td></td>
                     </tr>
                    <%-- kcirb-1159 is closed (not fix, so comment out this       
                     <tr>

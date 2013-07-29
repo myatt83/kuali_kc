@@ -1,6 +1,6 @@
  
  <%--
- Copyright 2005-2010 The Kuali Foundation
+ Copyright 2005-2013 The Kuali Foundation
 
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ var kualiElements = kualiForm.elements;
 </script>
 <script language="javascript" src="dwr/interface/SponsorService.js"></script>
 <c:if test="${readOnly}">
-  <c:if test="${KualiForm.subAwardDocument.subAward.editSubAward}">
+  <c:if test="${KualiForm.displayEditButton && KualiForm.subAwardDocument.subAward.editSubAward}">
 	<c:set var="extraButtonSource" value="${ConfigProperties.kra.externalizable.images.url}buttonsmall_edit_temp.gif"/>
 	<c:set var="extraButtonProperty" value="methodToCall.editOrVersion"/>
 	<c:set var="extraButtonAlt" value="Edit or Version"/>

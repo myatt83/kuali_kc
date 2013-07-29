@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,6 +44,7 @@ import org.kuali.rice.kew.api.action.ActionRequest;
 import org.kuali.rice.kew.api.action.ActionRequestPolicy;
 import org.kuali.rice.kew.api.action.RoutingReportCriteria;
 import org.kuali.rice.kew.api.action.WorkflowDocumentActionsService;
+import org.kuali.rice.kew.api.actionlist.ActionListService;
 import org.kuali.rice.kew.api.document.DocumentDetail;
 import org.kuali.rice.kew.api.document.WorkflowDocumentService;
 import org.kuali.rice.kim.api.identity.Person;
@@ -60,6 +61,7 @@ public class KraWorkflowServiceImpl implements KraWorkflowService {
     static Log LOG = LogFactory.getLog(KraWorkflowService.class);
     protected WorkflowDocumentActionsService workflowDocumentActionsService;
     protected WorkflowDocumentService workflowDocumentService;
+    protected ActionListService actionListService;
     
     public void setWorkflowDocumentActionsService(WorkflowDocumentActionsService workflowDocumentActionsService) {
         this.workflowDocumentActionsService = workflowDocumentActionsService;
@@ -392,6 +394,25 @@ public ProposalDevelopmentApproverViewDO populateApproverViewDO (ProposalDevelop
         } 
         
         return !doNotReceiveFutureRequests;
-    }    
+    }
+    
+    private static List<String> approvalCodes = new ArrayList<String>();
+    static {
+        approvalCodes.add("C");
+        approvalCodes.add("A");
+    }
+    
+    public boolean hasPendingApprovalRequests(WorkflowDocument workflowDoc) {
+        return !actionListService.getActionItems(workflowDoc.getDocumentId(), approvalCodes).isEmpty();
+    }
+
+    protected ActionListService getActionListService() {
+        return actionListService;
+    }
+
+    public void setActionListService(ActionListService actionListService) {
+        this.actionListService = actionListService;
+    }
+
     
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,16 +19,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.infrastructure.PermissionConstants;
 import org.kuali.kra.lookup.KraLookupableHelperServiceImpl;
 import org.kuali.kra.proposaldevelopment.bo.DevelopmentProposal;
 import org.kuali.kra.proposaldevelopment.document.ProposalDevelopmentDocument;
-import org.kuali.kra.proposaldevelopment.document.authorization.ProposalDevelopmentDocumentAuthorizer;
 import org.kuali.kra.service.KraAuthorizationService;
 import org.kuali.rice.kim.api.identity.Person;
+import org.kuali.rice.kns.document.authorization.DocumentAuthorizer;
 import org.kuali.rice.kns.lookup.HtmlData;
 import org.kuali.rice.kns.lookup.HtmlData.AnchorHtmlData;
+import org.kuali.rice.kns.service.DocumentHelperService;
 import org.kuali.rice.krad.bo.BusinessObject;
+import org.kuali.rice.krad.lookup.CollectionIncomplete;
 import org.kuali.rice.krad.util.GlobalVariables;
 
 /**
@@ -43,11 +46,15 @@ public class DevelopmentProposalLookupableHelperServiceImpl extends KraLookupabl
     @Override
     @SuppressWarnings("unchecked")
     public List<? extends BusinessObject> getSearchResults(Map<String, String> fieldValues) {
-        List<DevelopmentProposal> unboundedResults = (List<DevelopmentProposal>) super.getSearchResultsUnbounded(fieldValues);
+        List<DevelopmentProposal> unboundedResults = (List<DevelopmentProposal>) super.getSearchResults(fieldValues);
         
         List<DevelopmentProposal> filteredResults = new ArrayList<DevelopmentProposal>();
         
         filteredResults = (List<DevelopmentProposal>) filterForPermissions(unboundedResults);
+        
+        if (unboundedResults instanceof CollectionIncomplete) {
+            filteredResults = new CollectionIncomplete<DevelopmentProposal>(filteredResults, ((CollectionIncomplete)unboundedResults).getActualSizeIfTruncated());
+        }
 
         return filteredResults;
     }
@@ -112,10 +119,9 @@ public class DevelopmentProposalLookupableHelperServiceImpl extends KraLookupabl
 
     private List<DevelopmentProposal> filterForPermissions(List<DevelopmentProposal> results) {
         Person user = GlobalVariables.getUserSession().getPerson();
-        ProposalDevelopmentDocumentAuthorizer authorizer = new ProposalDevelopmentDocumentAuthorizer();
         List<DevelopmentProposal> filteredResults = new ArrayList<DevelopmentProposal>();
-
         for (DevelopmentProposal developmentProposal : results) {      
+            DocumentAuthorizer authorizer = getDocumentHelperService().getDocumentAuthorizer("ProposalDevelopmentDocument");
             if (authorizer.canOpen(developmentProposal.getProposalDocument(), user)) {
                 filteredResults.add(developmentProposal);
             }
@@ -130,5 +136,9 @@ public class DevelopmentProposalLookupableHelperServiceImpl extends KraLookupabl
      */
     public void setKraAuthorizationService(KraAuthorizationService kraAuthorizationService) {
         this.kraAuthorizationService = kraAuthorizationService;
+    }
+    
+    private DocumentHelperService getDocumentHelperService() {
+        return KraServiceLocator.getService(DocumentHelperService.class);
     }
 }

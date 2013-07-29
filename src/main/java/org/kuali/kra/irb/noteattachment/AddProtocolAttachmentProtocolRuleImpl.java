@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,29 +15,19 @@
  */
 package org.kuali.kra.irb.noteattachment;
 
+import org.kuali.kra.protocol.noteattachment.AddProtocolAttachmentProtocolRuleImplBase;
+
 /**
  * Implementation of {@link AddProtocolAttachmentProtocolRule AddProtocolAttachmentProtocolRule}.
  * @see AddProtocolAttachmentProtocolRule for details
  */
-class AddProtocolAttachmentProtocolRuleImpl implements AddProtocolAttachmentProtocolRule {
+public class AddProtocolAttachmentProtocolRuleImpl extends AddProtocolAttachmentProtocolRuleImplBase {
     
-    private final ProtocolAttachmentBaseRuleHelper baseHelper
-        = new ProtocolAttachmentBaseRuleHelper(NoteAndAttachmentPrefix.NEW_ATTACHMENT_PROTOCOL.getPrefixName());
     
-    private final ProtocolAttachmentProtocolRuleHelper protocolHelper
-    = new ProtocolAttachmentProtocolRuleHelper(NoteAndAttachmentPrefix.NEW_ATTACHMENT_PROTOCOL.getPrefixName());
-    
-    /** {@inheritDoc} */
-    public boolean processAddProtocolAttachmentProtocolRules(AddProtocolAttachmentProtocolEvent event) {      
+    public AddProtocolAttachmentProtocolRuleImpl() {
+        super();
         
-        final ProtocolAttachmentProtocol newAttachmentProtocol = event.getNewAttachmentProtocol();
-        
-        boolean valid = this.baseHelper.validPrimitiveFields(newAttachmentProtocol);
-        valid &= this.baseHelper.validTypeForGroup(newAttachmentProtocol);
-        valid &= this.baseHelper.validDescriptionWhenRequired(newAttachmentProtocol);
-        valid &= this.protocolHelper.validStatus(newAttachmentProtocol);
-        valid &= this.baseHelper.validFile(newAttachmentProtocol);
-        
-        return valid;
+        baseHelper = new ProtocolAttachmentBaseRuleHelper(NoteAndAttachmentPrefix.NEW_ATTACHMENT_PROTOCOL.getPrefixName());
+        protocolHelper = new ProtocolAttachmentProtocolRuleHelper(NoteAndAttachmentPrefix.NEW_ATTACHMENT_PROTOCOL.getPrefixName());
     }
 }

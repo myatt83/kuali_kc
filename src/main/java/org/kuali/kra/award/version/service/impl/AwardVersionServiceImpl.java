@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,34 +38,37 @@ public class AwardVersionServiceImpl implements AwardVersionService {
      */
     @Override
     public Award getWorkingAwardVersion(String awardNumber) {
-        List<VersionHistory> versions = versionHistoryService.loadVersionHistory(Award.class, awardNumber);
+        List<VersionHistory> versions = versionHistoryService.findVersionHistory(Award.class, awardNumber);
         VersionHistory activeVersion = getActiveVersionHistory(versions);
         VersionHistory pendingVersion = getPendingVersionHistory(versions);
-        VersionHistory returnVal = null;
+        VersionHistory workingVersion = null;
         if(!(pendingVersion == null)) {
-            returnVal = pendingVersion;
+            workingVersion = pendingVersion;
         } else if(!(activeVersion == null)) {
-            returnVal = activeVersion;
+            workingVersion = activeVersion;
         } else {
             return null;
         }
-        return (Award)returnVal.getSequenceOwner();
+        versionHistoryService.loadSequenceOwner(Award.class,workingVersion);
+        return (Award)workingVersion.getSequenceOwner();
     }
     
     
     
     @Override
     public Award getActiveAwardVersion(String awardNumber) {
-        List<VersionHistory> versions = versionHistoryService.loadVersionHistory(Award.class, awardNumber);
-        return (Award) getActiveVersionHistory(versions).getSequenceOwner();
+        List<VersionHistory> versions = versionHistoryService.findVersionHistory(Award.class, awardNumber);
+        VersionHistory result = getActiveVersionHistory(versions);
+        return (result == null) ? null : (Award) result.getSequenceOwner();
     }
 
 
 
     @Override
     public Award getPendingAwardVersion(String awardNumber) {
-        List<VersionHistory> versions = versionHistoryService.loadVersionHistory(Award.class, awardNumber);
-        return (Award) getPendingVersionHistory(versions).getSequenceOwner();
+        List<VersionHistory> versions = versionHistoryService.findVersionHistory(Award.class, awardNumber);
+        VersionHistory result = getPendingVersionHistory(versions);
+        return (result == null) ? null : (Award) result.getSequenceOwner();
     }
 
 

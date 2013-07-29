@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -109,6 +109,17 @@ public class QuestionnaireMaintenanceDocumentRule extends MaintenanceDocumentRul
             errorMap.putError("document.newMaintainableObject.businessObject.name", ALREADY_EDITED_ERROR, "");
             valid = false;
         }
+        
+        for (QuestionnaireUsage usage : newQuestionnaire.getQuestionnaireUsages()) {
+            if (usage.getCoeusSubModule() != null 
+                    && usage.getCoeusSubModule().isRequireUniqueQuestionnareUsage()
+                    && !getQuestionnaireService().isUniqueUsage(newQuestionnaire, usage)) {
+                errorMap.putError("document.newMaintainableObject.businessObject.questionnaireUsages[" + 
+                                   newQuestionnaire.getQuestionnaireUsages().indexOf(usage) + "].moduleSubItemCode", 
+                        KeyConstants.ERROR_QUESTIONNAIRE_DUPLICATE_USAGE);
+            }
+        }
+        
         
         return valid;
 

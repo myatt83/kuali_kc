@@ -32,6 +32,7 @@
         <ref bean="Rolodex-phoneNumber"/>
         <ref bean="Rolodex-postalCode"/>
         <ref bean="Rolodex-prefix"/>
+        <ref bean="Rolodex-isSponsorAddress"/>
         <ref bean="Rolodex-sponsorAddressFlag"/>
         <ref bean="Rolodex-sponsorCode"/>
         <ref bean="Rolodex-sponsor.sponsorName"/>
@@ -71,7 +72,7 @@
             <list>
               <bean p:identifier="true" p:sourceName="sponsor.sponsorName" p:targetName="sponsorName" parent="SupportAttributeDefinition"/>
             </list>
-          </property>
+          </property> 
         </bean>
       </list>
     </property>
@@ -276,9 +277,7 @@
       <bean p:allowWhitespace="true" parent="AnyCharacterValidationPattern"/>
     </property>
     <property name="control">
-      <bean parent="TextareaControlDefinition" 
-            p:rows="5"
-            p:cols="40" />
+      <bean p:size="40" parent="TextControlDefinition"/> 
     </property>
     <property name="summary" value="Organization"/>
     <property name="description" value="Organization"/>
@@ -355,6 +354,25 @@
     </property>
     <property name="summary" value="Prefix"/>
     <property name="description" value="Prefix"/>
+  </bean>
+  <bean id="Rolodex-isSponsorAddress" parent="Rolodex-isSponsorAddress-parentBean"/>
+
+  <bean abstract="true" id="Rolodex-isSponsorAddress-parentBean" parent="AttributeDefinition">
+    <property name="name" value="isSponsorAddress"/>
+    <property name="forceUppercase" value="false"/>
+    <property name="label" value="Sponsor Address Flag"/>
+    <property name="shortLabel" value="Sponsor Address Flag"/>
+    <property name="maxLength" value="1"/>
+    <property name="validationPattern">
+      <bean parent="AlphaNumericValidationPattern"/>
+    </property>
+    <property name="control">
+      <bean parent="SelectControlDefinition" 
+      p:valuesFinderClass="org.kuali.kra.lookup.keyvalue.RolodexAddressFlagValuesFinder"
+      p:script="updateOrganizationLookupReturn(this)"/>
+    </property>
+    <property name="summary" value="Sponsor Address Flag"/>
+    <property name="description" value="Sponsor Address Flag"/>
   </bean>
   <bean id="Rolodex-sponsorAddressFlag" parent="Rolodex-sponsorAddressFlag-parentBean"/>
 
@@ -491,12 +509,12 @@
               <bean p:attributeName="lastName" parent="FieldDefinition"/>
               <bean p:attributeName="middleName" parent="FieldDefinition"/>
               <bean p:attributeName="fullName" parent="FieldDefinition"/>
-              <bean p:attributeName="organization" parent="FieldDefinition"/>
+              <bean p:attributeName="sponsorAddressFlag" parent="FieldDefinition"/>
+              <bean p:attributeName="organization" parent="FieldDefinition" />
               <bean p:attributeName="unit.unitName" parent="FieldDefinition"/>
               <bean p:attributeName="phoneNumber" parent="FieldDefinition"/>
               <bean p:attributeName="postalCode" parent="FieldDefinition"/>
               <bean p:attributeName="prefix" parent="FieldDefinition"/>
-              <bean p:attributeName="sponsorAddressFlag" parent="FieldDefinition"/>
               <bean p:attributeName="sponsor.sponsorName" parent="FieldDefinition"/>
               <bean p:attributeName="suffix" parent="FieldDefinition"/>
               <bean p:attributeName="title" parent="FieldDefinition"/>
@@ -515,6 +533,7 @@
 
   <bean abstract="true" id="Rolodex-lookupDefinition-parentBean" parent="LookupDefinition">
     <property name="title" value="Address Book Lookup"/>
+    <property name="lookupableID" value="rolodexLookupable" />
     <property name="menubar" value="&lt;a href=&quot;index.jsp&quot;&gt;Main&lt;/a&gt;"/>
 
     <property name="defaultSort">
@@ -526,6 +545,7 @@
         <bean p:attributeName="rolodexId" parent="FieldDefinition"/>
         <bean p:attributeName="sponsorCode" parent="FieldDefinition"/>
         <bean p:attributeName="sponsor.sponsorName" parent="FieldDefinition"/>
+        <bean p:attributeName="isSponsorAddress" parent="FieldDefinition"/>
         <bean p:attributeName="organization" parent="FieldDefinition"/>
         <bean p:attributeName="lastName" parent="FieldDefinition"/>
         <bean p:attributeName="firstName" parent="FieldDefinition"/>
@@ -539,7 +559,6 @@
         <bean p:attributeName="countryCode" parent="FieldDefinition"/>
         <bean p:attributeName="postalCode" parent="FieldDefinition"/>
         <bean p:attributeName="emailAddress" parent="FieldDefinition"/>
-        <bean p:attributeName="sponsorAddressFlag" parent="FieldDefinition"/>
          <bean p:attributeName="active" parent="FieldDefinition"/>
       </list>
     </property>

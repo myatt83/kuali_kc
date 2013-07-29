@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,29 +17,36 @@ package org.kuali.kra.common.committee.notification;
 
 import java.util.Map;
 
-import org.kuali.kra.common.committee.bo.CommonCommittee;
+import org.kuali.kra.common.committee.bo.CommitteeBase;
 import org.kuali.kra.common.notification.NotificationRendererBase;
 import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.service.KcPersonService;
 import org.kuali.rice.core.api.config.property.ConfigurationService;
 import org.kuali.rice.krad.service.BusinessObjectService;
 import org.kuali.rice.krad.service.KRADServiceLocator;
+import org.apache.commons.lang.StringUtils;
+
 
 /**
  * Renders fields for the IRB notifications.
  */
 public class CommitteeNotificationRenderer extends NotificationRendererBase {
 
-    private CommonCommittee committee;
+    /**
+     * Comment for <code>serialVersionUID</code>
+     */
+    private static final long serialVersionUID = 6334584979829689495L;
+
+    private CommitteeBase committee;
     
     private transient BusinessObjectService businessObjectService;
     private transient KcPersonService kcPersonService;
     
     /**
      * Constructs an IRB notification renderer.
-     * @param CommonCommittee
+     * @param CommitteeBase
      */
-    public CommitteeNotificationRenderer(CommonCommittee committee) {
+    public CommitteeNotificationRenderer(CommitteeBase committee) {
         this.committee = committee;
     }
 
@@ -56,26 +63,24 @@ public class CommitteeNotificationRenderer extends NotificationRendererBase {
         for (int i = 0; i < replacementParameters.length; i++) {
             key = replacementParameters[i];
             
-            // TODO IRB specific should go in subclassed IRB - commented as part of code lifted for base
-            /*
-            if (StringUtils.equals(key, IRBReplacementParameters.DOCUMENT_NUMBER)) {
+            if (StringUtils.equals(key, CommitteeReplacementParameters.DOCUMENT_NUMBER)) {
                 params.put(key, committee.getCommitteeDocument().getDocumentNumber());
             } else if (StringUtils.equals(key, CommitteeReplacementParameters.SEQUENCE_NUMBER)) {
                 params.put(key, committee.getSequenceNumber().toString());
             } else if (StringUtils.equals(key, CommitteeReplacementParameters.COMMITTEE_NAME)) {
                 params.put(key, committee.getCommitteeName().toString());
             }
-            */
+           
             
         }
         return params;
     }
 
-    public CommonCommittee getCommittee() {
+    public CommitteeBase getCommittee() {
         return committee;
     }
 
-    public void setCommittee(CommonCommittee committee) {
+    public void setCommittee(CommitteeBase committee) {
         this.committee = committee;
     }
     

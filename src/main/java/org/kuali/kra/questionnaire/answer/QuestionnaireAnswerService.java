@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,8 @@ import org.kuali.kra.questionnaire.QuestionnaireUsage;
  */
 public interface QuestionnaireAnswerService {
 
+    public static final String YES = "Y";
+    public static final String NO = "N";
 
     /**
      * 
@@ -83,7 +85,7 @@ public interface QuestionnaireAnswerService {
      * 
      * @param answers
      */
-    void setupChildAnswerIndicator(List<Answer> answers);
+    void setupChildAnswerIndicator(AnswerHeader answerHeader);
     
     /**
      * check if the questionnaire is complete.
@@ -131,7 +133,7 @@ public interface QuestionnaireAnswerService {
      * @param finalDoc
      * @return
      */
-    public List<QuestionnaireUsage> getPublishedQuestionnaire(String coeusModule, String coeusSubModule, boolean finalDoc);
+    public List<QuestionnaireUsage> getPublishedQuestionnaire(ModuleQuestionnaireBean moduleQuestionnaireBean);
     
     
     
@@ -145,4 +147,34 @@ public interface QuestionnaireAnswerService {
      * @return
      */
     public boolean checkIfQuestionnaireIsActiveForModule(Integer questionnaireId, String coeusModuleCode, String coeusSubModuleCode);
+    
+    /**
+     * Based on the data in the answer header, rebuild the module specific ModuleQuestionnaireBean. Assumes the document is in a final state.
+     * @param answerHeader
+     * @return
+     */
+    ModuleQuestionnaireBean getModuleSpecificBean(AnswerHeader answerHeader);
+    
+    /**
+     * Based on the moduleItemCode and moduleSubItemCode rebuilds the module specific ModuleQuestionnaireBean.
+     * @param moduleItemCode
+     * @param moduleItemKey
+     * @param moduleSubItemCode
+     * @param moduleSubItemKey
+     * @param finalDoc
+     * @return
+     */
+    ModuleQuestionnaireBean getModuleSpecificBean(String moduleItemCode, String moduleItemKey, String moduleSubItemCode, String moduleSubItemKey, boolean finalDoc);
+    
+
+    /**
+     * 
+     * This method is to get a new version of existing questionnaire answer or set up the associate questionnaire answer for the module keys
+     * specified in ModuleQuestionnaireBean.
+     * 
+     * @param moduleQuestionnaireBean
+     * @return
+     */
+    List<AnswerHeader> getNewVersionOfQuestionnaireAnswer(ModuleQuestionnaireBean moduleQuestionnaireBean);
+
 }

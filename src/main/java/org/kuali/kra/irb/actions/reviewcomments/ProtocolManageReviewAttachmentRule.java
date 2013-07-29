@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,42 +15,10 @@
  */
 package org.kuali.kra.irb.actions.reviewcomments;
 
-import org.apache.commons.lang.StringUtils;
-import org.kuali.kra.infrastructure.KeyConstants;
-import org.kuali.kra.irb.onlinereview.ProtocolReviewAttachment;
-import org.kuali.kra.rule.BusinessRuleInterface;
-import org.kuali.kra.rules.ResearchDocumentRuleBase;
-import org.kuali.rice.krad.util.GlobalVariables;
-
 /**
  * 
  * This class is validating the description of review attachments is not empty 
  */
-public class ProtocolManageReviewAttachmentRule extends ResearchDocumentRuleBase implements
-        BusinessRuleInterface<ProtocolManageReviewAttachmentEvent> {
+public class ProtocolManageReviewAttachmentRule extends org.kuali.kra.protocol.actions.reviewcomments.ProtocolManageReviewAttachmentRule<ProtocolManageReviewAttachmentEvent> {
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.kuali.kra.rule.BusinessRuleInterface#processRules(org.kuali.kra.rule.event.KraDocumentEventBaseExtension)
-     */
-    public boolean processRules(ProtocolManageReviewAttachmentEvent event) {
-        boolean isValid = true;
-
-
-        GlobalVariables.getMessageMap().clearErrorPath();
-        GlobalVariables.getMessageMap().addToErrorPath(event.getPropertyName());
-        int index = 0;
-
-        for (ProtocolReviewAttachment reviewAttachment : event.getReviewAttachments()) {
-            if (StringUtils.isEmpty(reviewAttachment.getDescription())) {
-                isValid = false;
-                GlobalVariables.getMessageMap().putError(String.format("reviewAttachments[%s].description", index),
-                        KeyConstants.ERROR_ONLINE_REVIEW_ATTACHMENT_DESCRIPTION_REQUIRED);
-            }
-            index++;
-        }
-
-        return isValid;
-    }
 }

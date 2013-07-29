@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-    Copyright 2005-2010 The Kuali Foundation.
+    Copyright 2005-2013 The Kuali Foundation.
 
     Licensed under the Educational Community License, Version 1.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -158,6 +158,10 @@
      <bean id="identityService" class="org.kuali.rice.krad.config.GlobalResourceLoaderServiceFactoryBean">
         <property name="serviceName" value="kimIdentityService" />
     </bean>
+
+     <bean id="krmsRulesExecutionService" class="org.kuali.rice.krad.config.GlobalResourceLoaderServiceFactoryBean">
+        <property name="serviceName" value="krmsRulesExecutionService" />
+    </bean>
     
     <bean id="parentLookupableHelperService" abstract="true">
         <property name="persistenceStructureService" ref="persistenceStructureService" />
@@ -263,8 +267,13 @@
         <property name="parameterService" ref="parameterService" />
         <property name="dateTimeService" ref="dateTimeService" />
         <property name="coiDisclosureDao" ref="coiDisclosureDao" />
+        <property name="krmsRulesExecutionService" ref="krmsRulesExecutionService" />
+        <property name="coiDisclosureUndisclosedEventsDao" ref="coiDisclosureUndisclosedEventsDao" />
     </bean>
     
+    <bean id="coiDisclosureUndisclosedEventsDao" parent="platformAwareDao"
+		class="org.kuali.kra.coi.lookup.dao.ojb.CoiDisclosureUndisclosedEventsDaoOjb" />
+
     <bean id="coiDisclosureDao" parent="platformAwareDao"
 		class="org.kuali.kra.coi.lookup.dao.ojb.CoiDisclosureDaoOjb" />
 
@@ -292,10 +301,17 @@
                     <property name="taskName" value="viewCoiDisclosure" />
                 </bean>
                 
+                <bean class="org.kuali.kra.coi.auth.AddCoiDisclosureAttachmentsAuthorizer" parent="parentCoiDisclosureAuthorizer">
+                	<property name="taskName" value="addCoiDisclosureAttachments"/>
+                </bean>  
+                              
                 <bean class="org.kuali.kra.coi.auth.MaintainCoiDisclosureAttachmentsAuthorizer" parent="parentCoiDisclosureAuthorizer" >
                 	 <property name="taskName" value="maintainCoiDisclosureAttachments" />                	 
                 </bean>
                 
+                <bean class="org.kuali.kra.coi.auth.AddCoiDisclosureNotesAuthorizer" parent="parentCoiDisclosureAuthorizer">
+                	<property name="taskName" value="addCoiDisclosureNotes"/>
+                </bean>
                 <bean class="org.kuali.kra.coi.auth.MaintainCoiDisclosureNotesAuthorizer" parent="parentCoiDisclosureAuthorizer" >
                 	 <property name="taskName" value="maintainCoiDisclosureNotes" />   
                 </bean>
@@ -309,7 +325,10 @@
                 </bean>       
                  <bean class="org.kuali.kra.coi.auth.ApproveCoiDisclosureAuthorizer" parent="parentCoiDisclosureAuthorizer">
                 	<property name="taskName" value="approveCoiDisclosure" />
-                </bean>  
+                </bean>
+                  <bean class="org.kuali.kra.coi.auth.ViewCoiDisclosureActionsAuthorizer" parent="parentCoiDisclosureAuthorizer">
+                	<property name="taskName" value="viewCoiDisclosureAction" />
+                </bean>
                  <bean class="org.kuali.kra.coi.auth.PerformCoiDisclosureActionsAuthorizer" parent="parentCoiDisclosureAuthorizer">
                 	<property name="taskName" value="performCoiDisclosureAction" />
                 </bean> 
@@ -322,6 +341,9 @@
                 	<property name="taskName" value="deleteUpdateAttachment" />
                 	<property name="roleService" ref ="roleService" />
                 	 <property name="identityService" ref ="identityService" />
+                </bean> 
+                <bean class="org.kuali.kra.coi.auth.UpdateFEStatusAdminAuthorizer" parent="parentCoiDisclosureAuthorizer">
+                	<property name="taskName" value="updateFEStatusAdmin" />
                 </bean> 
             </list>
         </property>
@@ -376,9 +398,10 @@
         <property name="coiCoeusModuleCode" value="8" />
     </bean>
 
-    <bean class="org.kuali.rice.ksb.api.bus.support.CallbackServiceExporter" p:serviceBus-ref="kc.import.serviceBus" 
-		p:callbackService-ref="coiDisclosureReviewerDerivedRoleTypeService" p:localServiceName="coiDisclosureReviewerDerivedRoleTypeService" 
-		p:serviceInterface="org.kuali.rice.kim.framework.role.RoleTypeService" p:serviceNameSpaceURI="" />
+    <bean id="coiDisclosureReviewerDerivedRoleTypeServiceCallback" parent="kcCallbackService"
+		p:callbackService-ref="coiDisclosureReviewerDerivedRoleTypeService" 
+		p:localServiceName="coiDisclosureReviewerDerivedRoleTypeService" 
+		p:serviceInterface="org.kuali.rice.kim.framework.role.RoleTypeService"/>
 
 
 	<bean id="coiDisclosureLookupable" class="org.kuali.rice.kns.lookup.KualiLookupableImpl" scope="prototype">
@@ -391,9 +414,14 @@
         scope="prototype" parent="parentLookupableHelperService">
     </bean>
     
-    <bean id="coiDisclosureFactBuilderService" class="org.kuali.kra.coi.rules.CoiDisclosureFactBuilderServiceImpl">
+    <bean id="coiDisclosureFactBuilderService" class="org.kuali.kra.coi.CoiDisclosureFactBuilderServiceImpl">
          <property name="businessObjectService" ref="businessObjectService" />
           <property name="documentService" ref="documentService" />
+    </bean>
+    
+    <bean id="coiJavaFunctionKrmsTermService" class="org.kuali.kra.coi.service.impl.CoiJavaFunctionKrmsTermServiceImpl">
+    	<property name="questionnaireAnswerService" ref="questionnaireAnswerService"/>
+    	<property name="financialEntityService" ref="financialEntityService" />
     </bean>
 
 </beans>

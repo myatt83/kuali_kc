@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,45 +15,9 @@
  */
 package org.kuali.kra.irb.onlinereview;
 
-import org.kuali.kra.bo.KraPersistableBusinessObjectBase;
+import org.kuali.kra.protocol.onlinereview.ProtocolOnlineReviewDeterminationRecommendationBase;
 
-public class ProtocolOnlineReviewDeterminationRecommendation extends KraPersistableBusinessObjectBase {
+public class ProtocolOnlineReviewDeterminationRecommendation extends ProtocolOnlineReviewDeterminationRecommendationBase {
 
-    private static final long serialVersionUID = 521840115701578958L;
-
-    private Long protocolOnlineReviewDeterminationRecommendationCode;
-
-    private String description;
-
-    /**
-     * Gets the protocolReviewDeterminationRecommendationCode attribute. 
-     * @return Returns the protocolReviewDeterminationRecommendationCode.
-     */
-    public Long getProtocolOnlineReviewDeterminationRecommendationCode() {
-        return protocolOnlineReviewDeterminationRecommendationCode;
-    }
-
-    /**
-     * Sets the protocolReviewDeterminationRecommendationCode attribute value.
-     * @param protocolOnlineReviewDeterminationRecommendationCode The protocolReviewDeterminationRecommendationCode to set.
-     */
-    public void setProtocolOnlineReviewDeterminationRecommendationCode(Long protocolOnlineReviewDeterminationRecommendationCode) {
-        this.protocolOnlineReviewDeterminationRecommendationCode = protocolOnlineReviewDeterminationRecommendationCode;
-    }
-
-    /**
-     * Gets the description attribute. 
-     * @return Returns the description.
-     */
-    public String getDescription() {
-        return description;
-    }
-
-    /**
-     * Sets the description attribute value.
-     * @param description The description to set.
-     */
-    public void setDescription(String description) {
-        this.description = description;
-    }
+    private static final long serialVersionUID = 521840115701578958L;    
 }

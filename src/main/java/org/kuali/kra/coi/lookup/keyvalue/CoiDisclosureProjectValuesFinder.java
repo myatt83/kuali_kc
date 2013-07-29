@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,7 +50,6 @@ public class CoiDisclosureProjectValuesFinder extends KeyValuesBase {
     public List getKeyValues() {
         List<KeyValue> keyLabels = new ArrayList<KeyValue>();
         CoiDisclosureForm coiDisclosureForm = (CoiDisclosureForm) KNSGlobalVariables.getKualiForm();
-        keyLabels.add(new ConcreteKeyValue("", "select"));
 
         CoiDisclosureDocument coiDisclosureDocument = coiDisclosureForm.getCoiDisclosureDocument();
         CoiDisclosure coiDisclosure = coiDisclosureDocument.getCoiDisclosure();
@@ -81,6 +80,7 @@ public class CoiDisclosureProjectValuesFinder extends KeyValuesBase {
         addManualProject(keyLabels, masterDisclosureBean.getManualTravelProjects(), "Manual Travel --");
         addManualProject(keyLabels, masterDisclosureBean.getManualAwardProjects(), "Manual Award --");
         addManualProject(keyLabels, masterDisclosureBean.getManualProposalProjects(), "Manual Proposal --");
+        addManualProject(keyLabels, masterDisclosureBean.getOtherManualProjects(), "Manual Other --");
         addAutomaticProject(keyLabels, masterDisclosureBean.getAwardProjects(), "AWARD --");
         addAutomaticProject(keyLabels, masterDisclosureBean.getProtocolProjects(), "PROTOCOL --");
         addAutomaticProject(keyLabels, masterDisclosureBean.getProposalProjects(), "PROPOSAL --");

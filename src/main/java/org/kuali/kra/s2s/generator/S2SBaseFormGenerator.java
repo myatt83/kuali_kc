@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation.
+ * Copyright 2005-2013 The Kuali Foundation.
  * 
  * Licensed under the Educational Community License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import gov.grants.apply.system.attachmentsV10.AttachedFileDataType;
 import gov.grants.apply.system.attachmentsV10.AttachedFileDataType.FileLocation;
 import gov.grants.apply.system.globalV10.HashValueDocument.HashValue;
 
+import java.io.ByteArrayInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -27,25 +28,37 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.xml.security.exceptions.Base64DecodingException;
 import org.apache.xml.security.utils.Base64;
+import org.kuali.kra.bo.CoeusModule;
+import org.kuali.kra.bo.CoeusSubModule;
 import org.kuali.kra.infrastructure.KraServiceLocator;
+import org.kuali.kra.proposaldevelopment.bo.DevelopmentProposal;
 import org.kuali.kra.proposaldevelopment.bo.Narrative;
 import org.kuali.kra.proposaldevelopment.bo.NarrativeAttachment;
 import org.kuali.kra.proposaldevelopment.bo.NarrativeType;
 import org.kuali.kra.proposaldevelopment.bo.ProposalPerson;
 import org.kuali.kra.proposaldevelopment.bo.ProposalPersonBiography;
 import org.kuali.kra.proposaldevelopment.document.ProposalDevelopmentDocument;
+import org.kuali.kra.proposaldevelopment.questionnaire.ProposalDevelopmentModuleQuestionnaireBean;
 import org.kuali.kra.proposaldevelopment.service.NarrativeService;
+import org.kuali.kra.questionnaire.answer.AnswerHeader;
+import org.kuali.kra.questionnaire.answer.ModuleQuestionnaireBean;
+import org.kuali.kra.questionnaire.answer.QuestionnaireAnswerService;
 import org.kuali.kra.s2s.generator.bo.AttachmentData;
 import org.kuali.kra.s2s.generator.impl.GlobalLibraryV1_0Generator;
 import org.kuali.kra.s2s.generator.impl.GlobalLibraryV2_0Generator;
 import org.kuali.kra.s2s.util.S2SConstants;
 import org.kuali.kra.service.SponsorService;
 import org.kuali.rice.kns.util.AuditError;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
 
 /**
  * 
@@ -65,6 +78,7 @@ public abstract class S2SBaseFormGenerator implements S2SFormGenerator {
     public static final String MODULE_NUMBER = "M";
     public static final String AREAS_AFFECTED_ABSTRACT_TYPE_CODE="16";
     private static final String NARRATIVE_ATTACHMENT_LIST = "narrativeAttachmentList";
+    private static final String NARRATIVE_ATTACHMENT_FILE_LOCATION = "att:FileLocation";
        
     protected static final int ORGANIZATON_NAME_MAX_LENGTH = 60;
     protected static final int DUNS_NUMBER_MAX_LENGTH = 13;
@@ -400,5 +414,53 @@ public abstract class S2SBaseFormGenerator implements S2SFormGenerator {
     public void setAttachments(List<AttachmentData> attachments) {
         this.attachments = attachments;
     }
+   
+    public List<AnswerHeader> getQuestionnaireAnswers(DevelopmentProposal proposal, boolean finalDoc) {
+        ModuleQuestionnaireBean moduleQuestionnaireBean = new ProposalDevelopmentModuleQuestionnaireBean(pdDoc.getDevelopmentProposal());
+        QuestionnaireAnswerService questionnaireAnswerService = KraServiceLocator.getService(QuestionnaireAnswerService.class);
+        return questionnaireAnswerService.getQuestionnaireAnswer(moduleQuestionnaireBean);
+    }
     
+    /**
+     * Sort the attachments.
+     * @param byteArrayInputStream.
+     */
+    public void sortAttachments(ByteArrayInputStream byteArrayInputStream)  {
+        List<String> attachmentNameList = new ArrayList<String> ();
+        List<AttachmentData> attacmentList = getAttachments();
+        List<AttachmentData> tempAttacmentList = new ArrayList<AttachmentData>();
+        
+        try{
+            DocumentBuilderFactory domParserFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder domParser = domParserFactory.newDocumentBuilder();
+            Document document = domParser.parse(byteArrayInputStream);
+            byteArrayInputStream.close();
+            NodeList fileLocationList = document.getElementsByTagName(NARRATIVE_ATTACHMENT_FILE_LOCATION);                       
+            
+           for(int itemLocation=0;itemLocation<fileLocationList.getLength();itemLocation++){
+               String attachmentName =fileLocationList.item(itemLocation).getAttributes().item(0).getNodeValue();
+               String[] name = attachmentName.split(KEY_VALUE_SEPARATOR);               
+               String fileName =name[name.length-1];
+               attachmentNameList.add(fileName);
+           }
+        }catch (Exception e) {
+            LOG.error(e.getMessage(), e);
+        }
+        
+        for(String attachmentName :attachmentNameList){
+            for(AttachmentData attachment : attacmentList){                
+                String[] names = attachment.getContentId().split(KEY_VALUE_SEPARATOR);               
+                String fileName =names[names.length-1];
+                if(fileName.equalsIgnoreCase(attachmentName)){
+                    tempAttacmentList.add(attachment);
+                }
+            }
+        }
+        if(tempAttacmentList.size() > 0){
+            attachments.clear();
+            for(AttachmentData tempAttachment :tempAttacmentList){
+                attachments.add(tempAttachment);
+            } 
+        }
+    }     
 }

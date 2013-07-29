@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,16 +23,17 @@ import org.kuali.kra.negotiations.bo.NegotiationActivity;
 import org.kuali.kra.negotiations.bo.NegotiationActivityAttachment;
 import org.kuali.kra.negotiations.bo.NegotiationAssociationType;
 import org.kuali.kra.negotiations.bo.NegotiationUnassociatedDetail;
-import org.kuali.kra.negotiations.customdata.NegotiationCustomDataRuleImpl;
-import org.kuali.kra.negotiations.customdata.NegotiationSaveCustomDataRuleEvent;
 import org.kuali.kra.negotiations.document.NegotiationDocument;
 import org.kuali.kra.negotiations.service.NegotiationService;
 import org.kuali.kra.rule.event.KraDocumentEventBaseExtension;
+import org.kuali.kra.rule.event.SaveCustomDataEvent;
 import org.kuali.kra.rules.ResearchDocumentRuleBase;
+import org.kuali.kra.service.SponsorService;
 import org.kuali.rice.core.api.config.property.ConfigurationService;
 import org.kuali.rice.kns.service.DataDictionaryService;
 import org.kuali.rice.krad.document.Document;
 import org.kuali.rice.krad.util.GlobalVariables;
+import org.kuali.rice.krad.util.MessageMap;
 
 /**
  * 
@@ -49,6 +50,7 @@ public class NegotiationDocumentRule extends ResearchDocumentRuleBase {
     
     private NegotiationService negotiationService;
     private DataDictionaryService dataDictionaryService;
+    private SponsorService sponsorService;
     
     /**
      * 
@@ -72,19 +74,18 @@ public class NegotiationDocumentRule extends ResearchDocumentRuleBase {
         NegotiationDocument negotiationDocument = (NegotiationDocument) document;
         Negotiation negotiation = negotiationDocument.getNegotiation();
         
+        boolean result = true;
+        
+        result &= processRules(new SaveCustomDataEvent(negotiationDocument, true));
+
         GlobalVariables.getMessageMap().addToErrorPath(NEGOTIATION_ERROR_PATH);
         
-        boolean result = true;
         result &= validateEndDate(negotiation);
         result &= validateNegotiator(negotiation);
         result &= validateNegotiationAssociations(negotiation);
         result &= validateNegotiationUnassociatedDetails(negotiation);
         result &= validateNegotiationActivities(negotiation); 
-        String errorPath = "negotiationCustomData";
-        NegotiationSaveCustomDataRuleEvent event = new NegotiationSaveCustomDataRuleEvent(errorPath, 
-                                                               negotiationDocument);
-        result &= new NegotiationCustomDataRuleImpl().processSaveNegotiationCustomDataBusinessRules(event);
-           
+        
         GlobalVariables.getMessageMap().removeFromErrorPath(NEGOTIATION_ERROR_PATH);
         
         return result;
@@ -144,12 +145,13 @@ public class NegotiationDocumentRule extends ResearchDocumentRuleBase {
         if (negotiation.getNegotiationAssociationType() != null 
                 && !StringUtils.equals(negotiation.getNegotiationAssociationType().getCode(), NegotiationAssociationType.NONE_ASSOCIATION)
                 && StringUtils.isEmpty(negotiation.getAssociatedDocumentId())) {
-            negotiation.setAssociatedDocumentWarning(expandErrorString(KeyConstants.NEGOTIATION_WARNING_ASSOCIATEDID_NOT_SET, 
-                    new String[]{negotiation.getNegotiationAssociationType().getDescription()}));
+            //negotiation.setAssociatedDocumentWarning(expandErrorString(KeyConstants.NEGOTIATION_WARNING_ASSOCIATEDID_NOT_SET, 
+               //     new String[]{negotiation.getNegotiationAssociationType().getDescription()}));
+            valid = false;
             //can't do this because the document is final, when final and without error the messagemap is cleared during save
             //so must workaround to display this warning.
-            //getErrorReporter().reportWarning(ASSOCIATED_DOCMENT_ID, KeyConstants.NEGOTIATION_WARNING_ASSOCIATEDID_NOT_SET, 
-            //        negotiation.getNegotiationAssociationType().getDescription());
+            getErrorReporter().reportError(ASSOCIATED_DOCMENT_ID, KeyConstants.NEGOTIATION_WARNING_ASSOCIATEDID_NOT_SET, 
+                    negotiation.getNegotiationAssociationType().getDescription());
         }
         return valid;
     }
@@ -181,24 +183,28 @@ public class NegotiationDocumentRule extends ResearchDocumentRuleBase {
                 && negotiation.getUnAssociatedDetail() != null) {
             NegotiationUnassociatedDetail detail = negotiation.getUnAssociatedDetail();
             valid &= getDictionaryValidationService().isBusinessObjectValid(detail);
+            
             detail.refreshReferenceObject("sponsor");
-            if (detail.getSponsorCode() != null && detail.getSponsor() == null) {
+            if (detail.getSponsorCode() != null && !this.getSponsorService().validateSponsor(detail.getSponsor())) {
                 valid = false;
                 getErrorReporter().reportError("sponsorCode", KeyConstants.ERROR_MISSING, getDataDictionaryService().getAttributeErrorLabel(
                         NegotiationUnassociatedDetail.class, "sponsorCode"));
             }
+            
             detail.refreshReferenceObject("leadUnit");
             if (detail.getLeadUnitNumber() != null && detail.getLeadUnit() == null) {
                 valid = false;
                 getErrorReporter().reportError("leadUnitNumber", KeyConstants.ERROR_MISSING, getDataDictionaryService().getAttributeErrorLabel(
                         NegotiationUnassociatedDetail.class, "leadUnitNumber"));
             }
+            
             detail.refreshReferenceObject("primeSponsor");
-            if (detail.getPrimeSponsorCode() != null && detail.getPrimeSponsor() == null) {
+            if (detail.getPrimeSponsorCode() != null && !this.getSponsorService().validateSponsor(detail.getPrimeSponsor())) {
                 valid = false;
                 getErrorReporter().reportError("primeSponsorCode", KeyConstants.ERROR_MISSING, getDataDictionaryService().getAttributeErrorLabel(
                         NegotiationUnassociatedDetail.class, "primeSponsorCode"));
             }
+            
             detail.refreshReferenceObject("subAwardOrganization");
             if (detail.getSubAwardOrganizationId() != null && detail.getSubAwardOrganization() == null) {
                 valid = false;
@@ -285,6 +291,17 @@ public class NegotiationDocumentRule extends ResearchDocumentRuleBase {
 
     public void setDataDictionaryService(DataDictionaryService dataDictionaryService) {
         this.dataDictionaryService = dataDictionaryService;
+    }
+
+    public SponsorService getSponsorService() {
+        if (sponsorService == null) {
+            sponsorService = KraServiceLocator.getService(SponsorService.class);
+        }
+        return sponsorService;
+    }
+
+    public void setSponsorService(SponsorService sponsorService) {
+        this.sponsorService = sponsorService;
     }
 
 }

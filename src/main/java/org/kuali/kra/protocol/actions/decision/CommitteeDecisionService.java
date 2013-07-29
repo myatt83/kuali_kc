@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,21 +17,21 @@ package org.kuali.kra.protocol.actions.decision;
 
 import java.util.List;
 
-import org.kuali.kra.protocol.Protocol;
-import org.kuali.kra.common.committee.meeting.ProtocolVoteAbstainee;
-import org.kuali.kra.common.committee.meeting.ProtocolVoteRecused;
+import org.kuali.kra.protocol.ProtocolBase;
+import org.kuali.kra.common.committee.meeting.ProtocolVoteAbstaineeBase;
+import org.kuali.kra.common.committee.meeting.ProtocolVoteRecusedBase;
 
 /**
  * The Committee Decision Service processes committee decisions.
  */
-public interface CommitteeDecisionService<CD extends CommitteeDecision<? extends CommitteePerson> > {
+public interface CommitteeDecisionService<CD extends CommitteeDecision<? extends CommitteePersonBase> > {
 
     /**
      * Record the committee's decision.
      * @param protocol
      * @param committeeDecision
      */
-    void processCommitteeDecision(Protocol protocol, CD committeeDecision) throws Exception;
+    void processCommitteeDecision(ProtocolBase protocol, CD committeeDecision) throws Exception;
     
     /**
      * Finds all of the abstainer votes for the given protocolNumber and submissionNumber.
@@ -39,7 +39,7 @@ public interface CommitteeDecisionService<CD extends CommitteeDecision<? extends
      * @param submissionNumber The submission number
      * @return the list of abstainee votes for the given protocolNumber
      */
-    List<ProtocolVoteAbstainee> getAbstainers(String protocolNumber, int submissionNumber);
+    List<ProtocolVoteAbstaineeBase> getAbstainers(String protocolNumber, int submissionNumber);
     
     /**
      * Finds all of the recused votes for the given protocolNumber and submissionNumber.
@@ -47,5 +47,5 @@ public interface CommitteeDecisionService<CD extends CommitteeDecision<? extends
      * @param submissionNumber The submission number
      * @return the list of recused votes for the given protocolNumber
      */
-    List<ProtocolVoteRecused> getRecusers(String protocolNumber, int submissionNumber);
+    List<ProtocolVoteRecusedBase> getRecusers(String protocolNumber, int submissionNumber);
 }

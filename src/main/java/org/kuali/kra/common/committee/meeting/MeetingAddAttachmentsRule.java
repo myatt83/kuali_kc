@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ public class MeetingAddAttachmentsRule  extends ResearchDocumentRuleBase impleme
     public boolean processRules(MeetingAddAttachmentsEvent event) {
         // TODO Auto-generated method stub
         boolean isValid = true;
-        CommitteeScheduleAttachments committeeScheduleAttachments = event.getMeetingHelper().getNewCommitteeScheduleAttachments();
+        CommitteeScheduleAttachmentsBase committeeScheduleAttachments = event.getMeetingHelper().getNewCommitteeScheduleAttachments();
         if (committeeScheduleAttachments.getAttachmentsTypeCode() == null){
             isValid = false;
             reportError(propertyPrefix+ATTACHMENTS_ID

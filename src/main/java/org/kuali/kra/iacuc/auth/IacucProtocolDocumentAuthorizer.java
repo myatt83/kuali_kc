@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,18 +26,19 @@ import org.kuali.kra.authorization.ApplicationTask;
 import org.kuali.kra.authorization.KcTransactionalDocumentAuthorizerBase;
 import org.kuali.kra.iacuc.IacucProtocol;
 import org.kuali.kra.iacuc.IacucProtocolDocument;
+import org.kuali.kra.iacuc.actions.IacucProtocolStatus;
 import org.kuali.kra.iacuc.actions.submit.IacucProtocolReviewerType;
 import org.kuali.kra.iacuc.onlinereview.IacucProtocolOnlineReview;
 import org.kuali.kra.iacuc.onlinereview.IacucProtocolOnlineReviewService;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.infrastructure.TaskName;
-import org.kuali.kra.protocol.onlinereview.ProtocolOnlineReview;
-import org.kuali.kra.protocol.ProtocolDocument;
-import org.kuali.kra.protocol.actions.ProtocolStatus;
+import org.kuali.kra.protocol.onlinereview.ProtocolOnlineReviewBase;
+import org.kuali.kra.protocol.ProtocolDocumentBase;
+import org.kuali.kra.protocol.actions.ProtocolStatusBase;
 import org.kuali.kra.protocol.actions.amendrenew.ProtocolAmendRenewService;
 import org.kuali.kra.protocol.actions.submit.ProtocolReviewer;
-import org.kuali.kra.protocol.personnel.ProtocolPerson;
+import org.kuali.kra.protocol.personnel.ProtocolPersonBase;
 import org.kuali.kra.service.TaskAuthorizationService;
 import org.kuali.rice.kim.api.identity.Person;
 import org.kuali.rice.kns.authorization.AuthorizationConstants;
@@ -98,12 +99,12 @@ public class IacucProtocolDocumentAuthorizer extends KcTransactionalDocumentAuth
     }
     
     public boolean canViewReviewComments(Document document, Person user) {
-        ProtocolDocument protocolDoc = (ProtocolDocument)document;
-        List<ProtocolPerson> participants = protocolDoc.getProtocol().getProtocolPersons();
-        for (ProtocolPerson participant : participants) {
+        ProtocolDocumentBase protocolDoc = (ProtocolDocumentBase)document;
+        List<ProtocolPersonBase> participants = protocolDoc.getProtocol().getProtocolPersons();
+        for (ProtocolPersonBase participant : participants) {
             if (StringUtils.equalsIgnoreCase(participant.getPersonId() + "", user.getPrincipalId())) {
                 String statusCode = protocolDoc.getProtocol().getProtocolStatusCode();
-                if (statusCode.equalsIgnoreCase(ProtocolStatus.SUBMITTED_TO_IACUC)) {
+                if (statusCode.equalsIgnoreCase(IacucProtocolStatus.SUBMITTED_TO_IACUC)) {
                     return false;
                 }
             }
@@ -113,9 +114,9 @@ public class IacucProtocolDocumentAuthorizer extends KcTransactionalDocumentAuth
     
     public boolean canEditReviewComments(Document document, Person user) {
         IacucProtocolDocument protocolDoc = (IacucProtocolDocument)document;
-        List<ProtocolOnlineReview> reviews = getIacucProtocolOnlineReviewService().getProtocolReviews(protocolDoc.getProtocol().getProtocolNumber());
+        List<ProtocolOnlineReviewBase> reviews = getIacucProtocolOnlineReviewService().getProtocolReviews(protocolDoc.getProtocol().getProtocolNumber());
         if (reviews != null && reviews.size() > 0) {
-            for (ProtocolOnlineReview review : reviews) {
+            for (ProtocolOnlineReviewBase review : reviews) {
                 ProtocolReviewer reviewer = review.getProtocolReviewer();
                 if (StringUtils.equalsIgnoreCase(reviewer.getPerson().getPersonId(), user.getPrincipalId())) {
                     if (isPrimarySecondary(reviewer)) {
@@ -131,9 +132,9 @@ public class IacucProtocolDocumentAuthorizer extends KcTransactionalDocumentAuth
     
     public boolean canEditReviewAttachments(Document document, Person user) {
         IacucProtocolDocument protocolDoc = (IacucProtocolDocument)document;
-        List<ProtocolOnlineReview> reviews = getIacucProtocolOnlineReviewService().getProtocolReviews(protocolDoc.getProtocol().getProtocolNumber());
+        List<ProtocolOnlineReviewBase> reviews = getIacucProtocolOnlineReviewService().getProtocolReviews(protocolDoc.getProtocol().getProtocolNumber());
         if (reviews != null && reviews.size() > 0) {
-            for (ProtocolOnlineReview review : reviews) {
+            for (ProtocolOnlineReviewBase review : reviews) {
                 ProtocolReviewer reviewer = review.getProtocolReviewer();
                 if (StringUtils.equalsIgnoreCase(reviewer.getPerson().getPersonId(), user.getPrincipalId())) {
                     if (isPrimarySecondary(reviewer)) {
@@ -152,7 +153,7 @@ public class IacucProtocolDocumentAuthorizer extends KcTransactionalDocumentAuth
                 StringUtils.equalsIgnoreCase(reviewer.getReviewerTypeCode(), IacucProtocolReviewerType.SECONDARY);
     }
     
-    protected boolean isCommitteeAndPastDeterminationDueDate(ProtocolReviewer reviewer, ProtocolOnlineReview review) {
+    protected boolean isCommitteeAndPastDeterminationDueDate(ProtocolReviewer reviewer, ProtocolOnlineReviewBase review) {
         if(StringUtils.equalsIgnoreCase(reviewer.getReviewerTypeCode(), IacucProtocolReviewerType.COMMITTEE)) {
             Date determinationDueDate = ((IacucProtocolOnlineReview) review.getProtocolOnlineReviewDocument().getProtocolOnlineReview()).getDeterminationReviewDateDue();
             if (determinationDueDate != null && Calendar.getInstance().getTime().after(determinationDueDate)) {
@@ -177,16 +178,12 @@ public class IacucProtocolDocumentAuthorizer extends KcTransactionalDocumentAuth
      * @see org.kuali.rice.kns.document.authorization.DocumentAuthorizer#canOpen(org.kuali.rice.krad.document.Document, org.kuali.rice.kim.api.identity.Person)
      */
     public boolean canOpen(Document document, Person user) {
-        // TODO : this is temporarily return 'true' because the required fields are not done.  unit number is not saved.
-        // so, the permission check can't be done properly.
         IacucProtocolDocument protocolDocument = (IacucProtocolDocument) document;
         if (protocolDocument.getProtocol().getProtocolId() == null) {
             return canCreateIacucProtocol(user);
         }
         return canExecuteIacucProtocolTask(user.getPrincipalId(), (IacucProtocolDocument) document, TaskName.VIEW_IACUC_PROTOCOL);
-
-//          return true;
-        }
+    }
     
     /**
      * Does the user have permission to create a Iacuc Protocol?
@@ -207,7 +204,6 @@ public class IacucProtocolDocumentAuthorizer extends KcTransactionalDocumentAuth
      * @return true if has permission; otherwise false
      */
     private boolean canExecuteIacucProtocolTask(String userId, IacucProtocolDocument doc, String taskName) {
-        // TODO : to be implemented later
         IacucProtocolTask task = new IacucProtocolTask(taskName, doc.getIacucProtocol());       
         TaskAuthorizationService taskAuthenticationService = KraServiceLocator.getService(TaskAuthorizationService.class);
         return taskAuthenticationService.isAuthorized(userId, task);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,9 +24,9 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.kuali.kra.award.AwardForm;
-import org.kuali.kra.award.customdata.AwardCustomData;
-import org.kuali.kra.bo.CustomAttribute;
-import org.kuali.kra.common.customattributes.CustomDataAction;
+import org.kuali.kra.infrastructure.Constants;
+import org.kuali.kra.rule.event.SaveCustomDataEvent;
+import org.kuali.kra.rules.CustomDataRule;
 import org.kuali.rice.kns.web.struts.form.KualiDocumentFormBase;
 
 /**
@@ -50,7 +50,8 @@ public class AwardCustomDataAction extends AwardAction {
             HttpServletRequest request, HttpServletResponse response) throws Exception { 
         AwardForm awardForm = (AwardForm) form;
         super.reload(mapping, form, request, response);
-        return awardForm.getCustomDataHelper().awardCustomData(mapping, awardForm, request, response);        
+        awardForm.getCustomDataHelper().prepareCustomData();
+        return mapping.findForward(Constants.MAPPING_AWARD_CUSTOM_DATA_PAGE);
     }
     
     /**
@@ -61,60 +62,13 @@ public class AwardCustomDataAction extends AwardAction {
     @Override
     public ActionForward save(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-        AwardForm awardForm = (AwardForm) form;  
-        copyCustomDataToAward(awardForm);
-        ActionForward forward = super.save(mapping, form, request, response);
-        
-        return forward;
-    }
-    
-    /**
-     * Copy the custom data to the Award so that it can saved.
-     * @param form
-     */
-    public void copyCustomDataToAward(AwardForm awardForm) {
-        awardForm.getCustomDataHelper().populateCustomAttributeValuesMap();
-        if(awardForm.getAwardDocument().getAward().getAwardCustomDataList().size() == 0) {
-            copyCustomDataToNewAward(awardForm);
-        }else {
-            copyCustomDataToExistingAward(awardForm);
-        }
-    }
-    
-    /**
-     * This method is called when custom data is created on a newly created Award. It initializes the list on Award and sets the values from the form
-     * @param awardForm
-     */
-    private void copyCustomDataToNewAward(AwardForm awardForm) {
-        for (Map.Entry<String, String[]>customAttributeValue: awardForm.getCustomDataHelper().getCustomAttributeValues().entrySet()) {
-            int customAttributeId = Integer.parseInt(customAttributeValue.getKey().substring(2));         
-            AwardCustomData awardCustomData = new AwardCustomData();
-            awardCustomData.setCustomAttribute(new CustomAttribute());
-            awardCustomData.getCustomAttribute().setId(customAttributeId);
-            awardCustomData.setCustomAttributeId((long) customAttributeId);
-            awardCustomData.setAward(awardForm.getAwardDocument().getAward());
-            if(customAttributeValue.getValue()[0] == null) {
-                awardCustomData.setValue("");
-            }else {
-                awardCustomData.setValue(customAttributeValue.getValue()[0]);
-            }
-            awardForm.getAwardDocument().getAward().getAwardCustomDataList().add(awardCustomData);
-        }
-    }
-    
-    /**
-     * This method copies the values from the form to the awardCustomDataList on Award.
-     * @param awardForm
-     */
-    private void copyCustomDataToExistingAward(AwardForm awardForm) {
-        for (Map.Entry<String, String[]>customAttributeValue: awardForm.getCustomDataHelper().getCustomAttributeValues().entrySet()) {
-            int customAttributeId = Integer.parseInt(customAttributeValue.getKey().substring(2));         
-            String value = customAttributeValue.getValue()[0];
-            for(AwardCustomData awardCustomData : awardForm.getAwardDocument().getAward().getAwardCustomDataList()) {
-                if(customAttributeId == awardCustomData.getCustomAttributeId()) {
-                    awardCustomData.setValue(value);
-                }
-            }
+        AwardForm awardForm = (AwardForm) form;
+        //have to do the custom data validation here, separate from the document save, as invalid default values could cause the
+        //document to be unusable.
+        if (new CustomDataRule().processRules(new SaveCustomDataEvent(awardForm.getAwardDocument()))) {
+            return super.save(mapping, form, request, response);   
+        } else {
+            return mapping.findForward(Constants.MAPPING_BASIC);
         }
     }
     
@@ -124,6 +78,7 @@ public class AwardCustomDataAction extends AwardAction {
     @Override
     public void postDocumentSave(KualiDocumentFormBase form) throws Exception {
         super.postDocumentSave(form);
-        CustomDataAction.setCustomAttributeContent(form, CUSTOM_ATTRIBUTE_NAME);
+        AwardForm awardForm = (AwardForm) form;
+        awardForm.getCustomDataHelper().setCustomAttributeContent(awardForm.getAwardDocument().getDocumentNumber(), CUSTOM_ATTRIBUTE_NAME);
     }
 }

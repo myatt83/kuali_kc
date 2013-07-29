@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@ import gov.grants.apply.forms.phs398ResearchTrainingProgramPlanV10.PHS398Researc
 import gov.grants.apply.system.attachmentsV10.AttachedFileDataType;
 import gov.grants.apply.system.attachmentsV10.AttachmentGroupMin0Max100DataType;
 
+import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
 
 import org.apache.xmlbeans.XmlObject;
@@ -214,7 +215,9 @@ public class PHS398ResTrainProgPlanV1_0Generator extends S2SBaseFormGenerator{
          }
         
          if (researchTrainingProgramPlanAttachments != null)   phs398ResTrainProgPlan.setResearchTrainingProgramPlanAttachments(researchTrainingProgramPlanAttachments);
-
+        
+         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(phs398ResTrainProgPlan.toString().getBytes());            
+         sortAttachments(byteArrayInputStream);
         return phs398ResTrainProgPlan;
         
     }

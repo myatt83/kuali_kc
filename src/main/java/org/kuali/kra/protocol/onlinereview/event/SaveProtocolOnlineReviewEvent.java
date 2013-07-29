@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,9 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.kuali.kra.common.committee.meeting.CommitteeScheduleMinute;
-import org.kuali.kra.protocol.ProtocolOnlineReviewDocument;
-import org.kuali.kra.protocol.onlinereview.ProtocolReviewAttachment;
+import org.kuali.kra.common.committee.meeting.CommitteeScheduleMinuteBase;
+import org.kuali.kra.protocol.ProtocolOnlineReviewDocumentBase;
+import org.kuali.kra.protocol.onlinereview.ProtocolReviewAttachmentBase;
 import org.kuali.kra.protocol.onlinereview.rules.SaveProtocolOnlineReviewRule;
 import org.kuali.kra.rule.event.KraDocumentEventBase;
 import org.kuali.rice.krad.rules.rule.BusinessRule;
@@ -31,8 +31,8 @@ public class SaveProtocolOnlineReviewEvent extends KraDocumentEventBase {
     
     
     private static final Log LOG = LogFactory.getLog(SaveProtocolOnlineReviewEvent.class);
-    private final List<CommitteeScheduleMinute> minutes;
-    private List<ProtocolReviewAttachment> reviewAttachments;
+    private final List<CommitteeScheduleMinuteBase> minutes;
+    private List<ProtocolReviewAttachmentBase> reviewAttachments;
     private final long onlineReviewIndex;
   
     /**
@@ -40,8 +40,8 @@ public class SaveProtocolOnlineReviewEvent extends KraDocumentEventBase {
      * @param document the document.
      * @param newProtocolNotepad the new attachment to be added.
      */
-    public SaveProtocolOnlineReviewEvent(final ProtocolOnlineReviewDocument document,
-        final List<CommitteeScheduleMinute> minutes, final long onlineReviewIndex ) {
+    public SaveProtocolOnlineReviewEvent(final ProtocolOnlineReviewDocumentBase document,
+        final List<CommitteeScheduleMinuteBase> minutes, final long onlineReviewIndex ) {
         super("adding new protocol notepad", "notesAttachmentsHelper", document);
         this.onlineReviewIndex = onlineReviewIndex;
         if (document == null) {
@@ -76,8 +76,8 @@ public class SaveProtocolOnlineReviewEvent extends KraDocumentEventBase {
     }
 
    
-    public ProtocolOnlineReviewDocument getProtocolOnlineReviewDocument() {
-        return (ProtocolOnlineReviewDocument)getDocument();
+    public ProtocolOnlineReviewDocumentBase getProtocolOnlineReviewDocument() {
+        return (ProtocolOnlineReviewDocumentBase)getDocument();
     }
 
     /**
@@ -92,12 +92,12 @@ public class SaveProtocolOnlineReviewEvent extends KraDocumentEventBase {
      * Gets the minutes attribute. 
      * @return Returns the minutes.
      */
-    public List<CommitteeScheduleMinute> getMinutes() {
+    public List<CommitteeScheduleMinuteBase> getMinutes() {
         return minutes;
     }
 
 
-    public List<ProtocolReviewAttachment> getReviewAttachments() {
+    public List<ProtocolReviewAttachmentBase> getReviewAttachments() {
         return reviewAttachments;
     }
     

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,6 +49,7 @@ public class NarrativeStatusValuesFinder extends KeyValuesBase {
         KeyValuesService keyValuesService = (KeyValuesService) KraServiceLocator.getService("keyValuesService");
         Collection<NarrativeStatus> statuses = keyValuesService.findAll(NarrativeStatus.class);
         List<KeyValue> keyValues = new ArrayList<KeyValue>();
+        keyValues.add(new ConcreteKeyValue("", "select"));
         for (NarrativeStatus status : statuses) {
              keyValues.add(new ConcreteKeyValue(status.getNarrativeStatusCode(), status.getDescription()));
       

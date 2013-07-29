@@ -1,5 +1,5 @@
 <%--
- Copyright 2005-2010 The Kuali Foundation
+ Copyright 2005-2013 The Kuali Foundation
  
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
 --%>
 
 <%@ include file="/WEB-INF/jsp/kraTldHeader.jsp"%>
+<%@ attribute name="transparentBackground" required="false" %>
 <c:set var="proposalDevelopmentAttributes"
 	value="${DataDictionary.DevelopmentProposal.attributes}" />
 <c:set var="scienceKeywordAttributes"
@@ -26,7 +27,7 @@
 	value="org.kuali.kra.proposaldevelopment.document.ProposalDevelopmentDocument" />
 <c:set var="className"
 	value="org.kuali.kra.proposaldevelopment.document.ProposalDevelopmentDocument" />
-<kul:tab tabTitle="Custom Data Information" defaultOpen="false"
+<kul:tab tabTitle="Custom Data Information" defaultOpen="false" transparentBackground="${transparentBackground }"
 	tabErrorKey="">
 	<div class="tab-container" align="center">
 		<h3>

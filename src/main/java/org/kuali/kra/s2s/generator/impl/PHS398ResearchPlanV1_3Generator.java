@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation.
+ * Copyright 2005-2013 The Kuali Foundation.
  * 
  * Licensed under the Educational Community License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 package org.kuali.kra.s2s.generator.impl;
+
+import java.io.ByteArrayInputStream;
 
 import gov.grants.apply.forms.phs398ResearchPlan13V13.PHS398ResearchPlan13Document;
 import gov.grants.apply.forms.phs398ResearchPlan13V13.PHS398ResearchPlan13Document.PHS398ResearchPlan13;
@@ -81,6 +83,9 @@ public class PHS398ResearchPlanV1_3Generator extends
 		researchPlanAttachments.setAppendix(attachmentGroupMin0Max100DataType);
 		phsResearchPlan.setResearchPlanAttachments(researchPlanAttachments);
 		phsResearchPlanDocument.setPHS398ResearchPlan13(phsResearchPlan);
+		
+		ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(phsResearchPlanDocument.toString().getBytes());            
+		sortAttachments(byteArrayInputStream);		
 		return phsResearchPlanDocument;
 	}
 

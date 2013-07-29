@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.kuali.kra.authorization.KraAuthorizationConstants;
-import org.kuali.kra.common.customattributes.CustomDataForm;
 import org.kuali.kra.common.notification.web.struts.form.NotificationHelper;
 import org.kuali.kra.common.web.struts.form.ReportHelperBean;
 import org.kuali.kra.common.web.struts.form.ReportHelperBeanContainer;
@@ -43,6 +42,7 @@ import org.kuali.kra.proposaldevelopment.document.ProposalDevelopmentDocument;
 import org.kuali.kra.proposaldevelopment.document.authorization.ProposalTask;
 import org.kuali.kra.service.TaskAuthorizationService;
 import org.kuali.kra.web.struts.form.Auditable;
+import org.kuali.kra.web.struts.form.CustomDataDocumentForm;
 import org.kuali.kra.web.struts.form.KraTransactionalDocumentFormBase;
 import org.kuali.kra.web.struts.form.MultiLookupFormBase;
 import org.kuali.rice.core.api.config.property.ConfigurationService;
@@ -58,8 +58,9 @@ import org.kuali.rice.krad.util.KRADConstants;
 /**
  * This class...
  */
-public class InstitutionalProposalForm extends KraTransactionalDocumentFormBase implements CustomDataForm, Auditable,
-                                                                        MultiLookupFormBase, ReportHelperBeanContainer {
+public class InstitutionalProposalForm extends KraTransactionalDocumentFormBase implements Auditable,
+                                                                        MultiLookupFormBase, ReportHelperBeanContainer,
+                                                                        CustomDataDocumentForm {
 
     /**
      * Comment for <code>serialVersionUID</code>

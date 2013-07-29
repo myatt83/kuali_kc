@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@ package org.kuali.kra.iacuc.notification;
 
 import org.kuali.kra.iacuc.IacucProtocol;
 import org.kuali.kra.iacuc.onlinereview.IacucProtocolOnlineReview;
-import org.kuali.kra.protocol.notification.ProtocolNotificationRequestBean;
+import org.kuali.kra.protocol.notification.ProtocolNotificationRequestBeanBase;
 
-public class IacucProtocolNotificationRequestBean extends ProtocolNotificationRequestBean {
+public class IacucProtocolNotificationRequestBean extends ProtocolNotificationRequestBeanBase {
 
     /**
      * Comment for <code>serialVersionUID</code>

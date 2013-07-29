@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,30 +17,13 @@ package org.kuali.kra.irb.actions.amendrenew;
 
 import org.apache.commons.lang.StringUtils;
 import org.kuali.kra.infrastructure.KeyConstants;
-import org.kuali.kra.rule.BusinessRuleInterface;
-import org.kuali.kra.rules.ResearchDocumentRuleBase;
+import org.kuali.kra.protocol.actions.amendrenew.CreateAmendmentRuleBase;
 
 /**
  * Business rule for creating an amendment.  The user is required to enter a summary
  * and they must select at least one module which will be modified in the amendment.
  */
 @SuppressWarnings("unchecked")
-public class CreateAmendmentRule extends ResearchDocumentRuleBase implements BusinessRuleInterface<CreateAmendmentEvent> {
+public class CreateAmendmentRule extends CreateAmendmentRuleBase {
 
-    public boolean processRules(CreateAmendmentEvent event) {
-        
-        boolean valid = true;
-        
-        if (StringUtils.isBlank(event.getAmendmentBean().getSummary())) {
-            valid = false;
-            reportError(event.getPropertyName(), KeyConstants.ERROR_PROTOCOL_SUMMARY_IS_REQUIRED);
-        }
-        
-        if (!event.getAmendmentBean().isSomeSelected()) {
-            valid = false;
-            reportError(event.getPropertyName(), KeyConstants.ERROR_PROTOCOL_SELECT_MODULE);
-        }
-        
-        return valid;
-    }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,13 @@ package org.kuali.kra.iacuc.auth;
 import org.kuali.kra.iacuc.actions.IacucProtocolActionType;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.PermissionConstants;
-import org.kuali.kra.protocol.Protocol;
+import org.kuali.kra.protocol.ProtocolBase;
 
 public class IacucProtocolRemoveFromAgendaAuthorizer extends IacucProtocolAuthorizer {
 
     @Override
     public boolean isAuthorized(String userId, IacucProtocolTask task) {
-        Protocol protocol = task.getProtocol();
+        ProtocolBase protocol = task.getProtocol();
         boolean workFlow = kraWorkflowService.isInWorkflow(protocol.getProtocolDocument());
         boolean documentOn = kraWorkflowService.isDocumentOnNode(protocol.getProtocolDocument(), Constants.PROTOCOL_IACUCREVIEW_ROUTE_NODE_NAME);
         boolean executable = canExecuteAction(protocol, IacucProtocolActionType.REMOVE_FROM_AGENDA);

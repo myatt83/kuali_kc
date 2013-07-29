@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -92,9 +92,12 @@ public class CoiPrintingServiceImpl  implements CoiPrintingService {
          return printable;
      }
      public AttachmentDataSource print(List<Printable> printableArtifactList) throws PrintingException {
+         String fileName = "";
          AttachmentDataSource attachmentDataSource =  getPrintingService().print(printableArtifactList);
-           String fileName = "ApprovedDisclosure" + Constants.PDF_FILE_EXTENSION;
-           try {
+         CoiCertificationPrint certificationPrint = (CoiCertificationPrint) printableArtifactList.get(0);
+         CoiDisclosure coiDisclosure = (CoiDisclosure) certificationPrint.getPrintableBusinessObject();
+         fileName = "PendingDisclosure" + Constants.PDF_FILE_EXTENSION;
+          try {
                attachmentDataSource.setFileName(URLEncoder.encode(fileName,"UTF-8"));
            } catch (UnsupportedEncodingException e) {
                attachmentDataSource.setFileName(fileName);

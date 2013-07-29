@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 package org.kuali.kra.common.committee.rule.event;
 
 import org.kuali.kra.common.committee.bo.CommitteeMembershipRole;
-import org.kuali.kra.common.committee.document.CommonCommitteeDocument;
+import org.kuali.kra.common.committee.document.CommitteeDocumentBase;
 import org.kuali.kra.common.committee.rule.AddCommitteeMembershipRoleRule;
 import org.kuali.rice.krad.document.Document;
 import org.kuali.rice.krad.rules.rule.BusinessRule;
@@ -33,7 +33,7 @@ public class AddCommitteeMembershipRoleEvent extends CommitteeMembershipRoleEven
      * @param committeeMembershipRole
      * @param membershipIndex
      */
-    public AddCommitteeMembershipRoleEvent(String errorPathPrefix, CommonCommitteeDocument comitteeDocument,
+    public AddCommitteeMembershipRoleEvent(String errorPathPrefix, CommitteeDocumentBase comitteeDocument,
             CommitteeMembershipRole committeeMembershipRole, int membershipIndex) {
         super("adding CommitteeMembershipRole to document " + getDocumentId(comitteeDocument), errorPathPrefix, comitteeDocument,
             committeeMembershipRole, membershipIndex);
@@ -51,7 +51,7 @@ public class AddCommitteeMembershipRoleEvent extends CommitteeMembershipRoleEven
      */
     public AddCommitteeMembershipRoleEvent(String errorPathPrefix, Document document, 
             CommitteeMembershipRole committeeMembershipRole, int membershipIndex) {
-        this(errorPathPrefix, (CommonCommitteeDocument) document, committeeMembershipRole, membershipIndex);
+        this(errorPathPrefix, (CommitteeDocumentBase) document, committeeMembershipRole, membershipIndex);
     }
 
     /**

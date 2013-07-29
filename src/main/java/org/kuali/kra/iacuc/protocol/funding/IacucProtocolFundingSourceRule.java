@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,10 @@
  */
 package org.kuali.kra.iacuc.protocol.funding;
 
-import org.kuali.kra.protocol.protocol.funding.ProtocolFundingSourceRule;
+import org.kuali.kra.protocol.protocol.funding.ProtocolFundingSourceRuleBase;
 import org.kuali.kra.protocol.protocol.funding.ProtocolFundingSourceService;
 
-public class IacucProtocolFundingSourceRule extends ProtocolFundingSourceRule {
+public class IacucProtocolFundingSourceRule extends ProtocolFundingSourceRuleBase {
 
     @Override
     protected Class<? extends ProtocolFundingSourceService> getProtocolFundingSourceServiceClassHook() {

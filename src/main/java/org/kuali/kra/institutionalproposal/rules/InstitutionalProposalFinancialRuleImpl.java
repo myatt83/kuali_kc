@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,7 +65,7 @@ public class InstitutionalProposalFinancialRuleImpl extends ResearchDocumentRule
                valid = false;
            }
        }
-       if(institutionalProposal.getRequestedStartDateTotal() != null && institutionalProposal.getRequestedStartDateInitial() != null) {
+       if(institutionalProposal.getRequestedEndDateTotal() != null && institutionalProposal.getRequestedEndDateInitial() != null) {
            if (!(validateFirstDatePriorToSecondDate(institutionalProposal.getRequestedEndDateInitial(),
                    institutionalProposal.getRequestedEndDateTotal()))) {
                this.reportError("document.institutionalProposalList[0].requestedEndDateInitial", KeyConstants.ERROR_FINANCIAL_DATES, 

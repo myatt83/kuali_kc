@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,15 +25,6 @@ import org.kuali.kra.infrastructure.TaskName;
 public enum IacucProtocolRequestAction {
     
     /**
-     * Request to close a Protocol.
-     */
-//    REQUEST_TO_CLOSE               (IacucProtocolActionType..REQUEST_TO_CLOSE,
-//                                    TaskName.PROTOCOL_REQUEST_CLOSE,
-//                                    Constants.PROTOCOL_CLOSE_REQUEST_PROPERTY_KEY, 
-//                                    "protocolCloseRequestBean", 
-//                                    "Request to Close"), 
-//
-    /**
      * Request to deactivate a Protocol.
      */
     REQUEST_TO_DEACTIVATE           (IacucProtocolActionType.REQUEST_DEACTIVATE,
@@ -58,16 +49,8 @@ public enum IacucProtocolRequestAction {
                                     TaskName.IACUC_PROTOCOL_REQUEST_SUSPENSION,
                                     Constants.PROTOCOL_SUSPEND_REQUEST_PROPERTY_KEY, 
                                     "iacucProtocolSuspendRequestBean", 
-                                    "Request for Suspension"), 
+                                    "Request for Suspension")
                                   
-//    /**
-//     * Request for termination of a Protocol.
-//     */
-//    REQUEST_FOR_TERMINATION        (IacucProtocolActionType.REQUEST_FOR_TERMINATION, 
-//                                    TaskName.PROTOCOL_REQUEST_TERMINATE,
-//                                    Constants.PROTOCOL_TERMINATE_REQUEST_PROPERTY_KEY, 
-//                                    "protocolTerminateRequestBean", 
-//                                    "Request for Termination")
                                     ;
     
     private final String actionTypeCode;

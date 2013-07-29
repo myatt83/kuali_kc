@@ -1,6 +1,6 @@
 
 	<!--
-		Copyright 2005-2010 The Kuali Foundation Licensed under the
+		Copyright 2005-2013 The Kuali Foundation Licensed under the
 		Educational Community License, Version 2.0 (the "License"); you may
 		not use this file except in compliance with the License. You may
 		obtain a copy of the License at http://www.osedu.org/licenses/ECL-2.0
@@ -127,7 +127,7 @@
 		</property>
     	<property name="control" >
       <bean parent="SelectControlDefinition"
-            p:valuesFinderClass="org.kuali.kra.meeting.MinuteEntryTypeValuesFinder"
+            p:valuesFinderClass="org.kuali.kra.common.committee.meeting.MinuteEntryTypeValuesFinder"
             p:includeKeyInLabel="false" 
             p:script="updateProtocolContingencyDiv(this)" />
     	</property>

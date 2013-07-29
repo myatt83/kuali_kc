@@ -1,5 +1,5 @@
 <%--
- Copyright 2005-2010 The Kuali Foundation
+ Copyright 2005-2013 The Kuali Foundation
 
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -49,12 +49,20 @@
     <script type="text/javascript" src="scripts/questionnaireAnswer.js"></script>
   	
   	
-	<c:set var = "topTabTransparent" value = "true"/>
-  	<c:if test="${fn:length(KualiForm.questionnaireHelper.answerHeaders) gt 0 or fn:length(KualiForm.s2sQuestionnaireHelper.answerHeaders) gt 0}">
-  		<c:set var="topTabTransparent" value = "false"/>
+	<c:set var = "hasQuestionnaires" value = "false"/>
+  	<c:if test="${not empty KualiForm.questionnaireHelper.answerHeaders or not empty KualiForm.s2sQuestionnaireHelper.answerHeaders}">
+  		<c:set var="hasQuestionnaires" value = "true"/>
   	</c:if>
+	
+	<kra-pd:proposalYnq topTabTransparent="${!hasQuestionnaires}"/>  	
   	
-	<kra-pd:proposalYnq topTabTransparent="${topTabTransparent}" />
+  	<c:if test="${!hasQuestionnaires && empty KualiForm.document.developmentProposalList[0].proposalYnqs}">
+  		<kul:tabTop tabTitle="Questions" defaultOpen="true">
+			<div class="tab-container" align="center">
+    			<h2>There are no questions defined for this proposal.</h2>
+    		</div>
+  		</kul:tabTop>
+	</c:if>
 	<kul:panelFooter />
 	</div>
 <kul:documentControls transactionalDocument="true" suppressRoutingControls="true" suppressCancelButton="true" />

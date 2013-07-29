@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,13 +24,11 @@ public class AdditionalInfoSummary implements Serializable {
     private static final long serialVersionUID = 1740333929467337320L;
     
     private String fdaApplicationNumber;
-    //private String billable;
     private String referenceId1;
     private String referenceId2;
     private String description;
     
     private boolean fdaApplicationNumberChanged;
-    //private boolean billableChanged;
     private boolean referenceId1Changed;
     private boolean referenceId2Changed;
     private boolean descriptionChanged;

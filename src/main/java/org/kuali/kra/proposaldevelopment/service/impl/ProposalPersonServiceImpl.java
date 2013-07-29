@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,9 +25,12 @@ import org.kuali.kra.bo.Unit;
 import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.proposaldevelopment.bo.ProposalPerson;
 import org.kuali.kra.proposaldevelopment.document.ProposalDevelopmentDocument;
+import org.kuali.kra.proposaldevelopment.lookup.keyvalue.KCStateValuesFinder;
 import org.kuali.kra.proposaldevelopment.service.ProposalPersonService;
 import org.kuali.kra.service.KcPersonService;
 import org.kuali.kra.service.UnitService;
+import org.kuali.kra.util.ValuesFinderUtility;
+import org.kuali.rice.core.api.util.KeyValue;
 import org.kuali.rice.krad.service.BusinessObjectService;
 /**
  * 
@@ -124,4 +127,11 @@ public class ProposalPersonServiceImpl implements ProposalPersonService {
         }
         return personDivisionName;
     }
+    
+    @Override
+    public String getNewStateList(String countryCode) {
+        List<KeyValue> values = KCStateValuesFinder.getKeyValues(countryCode.trim());
+        return ValuesFinderUtility.processKeyValueList(values);
+    }
+    
 }

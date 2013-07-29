@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,24 +24,25 @@ import org.kuali.rice.krad.service.DocumentService;
 public abstract class KcKrmsJavaFunctionTermServiceBase {
     public static final String TRUE = "true";
     public static final String FALSE = "false";
-    public static final String[] restrictedElements = {" ", "`", "@", "#", "!", "$", "%", "^", "&", "*", "(", ")", "[", "]", "{", "}", 
-            "|", "\\", "/", "?", "<", ">", ",", ";", ":", "'", "\"", "`", "+"};    
+    public static final String[] restrictedElements = { " ", "`", "@", "#", "!", "$", "%", "^", "&", "*", "(", ")", "[", "]", "{",
+            "}", "|", "\\", "/", "?", "<", ">", ",", ";", ":", "'", "\"", "`", "+" };
     private BusinessObjectService businessObjectService;
     private UnitService unitService;
     private ParameterService parameterService;
     private DocumentService documentService;
-    
+
     protected String[] buildArrayFromCommaList(String commaList) {
-        String[] newArray = commaList.split(","); //MIT Equity Interests
-        if(commaList!=null && newArray.length==0){
-            newArray = new String[]{commaList.trim()};
+        String[] newArray = commaList.split(","); // MIT Equity Interests
+        if (commaList != null && newArray.length == 0) {
+            newArray = new String[] { commaList.trim() };
         }
         return newArray;
     }
-    
+
     /**
      * 
      * This method returns 'true' if 'stringToCheck' does not contain a special character, otherwise returns 'false'.
+     * 
      * @param stringToCheck
      * @return
      */
@@ -53,7 +54,7 @@ public abstract class KcKrmsJavaFunctionTermServiceBase {
         }
         return TRUE;
     }
-    
+
     public BusinessObjectService getBusinessObjectService() {
         return businessObjectService;
     }
@@ -61,7 +62,7 @@ public abstract class KcKrmsJavaFunctionTermServiceBase {
     public void setBusinessObjectService(BusinessObjectService businessObjectService) {
         this.businessObjectService = businessObjectService;
     }
-    
+
     public UnitService getUnitService() {
         return unitService;
     }

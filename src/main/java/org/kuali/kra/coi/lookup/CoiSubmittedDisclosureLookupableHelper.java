@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,20 +19,61 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.drools.core.util.StringUtils;
 import org.kuali.kra.coi.CoiDisclosure;
+import org.kuali.kra.coi.auth.CoiDisclosureTask;
+import org.kuali.kra.infrastructure.TaskName;
 import org.kuali.rice.krad.bo.BusinessObject;
 
+@SuppressWarnings("unchecked")
 public class CoiSubmittedDisclosureLookupableHelper extends CoiDisclosureLookupableHelperBase {
+    
+    /**
+     * Comment for <code>serialVersionUID</code>
+     */
+    private static final long serialVersionUID = 4999402404037030752L;
+    //field name
+    private static final String LEAD_UNIT = "leadUnitNumber";
+    
 
-    public List<? extends BusinessObject> getSearchResults(Map<String, String> fieldValues) {
+    @Override
+    public List<? extends BusinessObject> getLookupSpecificSearchResults(Map<String, String> fieldValues) {
         List<CoiDisclosure> allDisclosures = (List<CoiDisclosure>) super.getResults(fieldValues);
         List<CoiDisclosure> submittedDisclosures = new ArrayList<CoiDisclosure>();
 
         for (CoiDisclosure disclosure : allDisclosures) {
-            if (disclosure.isSubmitted()) {
+            if (disclosure.isSubmitted() && this.disclosureCanBeDisplayed(disclosure, fieldValues)) {
                 submittedDisclosures.add(disclosure);
             }
         }
         return submittedDisclosures;
     }
+    
+    /**
+     * This method determines whether the disclosure can be viewed by the current user.
+     * Researchers should only see their own disclosures.  COI Admin should have unrestricted access.
+     * @param rawDisclosure
+     * @param fieldValues
+     * @return true when current user is allowed to view the disclosure; false otherwise
+     */
+    private boolean disclosureCanBeDisplayed(CoiDisclosure rawDisclosure, Map<String, String> fieldValues) {
+        boolean displayDisclosure = false;
+        String researcherLeadUnit = fieldValues.get(LEAD_UNIT);
+        if (rawDisclosure.getCoiDisclosureDocument() != null) {
+            CoiDisclosureTask task = new CoiDisclosureTask(TaskName.VIEW_COI_DISCLOSURE, rawDisclosure);
+            if (getTaskAuthorizationService().isAuthorized(getUserIdentifier(), task) && 
+                (StringUtils.isEmpty(researcherLeadUnit) || researcherLeadUnit.equals(rawDisclosure.getLeadUnitNumber()))) {
+                
+                displayDisclosure = true;
+            }
+        }        
+        return displayDisclosure;
+    }
+
+    
+    @Override
+    protected boolean isAuthorizedForCoiLookups() {
+        return true;
+    }
+    
 }

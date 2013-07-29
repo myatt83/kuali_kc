@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
  */
 package org.kuali.kra.irb.onlinereview.rules;
 
+import java.util.List;
+
 import org.apache.commons.lang.StringUtils;
 import org.kuali.kra.infrastructure.KeyConstants;
 import org.kuali.kra.infrastructure.KraServiceLocator;
@@ -24,16 +26,21 @@ import org.kuali.kra.irb.onlinereview.event.AddProtocolOnlineReviewCommentEvent;
 import org.kuali.kra.irb.onlinereview.event.DeleteProtocolOnlineReviewEvent;
 import org.kuali.kra.irb.onlinereview.event.DisapproveProtocolOnlineReviewCommentEvent;
 import org.kuali.kra.irb.onlinereview.event.RejectProtocolOnlineReviewCommentEvent;
-import org.kuali.kra.irb.onlinereview.event.RouteProtocolOnlineReviewEvent;
-import org.kuali.kra.irb.onlinereview.event.SaveProtocolOnlineReviewEvent;
+import org.kuali.kra.protocol.onlinereview.ProtocolReviewAttachmentBase;
 import org.kuali.kra.meeting.CommitteeScheduleMinute;
 import org.kuali.kra.rule.BusinessRuleInterface;
 import org.kuali.kra.rule.event.KraDocumentEventBaseExtension;
 import org.kuali.kra.rules.ResearchDocumentRuleBase;
 import org.kuali.kra.service.KraAuthorizationService;
 import org.kuali.kra.service.KraWorkflowService;
+import org.kuali.kra.util.DateUtils;
 import org.kuali.rice.krad.service.KualiRuleService;
 import org.kuali.rice.krad.util.GlobalVariables;
+import org.kuali.kra.common.committee.meeting.CommitteeScheduleMinuteBase;
+import org.kuali.kra.protocol.onlinereview.event.SaveProtocolOnlineReviewEvent;
+import org.kuali.kra.protocol.onlinereview.rules.SaveProtocolOnlineReviewRule;
+import org.kuali.kra.protocol.onlinereview.event.RouteProtocolOnlineReviewEvent;
+import org.kuali.kra.protocol.onlinereview.rules.RouteProtocolOnlineReviewRule;
 
 public class ProtocolOnlineReviewDocumentRule extends ResearchDocumentRuleBase implements AddOnlineReviewCommentRule
                                                                                          ,SaveProtocolOnlineReviewRule
@@ -75,11 +82,11 @@ public class ProtocolOnlineReviewDocumentRule extends ResearchDocumentRuleBase i
         GlobalVariables.getMessageMap().clearErrorPath();
         GlobalVariables.getMessageMap().addToErrorPath(String.format(ONLINE_REVIEW_COMMENTS_ERROR_PATH, event.getOnlineReviewIndex()));
         
-        ProtocolOnlineReview protocolOnlineReview = event.getProtocolOnlineReviewDocument().getProtocolOnlineReview();
+        ProtocolOnlineReview protocolOnlineReview = (ProtocolOnlineReview)event.getProtocolOnlineReviewDocument().getProtocolOnlineReview();
         
         int index = 0;
         
-        for (CommitteeScheduleMinute minute : event.getMinutes()) {
+        for (CommitteeScheduleMinuteBase minute : event.getMinutes()) {
             if (StringUtils.isEmpty(minute.getMinuteEntry()) && StringUtils.isEmpty(minute.getProtocolContingencyCode())) {
                 valid=false;
                 GlobalVariables.getMessageMap().putError(String.format("reviewComments[%s].minuteEntry" ,index),  
@@ -92,7 +99,7 @@ public class ProtocolOnlineReviewDocumentRule extends ResearchDocumentRuleBase i
         GlobalVariables.getMessageMap().addToErrorPath(String.format(ONLINE_REVIEW_ATTACHMENTS_ERROR_PATH, event.getOnlineReviewIndex()));
         index = 0;
         
-        for (ProtocolReviewAttachment reviewAttachment : event.getReviewAttachments()) {
+        for (ProtocolReviewAttachmentBase reviewAttachment : event.getReviewAttachments()) {
             if (StringUtils.isEmpty(reviewAttachment.getDescription())) {
                 valid=false;
                 GlobalVariables.getMessageMap().putError(String.format("reviewAttachments[%s].description" ,index),  
@@ -111,7 +118,12 @@ public class ProtocolOnlineReviewDocumentRule extends ResearchDocumentRuleBase i
         }
         
         if( protocolOnlineReview.getDateRequested() != null && protocolOnlineReview.getDateDue() != null ) {
-            if (!protocolOnlineReview.getDateDue().after(protocolOnlineReview.getDateRequested())) {
+            if ( (DateUtils.isSameDay(protocolOnlineReview.getDateDue(), protocolOnlineReview.getDateRequested())) || 
+                 (protocolOnlineReview.getDateDue().after(protocolOnlineReview.getDateRequested())) ) {
+                  //no-op,
+            }
+            else
+            {   //dates are not the same or due date is before requested date
                 valid=false;
                 GlobalVariables.getMessageMap().putError("protocolOnlineReviewDueDate", "error.protocol.onlinereview.create.dueDateAfterRequestedDate", new String[0]);
             }
@@ -126,28 +138,9 @@ public class ProtocolOnlineReviewDocumentRule extends ResearchDocumentRuleBase i
         
         boolean valid = true;
         KualiRuleService ruleService = KraServiceLocator.getService(KualiRuleService.class);
-        valid &= ruleService.applyRules(new SaveProtocolOnlineReviewEvent(event.getProtocolOnlineReviewDocument(),event.getMinutes(),event.getOnlineReviewIndex()));
+        valid &= ruleService.applyRules(new SaveProtocolOnlineReviewEvent(event.getProtocolOnlineReviewDocument(), (List)event.getMinutes(), event.getOnlineReviewIndex()));
         GlobalVariables.getMessageMap().clearErrorPath();
         GlobalVariables.getMessageMap().addToErrorPath(String.format(ONLINE_REVIEW_COMMENTS_ERROR_PATH, event.getOnlineReviewIndex()));
-  
-        // KCIRB-1315 : no final check for approve
-        //check to see if it is on the 
-//        boolean isOnReviewerApproveNode = getKraWorkflowService().isDocumentOnNode(event.getProtocolOnlineReviewDocument(), REVIEWER_APPROVAL_NODE_NAME);
-//       
-//        if (isOnReviewerApproveNode) {
-//            //we only enforce "all comments must be final" if we are moving off of the reviewers approval node.
-//            int commentIndex = 0;
-//            
-//            for (CommitteeScheduleMinute minute : event.getMinutes()) {
-//                if (!minute.isFinalFlag()) {
-//                    GlobalVariables.getMessageMap().putError(String.format("reviewComments[%s].finalFlag", commentIndex),
-//                            KeyConstants.ERROR_ONLINE_REVIEW_COMMENTS_FINAL_AFTER_REVIEWER_ROUTE);
-//                    valid = false;
-//                   
-//                }
-//                commentIndex++;
-//            }
-//        }
         return valid;
     }
     

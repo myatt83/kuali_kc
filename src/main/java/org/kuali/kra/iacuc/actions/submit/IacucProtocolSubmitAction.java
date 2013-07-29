@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,12 +19,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.kuali.kra.common.committee.service.CommonCommitteeService;
+import org.kuali.kra.common.committee.service.CommitteeServiceBase;
 import org.kuali.kra.iacuc.actions.IacucActionHelper;
 import org.kuali.kra.iacuc.actions.IacucProtocolActionBean;
+import org.kuali.kra.iacuc.committee.service.IacucCommitteeService;
 import org.kuali.kra.infrastructure.KraServiceLocator;
-import org.kuali.kra.protocol.actions.ActionHelper;
-import org.kuali.kra.protocol.actions.submit.ProtocolReviewerBean;
+import org.kuali.kra.protocol.actions.ActionHelperBase;
+import org.kuali.kra.protocol.actions.submit.ProtocolReviewerBeanBase;
 import org.kuali.kra.protocol.actions.submit.ProtocolSubmitAction;
 import org.springframework.util.AutoPopulatingList;
 
@@ -53,11 +54,7 @@ public class IacucProtocolSubmitAction extends IacucProtocolActionBean implement
      * We use a AutoPopulatingList because we need it to grow. When JavaScript is enabled, it will display the list of reviewers. When
      * the form is submitted, this list will automatically grow to accommodate all of the reviewers.
      */
-    protected List<ProtocolReviewerBean> reviewers = new AutoPopulatingList<ProtocolReviewerBean>(IacucProtocolReviewerBean.class);
-    
-// TODO *********commented the code below during IACUC refactoring*********     
-//    private List<ExpeditedReviewCheckListItem> expeditedReviewCheckList = null;
-//    private List<ExemptStudiesCheckListItem> exemptStudiesCheckList = null;
+    protected List<ProtocolReviewerBeanBase> reviewers = new AutoPopulatingList<ProtocolReviewerBeanBase>(IacucProtocolReviewerBean.class);
     
     private String newCommitteeId = "";
     private String newScheduleId = "";
@@ -70,11 +67,11 @@ public class IacucProtocolSubmitAction extends IacucProtocolActionBean implement
      * 
      * @param actionHelper Reference back to the action helper for this bean
      */
-    public IacucProtocolSubmitAction(ActionHelper actionHelper) {
+    public IacucProtocolSubmitAction(ActionHelperBase actionHelper) {
         super(actionHelper);
     }
 
-    protected Class<? extends ProtocolReviewerBean> getProtocolReviewerBeanClassHook() {
+    protected Class<? extends ProtocolReviewerBeanBase> getProtocolReviewerBeanClassHook() {
         return IacucProtocolReviewerBean.class;        
     }
 
@@ -91,7 +88,6 @@ public class IacucProtocolSubmitAction extends IacucProtocolActionBean implement
             if ((!StringUtils.isBlank(this.committeeId)) && (!this.committeeIdChanged) && (!StringUtils.isBlank(this.scheduleId))) {
                 if (this.scheduleIdChanged) {
                     reviewers.clear();
-                   // buildReviewers();
                 }
             }
             else {
@@ -111,8 +107,8 @@ public class IacucProtocolSubmitAction extends IacucProtocolActionBean implement
     }
 
 
-    public CommonCommitteeService getCommitteeService() {
-        return KraServiceLocator.getService(CommonCommitteeService.class);
+    public CommitteeServiceBase getCommitteeService() {
+        return KraServiceLocator.getService(IacucCommitteeService.class);
     }
 
     public String getSubmissionTypeCode() {
@@ -188,11 +184,11 @@ public class IacucProtocolSubmitAction extends IacucProtocolActionBean implement
         return reviewerListAvailable;
     }
 
-    public List<ProtocolReviewerBean> getReviewers() {
+    public List<ProtocolReviewerBeanBase> getReviewers() {
         return reviewers;
     }
 
-    public ProtocolReviewerBean getReviewer(int i) {
+    public ProtocolReviewerBeanBase getReviewer(int i) {
         return reviewers.get(i);
     }
 
@@ -201,8 +197,8 @@ public class IacucProtocolSubmitAction extends IacucProtocolActionBean implement
      * 
      * @return
      */
-    public List<ProtocolReviewerBean> getLeftReviewers() {
-        List<ProtocolReviewerBean> leftReviewers = new ArrayList<ProtocolReviewerBean>();
+    public List<ProtocolReviewerBeanBase> getLeftReviewers() {
+        List<ProtocolReviewerBeanBase> leftReviewers = new ArrayList<ProtocolReviewerBeanBase>();
         for (int i = 0; i < (reviewers.size() + 1) / 2; i++) {
             leftReviewers.add(reviewers.get(i));
         }
@@ -214,15 +210,15 @@ public class IacucProtocolSubmitAction extends IacucProtocolActionBean implement
      * 
      * @return
      */
-    public List<ProtocolReviewerBean> getRightReviewers() {
-        List<ProtocolReviewerBean> rightReviewers = new ArrayList<ProtocolReviewerBean>();
+    public List<ProtocolReviewerBeanBase> getRightReviewers() {
+        List<ProtocolReviewerBeanBase> rightReviewers = new ArrayList<ProtocolReviewerBeanBase>();
         for (int i = (reviewers.size() + 1) / 2; i < reviewers.size(); i++) {
             rightReviewers.add(reviewers.get(i));
         }
         return rightReviewers;
     }
 
-    public void setReviewers(List<ProtocolReviewerBean> reviewerBeans) {
+    public void setReviewers(List<ProtocolReviewerBeanBase> reviewerBeans) {
         this.reviewers = reviewerBeans;
     }
 
@@ -242,20 +238,4 @@ public class IacucProtocolSubmitAction extends IacucProtocolActionBean implement
     public IacucProtocolSubmitAction(IacucActionHelper actionHelper) {
         super(actionHelper);
     }
-
-    
-    /**
-     * Create the list of reviewers based upon the currently selected committee and schedule.
-     */
-   /* private void buildReviewers() {
-        this.reviewerListAvailable = true;
-        List<CommitteeMembership> members = getProtocol().filterOutProtocolPersonnel(
-                getCommitteeService().getAvailableMembers(this.committeeId, this.scheduleId));
-        for (CommitteeMembership member : members) {
-            ProtocolReviewerBean reviewer = new ProtocolReviewerBean(member);
-            reviewers.add(reviewer);
-        }
-    }*/
-    
-
 }

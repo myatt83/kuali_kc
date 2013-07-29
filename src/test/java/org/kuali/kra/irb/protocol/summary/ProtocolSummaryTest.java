@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,11 +27,11 @@ import org.kuali.kra.bo.AttachmentFile;
 import org.kuali.kra.bo.ExemptionType;
 import org.kuali.kra.bo.FundingSourceType;
 import org.kuali.kra.bo.Organization;
-import org.kuali.kra.bo.ResearchArea;
 import org.kuali.kra.bo.SpecialReviewApprovalType;
 import org.kuali.kra.bo.SpecialReviewType;
 import org.kuali.kra.irb.Protocol;
 import org.kuali.kra.irb.ProtocolDocument;
+import org.kuali.kra.irb.ResearchArea;
 import org.kuali.kra.irb.actions.ProtocolStatus;
 import org.kuali.kra.irb.noteattachment.ProtocolAttachmentProtocol;
 import org.kuali.kra.irb.noteattachment.ProtocolAttachmentType;
@@ -112,7 +112,7 @@ public class ProtocolSummaryTest extends KcUnitTestBase {
     private SpecialReviewType mySpecialReviewType;
     private Date specialReviewApplicationDate;
     private SpecialReviewApprovalType specialReviewApprovalType;
-    private List<ProtocolSpecialReviewExemption> specialReviewExemptions;
+    private List<org.kuali.kra.protocol.specialreview.ProtocolSpecialReviewExemption> specialReviewExemptions;
     
     @Before
     public void setUp() throws Exception {
@@ -154,7 +154,7 @@ public class ProtocolSummaryTest extends KcUnitTestBase {
         specialReviewApprovalType = new SpecialReviewApprovalType();
         specialReviewApprovalType.setDescription(SPECIAL_REVIEW_APPROVAL_TYPE_DESCRIPTION);
         
-        specialReviewExemptions = new ArrayList<ProtocolSpecialReviewExemption>();
+        specialReviewExemptions = new ArrayList<org.kuali.kra.protocol.specialreview.ProtocolSpecialReviewExemption>();
         ProtocolSpecialReviewExemption specialReviewExemption = new ProtocolSpecialReviewExemption();
         ExemptionType exemptionType = new ExemptionType();
         exemptionType.setDescription(EXEMPTION_DESCRIPTION);

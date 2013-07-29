@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ public class MaintainCoiDisclosureNotesAuthorizer extends CoiDisclosureAuthorize
             if (isNewDisclosure(coiDisclosure)) {
                 hasPermission = hasUnitPermission(userId, Constants.MODULE_NAMESPACE_COIDISCLOSURE, PermissionConstants.REPORT_COI_DISCLOSURE);
             } else if (isNotSubmitted(coiDisclosure)) {
-                if (isDisclosureReporter(userId, coiDisclosure)) {
+                if (isDisclosureReporter(userId, coiDisclosure) && !isPessimisticLocked(coiDisclosure.getCoiDisclosureDocument())) {
                     hasPermission = true;
                 } else {
                     //hasPermission = hasUnitPermission(userId, Constants.MODULE_NAMESPACE_COIDISCLOSURE, PermissionConstants.MAINTAIN_COI_DISCLOSURE_NOTES)
@@ -53,7 +53,7 @@ public class MaintainCoiDisclosureNotesAuthorizer extends CoiDisclosureAuthorize
                 } else {
                     //hasPermission = hasUnitPermission(userId, Constants.MODULE_NAMESPACE_COIDISCLOSURE, PermissionConstants.MAINTAIN_COI_DISCLOSURE_NOTES)
                     hasPermission = getPermissionService().isAuthorized(userId, Constants.MODULE_NAMESPACE_COIDISCLOSURE, PermissionConstants.MAINTAIN_COI_DISCLOSURE_NOTES, getQualificationMap(task.getCoiDisclosure()))
-                        && !isDocumentFinal(coiDisclosure) && isEditableByAdminReviewer(coiDisclosure);                    
+                        && !isDocumentFinal(coiDisclosure) && !isDocumentSubmitted(coiDisclosure) && isEditableByAdminReviewer(coiDisclosure);                    
                 }
             }
             
@@ -72,8 +72,16 @@ public class MaintainCoiDisclosureNotesAuthorizer extends CoiDisclosureAuthorize
         return false;
     }
     
+    protected boolean isDocumentSubmitted(CoiDisclosure coiDisclosure) {
+        return coiDisclosure.isSubmitted();
+    }
+    
     protected boolean isNotSubmitted(CoiDisclosure coiDisclosure) {
         return !coiDisclosure.isSubmitted();
+    }
+    
+    protected boolean isDocumentViewOnly(CoiDisclosure coiDisclosure) {
+        return coiDisclosure.getCoiDisclosureDocument().isViewOnly();
     }
     
     protected boolean isDocumentFinal(CoiDisclosure coiDisclosure) {
@@ -82,14 +90,6 @@ public class MaintainCoiDisclosureNotesAuthorizer extends CoiDisclosureAuthorize
     
     protected boolean isDisclosureReporter(String userId, CoiDisclosure coiDisclosure) {
         return StringUtils.equals(userId, coiDisclosure.getPersonId());
-    }
-
-    protected boolean isEditableByAdminReviewer(CoiDisclosure coiDisclosure) {
-        return (coiDisclosure != null)
-        && !coiDisclosure.getCoiDisclosureDocument().isViewOnly()
-        && !isPessimisticLocked(coiDisclosure.getCoiDisclosureDocument())
-        && !coiDisclosure.isApprovedDisclosure()
-        && !coiDisclosure.isDisapprovedDisclosure();
     }
 
     protected PermissionService getPermissionService() {

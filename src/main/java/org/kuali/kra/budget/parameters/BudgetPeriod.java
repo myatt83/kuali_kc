@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,9 @@ import org.kuali.kra.budget.core.Budget;
 import org.kuali.kra.budget.core.BudgetAssociate;
 import org.kuali.kra.budget.nonpersonnel.BudgetLineItem;
 import org.kuali.kra.infrastructure.DeepCopyIgnore;
+import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.proposaldevelopment.budget.modular.BudgetModular;
+import org.kuali.kra.proposaldevelopment.budget.service.ProposalBudgetNumberOfMonthsService;
 import org.kuali.kra.util.DateUtils;
 
 public class BudgetPeriod extends BudgetAssociate {
@@ -61,6 +63,8 @@ public class BudgetPeriod extends BudgetAssociate {
     private BudgetDecimal underrecoveryAmount;
 
     private List<BudgetLineItem> budgetLineItems;
+    
+    private Integer numberOfParticipants;
 
     // expences total for 'totals' page 
     // if 'totalCost' is intended for 'totals' page, then this is not needed 
@@ -82,6 +86,7 @@ public class BudgetPeriod extends BudgetAssociate {
     private Integer institutionalProposalVersion;
 
     private BudgetDecimal directCostLimit;
+    
 
     // This is a BO and hence will not be shared between threads. dateFormatter here is thread safe. 
     private SimpleDateFormat dateFormatter = new SimpleDateFormat("MM/dd/yyyy");
@@ -454,5 +459,21 @@ public class BudgetPeriod extends BudgetAssociate {
     }
 
     public void populateSummaryCalcAmounts() {
+    }
+    
+    public String getNumberOfMonths() {
+        return String.valueOf(this.getProposalBudgetNumberOfMonthsService().getNumberOfMonth(this.getStartDate(), this.getEndDate()));
+    }
+    
+    protected ProposalBudgetNumberOfMonthsService getProposalBudgetNumberOfMonthsService() {
+        return KraServiceLocator.getService(ProposalBudgetNumberOfMonthsService.class);
+    }
+
+    public Integer getNumberOfParticipants() {
+        return numberOfParticipants;
+    }
+
+    public void setNumberOfParticipants(Integer numberOfParticipants) {
+        this.numberOfParticipants = numberOfParticipants;
     }
 }

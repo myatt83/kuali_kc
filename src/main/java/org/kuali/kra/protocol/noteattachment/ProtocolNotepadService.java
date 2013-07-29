@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +20,10 @@ import java.util.List;
 public interface ProtocolNotepadService {
 
     /**
-     * Populate the updateUserFullName transient field in each ProtocolNotepad object in the list param. 
+     * Populate the updateUserFullName transient field in each ProtocolNotepadBase object in the list param. 
      * list.
-     * @param protocolNotepads The list of ProtocolNotepad objects you wish to populate the updateUserFullName field on.
+     * @param protocolNotepads The list of ProtocolNotepadBase objects you wish to populate the updateUserFullName field on.
      */
-    void setProtocolNotepadUpdateUsersName(List<ProtocolNotepad> protocolNotepads);
+    void setProtocolNotepadUpdateUsersName(List<ProtocolNotepadBase> protocolNotepads);
     
 }

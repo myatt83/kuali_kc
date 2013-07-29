@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@ package org.kuali.kra.common.committee.lookup.keyvalue;
 
 import java.util.List;
 
-import org.kuali.kra.common.committee.service.CommonCommitteeService;
+import org.kuali.kra.common.committee.service.CommitteeServiceBase;
 import org.kuali.kra.infrastructure.KraServiceLocator;
-import org.kuali.kra.protocol.ProtocolForm;
+import org.kuali.kra.protocol.ProtocolFormBase;
 import org.kuali.rice.core.api.util.KeyValue;
 import org.kuali.rice.kns.util.KNSGlobalVariables;
 import org.kuali.rice.kns.web.struts.form.KualiForm;
@@ -28,7 +28,7 @@ import org.kuali.rice.krad.keyvalues.KeyValuesBase;
 /**
  * Finds the available set of dates where a protocol can be scheduled
  * for a review by a committee.  This values finder is almost exactly 
- * the same as CommitteeScheduleValuesFinder, except that the committee
+ * the same as CommitteeScheduleValuesFinderBase, except that the committee
  * information comes from the AssignCmtSchedBean.
  * 
  * @author Kuali Research Administration Team (kualidev@oncourse.iu.edu)
@@ -45,16 +45,16 @@ public class CommitteeScheduleValuesFinder2 extends KeyValuesBase {
     }
     
     /**
-     * Get the Committee Service.
-     * @return the Committee Service
+     * Get the CommitteeBase Service.
+     * @return the CommitteeBase Service
      */
-    private CommonCommitteeService getCommitteeService() {
-        return KraServiceLocator.getService(CommonCommitteeService.class);
+    private CommitteeServiceBase getCommitteeService() {
+        return KraServiceLocator.getService(CommitteeServiceBase.class);
     }
 
     /**
      * Get the committee id.  Currently we are only concerned with
-     * scheduling protocols.  The committee id is found in via the ProtocolForm.
+     * scheduling protocols.  The committee id is found in via the ProtocolFormBase.
      * Keep in mind that the user selects the committee via a drop-down and
      * thus the selected committee id is placed into the form.
      * @return
@@ -62,8 +62,8 @@ public class CommitteeScheduleValuesFinder2 extends KeyValuesBase {
     private String getCommitteeId() {
         String committeeId = "";
         KualiForm form = KNSGlobalVariables.getKualiForm();
-        if (form instanceof ProtocolForm) {
-            ProtocolForm protocolForm = (ProtocolForm) form;
+        if (form instanceof ProtocolFormBase) {
+            ProtocolFormBase protocolForm = (ProtocolFormBase) form;
             // this needs to be different for irb and iacuc. iacuc does not have a assignCmtSchedBean
             //committeeId = ()protocolForm.getActionHelper().getAssignCmtSchedBean().getCommitteeId();
         }

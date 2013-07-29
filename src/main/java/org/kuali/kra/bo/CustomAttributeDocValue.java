@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  *
  * Licensed under the Educational Community License, Version 2.0 (the License);
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,9 @@ package org.kuali.kra.bo;
  * 
  * This class is bo of CustomAttributeDocValue.
  */
-public class CustomAttributeDocValue extends KraPersistableBusinessObjectBase {
+public class CustomAttributeDocValue extends KraPersistableBusinessObjectBase implements DocumentCustomData {
 
-    private Integer customAttributeId;
+    private Long customAttributeId;
 
     private String documentNumber;
 
@@ -34,11 +34,11 @@ public class CustomAttributeDocValue extends KraPersistableBusinessObjectBase {
         super();
     }
 
-    public Integer getCustomAttributeId() {
+    public Long getCustomAttributeId() {
         return customAttributeId;
     }
 
-    public void setCustomAttributeId(Integer customAttributeId) {
+    public void setCustomAttributeId(Long customAttributeId) {
         this.customAttributeId = customAttributeId;
     }
 

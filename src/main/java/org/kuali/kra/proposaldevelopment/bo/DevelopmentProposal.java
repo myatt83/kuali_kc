@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.kuali.kra.award.home.AwardType;
 import org.kuali.kra.award.home.ContactRole;
+import org.kuali.kra.bo.CustomAttributeDocValue;
 import org.kuali.kra.bo.KraPersistableBusinessObjectBase;
 import org.kuali.kra.bo.NonOrganizationalRolodex;
 import org.kuali.kra.bo.NoticeOfOpportunity;
@@ -104,6 +105,8 @@ public class DevelopmentProposal extends KraPersistableBusinessObjectBase implem
     private String currentAwardNumber;
 
     private Date deadlineDate;
+    
+    private String deadlineTime;
 
     private String noticeOfOpportunityCode;
 
@@ -218,6 +221,8 @@ public class DevelopmentProposal extends KraPersistableBusinessObjectBase implem
     private Map<String, List<BudgetChangedData>> budgetChangeHistory;
 
     private Boolean submitFlag = Boolean.FALSE;
+    
+    private Boolean grantsGovSelectFlag = Boolean.FALSE;
 
     private ProposalDevelopmentDocument proposalDocument;
 
@@ -232,6 +237,8 @@ public class DevelopmentProposal extends KraPersistableBusinessObjectBase implem
     private Integer hierarchyLastSyncHashCode;
 
     private String hierarchyBudgetType;
+    
+    private String lastSyncedBudgetDocumentNumber;
 
     private transient ParameterService parameterService;
 
@@ -458,11 +465,13 @@ public class DevelopmentProposal extends KraPersistableBusinessObjectBase implem
         for (int i = 0; i < proposalPersons.size(); i++) {
             ProposalPerson person = proposalPersons.get(i);
             person.setMoveUpAllowed(i > 0
-                    && person.getProposalPersonRoleId().equals(proposalPersons.get(i - 1).getProposalPersonRoleId()));
+                    && !getKeyPersonnelService().isPrincipalInvestigator(person)
+                    && !getKeyPersonnelService().isPrincipalInvestigator(proposalPersons.get(i - 1))
+                    && !(isSponsorNihMultiplePi() && proposalPersons.get(i - 1).isMultiplePi()));
             person.setMoveDownAllowed(i < (proposalPersons.size() - 1)
-                    && person.getProposalPersonRoleId().equals(proposalPersons.get(i + 1).getProposalPersonRoleId()));
-            if (isSponsorNihMultiplePi() && getKeyPersonnelService().isCoInvestigator(person)) {
-                person.setMoveUpAllowed(person.isMoveUpAllowed() 
+                    && !getKeyPersonnelService().isPrincipalInvestigator(person));
+            if (isSponsorNihMultiplePi() && getKeyPersonnelService().isCoInvestigator(person) && person.isMultiplePi()) {
+                person.setMoveUpAllowed(i > 0 
                         && person.isMultiplePi() == proposalPersons.get(i - 1).isMultiplePi());
                 person.setMoveDownAllowed(person.isMoveDownAllowed() 
                         && person.isMultiplePi() == proposalPersons.get(i + 1).isMultiplePi());
@@ -500,6 +509,17 @@ public class DevelopmentProposal extends KraPersistableBusinessObjectBase implem
     }
 
     public void setOwnedByUnitNumber(String ownedByUnit) {
+        this.ownedByUnitNumber = ownedByUnit;
+    }
+
+    /**
+     * Dummy getter to support 2 different views of ownedByUnit through the DD.
+     * @return
+     */
+    public String getOwnedByUnitNumberRestricted() {
+        return ownedByUnitNumber;
+    }
+    public void setOwnedByUnitNumberRestricted(String ownedByUnit) {
         this.ownedByUnitNumber = ownedByUnit;
     }
 
@@ -647,6 +667,14 @@ public class DevelopmentProposal extends KraPersistableBusinessObjectBase implem
      */
     public void setDeadlineDate(Date deadlineDate) {
         this.deadlineDate = deadlineDate;
+    }
+
+    public String getDeadlineTime() {
+        return deadlineTime;
+    }
+
+    public void setDeadlineTime(String deadlineTime) {
+        this.deadlineTime = deadlineTime;
     }
 
     /**
@@ -1202,6 +1230,9 @@ public class DevelopmentProposal extends KraPersistableBusinessObjectBase implem
      * @return Returns the sponsor.
      */
     public Sponsor getSponsor() {
+        if (!StringUtils.isEmpty(sponsorCode)) {
+            this.refreshReferenceObject("sponsor");
+        }
         return sponsor;
     }
 
@@ -1906,6 +1937,15 @@ public class DevelopmentProposal extends KraPersistableBusinessObjectBase implem
         return this.submitFlag;
     }
 
+
+    public Boolean getGrantsGovSelectFlag() {
+        return grantsGovSelectFlag;
+    }
+
+    public void setGrantsGovSelectFlag(Boolean grantsGovSelectFlag) {
+        this.grantsGovSelectFlag = grantsGovSelectFlag;
+    }
+
     public String getProposalStateTypeCode() {
         return proposalStateTypeCode;
     }
@@ -2226,6 +2266,14 @@ public List<BudgetChangedData> getBudgetChangedDataList() {
 
 public KrmsRulesContext getKrmsRulesContext() {
     return (KrmsRulesContext) getProposalDocument();
+}
+
+public String getLastSyncedBudgetDocumentNumber() {
+    return lastSyncedBudgetDocumentNumber;
+}
+
+public void setLastSyncedBudgetDocumentNumber(String lastSyncedBudgetDocumentNumber) {
+    this.lastSyncedBudgetDocumentNumber = lastSyncedBudgetDocumentNumber;
 }
 
 }

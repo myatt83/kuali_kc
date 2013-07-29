@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import org.kuali.kra.iacuc.procedures.IacucProtocolStudyGroupBean;
 import org.kuali.kra.iacuc.procedures.IacucProtocolStudyGroupDetailBean;
 import org.kuali.kra.infrastructure.KeyConstants;
 import org.kuali.kra.infrastructure.KraServiceLocator;
-import org.kuali.kra.protocol.personnel.ProtocolPerson;
+import org.kuali.kra.protocol.personnel.ProtocolPersonBase;
 import org.kuali.kra.protocol.personnel.ProtocolPersonnelRuleBase;
 import org.kuali.kra.protocol.personnel.ProtocolPersonnelService;
 import org.kuali.kra.rule.BusinessRuleInterface;
@@ -54,9 +54,9 @@ public class DeleteIacucProtocolPersonnelRule extends ProtocolPersonnelRuleBase 
      */
     private boolean isPersonDeleteValid(IacucProtocolDocument protocolDocument) {
         boolean personDeleteValid = true;
-        List<ProtocolPerson> protocolPersons = protocolDocument.getIacucProtocol().getProtocolPersons();
+        List<ProtocolPersonBase> protocolPersons = protocolDocument.getIacucProtocol().getProtocolPersons();
         List<IacucProtocolStudyGroupBean> protocolStudyGroups = protocolDocument.getIacucProtocol().getIacucProtocolStudyGroups();
-        for (ProtocolPerson protocolPerson : protocolPersons) {
+        for (ProtocolPersonBase protocolPerson : protocolPersons) {
             if(protocolPerson.isDelete()) {
                 int personIndex = protocolPersons.indexOf(protocolPerson);
                 String personId = protocolPerson.getPersonId();

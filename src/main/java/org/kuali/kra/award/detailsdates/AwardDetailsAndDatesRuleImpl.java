@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+import org.kuali.kra.award.document.AwardDocument;
 import org.kuali.kra.award.document.authorization.AwardDocumentAuthorizer;
 import org.kuali.kra.award.home.Award;
 import org.kuali.kra.award.home.AwardTransferringSponsor;
@@ -44,8 +45,8 @@ public class AwardDetailsAndDatesRuleImpl extends ResearchDocumentRuleBase imple
     private static final String SPONSOR_CODE_PROPERTY_NAME = "detailsAndDatesFormHelper.newAwardTransferringSponsor.sponsorCode";
     private static final String ANTICIPATED_AMOUNT_PROPERTY_NAME = "awardAmountInfos[0].anticipatedTotalAmount";
     private static final String OBLIGATED_AMOUNT_PROPERTY_NAME = "awardAmountInfos[0].amountObligatedToDate";
-    private static final String AWARD_EFFECTIVE_DATE_PROPERTY_NAME = "awardEffectiveDate";
-    private static final String OBLIGATION_EXPIRATION_DATE_PROPERTY_NAME = "obligationExpirationDate";
+    private static final String AWARD_EFFECTIVE_DATE_PROPERTY_NAME = "awardAmountInfos[0].currentFundEffectiveDate";
+    private static final String OBLIGATION_EXPIRATION_DATE_PROPERTY_NAME = "awardAmountInfos[0].obligationExpirationDate";
     private static final String AWARD_ACCOUNT_NUMBER_PROPERTY_NAME = "accountNumber";
     private static final String AWARD_FIN_CHART_OF_ACCOUNTS_CODE_PROPERTY_NAME = "financialChartOfAccountsCode";
     private ParameterService parameterService;
@@ -107,15 +108,23 @@ public class AwardDetailsAndDatesRuleImpl extends ResearchDocumentRuleBase imple
                 //award.getAwardEffectiveDate() == null) {
                 award.getAwardAmountInfos().get(award.getAwardAmountInfos().size() - 1).getCurrentFundEffectiveDate() == null) {
             valid = false;
-            reportError(AWARD_EFFECTIVE_DATE_PROPERTY_NAME, KeyConstants.ERROR_AWARD_EFFECTIVE_DATE);
+            if ("1".equals(getParameterService().getParameterValueAsString(Constants.PARAMETER_MODULE_AWARD, Constants.PARAMETER_COMPONENT_DOCUMENT, "ENABLE_AWD_ANT_OBL_DIRECT_INDIRECT_COST"))) {
+                reportError(AWARD_EFFECTIVE_DATE_PROPERTY_NAME, KeyConstants.ERROR_AWARD_EFFECTIVE_DATE_TOTAL);
+            } else {
+                reportError(AWARD_EFFECTIVE_DATE_PROPERTY_NAME, KeyConstants.ERROR_AWARD_EFFECTIVE_DATE);
+            }
         }
         if(award.getObligatedTotal().isGreaterThan(new KualiDecimal(0)) &&
                 //award.getObligationExpirationDate() == null) {
                 award.getAwardAmountInfos().get(award.getAwardAmountInfos().size() - 1).getObligationExpirationDate() == null) {
             valid = false;
-            reportError(OBLIGATION_EXPIRATION_DATE_PROPERTY_NAME, KeyConstants.ERROR_OBLIGATION_EXPIRATION_DATE);
+            if ("1".equals(getParameterService().getParameterValueAsString(Constants.PARAMETER_MODULE_AWARD, Constants.PARAMETER_COMPONENT_DOCUMENT, "ENABLE_AWD_ANT_OBL_DIRECT_INDIRECT_COST"))) {
+                reportError(OBLIGATION_EXPIRATION_DATE_PROPERTY_NAME, KeyConstants.ERROR_OBLIGATION_EXPIRATION_DATE_TOTAL);
+            } else {
+                reportError(OBLIGATION_EXPIRATION_DATE_PROPERTY_NAME, KeyConstants.ERROR_OBLIGATION_EXPIRATION_DATE);
+            }
         }
-        if (!isValidAccountNumber(award)) {
+        if (!isValidAccountNumber((AwardDocument) awardDetailsAndDatesSaveEvent.getDocument())) {
             valid &= false;
         }
         
@@ -143,32 +152,28 @@ public class AwardDetailsAndDatesRuleImpl extends ResearchDocumentRuleBase imple
     /**
      * This method checks if the account number is valid and if the chart of accounts code is present,
      *  it checks if the combination of account number and chart code is valid.
+     *  Only if the financial system integration parameter is on,
+     *  use the financial system service to verify if the account number is valid.
      * @param award
      * @return
      */
-    protected boolean isValidAccountNumber(Award award) {
+    protected boolean isValidAccountNumber(AwardDocument awardDocument) {
         boolean isValid = true;
-        // Only if the financial system integration parameter is on,
-        // use the financial system service to verify if the account number is valid,
+        Award award = awardDocument.getAward();
+      
         String accountNumber = award.getAccountNumber();
         String financialDocNbr = award.getFinancialAccountDocumentNumber();
         String chartOfAccountsCode = award.getFinancialChartOfAccountsCode();
 
-        // If the financial doc nbr is present, it means the account number is present as a result of  
-        // creating a financial account. Need not check for valid account number of chart in this case.
-        // Because at this point if the account doc in KFS is only being saved and not routed then this will return
-        // false because the account does not exist yet on KFS.
+        /* Only check if financial doc number is absent.
+         * If the financial doc nbr is present, it means the account number 
+         * is present as a result of creating a financial account. 
+         * Need not check for valid account number or chart in this case because KFS returned these values. 
+         * At this point if the account doc in KFS is only being saved and not routed then this will return
+         * false (which is incorrect behavior) because the account does not *exist* yet on KFS.*/
         if (isIntegrationParameterOn() && StringUtils.isEmpty(financialDocNbr) && validationRequired(award)) { 
-            if (ObjectUtils.isNotNull(accountNumber) || ObjectUtils.isNotNull(chartOfAccountsCode)) {
-                // check is user is authorized to link accounts
-                AwardDocumentAuthorizer authorizer = new AwardDocumentAuthorizer();
-                if (!authorizer.hasCreateAccountPermission()) {
-                    reportError(AWARD_ACCOUNT_NUMBER_PROPERTY_NAME, KeyConstants.NO_PERMISSION_TO_LINK_ACCOUNT);
-                    return false;
-                }
-            
+            if (ObjectUtils.isNotNull(accountNumber) || ObjectUtils.isNotNull(chartOfAccountsCode)) {               
                 AccountCreationClient client = getAccountCreationClientService();            
-
                 if (ObjectUtils.isNull(chartOfAccountsCode) || ObjectUtils.isNull(accountNumber)) {
                     isValid &= false;
                    //report error
@@ -194,7 +199,9 @@ public class AwardDetailsAndDatesRuleImpl extends ResearchDocumentRuleBase imple
     
     /**
      * If the award account number and the chart did not change, validation is
-     * not required.
+     * not required. Validation is required ONLY if the account number on the eDoc
+     * is different from the one stored for the award in the db. This prevents all the
+     * round trips back and forth to KFS to verify the account number and chart.
      * @param award
      * @return
      */
@@ -228,9 +235,9 @@ public class AwardDetailsAndDatesRuleImpl extends ResearchDocumentRuleBase imple
     }
     
     protected boolean isIntegrationParameterOn() {
-        String integrationOn = getParameterService().getParameterValueAsString(Constants.MODULE_NAMESPACE_AWARD, 
+        boolean integrationOn = getParameterService().getParameterValueAsBoolean(Constants.MODULE_NAMESPACE_AWARD, 
                                 Constants.PARAMETER_COMPONENT_DOCUMENT, Constants.FIN_SYSTEM_INTEGRATION_ON_OFF_PARAMETER);
-        return StringUtils.equalsIgnoreCase(integrationOn, Constants.FIN_SYSTEM_INTEGRATION_ON) ? true : false;
+        return integrationOn;
     }
     
     protected ParameterService getParameterService() {

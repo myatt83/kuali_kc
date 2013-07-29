@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,21 +15,21 @@
  */
 package org.kuali.kra.common.committee.rule.event;
 
-import org.kuali.kra.common.committee.bo.CommitteeMembership;
+import org.kuali.kra.common.committee.bo.CommitteeMembershipBase;
 import org.kuali.rice.krad.rules.rule.event.KualiDocumentEvent;
 
 /**
 *
-* This interface addresses the lookup of the <code>{@link CommitteeMembership}</code> of an event.
+* This interface addresses the lookup of the <code>{@link CommitteeMembershipBase}</code> of an event.
 *
 * @author Kuali Research Administration Team (kc.dev@kuali.org)
 */
 public interface CommitteeMembershipEvent extends KualiDocumentEvent {
     /**
      * 
-     * Get the <code>{@link CommitteeMembership}</code> of this event.
+     * Get the <code>{@link CommitteeMembershipBase}</code> of this event.
      * 
-     * @return <code>CommitteeMembership</code>
+     * @return <code>CommitteeMembershipBase</code>
      */
-    CommitteeMembership getCommitteeMembership();
+    CommitteeMembershipBase getCommitteeMembership();
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -96,6 +96,10 @@ public class CoiDisclEventProject implements Serializable {
         return StringUtils.equals(CoiDisclosureEventType.AWARD, this.eventType);
     }
     
+    public boolean isAnnual() {
+        return StringUtils.equals(CoiDisclosureEventType.ANNUAL, this.eventType);
+    }
+    
     public boolean isProtocolEvent() {
         return StringUtils.equals(CoiDisclosureEventType.IRB_PROTOCOL, this.eventType);
     }
@@ -146,7 +150,7 @@ public class CoiDisclEventProject implements Serializable {
         int completeCount = 0;
         if (CollectionUtils.isNotEmpty(this.getCoiDiscDetails())) {
             for (CoiDiscDetail coiDiscDetail : this.getCoiDiscDetails()) {
-                if (StringUtils.isNotBlank(coiDiscDetail.getEntityStatusCode())) {
+                if (coiDiscDetail.getEntityDispositionCode() != null && coiDiscDetail.getEntityDispositionCode() > 0) {
                     completeCount ++;
                 }
                 
@@ -161,7 +165,7 @@ public class CoiDisclEventProject implements Serializable {
         boolean isComplete = true;
         if (CollectionUtils.isNotEmpty(this.getCoiDiscDetails())) {
             for (CoiDiscDetail coiDiscDetail : this.getCoiDiscDetails()) {
-                if (StringUtils.isBlank(coiDiscDetail.getEntityStatusCode())) {
+                if (coiDiscDetail.getEntityDispositionCode() == null || coiDiscDetail.getEntityDispositionCode() == 0) {
                     isComplete = false;
                     break;
                 }

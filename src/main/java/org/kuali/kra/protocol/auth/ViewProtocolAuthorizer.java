@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,16 +18,16 @@ package org.kuali.kra.protocol.auth;
 import org.kuali.kra.infrastructure.PermissionConstants;
 
 /**
- * The View Protocol Authorizer determines if a user has the right
+ * The View ProtocolBase Authorizer determines if a user has the right
  * to view a specific protocol.
  */
-public class ViewProtocolAuthorizer extends ProtocolAuthorizer {
+public class ViewProtocolAuthorizer extends ProtocolAuthorizerBase {
 
     /**
      * {@inheritDoc}
-     * @see org.kuali.kra.protocol.auth.ProtocolAuthorizer#isAuthorized(java.lang.String, org.kuali.kra.protocol.auth.ProtocolTask)
+     * @see org.kuali.kra.protocol.auth.ProtocolAuthorizerBase#isAuthorized(java.lang.String, org.kuali.kra.protocol.auth.ProtocolTaskBase)
      */
-    public boolean isAuthorized(String userId, ProtocolTask task) {
+    public boolean isAuthorized(String userId, ProtocolTaskBase task) {
         return hasPermission(userId, task.getProtocol(), PermissionConstants.VIEW_PROTOCOL)
             || kraWorkflowService.hasWorkflowPermission(userId, task.getProtocol().getProtocolDocument());
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -78,30 +78,25 @@ public class ProtocolNotifyIrbServiceImpl implements ProtocolNotifyIrbService {
         protocolAction.setComments(notifyIrbBean.getComment());
         protocol.getProtocolActions().add(protocolAction);
         protocolActionService.updateProtocolStatus(protocolAction, protocol);
-//        businessObjectService.save(protocol.getProtocolDocument());
-        if (!CollectionUtils.isEmpty(notifyIrbBean.getAnswerHeaders())) {
+        if (!CollectionUtils.isEmpty(notifyIrbBean.getQuestionnaireHelper().getAnswerHeaders())) {
             saveQuestionnaire(notifyIrbBean, submission.getSubmissionNumber());
-            notifyIrbBean.setAnswerHeaders(new ArrayList<AnswerHeader>());
+            notifyIrbBean.getQuestionnaireHelper().setAnswerHeaders(new ArrayList<AnswerHeader>());
         }
         cleanUnreferencedQuestionnaire(protocol.getProtocolNumber());
         documentService.saveDocument(protocol.getProtocolDocument());
         protocol.refreshReferenceObject("protocolSubmissions");
-//        try {
-//            NotifyIrbNotificationRenderer renderer = new NotifyIrbNotificationRenderer(protocol, protocolAction.getComments());
-//            IRBNotificationContext context = new IRBNotificationContext(protocol, ProtocolActionType.NOTIFY_IRB, "Notify IRB", renderer);
-//            kcNotificationService.sendNotification(context);
-//        } catch (Exception e) {
-//            LOG.info("Notify Irb Notification exception " + e.getStackTrace());
-//        }
     }
     
     private void saveQuestionnaire(ProtocolNotifyIrbBean notifyIrbBean, Integer submissionNumber) {
         List<AnswerHeader> saveHeaders = new ArrayList<AnswerHeader>();
-        for (AnswerHeader answerHeader : notifyIrbBean.getAnswerHeaders()) {
+        for (AnswerHeader answerHeader : notifyIrbBean.getQuestionnaireHelper().getAnswerHeaders()) {
             if (answerHeader.getAnswerHeaderId() != null) {
                 answerHeader.setModuleSubItemKey(submissionNumber.toString());
-                answerHeader.setModuleItemKey(answerHeader.getModuleItemKey().substring(0,
-                        answerHeader.getModuleItemKey().length() - 1));
+                //remove any trailing characters from the protocol number to avoid linking to an amendment or renewal or whatever T means.
+                if (answerHeader.getModuleItemKey().matches(".*[A-Z]$")) {
+                    answerHeader.setModuleItemKey(answerHeader.getModuleItemKey().substring(0,
+                            answerHeader.getModuleItemKey().length() - 1));
+                }
                 saveHeaders.add(answerHeader);
             }
         }
@@ -115,7 +110,6 @@ public class ProtocolNotifyIrbServiceImpl implements ProtocolNotifyIrbService {
      * Once, one of them is submitted, then the others whould be removed.
      */
     private void cleanUnreferencedQuestionnaire(String protocolNumber) {
-        // TODO : make this a shared 
         Map<String, String> fieldValues = new HashMap<String, String>();
         fieldValues.put(MODULE_ITEM_CODE, CoeusModule.IRB_MODULE_CODE);
         fieldValues.put(MODULE_ITEM_KEY, protocolNumber + "T");
@@ -134,16 +128,11 @@ public class ProtocolNotifyIrbServiceImpl implements ProtocolNotifyIrbService {
      */
     protected ProtocolSubmission createProtocolSubmission(Protocol protocol, ProtocolNotifyIrbBean notifyIrbBean) {
         ProtocolSubmissionBuilder submissionBuilder = new ProtocolSubmissionBuilder(protocol, ProtocolSubmissionType.NOTIFY_IRB);
-        //submissionBuilder.setProtocolReviewTypeCode(ProtocolReviewType.FULL_TYPE_CODE);
-        //submissionBuilder.setProtocolReviewTypeCode(ProtocolReviewType.FYI_TYPE_CODE);
         submissionBuilder.setProtocolReviewTypeCode(notifyIrbBean.getReviewTypeCode());
         submissionBuilder.setSubmissionTypeQualifierCode(notifyIrbBean.getSubmissionQualifierTypeCode());
         submissionBuilder.setSubmissionStatus(ProtocolSubmissionStatus.SUBMITTED_TO_COMMITTEE);
         submissionBuilder.setCommittee(notifyIrbBean.getCommitteeId());
         submissionBuilder.setComments(notifyIrbBean.getComment());
-//        for (ProtocolActionAttachment attachment : notifyIrbBean.getActionAttachments()) {
-//            submissionBuilder.addAttachment(attachment.getFile());
-//        }
         submissionBuilder.setActionAttachments(notifyIrbBean.getActionAttachments());
         ProtocolSubmission submission = submissionBuilder.create();
         // schedule id is set to null

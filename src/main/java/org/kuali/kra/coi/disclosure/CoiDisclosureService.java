@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,13 @@
 package org.kuali.kra.coi.disclosure;
 
 import java.util.List;
+import java.util.Map;
 
 import org.kuali.kra.award.home.Award;
-import org.kuali.kra.coi.CoiDiscDetail;
 import org.kuali.kra.coi.CoiDisclProject;
 import org.kuali.kra.coi.CoiDisclosure;
+import org.kuali.kra.coi.CoiDisclosureDocument;
+import org.kuali.kra.coi.CoiDisclosureUndisclosedEvents;
 import org.kuali.kra.coi.CoiDispositionStatus;
 import org.kuali.kra.coi.DisclosureReporter;
 import org.kuali.kra.coi.DisclosureReporterUnit;
@@ -177,6 +179,73 @@ public interface CoiDisclosureService {
      * @param coiDisclosure
      * @param masterDisclosureBean
      */
-    public void setDisclProjectForSave(CoiDisclosure coiDisclosure, MasterDisclosureBean masterDisclosureBean);
+    public boolean setDisclProjectForSave(CoiDisclosure coiDisclosure, MasterDisclosureBean masterDisclosureBean);
+    
+    public CoiDisclosure getCurrentDisclosure();
+    
+    public void populateProposalsAndAwardToCompleteDisclosure(String userId, DisclosureHelper disclosureHelper);
+    
+    /**
+     * This method is to group all project disclosures by financial entity
+     * @param coiDisclosure
+     * @param masterDisclosureBean
+     */
+    public void createDisclosuresGroupedByFinancialEntity(CoiDisclosure coiDisclosure, MasterDisclosureBean masterDisclosureBean);
+
+    /**
+     * This method is to group all disclosures by event
+     * @param masterDisclosureBean
+     */
+    public void createDisclosuresGroupedByEvent(MasterDisclosureBean masterDisclosureBean);
+    
+    /**
+     * return a list of all disclosures for the given user
+     * 
+     */
+    public List<CoiDisclosure> getAllDisclosuresForUser(String userId);
+    
+    /**
+     * 
+     * Check the KRMS rule designated in KRMS_SCREENING_QUESTIONNAIRE_RULE to see if the screening questionnaire rule has passed or not.
+     * @return
+     */
+    public boolean checkScreeningQuestionnaireRule(CoiDisclosureDocument coiDisclosureDocument);
+
+
+    /**
+     * This method is to get a list of undisclosed events from all projects based
+     * on search criteria.
+     * @param searchCriteria
+     * @return
+     */
+    public List<CoiDisclosureUndisclosedEvents> getUndisclosedEvents(Map<String, String> searchCriteria);
+    
+    /**
+     * Loops through all projects and financial entities and sets the project disclosure to the maximum disposition in that project
+     * and returns the maximum disposition status from the disclosure.
+     * Returns in progress when the disclosure is in progress and not conflict exists when no financial entities exist.
+     * @param coiDisclosure
+     * @return
+     */
+    public CoiDispositionStatus calculateMaximumDispositionStatus(CoiDisclosure coiDisclosure);
+    
+    public Integer calculateMaximumDispositionStatusCode(CoiDisclosure coiDisclosure);  
+    
+    public void updateDisclosureAndProjectDisposition(CoiDisclosure coiDisclosure);
+
+
+    /**
+     * This method is to group undisclosed projects by event type
+     * @param coiDisclProjects
+     * @return
+     */
+    public List<CoiGroupedMasterDisclosureBean> getUndisclosedProjectsGroupedByEvent(List<CoiDisclProject> coiDisclProjects);
+    
+    /**
+     * This method is to group undisclosed projects by financial entity
+     * @param coiDisclProjects
+     * @return
+     */
+    public List<CoiGroupedMasterDisclosureBean> getUndisclosedProjectsGroupedByFinancialEntity(List<CoiDisclProject> coiDisclProjects);
     
 }

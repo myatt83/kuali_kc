@@ -1,5 +1,5 @@
 <%--
- Copyright 2005-2010 The Kuali Foundation
+ Copyright 2005-2013 The Kuali Foundation
 
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -38,9 +38,7 @@
 	</c:otherwise>
 </c:choose>
 
-<c:if test="${readOnly}" >
-	<c:set var="budgetExpensePanelReadOnly" value="true" />
-</c:if>
+<c:set var="budgetExpensePanelReadOnly" value="${budgetExpensePanelReadOnly || budgetLineItem.subAwardLineItem}" />
 
 <c:set var="budgetExpensePanelReadOnlyIfBudgetVersionIsFinal" value="${budgetExpensePanelReadOnly}" />
 <c:if test="${budgetCategoryTypeCode == 'P' and fn:length(budgetLineItem.budgetPersonnelDetailsList) > 0}" >
@@ -116,8 +114,10 @@
 	<td width="8%" valign="middle" >&nbsp;
 		<div align=center>
        		<kra:section permission="modifyBudgets">
+       		<c:if test="${!budgetExpensePanelReadOnly}">
 				<html:image property="methodToCall.deleteBudgetLineItem.line${budgetLineItemNumber}.anchor${currentTabIndex}"
 			    	src='${ConfigProperties.kra.externalizable.images.url}tinybutton-delete1.gif' styleClass="tinybutton" />
+			</c:if>
 			</kra:section> 
 		</div>
     </td>
@@ -144,7 +144,8 @@
 		    		<c:otherwise>
 			        	<kra-b:budgetLineItemFullView budgetPeriod = "${budgetPeriod}" budgetPeriodBO="${budgetPeriodBO}" budgetCategoryTypeCode = "${budgetCategoryTypeCode}" 
 			        		budgetLineItemNumber="${budgetLineItemNumber}" budgetLineItem="${budgetLineItem}" 
-			        		innerTabParent="${innerTabParent}" budgetExpensePanelReadOnly="${budgetExpensePanelReadOnly}" budgetExpensePanelReadOnlyIfBudgetVersionIsFinal="${budgetExpensePanelReadOnlyIfBudgetVersionIsFinal}"/>
+			        		innerTabParent="${innerTabParent}" budgetExpensePanelReadOnly="${budgetExpensePanelReadOnly}" 
+			        		budgetExpensePanelReadOnlyIfBudgetVersionIsFinal="${budgetExpensePanelReadOnlyIfBudgetVersionIsFinal}"/>
 		        	</c:otherwise>
 	        	</c:choose>
 			</td>

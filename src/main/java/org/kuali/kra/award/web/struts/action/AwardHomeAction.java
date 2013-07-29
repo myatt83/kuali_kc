@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,6 @@ import org.kuali.kra.common.specialreview.service.SpecialReviewService;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.KeyConstants;
 import org.kuali.kra.infrastructure.KraServiceLocator;
-import org.kuali.kra.institutionalproposal.specialreview.InstitutionalProposalSpecialReview;
 import org.kuali.kra.service.KeywordsService;
 import org.kuali.kra.service.VersioningService;
 import org.kuali.rice.core.api.util.type.KualiDecimal;
@@ -204,6 +203,11 @@ public class AwardHomeAction extends AwardAction {
             Award award = findSelectedAward(request.getParameter(AWARD_ID_PARAMETER_NAME));
             initializeFormWithAward(awardForm, award);
         }
+        if (StringUtils.isNotBlank(commandParam) && "redirectAwardHistoryFullViewForPopup".equals(commandParam)) {
+            String awardDocumentNumber = request.getParameter("awardDocumentNumber");
+            String awardNumber = request.getParameter("awardNumber");
+            actionForward = redirectAwardHistoryFullViewForPopup(mapping, form, request, response, awardDocumentNumber, awardNumber);
+        }
         
         return actionForward;
     }
@@ -251,10 +255,27 @@ public class AwardHomeAction extends AwardAction {
         AwardForm awardForm = (AwardForm) form;
         AwardDocument awardDocument = awardForm.getAwardDocument();
         
-      //if award is a root Award and direct/indirect view is enabled, then we need to sum the obligated and anticipated totals until we create
+        //if award is a root Award and direct/indirect view is enabled, then we need to sum the obligated and anticipated totals until we create
         //initial T&M doc.
-        if(awardDocument.getAward().getAwardNumber().endsWith("-00001") && isDirectIndirectViewEnabled()) {
-            setTotalsOnAward(awardDocument.getAward());
+        if(awardDocument.getAward().getAwardNumber().endsWith("-00000")) {
+            awardDocument.getAward().getLastAwardAmountInfo().resetChangeValues();
+        } else if(awardDocument.getAward().getAwardNumber().endsWith("-00001")) {
+            if (isDirectIndirectViewEnabled()) {
+                setTotalsOnAward(awardDocument.getAward());
+            }
+            Award oldAward = getAwardVersionService().getActiveAwardVersion(awardDocument.getAward().getAwardNumber());
+            AwardAmountInfo aaiNew = awardDocument.getAward().getLastAwardAmountInfo();
+            if (oldAward != null) {
+                AwardAmountInfo aaiOld = oldAward.getLastAwardAmountInfo();
+                aaiNew.setObligatedChange(aaiNew.getAmountObligatedToDate().subtract(aaiOld.getAmountObligatedToDate()));
+                aaiNew.setObligatedChangeDirect(aaiNew.getObligatedTotalDirect().subtract(aaiOld.getObligatedTotalDirect()));
+                aaiNew.setObligatedChangeIndirect(aaiNew.getObligatedTotalIndirect().subtract(aaiOld.getObligatedTotalIndirect()));
+                aaiNew.setAnticipatedChange(aaiNew.getAnticipatedTotalAmount().subtract(aaiOld.getAnticipatedTotalAmount()));
+                aaiNew.setAnticipatedChangeDirect(aaiNew.getAnticipatedTotalDirect().subtract(aaiOld.getAnticipatedTotalDirect()));
+                aaiNew.setAnticipatedChangeIndirect(aaiNew.getAnticipatedTotalIndirect().subtract(aaiOld.getAnticipatedTotalIndirect()));
+            } else {
+                aaiNew.resetChangeValues();
+            }
         }
         
         /**
@@ -288,7 +309,7 @@ public class AwardHomeAction extends AwardAction {
 
         return forward;
     }
-    
+
     private void setTotalsOnAward(Award award) {
         AwardAmountInfo aai = award.getLastAwardAmountInfo();
         aai.setAmountObligatedToDate(aai.getObligatedTotalDirect().add(aai.getObligatedTotalIndirect()));
@@ -448,7 +469,7 @@ public class AwardHomeAction extends AwardAction {
             return mapping.findForward(Constants.MAPPING_AWARD_BASIC);
         }
         
-        if(getTimeAndMoneyExistenceService().validateTimeAndMoneyRule(award, awardForm.getAwardHierarchyNodes())){
+        if(getTimeAndMoneyExistenceService().validateTimeAndMoneyRule(award, awardForm.getAwardHierarchyBean().getRootNode().getAwardNumber())) {
             VersionHistory foundPending = findPendingVersion(award);
             cleanUpUserSession();
             if(foundPending != null) {
@@ -471,7 +492,7 @@ public class AwardHomeAction extends AwardAction {
         AwardDocument newAwardDocument = getAwardService().createNewAwardVersion(awardForm.getAwardDocument());
         getDocumentService().saveDocument(newAwardDocument);
         getAwardService().updateAwardSequenceStatus(newAwardDocument.getAward(), VersionStatus.PENDING);
-        getVersionHistoryService().createVersionHistory(newAwardDocument.getAward(), VersionStatus.PENDING,
+        getVersionHistoryService().updateVersionHistory(newAwardDocument.getAward(), VersionStatus.PENDING,
                 GlobalVariables.getUserSession().getPrincipalName());
         reinitializeAwardForm(awardForm, newAwardDocument);
         return new ActionForward(makeDocumentOpenUrl(newAwardDocument), true);
@@ -621,8 +642,18 @@ public class AwardHomeAction extends AwardAction {
         AwardForm awardForm = (AwardForm) form;
         ActionForward result = fullSyncToAwardTemplate(mapping, form, request, response);
         
-        awardForm.setReportTrackingBeans(awardForm.buildReportTrackingBeans());
+        awardForm.buildReportTrackingBeans();
         
         return result;
     }
+    
+    private ActionForward redirectAwardHistoryFullViewForPopup(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+            HttpServletResponse response, String awardDocumentNumber, String awardNumber) throws Exception {
+        //super.populateAwardHierarchy(form);
+        AwardForm awardForm = (AwardForm)form;
+        response.sendRedirect("awardHistory.do?methodToCall=openWindow&awardDocumentNumber=" + awardDocumentNumber + "&awardNumber=" + awardNumber + "&docTypeName=" + awardForm.getDocTypeName());
+      
+        return null;
+    }
+
 }

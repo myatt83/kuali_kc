@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,11 +33,14 @@ import org.kuali.kra.award.home.fundingproposal.AwardFundingProposal;
 import org.kuali.kra.award.specialreview.AwardSpecialReview;
 import org.kuali.kra.bo.FundingSourceType;
 import org.kuali.kra.bo.NsfCode;
+import org.kuali.kra.bo.SpecialReviewApprovalType;
 import org.kuali.kra.bo.SpecialReviewType;
 import org.kuali.kra.bo.versioning.VersionHistory;
 import org.kuali.kra.bo.versioning.VersionStatus;
 import org.kuali.kra.common.specialreview.bo.SpecialReview;
 import org.kuali.kra.iacuc.IacucProtocol;
+import org.kuali.kra.infrastructure.Constants;
+import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.institutionalproposal.home.InstitutionalProposal;
 import org.kuali.kra.institutionalproposal.proposaladmindetails.ProposalAdminDetails;
 import org.kuali.kra.institutionalproposal.specialreview.InstitutionalProposalSpecialReview;
@@ -47,11 +50,13 @@ import org.kuali.kra.medusa.MedusaNode;
 import org.kuali.kra.negotiations.bo.Negotiation;
 import org.kuali.kra.negotiations.service.NegotiationService;
 import org.kuali.kra.proposaldevelopment.bo.DevelopmentProposal;
+import org.kuali.kra.protocol.protocol.funding.ProtocolFundingSourceBase;
 import org.kuali.kra.service.AwardHierarchyUIService;
 import org.kuali.kra.service.VersionHistoryService;
 import org.kuali.kra.subaward.bo.SubAward;
 import org.kuali.kra.subaward.bo.SubAwardFundingSource;
 import org.kuali.kra.subaward.service.SubAwardService;
+import org.kuali.rice.coreservice.framework.parameter.ParameterService;
 import org.kuali.rice.krad.bo.BusinessObject;
 import org.kuali.rice.krad.service.BusinessObjectService;
 
@@ -61,21 +66,14 @@ import org.kuali.rice.krad.service.BusinessObjectService;
  */
 public class MedusaServiceImpl implements MedusaService {
 
-    public static final String AWARD_MODULE = "award";
-    public static final String INSTITUTIONAL_PROPOSAL_MODULE = "IP";
-    public static final String DEVELOPMENT_PROPOSAL_MODULE = "DP";    
-    public static final String NEGOTIATION_MODULE = "neg";
     private static final int INST_PROPOSAL_STATUS_FUNDED = 2;
-    public static final String SUBAWARD_MODULE = "subaward";
-    public static final String IRB_MODULE = "irb";
-    public static final String IACUC_MODULE = "iacuc";
-    
 
     private BusinessObjectService businessObjectService;
     private AwardAmountInfoService awardAmountInfoService;
     private VersionHistoryService versionHistoryService;
     private NegotiationService negotiationService;
     private SubAwardService subAwardService;
+    private ParameterService parameterService;
     
     /**
      * 
@@ -84,30 +82,30 @@ public class MedusaServiceImpl implements MedusaService {
     public MedusaNode getMedusaNode(String moduleName, Long moduleId) {
         MedusaNode curNode = new MedusaNode();
         curNode.setType(moduleName);
-        if (StringUtils.equalsIgnoreCase(AWARD_MODULE, moduleName)) {
+        if (StringUtils.equalsIgnoreCase(Constants.AWARD_MODULE, moduleName)) {
             Award award = (Award) businessObjectService.findByPrimaryKey(Award.class, getFieldValues("awardId", moduleId));
             curNode.setBo(award);
             curNode.setExtraInfo(awardAmountInfoService.fetchAwardAmountInfoWithHighestTransactionId(award.getAwardAmountInfos()));
-        } else if (StringUtils.equalsIgnoreCase(INSTITUTIONAL_PROPOSAL_MODULE, moduleName)) {
+        } else if (StringUtils.equalsIgnoreCase(Constants.INSTITUTIONAL_PROPOSAL_MODULE, moduleName)) {
             InstitutionalProposal proposal = 
                 (InstitutionalProposal) businessObjectService.findByPrimaryKey(InstitutionalProposal.class, getFieldValues("proposalId", moduleId));
             proposal.setNsfCodeBo(getNsfCode(proposal.getNsfCode()));
             curNode.setBo(proposal);
-        } else if (StringUtils.equalsIgnoreCase(DEVELOPMENT_PROPOSAL_MODULE , moduleName)) {
+        } else if (StringUtils.equalsIgnoreCase(Constants.DEVELOPMENT_PROPOSAL_MODULE , moduleName)) {
             DevelopmentProposal devProp = 
                 (DevelopmentProposal) businessObjectService.findByPrimaryKey(DevelopmentProposal.class, getFieldValues("proposalNumber", moduleId));
             devProp.setNsfCodeBo(getNsfCode(devProp.getNsfCode()));
             curNode.setBo(devProp);
-        } else if (StringUtils.equalsIgnoreCase(NEGOTIATION_MODULE, moduleName)) {
+        } else if (StringUtils.equalsIgnoreCase(Constants.NEGOTIATION_MODULE, moduleName)) {
             Negotiation negotiation = getNegotiation(moduleId);
             curNode.setBo(negotiation);
-        } else if (StringUtils.equalsIgnoreCase(SUBAWARD_MODULE, moduleName)) {
+        } else if (StringUtils.equalsIgnoreCase(Constants.SUBAWARD_MODULE, moduleName)) {
             SubAward subaward = getSubAward(moduleId);
             curNode.setBo(subaward);
-        } else if (StringUtils.equalsIgnoreCase(IRB_MODULE, moduleName)) {
+        } else if (StringUtils.equalsIgnoreCase(Constants.IRB_MODULE, moduleName)) {
             Protocol protocol = getProtocol(moduleId);
             curNode.setBo(protocol);
-        } else if (StringUtils.equalsIgnoreCase(IACUC_MODULE, moduleName)) {
+        } else if (StringUtils.equalsIgnoreCase(Constants.IACUC_MODULE, moduleName)) {
             IacucProtocol protocol = getIacuc(moduleId);
             curNode.setBo(protocol);
         }
@@ -135,7 +133,7 @@ public class MedusaServiceImpl implements MedusaService {
      * @see org.kuali.kra.medusa.service.MedusaService#getMedusaByProposal(java.lang.String, java.lang.Long)
      */
     public List<MedusaNode> getMedusaByProposal(String moduleName, Long moduleIdentifier) {
-        String preferredModule = INSTITUTIONAL_PROPOSAL_MODULE;
+        String preferredModule = Constants.INSTITUTIONAL_PROPOSAL_MODULE;
         return getMedusaTree(moduleName, moduleIdentifier, preferredModule);
     }
     
@@ -144,7 +142,7 @@ public class MedusaServiceImpl implements MedusaService {
      * @see org.kuali.kra.medusa.service.MedusaService#getMedusaByAward(java.lang.String, java.lang.Long)
      */
     public List<MedusaNode> getMedusaByAward(String moduleName, Long moduleIdentifier) {
-        String preferredModule = AWARD_MODULE;
+        String preferredModule = Constants.AWARD_MODULE;
         return getMedusaTree(moduleName, moduleIdentifier, preferredModule);
     }
     
@@ -159,48 +157,48 @@ public class MedusaServiceImpl implements MedusaService {
     protected List<MedusaNode> getMedusaTree(String moduleName, Long moduleIdentifier, String preferredModule) {
         List<MedusaNode> nodes = new ArrayList<MedusaNode>();
         HashMap<BusinessObject, List<BusinessObject>> graph = new HashMap<BusinessObject, List<BusinessObject>>();
-        if (StringUtils.equals(moduleName, AWARD_MODULE)) {
+        if (StringUtils.equals(moduleName, Constants.AWARD_MODULE)) {
             Award award = getAward(moduleIdentifier);
             addVertex(graph, award);
             buildGraph(graph, award);
-            nodes = getParentNodes(graph, new String[]{preferredModule, AWARD_MODULE});
-        } else if (StringUtils.equals(moduleName, INSTITUTIONAL_PROPOSAL_MODULE)) {
+            nodes = getParentNodes(graph, new String[]{preferredModule, Constants.AWARD_MODULE});
+        } else if (StringUtils.equals(moduleName, Constants.INSTITUTIONAL_PROPOSAL_MODULE)) {
             InstitutionalProposal proposal = getInstitutionalProposal(moduleIdentifier);
             addVertex(graph, proposal);
             buildGraph(graph, proposal);
-            nodes = getParentNodes(graph, new String[]{preferredModule, INSTITUTIONAL_PROPOSAL_MODULE});
-        } else if (StringUtils.equals(moduleName, DEVELOPMENT_PROPOSAL_MODULE)) {
+            nodes = getParentNodes(graph, new String[]{preferredModule, Constants.INSTITUTIONAL_PROPOSAL_MODULE});
+        } else if (StringUtils.equals(moduleName, Constants.DEVELOPMENT_PROPOSAL_MODULE)) {
             DevelopmentProposal proposal = getDevelopmentProposal(moduleIdentifier.toString());
             addVertex(graph, proposal);
             buildGraph(graph, proposal);
-            nodes = getParentNodes(graph, new String[]{preferredModule, DEVELOPMENT_PROPOSAL_MODULE});
-        } else if (StringUtils.equals(moduleName, NEGOTIATION_MODULE)) {
+            nodes = getParentNodes(graph, new String[]{preferredModule, Constants.DEVELOPMENT_PROPOSAL_MODULE});
+        } else if (StringUtils.equals(moduleName, Constants.NEGOTIATION_MODULE)) {
             Negotiation negotiation = getNegotiation(moduleIdentifier);
             if (negotiation != null) {
                 addVertex(graph, negotiation);
                 buildGraph(graph, negotiation);
-                nodes = getParentNodes(graph, new String[]{preferredModule, NEGOTIATION_MODULE});
+                nodes = getParentNodes(graph, new String[]{preferredModule, Constants.NEGOTIATION_MODULE});
             }
-        } else if (StringUtils.equals(moduleName, SUBAWARD_MODULE)) {
+        } else if (StringUtils.equals(moduleName, Constants.SUBAWARD_MODULE)) {
             SubAward subAward = getSubAward(moduleIdentifier);
             if (subAward != null) {
                 addVertex(graph, subAward);
                 buildGraph(graph, subAward);
-                nodes = getParentNodes(graph, new String[]{preferredModule, SUBAWARD_MODULE});
+                nodes = getParentNodes(graph, new String[]{preferredModule, Constants.SUBAWARD_MODULE});
             }
-        } else if (StringUtils.equals(moduleName, IRB_MODULE)) {
+        } else if (StringUtils.equals(moduleName, Constants.IRB_MODULE)) {
             Protocol protocol = getProtocol(moduleIdentifier);
             if (protocol != null) {
                 addVertex(graph, protocol);
                 buildGraph(graph, protocol);
-                nodes = getParentNodes(graph, new String[]{preferredModule, IRB_MODULE});
+                nodes = getParentNodes(graph, new String[]{preferredModule, Constants.IRB_MODULE});
             }
-        } else if (StringUtils.equals(moduleName, IACUC_MODULE)) {
+        } else if (StringUtils.equals(moduleName, Constants.IACUC_MODULE)) {
             IacucProtocol protocol = getIacuc(moduleIdentifier);
             if (protocol != null) {
                 addVertex(graph, protocol);
                 buildGraph(graph, protocol);
-                nodes = getParentNodes(graph, new String[]{preferredModule, IACUC_MODULE});
+                nodes = getParentNodes(graph, new String[]{preferredModule, Constants.IACUC_MODULE});
             }
         }
         return nodes;
@@ -316,10 +314,14 @@ public class MedusaServiceImpl implements MedusaService {
         for (Award award : awards) {
             addToGraph(graph, award, subAward);
         }
+        Collection<Negotiation> negotiations = getNegotiations(subAward);
+        for (Negotiation negotiation : negotiations) {
+            addToGraph(graph, negotiation, subAward);
+        }        
     }
     
     protected void buildGraph(HashMap<BusinessObject, List<BusinessObject>> graph, Protocol protocol) {
-        for (ProtocolFundingSource fundingSource : protocol.getProtocolFundingSources()) {
+        for (ProtocolFundingSourceBase fundingSource : protocol.getProtocolFundingSources()) {
             if (StringUtils.equals(fundingSource.getFundingSourceTypeCode(), FundingSourceType.AWARD)) {
                 addToGraph(graph, getAward(fundingSource.getFundingSourceNumber()), protocol);
             } else if (StringUtils.equals(fundingSource.getFundingSourceTypeCode(), FundingSourceType.INSTITUTIONAL_PROPOSAL)) {
@@ -331,7 +333,7 @@ public class MedusaServiceImpl implements MedusaService {
     }
     
     protected void buildGraph(HashMap<BusinessObject, List<BusinessObject>> graph, IacucProtocol protocol) {
-        for (org.kuali.kra.protocol.protocol.funding.ProtocolFundingSource fundingSource : protocol.getProtocolFundingSources()) {
+        for (org.kuali.kra.protocol.protocol.funding.ProtocolFundingSourceBase fundingSource : protocol.getProtocolFundingSources()) {
             if (StringUtils.equals(fundingSource.getFundingSourceTypeCode(), FundingSourceType.AWARD)) {
                 addToGraph(graph, getAward(fundingSource.getFundingSourceNumber()), protocol);
             } else if (StringUtils.equals(fundingSource.getFundingSourceTypeCode(), FundingSourceType.INSTITUTIONAL_PROPOSAL)) {
@@ -343,13 +345,49 @@ public class MedusaServiceImpl implements MedusaService {
     }    
     
     protected void addSpecialReviewLinksToGraph(HashMap<BusinessObject, List<BusinessObject>> graph, List<? extends SpecialReview> specialReviews, BusinessObject existingBo) {
+        Map<String, Boolean> specialReviewLinking = getSpecialReviewLinkingEnabled(existingBo);
         for (SpecialReview specialReview : specialReviews) {
-            if (StringUtils.equals(specialReview.getSpecialReviewTypeCode(), SpecialReviewType.HUMAN_SUBJECTS)) {
-                addToGraph(graph, getProtocol(specialReview.getProtocolNumber()), existingBo);
-            } else if (StringUtils.equals(specialReview.getSpecialReviewTypeCode(), SpecialReviewType.ANIMAL_USAGE)) {
-                addToGraph(graph, getIacuc(specialReview.getProtocolNumber()), existingBo);
+            if (StringUtils.equals(specialReview.getSpecialReviewTypeCode(), SpecialReviewType.HUMAN_SUBJECTS)
+                    && specialReviewLinking.get(SpecialReviewType.HUMAN_SUBJECTS)
+                    && !StringUtils.equals(specialReview.getApprovalTypeCode(), SpecialReviewApprovalType.NOT_YET_APPLIED)) {
+                Protocol protocol = getProtocol(specialReview.getProtocolNumber());
+                addToGraph(graph, protocol, existingBo);
+            } else if (StringUtils.equals(specialReview.getSpecialReviewTypeCode(), SpecialReviewType.ANIMAL_USAGE)
+                    && specialReviewLinking.get(SpecialReviewType.ANIMAL_USAGE)
+                    && !StringUtils.equals(specialReview.getApprovalTypeCode(), SpecialReviewApprovalType.NOT_YET_APPLIED)) {
+                IacucProtocol protocol = getIacuc(specialReview.getProtocolNumber());
+                addToGraph(graph, protocol, existingBo);
             }
         }
+    }
+    
+    protected Map<String, Boolean> getSpecialReviewLinkingEnabled(BusinessObject existingBo) {
+        Map<String, Boolean> result = new HashMap<String, Boolean>();
+        String irbLinkingName = null;
+        String iacucLinkingName = null;
+        if (existingBo instanceof DevelopmentProposal) {
+            irbLinkingName = Constants.ENABLE_PROTOCOL_TO_DEV_PROPOSAL_LINK;
+            iacucLinkingName = Constants.IACUC_PROTOCOL_PROPOSAL_DEVELOPMENT_LINKING_ENABLED_PARAMETER;
+        } else if (existingBo instanceof InstitutionalProposal) {
+            irbLinkingName = Constants.ENABLE_PROTOCOL_TO_PROPOSAL_LINK;
+            iacucLinkingName = Constants.IACUC_PROTOCOL_INSTITUTE_PROPOSAL_LINKING_ENABLED_PARAMETER;
+        } else if (existingBo instanceof Award) {
+            irbLinkingName = Constants.ENABLE_PROTOCOL_TO_AWARD_LINK;
+            iacucLinkingName = Constants.IACUC_PROTOCOL_AWARD_LINKING_ENABLED_PARAMETER;
+        }
+        if (irbLinkingName != null) {
+            result.put(SpecialReviewType.HUMAN_SUBJECTS, 
+                    getParameterService().getParameterValueAsBoolean(Constants.MODULE_NAMESPACE_PROTOCOL, Constants.PARAMETER_COMPONENT_DOCUMENT, irbLinkingName));
+        } else {
+            result.put(SpecialReviewType.HUMAN_SUBJECTS, Boolean.FALSE);
+        }
+        if (iacucLinkingName != null) {
+            result.put(SpecialReviewType.ANIMAL_USAGE, 
+                    getParameterService().getParameterValueAsBoolean(Constants.MODULE_NAMESPACE_IACUC, Constants.PARAMETER_COMPONENT_DOCUMENT, iacucLinkingName));
+        } else {
+            result.put(SpecialReviewType.ANIMAL_USAGE, Boolean.FALSE);
+        }
+        return result;
     }
     
     /**
@@ -418,6 +456,9 @@ public class MedusaServiceImpl implements MedusaService {
     }
     
     protected void addToGraph(HashMap<BusinessObject, List<BusinessObject>> graph, BusinessObject newBo, BusinessObject existingBo) {
+        if (newBo == null || existingBo == null) {
+            throw new RuntimeException("Inavlid or null Medusa link found");
+        }
         if (findMatchingBo(graph.keySet(), newBo) == null) {
             addEdge(graph, existingBo, newBo);
             if (newBo instanceof Award) {
@@ -556,7 +597,7 @@ public class MedusaServiceImpl implements MedusaService {
     }
     
     protected Negotiation getNegotiation(Long negotiationId) {
-        Negotiation negotiation = (Negotiation) businessObjectService.findBySinglePrimaryKey(Negotiation.class, negotiationId);
+        Negotiation negotiation = negotiationId == null ? null : (Negotiation) businessObjectService.findBySinglePrimaryKey(Negotiation.class, negotiationId);
         return negotiation;
     }
     
@@ -566,6 +607,9 @@ public class MedusaServiceImpl implements MedusaService {
             return null;
         }
         SubAward currentSubAward = (SubAward) getActiveOrCurrentVersion(SubAward.class, subAward.getSubAwardCode());
+        if (currentSubAward != null) {
+            KraServiceLocator.getService(SubAwardService.class).getAmountInfo(currentSubAward);
+        }
         return currentSubAward == null ? subAward : currentSubAward;
     }
     
@@ -663,7 +707,7 @@ public class MedusaServiceImpl implements MedusaService {
         AwardAmountInfo awardAmountInfo = awardAmountInfoService.fetchAwardAmountInfoWithHighestTransactionId(award.getAwardAmountInfos());
         MedusaNode node = new MedusaNode();
         node.setBo(award);
-        node.setType(AWARD_MODULE);
+        node.setType(Constants.AWARD_MODULE);
         node.setExtraInfo(awardAmountInfo);
         return node;
     }
@@ -671,39 +715,39 @@ public class MedusaServiceImpl implements MedusaService {
     protected MedusaNode getNode(InstitutionalProposal proposal) {
         MedusaNode node = new MedusaNode();
         node.setBo(proposal);
-        node.setType(INSTITUTIONAL_PROPOSAL_MODULE);
+        node.setType(Constants.INSTITUTIONAL_PROPOSAL_MODULE);
         return node;
     }
     
     protected MedusaNode getNode(DevelopmentProposal proposal) {
         MedusaNode node = new MedusaNode();
         node.setBo(proposal);
-        node.setType(DEVELOPMENT_PROPOSAL_MODULE);
+        node.setType(Constants.DEVELOPMENT_PROPOSAL_MODULE);
         return node;
     }
     
     protected MedusaNode getNode(Negotiation negotiation) {
         MedusaNode node = new MedusaNode();
         node.setBo(negotiation);
-        node.setType(NEGOTIATION_MODULE);
+        node.setType(Constants.NEGOTIATION_MODULE);
         return node;
     }
     protected MedusaNode getNode(SubAward subAward) {
         MedusaNode node = new MedusaNode();
         node.setBo(subAward);
-        node.setType(SUBAWARD_MODULE);
+        node.setType(Constants.SUBAWARD_MODULE);
         return node;
     }
     protected MedusaNode getNode(Protocol protocol) {
         MedusaNode node = new MedusaNode();
         node.setBo(protocol);
-        node.setType(IRB_MODULE);
+        node.setType(Constants.IRB_MODULE);
         return node;
     }
     protected MedusaNode getNode(IacucProtocol protocol) {
         MedusaNode node = new MedusaNode();
         node.setBo(protocol);
-        node.setType(IACUC_MODULE);
+        node.setType(Constants.IACUC_MODULE);
         return node;
     }
     
@@ -755,6 +799,7 @@ public class MedusaServiceImpl implements MedusaService {
         Collection<SubAward> subAwards = getSubAwardService().getLinkedSubAwards(award);
         return subAwards;
     }
+    
     /**
      * 
      * Generates and returns a collection of all awards linked to the 
@@ -769,7 +814,11 @@ public class MedusaServiceImpl implements MedusaService {
         for (InstitutionalProposal curIp : institutionalProposalVersions) {
             Collection<AwardFundingProposal> awardFundingProposals = curIp.getAwardFundingProposals();
             for (AwardFundingProposal awardFunding : awardFundingProposals) {
-                if (awardFunding.isActive()) {
+                /*
+                 * KRACOEUS-6539: Medusa needs to check that this awardFundingProposal is STILL active in the current active IP version
+                 * before displaying it. Currently, awards from cancelled IPs are also appearing in the list.
+                 */
+                if (awardFunding.isActive() && !curIp.isCancelled()) {
                     awards.add(getAward(awardFunding.getAwardId()));
                 }
             }
@@ -785,7 +834,7 @@ public class MedusaServiceImpl implements MedusaService {
         }
         return awards;
     }
-    
+  
     /**
      * 
      * Gets and returns the newest active proposal version for the proposal number.
@@ -822,7 +871,9 @@ public class MedusaServiceImpl implements MedusaService {
         for (Award curAward : awardVersions) {
             Collection<AwardFundingProposal> awardFundingProposals = curAward.getFundingProposals();
             for (AwardFundingProposal awardFunding : awardFundingProposals) {
-                if (awardFunding.isActive()) {
+                InstitutionalProposal curProposal = businessObjectService.findByPrimaryKey(InstitutionalProposal.class, getFieldValues("proposalId", awardFunding.getProposalId()));
+                boolean proposalNotCancelled = !curProposal.isCancelled();
+                if (proposalNotCancelled && awardFunding.isActive()) {
                     ips.add(getInstitutionalProposal(awardFunding.getProposalId()));
                 }
             }
@@ -884,7 +935,7 @@ public class MedusaServiceImpl implements MedusaService {
      * Gets the awardAmountInfoService attribute. 
      * @return Returns the awardAmountInfoService.
      */
-    public AwardAmountInfoService getAwardAmountInfoService() {
+    protected AwardAmountInfoService getAwardAmountInfoService() {
         return awardAmountInfoService;
     }
 
@@ -896,7 +947,7 @@ public class MedusaServiceImpl implements MedusaService {
         this.awardAmountInfoService = awardAmountInfoService;
     }
 
-    public VersionHistoryService getVersionHistoryService() {
+    protected VersionHistoryService getVersionHistoryService() {
         return versionHistoryService;
     }
 
@@ -904,7 +955,7 @@ public class MedusaServiceImpl implements MedusaService {
         this.versionHistoryService = versionHistoryService;
     }
 
-    public NegotiationService getNegotiationService() {
+    protected NegotiationService getNegotiationService() {
         return negotiationService;
     }
 
@@ -918,6 +969,14 @@ public class MedusaServiceImpl implements MedusaService {
 
     public void setSubAwardService(SubAwardService subAwardService) {
         this.subAwardService = subAwardService;
+    }
+
+    protected ParameterService getParameterService() {
+        return parameterService;
+    }
+
+    public void setParameterService(ParameterService parameterService) {
+        this.parameterService = parameterService;
     } 
     
 }

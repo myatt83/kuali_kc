@@ -1,5 +1,5 @@
 <!--
- Copyright 2005-2010 The Kuali Foundation.
+ Copyright 2005-2013 The Kuali Foundation.
  
  Licensed under the Educational Community License, Version 1.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -45,13 +45,17 @@
         <collection-descriptor name="documentNextvalues" element-class-ref="org.kuali.kra.bo.DocumentNextvalue" auto-retrieve="true" auto-update="object" auto-delete="object">
             <inverse-foreignkey field-ref="documentKey" /> 
         </collection-descriptor>
+		<collection-descriptor name="customDataList" proxy="true" element-class-ref="org.kuali.kra.bo.CustomAttributeDocValue" 
+			collection-class="org.apache.ojb.broker.util.collections.ManageableArrayList" auto-retrieve="true" auto-update="object" auto-delete="object">
+			 <inverse-foreignkey field-ref="documentNumber"/>
+		</collection-descriptor>
     </class-descriptor>
 
     <class-descriptor class="org.kuali.kra.proposaldevelopment.bo.DevelopmentProposal" table="EPS_PROPOSAL">
         <field-descriptor name="proposalNumber" column="PROPOSAL_NUMBER" jdbc-type="VARCHAR" primarykey="true" sequence-name="SEQ_PROPOSAL_NUMBER_KRA" autoincrement="true" />
         <field-descriptor name="proposalNumberForGG" column="PROPOSALNUMBER_GG" jdbc-type="VARCHAR" />
         <field-descriptor name="opportunityIdForGG" column="OPPORTUNITYID_GG" jdbc-type="VARCHAR" />
-        <field-descriptor name="documentNumber" column="DOCUMENT_NUMBER" jdbc-type="VARCHAR" access="anonymous" />
+        <field-descriptor name="documentNumber" column="DOCUMENT_NUMBER" jdbc-type="VARCHAR" access="anonymous"/>
         <field-descriptor name="proposalTypeCode" column="PROPOSAL_TYPE_CODE" jdbc-type="VARCHAR" />
         <field-descriptor name="creationStatusCode" column="CREATION_STATUS_CODE" jdbc-type="VARCHAR" />
         <field-descriptor name="continuedFrom" column="CONTINUED_FROM" jdbc-type="VARCHAR" />
@@ -63,6 +67,7 @@
         <field-descriptor name="title" column="TITLE" jdbc-type="VARCHAR" />
         <field-descriptor name="currentAwardNumber" column="CURRENT_AWARD_NUMBER" jdbc-type="VARCHAR" />
         <field-descriptor name="deadlineDate" column="DEADLINE_DATE" jdbc-type="DATE" />
+        <field-descriptor name="deadlineTime" column="DEADLINE_TIME" jdbc-type="VARCHAR" />
         <field-descriptor name="noticeOfOpportunityCode" column="NOTICE_OF_OPPORTUNITY_CODE" jdbc-type="VARCHAR" />
         <field-descriptor name="deadlineType" column="DEADLINE_TYPE" jdbc-type="VARCHAR" />
         <field-descriptor name="cfdaNumber" column="CFDA_NUMBER" jdbc-type="VARCHAR" />
@@ -95,6 +100,7 @@
         <field-descriptor name="hierarchyLastSyncHashCode" column="HIERARCHY_HASH_CODE" jdbc-type="INTEGER"  />
         <field-descriptor name="hierarchyBudgetType" column="HIERARCHY_BUDGET_TYPE" jdbc-type="CHAR"  />
         <field-descriptor name="hierarchyOriginatingChildProposalNumber" column="HIERARCHY_ORIG_CHILD_PROP_NBR" jdbc-type="VARCHAR" />
+        <field-descriptor name="lastSyncedBudgetDocumentNumber" column="HIERARCHY_LAST_BUDGET_DOC_NBR" jdbc-type="VARCHAR" />
         
         <reference-descriptor name="anticipatedAwardType" class-ref="org.kuali.kra.award.home.AwardType" auto-retrieve="true" auto-update="none" auto-delete="none"> 
             <foreignkey field-ref="anticipatedAwardTypeCode"/>

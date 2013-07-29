@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -88,7 +88,7 @@ public class ProtocolLookupHelperServiceTest extends KcUnitTestBase {
         for (Row row : rows) {
             for (Field field : row.getFields()) {
                 if (field.getPropertyName().equals("researchAreaCode")) {
-                    assertDropDownField(field, "researchAreaCode","org.kuali.kra.bo.ResearchArea");
+                    assertDropDownField(field, "researchAreaCode", "org.kuali.kra.irb.ResearchArea");
                } 
             }
         }
@@ -129,7 +129,7 @@ public class ProtocolLookupHelperServiceTest extends KcUnitTestBase {
         assertEquals(((HtmlData.AnchorHtmlData) inquiryUrl).getHref(), UNIT_INQ_URL);
         inquiryUrl = protocolLookupableHelperServiceImpl.getInquiryUrl(protocol, "investigator");
         assertEquals(((HtmlData.AnchorHtmlData) inquiryUrl).getHref(), PERSON_INQ_URL);
-        ProtocolPerson protocolPerson = protocol.getProtocolPersons().get(0);
+        ProtocolPerson protocolPerson = (ProtocolPerson) protocol.getProtocolPersons().get(0);
         protocolPerson.setPersonId("");
         protocolPerson.setRolodexId(new Integer(1727));
         protocol.getProtocolPersons().clear();

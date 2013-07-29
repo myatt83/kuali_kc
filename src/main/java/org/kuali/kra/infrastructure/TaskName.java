@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,6 +50,8 @@ public interface TaskName {
     public static final String ANSWER_PROPOSAL_QUESTIONNAIRE = "answerProposalQuestionnaire";
     public static final String DELETE_PROPOSAL = "deleteProposal";
     public static final String REPLACE_PERSONNEL_ATTACHMENT = "replacePersonnelAttachmentAuthorizer";
+    public static final String REJECT_PROPOSAL = "rejectProposal";
+    public static final String RECALL_PROPOSAL = "recallProposal";
     
     /*
      * Narrative Tasks.
@@ -167,6 +169,7 @@ public interface TaskName {
     public static final String PROTOCOL_MANAGE_NOTES = "protocolManageNotes";
     public static final String PROTOCOL_MANAGE_NOTES_UNAVAILABLE = "protocolManageNotesUnavailable";
     public static final String ABANDON_PROTOCOL = "protocolAbandon";
+    public static final String RECALL_PROTOCOL = "recallProtocol";
     
     public static final String ADMIN_APPROVE_PROTOCOL = "adminApproveProtocol"; 
     public static final String ADMIN_APPROVE_PROTOCOL_UNAVAILABLE = "adminApproveProtocolUnavailable"; 
@@ -218,18 +221,23 @@ public interface TaskName {
      * COI tasks
      */
     public static final String CREATE_COI_DISCLOSURE = "createCoiDisclosure";
+    public static final String LOOKUP_COI_DISCLOSURES = "lookupCoiDisclosures";
     public static final String MODIFY_COI_DISCLOSURE = "modifyCoiDisclosure";
     public static final String ANSWER_COI_DISCLOSURE_QUESTIONNAIRE = "answerCoiDisclosureQuestionnaire";
     public static final String VIEW_COI_DISCLOSURE = "viewCoiDisclosure";
     public static final String VIEW_COI_DISCLOSURE_RESTRICTED_NOTES = "viewCoiRestrictedNotes";
     public static final String APPROVE_COI_DISCLOSURE = "approveCoiDisclosure";
     public static final String DISAPPROVE_COI_DISCLOSURE = "disapproveCoiDisclosure";
+    public static final String ADD_COI_DISCLOSURE_NOTES = "addCoiDisclosureNotes";
+    public static final String ADD_COI_DISCLOSURE_ATTACHMENTS = "addCoiDisclosureAttachments";
     public static final String MAINTAIN_COI_DISCLOSURE_NOTES = "maintainCoiDisclosureNotes";
     public static final String MAINTAIN_COI_DISCLOSURE_ATTACHMENTS = "maintainCoiDisclosureAttachments";
     public static final String MAINTAIN_COI_REVIEWERS = "maintainCoiReviewers";
     public static final String PERFORM_COI_DISCLOSURE_ACTIONS = "performCoiDisclosureAction";
+    public static final String VIEW_COI_DISCLOSURE_ACTIONS = "viewCoiDisclosureAction";
     public static final String DELETE_UPDATE_NOTE = "deleteUpdateNote";
     public static final String DELETE_UPDATE_ATTACHMENT = "deleteUpdateAttachment";
+    public static final String UPDATE_FE_STATUS_ADMIN = "updateFEStatusAdmin";
     
     /**
      * Negotiation Tasks
@@ -248,7 +256,7 @@ public interface TaskName {
     public static final String CREATE_SUBAWARD = "createSubaward";
     public static final String MODIFY_SUBAWARD = "modifySubaward";
     public static final String VIEW_SUBAWARD = "viewSubaward";
-    
+    public static final String ADD_INVOICE_SUBAWARD = "addInvoiceSubAward";
     
     /*
      * Iacuc Tasks
@@ -264,8 +272,8 @@ public interface TaskName {
 //    public static final String ADMIN_INCOMPLETE_IACUC_PROTOCOL_UNAVAILABLE = "adminMarkIncompleteIacucProtocolUnavailable"; 
 //    public static final String ADMIN_WITHDRAW_IACUC_PROTOCOL = "adminWithdrawIacucProtocol"; 
 //    public static final String ADMIN_WITHDRAW_IACUC_PROTOCOL_UNAVAILABLE = "adminWithdrawIacucProtocolUnavailable"; 
-    public static final String RETURN_TO_PI_PROTOCOL = "protocolReturnToPI"; 
-    public static final String RETURN_TO_PI_PROTOCOL_UNAVAILABLE = "returnToPIProtocolUnavailable"; 
+    public static final String RETURN_TO_PI_PROTOCOL = "protocolReturnToPI";
+    public static final String RETURN_TO_PI_PROTOCOL_UNAVAILABLE = "protocolReturnToPIUnavailable";
     public static final String REVIEW_NOT_REQUIRED_IACUC_PROTOCOL = "reviewNotRequiredIacucProtocol"; 
     public static final String REVIEW_NOT_REQUIRED_IACUC_PROTOCOL_UNAVAILABLE = "reviewNotRequiredIacucProtocolUnavailable"; 
     public static final String VIEW_IACUC_PROTOCOL = "viewIacucProtocol";
@@ -380,4 +388,10 @@ public interface TaskName {
     public static final String GENERIC_IACUC_PROTOCOL_ACTION = "iacucGenericProtocolAction";
     public static final String GENERIC_IACUC_PROTOCOL_ACTION_UNAVAILABLE = "iacucGenericProtocolActionUnavailable";
     
+    /* Research area task */
+    public static final String MAINTAIN_RESEARCH_AREAS = "maintainResearchAreas";
+    public static final String MAINTAIN_IACUC_RESEARCH_AREAS = "maintainIacucResearchAreas";
+    
+    /* COI Undisclosed events */
+    public static final String VIEW_COI_UNDISCLOSED_EVENTS = "viewCoiUndisclosedEvents";
 }

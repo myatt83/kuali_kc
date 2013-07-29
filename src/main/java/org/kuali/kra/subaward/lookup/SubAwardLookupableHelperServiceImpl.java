@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,10 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.commons.lang.StringUtils;
 import org.kuali.kra.award.home.Award;
 import org.kuali.kra.bo.versioning.VersionHistory;
+import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.lookup.KraLookupableHelperServiceImpl;
 import org.kuali.kra.service.ServiceHelper;
 import org.kuali.kra.service.VersionHistoryService;
@@ -74,8 +76,7 @@ public class SubAwardLookupableHelperServiceImpl extends KraLookupableHelperServ
         (List<SubAward>) super.getSearchResultsUnbounded(fieldValues);
         List<SubAward> returnResults = new ArrayList<SubAward>();
         try {
-            returnResults = filterForActiveSubAwards(
-            unboundedResults, awardNumber, subrecipientName, requisitionerUserName);
+            returnResults = filterForActiveSubAwards(unboundedResults, awardNumber, subrecipientName, requisitionerUserName, fieldValues.get("statusCode"));
         } catch (WorkflowException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -160,20 +161,22 @@ public class SubAwardLookupableHelperServiceImpl extends KraLookupableHelperServ
        * @see org.kuali.core.lookup.AbstractLookupableHelperServiceImpl#getRows()
        */
       @Override
-      public List<Row> getRows() {
-          List<Row> rows =  super.getRows();
-          for (Row row : rows) {
-              for (Field field : row.getFields()) {
+    public List<Row> getRows() {
+        List<Row> rows = super.getRows();
+        for (Row row : rows) {
+            for (Field field : row.getFields()) {
 
-    if (field.getPropertyName().equals("startDate")
-    || field.getPropertyName().equals("endDate")
-                          || field.getPropertyName().equals("closeoutDate")) {
-                      field.setDatePicker(true);
-                  }
-              }
-          }
-          return rows;
-      }
+                if (field.getPropertyName().equals("startDate") || field.getPropertyName().equals("endDate")
+                        || field.getPropertyName().equals("closeoutDate")) {
+                    field.setDatePicker(true);
+                }
+                if (field.getPropertyName().equals("requisitionerUserName")) {
+                    field.setFieldConversions("principalName:requisitionerUserName,principalId:requisitionerId");
+                }
+            }
+        }
+        return rows;
+    }
       @Override
       protected void addEditHtmlData(List<HtmlData> htmlDataList, BusinessObject businessObject) {
           //no-op
@@ -181,7 +184,7 @@ public class SubAwardLookupableHelperServiceImpl extends KraLookupableHelperServ
 
       protected List<SubAward> filterForActiveSubAwards(
               Collection<SubAward> collectionByQuery, String awardNumber,
-              String subrecipientName, String requisitionerUserName) throws WorkflowException {
+              String subrecipientName, String requisitionerUserName, String statusCode) throws WorkflowException {
           Set<String> subAwardCodes = new TreeSet<String>();
           List<Integer> subAwardCodeList = new ArrayList<Integer>();
           List<String> subAwardCodeSortedList = new ArrayList<String>();
@@ -212,8 +215,10 @@ public class SubAwardLookupableHelperServiceImpl extends KraLookupableHelperServ
           for (SubAward subAward : activeSubAwards) {
               if (subrecipientName != null
                       && !subrecipientName.equals("")
-                      && subAward.getOrganizationName() != null) {
-                  if (subAward.getOrganizationName().equals(subrecipientName)) {
+                      && subAward.getOrganization().getOrganizationName() != null) {
+                  String subRecName = subrecipientName.replace("*", ".*").replace("?",".");
+                  subRecName = subRecName.toLowerCase();                                  
+                  if (subAward.getOrganization().getOrganizationName().toLowerCase().matches(subRecName)) {
                       filteredSubAwards.add(subAward);
                   }
               } else {
@@ -263,14 +268,17 @@ public class SubAwardLookupableHelperServiceImpl extends KraLookupableHelperServ
         List<SubAward> filteredSubAwardListSubAwards = new ArrayList<SubAward>();
         if (requisitionerUserName != null && !requisitionerUserName.equalsIgnoreCase("")) {
             for (SubAward subAward : filteredSubAwardList) {
-                if (subAward.getRequisitionerUserName().equalsIgnoreCase(requisitionerUserName)) {
+                if (subAward.getRequisitionerUserName().equalsIgnoreCase(requisitionerUserName)
+                        && (StringUtils.isEmpty(statusCode) || StringUtils.equalsIgnoreCase(statusCode, subAward.getStatusCode().toString()))) {
                     filteredSubAwardListSubAwards.add(subAward);
                 }
             }
         }
         else {
             for (SubAward subAward : filteredSubAwardList) {
-                filteredSubAwardListSubAwards.add(subAward);
+                if (StringUtils.isEmpty(statusCode) || StringUtils.equalsIgnoreCase(statusCode, subAward.getStatusCode().toString())) {
+                    filteredSubAwardListSubAwards.add(subAward);
+                }
             }
 
 

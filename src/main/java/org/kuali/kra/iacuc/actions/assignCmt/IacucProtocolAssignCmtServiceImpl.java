@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,26 +18,26 @@ package org.kuali.kra.iacuc.actions.assignCmt;
 import java.sql.Timestamp;
 
 import org.apache.commons.lang.StringUtils;
-import org.kuali.kra.common.committee.bo.CommonCommittee;
-import org.kuali.kra.common.committee.service.CommonCommitteeService;
+import org.kuali.kra.common.committee.bo.CommitteeBase;
+import org.kuali.kra.common.committee.service.CommitteeServiceBase;
 import org.kuali.kra.iacuc.actions.IacucProtocolAction;
 import org.kuali.kra.iacuc.actions.IacucProtocolActionType;
 import org.kuali.kra.iacuc.actions.IacucProtocolStatus;
 import org.kuali.kra.iacuc.actions.submit.IacucProtocolSubmissionStatus;
-import org.kuali.kra.protocol.Protocol;
-import org.kuali.kra.protocol.actions.ProtocolAction;
-import org.kuali.kra.protocol.actions.submit.ProtocolSubmission;
+import org.kuali.kra.protocol.ProtocolBase;
+import org.kuali.kra.protocol.actions.ProtocolActionBase;
+import org.kuali.kra.protocol.actions.submit.ProtocolSubmissionBase;
 import org.kuali.rice.krad.service.BusinessObjectService;
 
 public class IacucProtocolAssignCmtServiceImpl implements IacucProtocolAssignCmtService {
 
     private BusinessObjectService businessObjectService;
-    private CommonCommitteeService committeeService;
+    private CommitteeServiceBase committeeService;
     private static final String NEXT_ACTION_ID_KEY = "actionId";
 
 
-    public void assignToCommittee(Protocol protocol, IacucProtocolAssignCmtBean actionBean) throws Exception {
-        ProtocolSubmission submission = findSubmission(protocol);
+    public void assignToCommittee(ProtocolBase protocol, IacucProtocolAssignCmtBean actionBean) throws Exception {
+        ProtocolSubmissionBase submission = findSubmission(protocol);
         String prevSubmissionStatusCode = null;
         if (submission != null) {
             prevSubmissionStatusCode = submission.getSubmissionStatusCode();
@@ -50,8 +50,8 @@ public class IacucProtocolAssignCmtServiceImpl implements IacucProtocolAssignCmt
         getBusinessObjectService().save(protocol);
     }
 
-    public boolean setCommittee(ProtocolSubmission submission, String committeeId) {
-        CommonCommittee committee = committeeService.getCommitteeById(committeeId);
+    public boolean setCommittee(ProtocolSubmissionBase submission, String committeeId) {
+        CommitteeBase committee = committeeService.getCommitteeById(committeeId);
         if (committee == null) {
             submission.setCommitteeId(null);
             submission.setCommitteeIdFk(null);
@@ -66,17 +66,16 @@ public class IacucProtocolAssignCmtServiceImpl implements IacucProtocolAssignCmt
         }
     }
     
-    protected void addNewAction(Protocol protocol, IacucProtocolAssignCmtBean actionBean, String prevSubmissionStatusCode) {
+    protected void addNewAction(ProtocolBase protocol, IacucProtocolAssignCmtBean actionBean, String prevSubmissionStatusCode) {
         
-        ProtocolAction lastAction = protocol.getLastProtocolAction();
-        ProtocolAction newAction = new IacucProtocolAction();
+        ProtocolActionBase lastAction = protocol.getLastProtocolAction();
+        ProtocolActionBase newAction = new IacucProtocolAction();
         // deep copy will replace the last action with the new one after save
-       // ProtocolAction newAction = (ProtocolAction)ObjectUtils.deepCopy(protocol.getLastProtocolAction());
         newAction.setComments("AssignedToCommittee");
         newAction.setActionId(protocol.getNextValue(NEXT_ACTION_ID_KEY));
         newAction.setActualActionDate(new Timestamp(System.currentTimeMillis()));
         newAction.setActionDate(new Timestamp(System.currentTimeMillis()));
-        newAction.setProtocolActionTypeCode(IacucProtocolActionType.NOTIFIED_COMMITTEE);
+        newAction.setProtocolActionTypeCode(IacucProtocolActionType.ASSIGNED_TO_COMMITTEE);
         newAction.setSubmissionIdFk(lastAction.getSubmissionIdFk());
         newAction.setSubmissionNumber(lastAction.getSubmissionNumber());
         newAction.setProtocolNumber(protocol.getProtocolNumber());
@@ -87,9 +86,9 @@ public class IacucProtocolAssignCmtServiceImpl implements IacucProtocolAssignCmt
 
     }
     
-    public String getAssignedCommitteeId(Protocol protocol) {
+    public String getAssignedCommitteeId(ProtocolBase protocol) {
         String retVal = null;
-        ProtocolSubmission submission = findSubmission(protocol);
+        ProtocolSubmissionBase submission = findSubmission(protocol);
         if (submission != null && 
             (StringUtils.equals(submission.getSubmissionStatusCode(), IacucProtocolSubmissionStatus.SUBMITTED_TO_COMMITTEE) ||
              (StringUtils.equals(protocol.getProtocolStatusCode(), IacucProtocolStatus.TABLED) &&
@@ -100,9 +99,9 @@ public class IacucProtocolAssignCmtServiceImpl implements IacucProtocolAssignCmt
         return retVal;
     }
     
-    public String getAssignedScheduleId(Protocol protocol) {
+    public String getAssignedScheduleId(ProtocolBase protocol) {
         String retVal = null;
-        ProtocolSubmission submission = findSubmission(protocol);
+        ProtocolSubmissionBase submission = findSubmission(protocol);
         if (submission != null && StringUtils.equals(submission.getSubmissionStatusCode(), IacucProtocolSubmissionStatus.SUBMITTED_TO_COMMITTEE)  ||
             (StringUtils.equals(protocol.getProtocolStatusCode(), IacucProtocolStatus.TABLED) &&
              StringUtils.equals(submission.getSubmissionStatusCode(), IacucProtocolSubmissionStatus.TABLED))) {
@@ -112,20 +111,20 @@ public class IacucProtocolAssignCmtServiceImpl implements IacucProtocolAssignCmt
         return retVal;
     }
     
-    public void setCommitteeService(CommonCommitteeService committeeService) {
+    public void setCommitteeService(CommitteeServiceBase committeeService) {
         this.committeeService = committeeService;
     }
     
-    public CommonCommitteeService getCommitteeService() {
+    public CommitteeServiceBase getCommitteeService() {
         return committeeService;
     }
     
     
-    protected ProtocolSubmission findSubmission(Protocol protocol) {
+    protected ProtocolSubmissionBase findSubmission(ProtocolBase protocol) {
         // need to loop thru to find the last submission.
         // it may have submit/Wd/notify irb/submit, and this will cause problem if don't loop thru.
-        ProtocolSubmission protocolSubmission = null;
-        for (ProtocolSubmission submission : protocol.getProtocolSubmissions()) {
+        ProtocolSubmissionBase protocolSubmission = null;
+        for (ProtocolSubmissionBase submission : protocol.getProtocolSubmissions()) {
             if (StringUtils.equals(submission.getSubmissionStatusCode(), IacucProtocolSubmissionStatus.PENDING) || 
                 StringUtils.equals(submission.getSubmissionStatusCode(), IacucProtocolSubmissionStatus.SUBMITTED_TO_COMMITTEE) || 
                 (StringUtils.equals(protocol.getProtocolStatusCode(), IacucProtocolStatus.TABLED) &&

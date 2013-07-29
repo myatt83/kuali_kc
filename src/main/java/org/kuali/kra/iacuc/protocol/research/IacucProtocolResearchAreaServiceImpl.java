@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,13 @@
  */
 package org.kuali.kra.iacuc.protocol.research;
 
-import org.kuali.kra.protocol.protocol.research.ProtocolResearchArea;
-import org.kuali.kra.protocol.protocol.research.ProtocolResearchAreaServiceImpl;
+import org.kuali.kra.protocol.protocol.research.ProtocolResearchAreaBase;
+import org.kuali.kra.protocol.protocol.research.ProtocolResearchAreaServiceImplBase;
 
-public class IacucProtocolResearchAreaServiceImpl extends ProtocolResearchAreaServiceImpl implements IacucProtocolResearchAreaService {
+public class IacucProtocolResearchAreaServiceImpl extends ProtocolResearchAreaServiceImplBase implements IacucProtocolResearchAreaService {
 
     @Override
-    protected ProtocolResearchArea getNewProtocolResearchAreaInstanceHook() {
+    protected ProtocolResearchAreaBase getNewProtocolResearchAreaInstanceHook() {
         return new IacucProtocolResearchArea();
     }
 

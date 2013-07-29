@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 package org.kuali.kra.protocol;
 
 /**
- * The Protocol Version Service.
+ * The ProtocolBase Version Service.
  */
 public interface ProtocolVersionService {
 
@@ -26,7 +26,7 @@ public interface ProtocolVersionService {
      * @return the new versioned protocol document
      * @throws Exception
      */
-    public ProtocolDocument versionProtocolDocument(ProtocolDocument protocolDocument) throws Exception;
+    public ProtocolDocumentBase versionProtocolDocument(ProtocolDocumentBase protocolDocument) throws Exception;
     
     /**
      * Get a particular version of a protocol.
@@ -34,5 +34,5 @@ public interface ProtocolVersionService {
      * @param sequenceNumber
      * @return
      */
-    public Protocol getProtocolVersion(String protocolNumber, Integer sequenceNumber);
+    public ProtocolBase getProtocolVersion(String protocolNumber, Integer sequenceNumber);
 }

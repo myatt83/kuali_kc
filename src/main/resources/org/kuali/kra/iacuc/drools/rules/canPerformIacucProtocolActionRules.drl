@@ -12,7 +12,7 @@ function void setAction(IacucProtocolActionMapping protocolAction, boolean flag)
 rule "Submit for Review"
 salience 100
 when
-    protocolAction : IacucProtocolActionMapping(actionTypeCode == "101", protocolStatusCode in ("100", "102", "104", "105", "107", "205", "206", "207", "302", "203", "303"))
+    protocolAction : IacucProtocolActionMapping(actionTypeCode == "101", protocolStatusCode in ("100", "102", "104", "105", "107", "205", "206", "207", "302", "203"))
 then    
     setAction(protocolAction, true);
 end
@@ -144,7 +144,7 @@ end
 rule "Request to Lift Hold"
 salience 100
 when
-    protocolAction : IacucProtocolActionMapping(actionTypeCode == "108", protocolStatusCode == "201")
+    protocolAction : IacucProtocolActionMapping(actionTypeCode == "108", protocolStatusCode == "201", submissionTypeCode != "103")
 then    
     setAction(protocolAction, true);
 end
@@ -170,8 +170,7 @@ rule "Record Committee Decision"
 salience 100
 # TODO : need to create this action type : use code "318"
 when
-    (protocolAction : IacucProtocolActionMapping(actionTypeCode == "318", protocolStatusCode == "101", submissionStatusCode == "103", protocolReviewTypeCode in ("2", "3", "4", "5", "6")) ||
-     protocolAction : IacucProtocolActionMapping(actionTypeCode == "318", protocolStatusCode == "101", submissionStatusCode == "102", protocolReviewTypeCode == "2"))
+    protocolAction : IacucProtocolActionMapping(actionTypeCode == "318", protocolStatusCode == "101", submissionStatusCode == "103", protocolReviewTypeCode in ("2", "3", "4", "5", "6"))
 then    
     setAction(protocolAction, true);
 end
@@ -308,11 +307,10 @@ end
 rule "IACUC Acknowledgement"
 salience 100
 when
-    protocolAction : IacucProtocolActionMapping(actionTypeCode == "206", submissionStatusCode in ("102","103","213"), submissionTypeCode in ("110", "100"))
+    protocolAction : IacucProtocolActionMapping(actionTypeCode == "206", submissionStatusCode in ("102","103"), submissionTypeCode == "110")
 then    
     setAction(protocolAction, true);
 end
-
 
 rule "IACUC review not required"
 salience 100

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,6 @@
  */
 package org.kuali.kra.irb.actions.delete;
 
-import java.io.Serializable;
-
 import org.kuali.kra.irb.actions.ActionHelper;
 import org.kuali.kra.irb.actions.ProtocolActionBean;
 
@@ -24,7 +22,7 @@ import org.kuali.kra.irb.actions.ProtocolActionBean;
  * This class is really just a "form" containing the reason
  * for deleting a protocol/amendment/renewal.
  */
-public class ProtocolDeleteBean extends ProtocolActionBean implements Serializable{
+public class ProtocolDeleteBean extends ProtocolActionBean implements org.kuali.kra.protocol.actions.delete.ProtocolDeleteBean {
 
     private static final long serialVersionUID = 7654109710201779704L;
     

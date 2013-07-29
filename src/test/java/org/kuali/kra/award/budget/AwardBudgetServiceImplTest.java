@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import org.kuali.kra.budget.parameters.BudgetPeriod;
 import org.kuali.kra.budget.versions.BudgetDocumentVersion;
 import org.kuali.kra.budget.versions.BudgetVersionOverview;
 import org.kuali.kra.institutionalproposal.home.InstitutionalProposal;
+import org.kuali.kra.institutionalproposal.home.InstitutionalProposalBoLite;
 import org.kuali.kra.institutionalproposal.proposaladmindetails.ProposalAdminDetails;
 import org.kuali.kra.proposaldevelopment.bo.DevelopmentProposal;
 import org.kuali.kra.proposaldevelopment.budget.bo.ProposalDevelopmentBudgetExt;
@@ -75,7 +76,7 @@ public class AwardBudgetServiceImplTest extends KcUnitTestBase {
             assertEquals(awardId, value);
             AwardFundingProposal temp = new AwardFundingProposal();
             temp.setActive(true);
-            InstitutionalProposal proposal = new InstitutionalProposal();
+            InstitutionalProposalBoLite proposal = new InstitutionalProposalBoLite();
             proposal.setProposalNumber(proposalNumber);
             temp.setProposal(proposal);
             result.add(temp);

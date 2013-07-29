@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,10 +22,10 @@ import org.kuali.kra.irb.actions.ProtocolActionType;
  * 
  * Is the user allowed to perform a modification to protocol submission and the action is currently not available?
  */
-public class ModifyProtocolSubmissionUnavailableAuthorizer extends ProtocolAuthorizer {
+public class ModifyProtocolSubmissionUnavailableAuthorizer extends ProtocolAuthorizerBase {
 
     @Override
-    public boolean isAuthorized(String userId, ProtocolTask task) {
+    public boolean isAuthorized(String userId, ProtocolTaskBase task) {
         return hasPermission(userId, task.getProtocol(), PermissionConstants.MODIFY_PROTOCOL_SUBMISSION) 
             && !canExecuteAction(task.getProtocol(), ProtocolActionType.MODIFY_PROTOCOL_SUBMISISON);
     }

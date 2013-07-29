@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,6 +67,7 @@ public class ProtocolFinderDaoOjbTest extends KcUnitTestBase {
         assertEquals(protocolDocument1.getProtocol().getProtocolId(), protocol.getProtocolId());
     }
     
+    @SuppressWarnings("unchecked")
     @Test
     public void testFindProtocol() throws WorkflowException {
         ProtocolFactory.createProtocolDocument(PROTOCOL_NUMBER, 1);
@@ -74,7 +75,7 @@ public class ProtocolFinderDaoOjbTest extends KcUnitTestBase {
         
         ProtocolDocument protocolDocument2 = ProtocolFactory.createProtocolDocument(PROTOCOL_NUMBER+"A001", 1);
        
-        List<Protocol> protocols = protocolFinder.findProtocols(PROTOCOL_NUMBER);
+        List<Protocol> protocols = (List)protocolFinder.findProtocols(PROTOCOL_NUMBER);
         assertEquals(3, protocols.size());
         assertEquals(PROTOCOL_NUMBER, protocols.get(0).getProtocolNumber());
     }

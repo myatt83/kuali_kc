@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-	Copyright 2005-2010 The Kuali Foundation.
+	Copyright 2005-2013 The Kuali Foundation.
 
 	Licensed under the Educational Community License, Version 1.0 (the "License");
 	you may not use this file except in compliance with the License.
@@ -37,6 +37,7 @@
                            http://www.springframework.org/schema/util/spring-util-3.0.xsd">
                            
     <bean id="budgetModuleConfiguration" parent="budgetModuleConfiguration-parentBean" />
+	<util:constant id="kc.integrationServiceNamespace" static-field="org.kuali.kra.infrastructure.Constants.FINANCIAL_INTEGRATION_KC_SERVICE_NAMESPACE"/>
 	
     <bean id="budgetModuleConfiguration-parentBean" class="org.kuali.rice.krad.bo.ModuleConfiguration" abstract="true">
     	<property name="namespaceCode" value="KC-B" />
@@ -334,7 +335,11 @@
 	</bean>
 	<!-- Budget Service Configuration End -->
   	
-    <bean id="budgetSubAwardService" class="org.kuali.kra.proposaldevelopment.budget.service.impl.BudgetSubAwardServiceImpl" />
+    <bean id="budgetSubAwardService" class="org.kuali.kra.proposaldevelopment.budget.service.impl.BudgetSubAwardServiceImpl">
+    	<property name="parameterService" ref="parameterService"/>
+    	<property name="budgetService" ref="budgetService" />
+    	<property name="businessObjectService" ref="businessObjectService"/>
+    </bean>
     
     <bean id="budgetPeriodLookupable" class="org.kuali.rice.kns.lookup.KualiLookupableImpl" scope="prototype" lazy-init="true">
   		<property name="lookupableHelperService">
@@ -362,6 +367,7 @@
               <property name="businessObjectService" ref="businessObjectService" />
     </bean>
     
+    <!-- Exposing as Java and Soap services -->
     <bean id="budgetCategoryService"
 		class="org.kuali.kra.external.budget.service.impl.BudgetCategoryServiceImpl">
 		<property name="businessObjectService" ref="businessObjectService" />
@@ -369,29 +375,27 @@
 	
     <bean id="budgetCategoryServiceJavaExporter" class="org.kuali.rice.ksb.api.bus.support.ServiceBusExporter">
 		<property name="serviceDefinition">
-			<bean class="org.kuali.rice.ksb.api.bus.support.JavaServiceDefinition">
-				<property name="service" ref="budgetCategoryService" />
-				<property name="serviceNameSpaceURI" value="KC" />
-				<property name="localServiceName" value="budgetCategoryService" />
-				<property name="serviceInterface"
-					value="org.kuali.kra.external.budget.service" />
-				<property name="busSecurity" value="false" />
-				<property name="retryAttempts" value="1" />
-			</bean>
+			<bean class="org.kuali.rice.ksb.api.bus.support.JavaServiceDefinition"
+				p:service-ref="budgetCategoryService"
+				p:serviceNameSpaceURI-ref="kc.integrationServiceNamespace"
+				p:localServiceName="budgetCategoryService"
+				p:serviceInterface="org.kuali.kra.external.budget.service"
+				p:busSecurity="${fin.system.integration.bus.security.on}"
+				p:retryAttempts="1" />
 		</property>
 	</bean>
 
 	<bean id="budgetCategoryServiceSoapExporter" class="org.kuali.rice.ksb.api.bus.support.ServiceBusExporter">
 		<property name="serviceDefinition">
-			<bean class="org.kuali.rice.ksb.api.bus.support.SoapServiceDefinition">
-				<property name="service" ref="budgetCategoryService" />
-				<property name="serviceNameSpaceURI" value="KC" />
-				<property name="localServiceName" value="budgetCategorySoapService" />
-				<property name="busSecurity" value="false" />
-				<property name="jaxWsService" value="true" />
-			</bean>
+			<bean class="org.kuali.rice.ksb.api.bus.support.SoapServiceDefinition"
+				p:service-ref="budgetCategoryService"
+				p:serviceNameSpaceURI-ref="kc.integrationServiceNamespace"
+				p:localServiceName="budgetCategorySoapService"
+				p:busSecurity="${fin.system.integration.bus.security.on}"
+				p:jaxWsService="true" />
 		</property>
 	</bean>
+	
 	<bean id="breakupIntervalService" class="org.kuali.kra.budget.calculator.BreakupIntervalServiceImpl">
 		<property name="businessObjectService" ref="businessObjectService" />
 	</bean>	

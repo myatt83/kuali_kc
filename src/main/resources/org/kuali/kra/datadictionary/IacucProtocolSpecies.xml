@@ -1,6 +1,6 @@
 <!--
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,11 +32,10 @@
 			<ref bean="IacucProtocolSpecies-lookupDefinition" />
 		</property>
 		
-		<!--  
+
 		<property name="helpDefinition" >
-            <bean parent="HelpDefinition" p:parameterNamespace="KC-PROTOCOL" p:parameterName="iacucProtocolSpeciesHelp" p:parameterDetailType="Document" />
+            <bean parent="HelpDefinition" p:parameterNamespace="KC-IACUC" p:parameterName="iacucProtocolSpeciesGroupsHelp" p:parameterDetailType="Document" />
         </property>
-        -->
         
 		<property name="titleAttribute" value="iacucProtocolSpeciesId" />
 		<property name="attributes" >
@@ -280,8 +279,8 @@
     	<property name="required" value="false" />
 		<property name="control" >
       		<bean parent="TextareaControlDefinition"
-            	p:rows="1"
-            	p:cols="200" />
+            	p:rows="2"
+            	p:cols="170" />
 		</property>
 		<property name="summary" value="Procedure Summary" />
 		<property name="description" value="Procedure Summary" />

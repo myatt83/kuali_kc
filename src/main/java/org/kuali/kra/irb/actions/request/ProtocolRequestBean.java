@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,10 @@
  */
 package org.kuali.kra.irb.actions.request;
 
-import java.io.Serializable;
-
 import org.kuali.kra.irb.actions.ActionHelper;
 import org.kuali.kra.irb.actions.ProtocolSubmissionBeanBase;
+import org.kuali.kra.irb.questionnaire.IrbSubmissionQuestionnaireHelper;
+import org.kuali.kra.protocol.questionnaire.ProtocolSubmissionQuestionnaireHelper;
 
 /**
  * The ProtocolRequestBean is used for some of the common, yet simple,
@@ -35,13 +35,14 @@ import org.kuali.kra.irb.actions.ProtocolSubmissionBeanBase;
  * protocol action type and submission type entry in the database.  Please
  * see the ActionHelper class for how this class is used.
  */
-public class ProtocolRequestBean extends ProtocolSubmissionBeanBase implements Serializable {
+public class ProtocolRequestBean extends ProtocolSubmissionBeanBase implements org.kuali.kra.protocol.actions.request.ProtocolRequestBean {
     
     private static final long serialVersionUID = -4980779026132275453L;
     private String protocolActionTypeCode;
     private String submissionTypeCode;
     private String reason = "";
     private String beanName;
+    private ProtocolSubmissionQuestionnaireHelper questionnaireHelper;
 
     /**
      * Constructs a ProtocolRequestBean.
@@ -56,6 +57,8 @@ public class ProtocolRequestBean extends ProtocolSubmissionBeanBase implements S
         this.protocolActionTypeCode = protocolActionTypeCode;
         this.submissionTypeCode = submissionTypeCode;
         this.beanName = beanName;
+        questionnaireHelper = new IrbSubmissionQuestionnaireHelper(actionHelper.getProtocol(), protocolActionTypeCode, null, false);
+
     }
 
     public void setReason(String reason) {
@@ -80,6 +83,14 @@ public class ProtocolRequestBean extends ProtocolSubmissionBeanBase implements S
 
     public void setBeanName(String beanName) {
         this.beanName = beanName;
+    }
+
+    public ProtocolSubmissionQuestionnaireHelper getQuestionnaireHelper() {
+        return questionnaireHelper;
+    }
+
+    public void setQuestionnaireHelper(ProtocolSubmissionQuestionnaireHelper questionnaireHelper) {
+        this.questionnaireHelper = questionnaireHelper;
     }
     
 }

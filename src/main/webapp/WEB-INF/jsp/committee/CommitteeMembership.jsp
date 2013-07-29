@@ -1,5 +1,5 @@
 <%--
- Copyright 2005-2010 The Kuali Foundation
+ Copyright 2005-2013 The Kuali Foundation
 
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -32,7 +32,8 @@
  
     <kra-committee:committeeAddMembershipSection readOnly="${readOnly}" />
     
-    <kra-committee:committeeMemberships readOnly="${readOnly}" />
+    <kra-committee:committeeMemberships readOnly="${readOnly}"  
+    researchAreaReference = "org.kuali.kra.irb.ResearchArea"/>
 
     <c:if test="${!readOnly && fn:length(KualiForm.document.committee.committeeMemberships) > 0}">
         <c:set var="extraButtonSource" value="${ConfigProperties.kra.externalizable.images.url}buttonsmall_deletesel.gif"/>

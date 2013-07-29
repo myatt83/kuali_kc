@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,22 +16,23 @@
 package org.kuali.kra.irb.personnel;
 
 import org.kuali.kra.irb.ProtocolDocument;
+import org.kuali.kra.protocol.personnel.SaveProtocolPersonnelEventBase;
 import org.kuali.kra.rule.BusinessRuleInterface;
-import org.kuali.kra.rule.event.KraDocumentEventBaseExtension;
 
 /**
  * Represents the event to save a ProtocolPersonnel.
  */
-public class SaveProtocolPersonnelEvent extends KraDocumentEventBaseExtension {
-
+public class SaveProtocolPersonnelEvent extends SaveProtocolPersonnelEventBase {
+    
     /**
      * Constructs an SaveProtocolPersonnelEvent.
      * @param errorPathPrefix The error path prefix
      * @param document The document to validate
      */
     public SaveProtocolPersonnelEvent(String errorPathPrefix, ProtocolDocument document) {
-        super("Saving protocol personnel on document " + getDocumentId(document), errorPathPrefix, document);
+        super(errorPathPrefix, document);
     }
+    
 
     @Override
     @SuppressWarnings("unchecked")

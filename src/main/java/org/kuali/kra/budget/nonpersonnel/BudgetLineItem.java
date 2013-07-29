@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,8 @@ public class BudgetLineItem extends BudgetLineItemBase implements HierarchyMaint
     private Date oldStartDate;
 
     private Date oldEndDate;
+    
+    private Integer subAwardNumber;
 
     private String hierarchyProposalNumber;
 
@@ -249,9 +251,22 @@ public class BudgetLineItem extends BudgetLineItemBase implements HierarchyMaint
     public int compareTo(BudgetLineItem o) {
         int compare = this.getCostElementName().compareTo(o.getCostElementName());
         if (compare == 0) {
-            compare = this.getLineItemSequence().compareTo(o.getLineItemSequence());
+            compare = this.getLineItemNumber().compareTo(o.getLineItemNumber());
         }
         // TODO Auto-generated method stub
         return compare;
     }
+    
+    public boolean isSubAwardLineItem() {
+        return subAwardNumber != null;
+    }
+
+    public Integer getSubAwardNumber() {
+        return subAwardNumber;
+    }
+
+    public void setSubAwardNumber(Integer subAwardNumber) {
+        this.subAwardNumber = subAwardNumber;
+    }
+
 }

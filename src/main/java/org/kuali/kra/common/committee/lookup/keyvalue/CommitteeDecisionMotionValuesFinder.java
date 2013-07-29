@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,9 +27,14 @@ import org.kuali.rice.krad.keyvalues.KeyValuesBase;
 import org.kuali.rice.krad.service.KeyValuesService;
 
 /**
- * Returns all possible values for the Committee Decision Motion dropdown box.
+ * Returns all possible values for the CommitteeBase Decision Motion dropdown box.
  */
 public class CommitteeDecisionMotionValuesFinder extends KeyValuesBase {
+    
+    /**
+     * Comment for <code>serialVersionUID</code>
+     */
+    private static final long serialVersionUID = 3729912964388818340L;
     
     private KeyValuesService keyValuesService;
     

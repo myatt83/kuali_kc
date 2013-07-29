@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@ import java.util.List;
 public enum ProtocolPrintType {
     
     PROTOCOL_SUMMARY_VIEW_REPORT("Summary View Report"), 
-    PROTOCOL_FULL_PROTOCOL_REPORT("Full Protocol Report"),
-    PROTOCOL_PROTOCOL_HISTORY_REPORT("Protocol History Report"), 
+    PROTOCOL_FULL_PROTOCOL_REPORT("Full ProtocolBase Report"),
+    PROTOCOL_PROTOCOL_HISTORY_REPORT("ProtocolBase History Report"), 
     PROTOCOL_REVIEW_COMMENTS_REPORT("Review Comments Report");
 
     private String protocolPrintType;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import org.kuali.kra.iacuc.actions.genericactions.IacucProtocolGenericActionBean
 import org.kuali.kra.iacuc.correspondence.IacucProtocolActionsCorrespondence;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.KraServiceLocator;
+import org.kuali.kra.infrastructure.TaskName;
 import org.kuali.kra.printing.Printable;
 import org.kuali.kra.protocol.actions.assignagenda.ProtocolAssignToAgendaBean;
 
@@ -97,15 +98,21 @@ public class IacucProtocolAssignToAgendaBean extends IacucProtocolGenericActionB
      */
     public void prepareView() {
         if (getProtocol() != null && getProtocol().getProtocolNumber() != null) {
-            String assignedCommitteeId = getProtocolAssignToAgendaService().getAssignedCommitteeId(getProtocol());
-            if (assignedCommitteeId != null) {
-                this.committeeId = assignedCommitteeId;
-                this.committeName = getProtocolAssignToAgendaService().getAssignedCommitteeName(getProtocol());
-                this.setComments(getProtocolAssignToAgendaService().getAssignToAgendaComments(getProtocol()));
-                this.protocolAssigned = getProtocolAssignToAgendaService().isAssignedToAgenda(getProtocol());
-                this.scheduleDate = getProtocolAssignToAgendaService().getAssignedScheduleDate(getProtocol());
+            // we refresh assign-to-agenda data (committee name, comments etc) from db only if the user is not 
+            // currently working on this task since we do not want to lose user changes
+            if( !(TaskName.ASSIGN_TO_AGENDA.equalsIgnoreCase(getActionHelper().getCurrentTask())) ) {
+                String assignedCommitteeId = getProtocolAssignToAgendaService().getAssignedCommitteeId(getProtocol());
+                if (assignedCommitteeId != null) {
+                    this.committeeId = assignedCommitteeId;
+                    this.committeName = getProtocolAssignToAgendaService().getAssignedCommitteeName(getProtocol());
+                    this.setComments(getProtocolAssignToAgendaService().getAssignToAgendaComments(getProtocol()));
+                    this.protocolAssigned = getProtocolAssignToAgendaService().isAssignedToAgenda(getProtocol());
+                    this.scheduleDate = getProtocolAssignToAgendaService().getAssignedScheduleDate(getProtocol());
+                }
+                if(this.getComments() == null) {
+                    this.setComments("");
+                }
             }
-            this.setComments("");
         }
         
         /*

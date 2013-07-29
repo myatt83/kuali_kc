@@ -1,5 +1,5 @@
 <!--
- Copyright 2005-2010 The Kuali Foundation
+ Copyright 2005-2013 The Kuali Foundation
 
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -46,11 +46,31 @@
                 <ref bean="CoiDisclosureNotepad-updateUser" />
 				<ref bean="CoiDisclosureNotepad-updateTimestamp" />
 				<ref bean="CoiDisclosureNotepad-financialEntityId" />
+				<ref bean="CoiDisclosureNotepad-createUser" />
+				<ref bean="CoiDisclosureNotepad-createTimestamp" />
+				<ref bean="CoiDisclosureNotepad-noteTypeCode" />
             </list>
         </property>
     </bean>
 
     <!-- Attribute Definitions -->
+    <bean id="CoiDisclosureNotepad-noteTypeCode" parent="CoiDisclosureNotepad-noteTypeCode-parentBean" />
+    <bean id="CoiDisclosureNotepad-noteTypeCode-parentBean" abstract="true" parent="AttributeDefinition" >
+    <property name="name" value="noteTypeCode" />
+        <property name="forceUppercase" value="false" />
+        <property name="label" value="Note Type" />
+        <property name="shortLabel" value="Note Type" />
+        <property name="maxLength" value="20" />
+        <property name="validationPattern" >
+            <bean parent="NumericValidationPattern" />
+        </property>
+        <property name="control" >
+            <bean parent="SelectControlDefinition"
+            p:valuesFinderClass="org.kuali.kra.coi.lookup.keyvalue.CoiNoteTypeValuesFinder" />
+        </property>
+        <property name="summary" value="Note Type" />
+        <property name="description" value="Note Type" />
+    </bean>
     
   <bean id="CoiDisclosureNotepad-financialEntityId" parent="CoiDisclosureNotepad-financialEntityId-parentBean" />
 	<bean id="CoiDisclosureNotepad-financialEntityId-parentBean" abstract="true" parent="AttributeDefinition" >
@@ -165,7 +185,7 @@
         <property name="control" >
             <bean parent="TextareaControlDefinition"
                 p:rows="3"
-                p:cols="100" />
+                p:cols="70" />
         </property>
         <property name="summary" value="Comments" />
         <property name="description" value="Comments" />
@@ -192,6 +212,20 @@
 		<property name="name" value="updateTimestamp" />
 		<property name="label" value="Last Update" />
 		<property name="shortLabel" value="Posted Timestamp" />
+	</bean>
+	
+	<bean id="CoiDisclosureNotepad-createUser" parent="CoiDisclosureNotepad-createUser-parentBean" />
+	<bean id="CoiDisclosureNotepad-createUser-parentBean" abstract="true" parent="KraAttributeReferenceDummy-updateUser" >
+		<property name="name" value="createUser" />
+		<property name="label" value="Created By" />
+		<property name="shortLabel" value="Author" />
+	</bean>
+	
+	<bean id="CoiDisclosureNotepad-createTimestamp" parent="CoiDisclosureNotepad-createTimestamp-parentBean" />
+	<bean id="CoiDisclosureNotepad-createTimestamp-parentBean" abstract="true" parent="KraAttributeReferenceDummy-updateTimestamp" >
+		<property name="name" value="createTimestamp" />
+		<property name="label" value="Created Date" />
+		<property name="shortLabel" value="Created Date" />
 	</bean>
 
     <bean id="CoiDisclosureNotepad-versionNumber" parent="CoiDisclosureNotepad-versionNumber-parentBean" />

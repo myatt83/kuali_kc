@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.kuali.kra.award.AwardForm;
+import org.kuali.kra.award.budget.AwardBudgetForm;
 import org.kuali.kra.award.budget.AwardBudgetService;
 import org.kuali.kra.award.budget.document.AwardBudgetDocument;
 import org.kuali.kra.award.commitments.AwardFandaRate;
@@ -62,6 +63,7 @@ import org.kuali.kra.proposaldevelopment.document.ProposalDevelopmentDocument;
 import org.kuali.kra.proposaldevelopment.hierarchy.ProposalHierarcyActionHelper;
 import org.kuali.kra.proposaldevelopment.service.ProposalDevelopmentService;
 import org.kuali.kra.question.CopyPeriodsQuestion;
+import org.kuali.kra.web.struts.action.AuditActionHelper;
 import org.kuali.kra.web.struts.action.StrutsConfirmation;
 import org.kuali.rice.kew.api.exception.WorkflowException;
 import org.kuali.rice.kns.web.struts.form.KualiForm;
@@ -395,6 +397,23 @@ public class BudgetVersionsAction extends BudgetAction {
         }
 
         if (!valid) {
+            for (BudgetDocumentVersion budgetDocumentVersion: parentDocument.getBudgetDocumentVersions()) {
+                BudgetVersionOverview budgetVersion =  budgetDocumentVersion.getBudgetVersionOverview();
+
+                    String budgetStatusIncompleteCode = getParameterService().getParameterValueAsString(
+                            BudgetDocument.class, Constants.BUDGET_STATUS_INCOMPLETE_CODE);
+                    budgetVersion.setBudgetStatus(budgetStatusIncompleteCode);
+
+                    if (form instanceof AwardBudgetForm) {
+                        //forward = new AuditActionHelper().setAuditMode(mapping, (AwardBudgetForm) form, true);
+                        new AuditActionHelper().setAuditMode(mapping, (AwardBudgetForm) form, true);
+                    } else {
+                        //forward = new AuditActionHelper().setAuditMode(mapping, (BudgetForm) form, true);
+                        new AuditActionHelper().setAuditMode(mapping, (BudgetForm) form, true);
+                    }
+                    
+                    return mapping.findForward(Constants.BUDGET_ACTIONS_PAGE);
+            }
             return mapping.findForward(Constants.MAPPING_BASIC);
         }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,13 @@ package org.kuali.kra.iacuc.actions.assignCmt;
 import org.apache.commons.lang.StringUtils;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.KeyConstants;
-import org.kuali.kra.protocol.ProtocolDocument;
+import org.kuali.kra.protocol.ProtocolDocumentBase;
 import org.kuali.kra.rules.ResearchDocumentRuleBase;
 import org.kuali.rice.krad.util.GlobalVariables;
 
 public class IacucProtocolAssignCmtRuleImpl extends ResearchDocumentRuleBase implements IacucProtocolAssignCmtRule {
 
-    public boolean processAssignToCommittee(ProtocolDocument document, IacucProtocolAssignCmtBean actionBean) {
+    public boolean processAssignToCommittee(ProtocolDocumentBase document, IacucProtocolAssignCmtBean actionBean) {
         boolean valid = true;
         if (StringUtils.isBlank(actionBean.getCommitteeId())) {
             valid = false;

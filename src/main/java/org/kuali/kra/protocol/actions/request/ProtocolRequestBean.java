@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,9 @@ package org.kuali.kra.protocol.actions.request;
 
 import java.io.Serializable;
 
-import org.kuali.kra.protocol.actions.ActionHelper;
+import org.kuali.kra.protocol.actions.ActionHelperBase;
 import org.kuali.kra.protocol.actions.ProtocolSubmissionBeanBase;
+import org.kuali.kra.protocol.questionnaire.ProtocolSubmissionQuestionnaireHelper;
 
 /**
  * The ProtocolRequestBean is used for some of the common, yet simple,
@@ -33,7 +34,7 @@ import org.kuali.kra.protocol.actions.ProtocolSubmissionBeanBase;
  * For each of these request actions, a user can select a committee and give
  * a reason for the request.  Each request, though, will require a different
  * protocol action type and submission type entry in the database.  Please
- * see the ActionHelper class for how this class is used.
+ * see the ActionHelperBase class for how this class is used.
  */
 public interface ProtocolRequestBean extends ProtocolSubmissionBeanBase, Serializable {
    
@@ -50,4 +51,5 @@ public interface ProtocolRequestBean extends ProtocolSubmissionBeanBase, Seriali
 
     public void setBeanName(String beanName);
     
+    public ProtocolSubmissionQuestionnaireHelper getQuestionnaireHelper();
 }

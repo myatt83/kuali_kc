@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import org.kuali.kra.authorization.Task;
 import org.kuali.kra.authorization.TaskAuthorizerImpl;
 import org.kuali.kra.iacuc.onlinereview.IacucProtocolOnlineReviewService;
 import org.kuali.kra.protocol.onlinereview.authorization.ProtocolOnlineReviewTask;
-import org.kuali.kra.protocol.onlinereview.ProtocolOnlineReview;
+import org.kuali.kra.protocol.onlinereview.ProtocolOnlineReviewBase;
 import org.kuali.kra.service.KraAuthorizationService;
 
 public abstract class IacucProtocolOnlineReviewAuthorizer extends TaskAuthorizerImpl {
@@ -34,9 +34,6 @@ public abstract class IacucProtocolOnlineReviewAuthorizer extends TaskAuthorizer
         return isAuthorized(userId, (IacucProtocolOnlineReviewTask) task);
     }
 
-//    public final boolean isAuthorized(String userId, IacucProtocolOnlineReviewTask task) {
-//        return isAuthorized(userId, task);
-//    }
     public abstract boolean isAuthorized(String userId, IacucProtocolOnlineReviewTask task);
 
         /**
@@ -54,7 +51,7 @@ public abstract class IacucProtocolOnlineReviewAuthorizer extends TaskAuthorizer
      * @param permissionName the name of the permission
      * @return true if the person has the permission; otherwise false
      */
-    protected final boolean hasPermission(String userId, ProtocolOnlineReview protocolOnlineReview, String permissionName) {
+    protected final boolean hasPermission(String userId, ProtocolOnlineReviewBase protocolOnlineReview, String permissionName) {
         return kraAuthorizationService.hasPermission(userId, protocolOnlineReview, permissionName);
     }
 

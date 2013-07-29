@@ -1,5 +1,5 @@
 <%--
- Copyright 2005-2010 The Kuali Foundation
+ Copyright 2005-2013 The Kuali Foundation
  
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -56,18 +56,6 @@
     </tr>
     
     <tr>
-      <td nowrap class="disabled-text">All My Disclosure Reviews</td>
-      <td>
-        <img src="static/images/pixel_clear.gif" alt="add" width="16" height="16" border="0" align="absmiddle">
-     	<portal:portalLink displayTitle="false" title="My Disclosure Reviews" 
-		      url="${ConfigProperties.application.url}/kr/lookup.do?methodToCall=search&businessObjectClassName=org.kuali.kra.coi.CoiDisclosureReviews&docFormKey=88888888&returnLocation=${ConfigProperties.application.url}/portal.do&hideReturnLink=true" >
-          <img src="static/images/searchicon.gif" alt="lookup" width="16" border="0" align="absmiddle">
-        </portal:portalLink>
-      </td>
-      
-    </tr>
-    
-    <tr>
       <td nowrap class="disabled-text">Submitted Disclosures</td>
       <td>
         <img src="static/images/pixel_clear.gif" alt="add" width="16" height="16" border="0" align="absmiddle">
@@ -97,12 +85,35 @@
       <td>
         <img src="static/images/pixel_clear.gif" alt="add" width="16" height="16" border="0" align="absmiddle">
      	<portal:portalLink displayTitle="false" title="Undisclosed Events" 
-		      url="${ConfigProperties.application.url}/kr/lookup.do?methodToCall=search&businessObjectClassName=org.kuali.kra.coi.CoiDisclosureUndisclosedEvents&docFormKey=88888888&returnLocation=${ConfigProperties.application.url}/portal.do&hideReturnLink=true" >
+		      url="${ConfigProperties.application.url}/kr/lookup.do?methodToCall=start&businessObjectClassName=org.kuali.kra.coi.CoiDisclosureUndisclosedEvents&docFormKey=88888888&returnLocation=${ConfigProperties.application.url}/portal.do&hideReturnLink=true" >
           <img src="static/images/searchicon.gif" alt="lookup" width="16" border="0" align="absmiddle">
         </portal:portalLink>
       </td>
       
-    </tr>   
+    </tr> 
+
+	<tr>
+      <td nowrap class="disabled-text">Open and In Progress Disclosures</td>
+      <td>
+        <img src="static/images/pixel_clear.gif" alt="add" width="16" height="16" border="0" align="absmiddle">
+     	<portal:portalLink displayTitle="false" title="Open and In Progress Disclosures" 
+		      url="${ConfigProperties.application.url}/coiSearchOpen.do?methodToCall=openCustomSearch&docFormKey=88888888" >
+          <img src="static/images/searchicon.gif" alt="lookup" width="16" border="0" align="absmiddle">
+        </portal:portalLink>
+      </td>
+      
+    </tr>
+    <tr>
+      <td nowrap class="disabled-text">Person Search</td>
+      <td>
+        <img src="static/images/pixel_clear.gif" alt="add" width="16" height="16" border="0" align="absmiddle">
+     	<portal:portalLink displayTitle="false" title="Person Search" 
+		      url="${ConfigProperties.application.url}/kr/lookup.do?methodToCall=start&businessObjectClassName=org.kuali.kra.bo.KcPerson&docFormKey=88888888&includeCustomActionUrls=false&returnLocation=${ConfigProperties.application.url}/coiPersonSearch.do&hideReturnLink=false&showMaintenanceLinks=false&refreshCaller=CoiDisclosurePersonSearch" >
+          <img src="static/images/searchicon.gif" alt="lookup" width="16" border="0" align="absmiddle">
+        </portal:portalLink>
+      </td>
+      
+    </tr>  
   </table>
   <p>
     <strong>Protocols</strong>
@@ -110,10 +121,10 @@
   <table border="0" cellpadding="2" cellspacing="0">
    <tr>
     <td nowrap class="disabled-text">Animals</td>
+    <td style="padding-left: 10px"/>
     <td>
       <portal:portalLink displayTitle="false" title="IACUC" url="${ConfigProperties.application.url}/iacucProtocolProtocol.do?methodToCall=docHandler&command=initiate&docTypeName=IacucProtocolDocument">
-      	<img src="static/images/add.png" alt="add" width="16" height="16" border="0" align="absmiddle">
-      </portal:portalLink>
+      	<img src="static/images/add.png" alt="add" width="16" height="16" border="0" align="absmiddle"></portal:portalLink>
       <portal:portalLink displayTitle="false" title="IACUC" 
 		   url="${ConfigProperties.application.url}/kr/lookup.do?methodToCall=start&businessObjectClassName=org.kuali.kra.iacuc.IacucProtocol&docFormKey=88888888&returnLocation=${ConfigProperties.application.url}/portal.do&hideReturnLink=true" >
       	<img src="static/images/searchicon.gif" alt="lookup" width="16" border="0" align="absmiddle">
@@ -121,33 +132,13 @@
     </td>
   </tr>
   <tr>
-    <td nowrap class="disabled-text">Biosafety</td>
-    <td>
-      <img src="static/images/add1.png" alt="add" width="16" height="16" border="0" align="absmiddle">
-      <img src="static/images/searchicon1.gif" alt="lookup" width="16" height="16" align="absmiddle">
-    </td>
-  </tr>
-  <tr>
-    <td nowrap class="disabled-text">Chemical Safety</td>
-    <td>
-      <img src="static/images/add1.png" alt="add" width="16" height="16" border="0" align="absmiddle">
-      <img src="static/images/searchicon1.gif" alt="lookup" width="16" height="16" align="absmiddle">
-    </td>
-  </tr>
-  <tr>
     <td nowrap class="disabled-text">Human Participants</td>
+    <td style="padding-left: 10px"/>
     <td>
       <portal:portalLink displayTitle="false" title="Protocol" url="${ConfigProperties.application.url}/protocolProtocol.do?methodToCall=docHandler&command=initiate&docTypeName=ProtocolDocument"><img src="static/images/add.png" alt="add" width="16" height="16" border="0" align="absmiddle"></portal:portalLink>
       <portal:portalLink displayTitle="false" title="Protocol" 
 		   url="${ConfigProperties.application.url}/kr/lookup.do?methodToCall=start&businessObjectClassName=org.kuali.kra.irb.Protocol&docFormKey=88888888&returnLocation=${ConfigProperties.application.url}/portal.do&hideReturnLink=true" >
             <img src="static/images/searchicon.gif" alt="lookup" width="16" border="0" align="absmiddle"></portal:portalLink>
-    </td>
-  </tr>
-  <tr>
-    <td nowrap class="disabled-text">Radiation Safety</td>
-    <td>
-      <img src="static/images/add1.png" alt="add" width="16" height="16" border="0" align="absmiddle">
-      <img src="static/images/searchicon1.gif" alt="lookup" width="16" height="16" align="absmiddle">
     </td>
   </tr>
   </table>

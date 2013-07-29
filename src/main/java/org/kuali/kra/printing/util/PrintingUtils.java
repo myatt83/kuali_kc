@@ -1,5 +1,5 @@
 /*
-\ * Copyright 2005-2010 The Kuali Foundation
+\ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ import org.kuali.kra.award.printing.AwardPrintType;
 import org.kuali.kra.bo.CommentType;
 import org.kuali.kra.budget.printing.BudgetPrintType;
 import org.kuali.kra.coi.print.CoiDisclosureType;
-import org.kuali.kra.committee.print.CommitteeReportType;
+import org.kuali.kra.common.committee.print.CommitteeReportType;
 import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.institutionalproposal.printing.InstitutionalProposalPrintType;
 import org.kuali.kra.institutionalproposal.proposallog.service.ProposalLogPrintingService;
@@ -42,6 +42,7 @@ import org.kuali.kra.proposaldevelopment.bo.AttachmentDataSource;
 import org.kuali.kra.proposaldevelopment.bo.ProposalPerson;
 import org.kuali.kra.proposaldevelopment.document.ProposalDevelopmentDocument;
 import org.kuali.kra.proposaldevelopment.printing.service.ProposalDevelopmentPrintingService;
+import org.kuali.kra.subawardReporting.printing.SubAwardPrintType;
 import org.kuali.rice.coreservice.framework.parameter.ParameterService;
 import org.kuali.rice.kns.util.WebUtils;
 import org.kuali.rice.krad.service.BusinessObjectService;
@@ -80,6 +81,8 @@ public class PrintingUtils {
 	private static final String PRINCIPAL_INVESTIGATOR = "PI";
 	private static final String COMMENT_TYPE_CODE_PARAMETER = "commentTypeCode";
 	private static final String  XSL_PRINT_NEGOTIATION_ACTIVITY_REPORT ="NegotiationActivityReport.xsl";
+	private static final String XSL_PRINT_SUB_AWARD_SF_294_REPORT ="294.xsl";
+	private static final String XSL_PRINT_SUB_AWARD_SF_295_REPORT ="295.xsl";
 	private static final String XSL_COI_APPROVED_DISCLOSURE = "ApprovedDisclosure.xsl";
     private static final String XSL_AWARD_REPORT_TRACKING = "AwardReportingRequirements.xsl";
 	/**
@@ -219,7 +222,17 @@ public class PrintingUtils {
                 .equals(NegotiationActivityPrintType.NEGOTIATION_ACTIVITY_REPORT
                         .getNegotiationActivityPrintType())) {
             xsl = XSL_PRINT_NEGOTIATION_ACTIVITY_REPORT;
-        }  
+        }
+        else if (reportType
+                .equals(SubAwardPrintType.SUB_AWARD_SF_294_PRINT_TYPE
+                        .getSubAwardPrintType())) {
+            xsl = XSL_PRINT_SUB_AWARD_SF_294_REPORT;
+        }
+        else if (reportType
+                .equals(SubAwardPrintType.SUB_AWARD_SF_295_PRINT_TYPE
+                        .getSubAwardPrintType())) {
+            xsl = XSL_PRINT_SUB_AWARD_SF_295_REPORT;
+        }
         else if (ProtocolPrintType.getReportTypes().contains(reportType)) {
             for (ProtocolPrintType protocolPrintType : ProtocolPrintType.values()) {
                 if (reportType.equals(protocolPrintType.getProtocolPrintType())) {

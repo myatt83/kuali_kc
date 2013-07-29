@@ -1,5 +1,5 @@
 <%--
- Copyright 2005-2010 The Kuali Foundation
+ Copyright 2005-2013 The Kuali Foundation
  
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -20,7 +20,10 @@
 <c:set var="readOnly" value="${not KualiForm.editingMode['fullEntry']}" scope="request" />
 <c:set var="canViewCfdaLookup" value="${KualiForm.cfdaLookupRequired}" scope="request" />
 
-<kul:tab tabTitle="Sponsor & Program Information" defaultOpen="false" tabErrorKey="document.institutionalProposal.noticeOfOpportunityCode,document.institutionalProposal.programAnnouncementNumber,document.institutionalProposal.sponsorProposalNumber,document.institutionalProposal.nsfCode,document.institutionalProposal.cfdaNumber,document.institutionalProposal.sponsorCode,document.institutionalProposalList[0].sponsorCode,document.institutionalProposal.primeSponsorCode,document.institutionalProposalList[0].opportunity" auditCluster="sponsorProgramInformationAuditErrors,sponsorProgramInformationAuditWarnings" tabAuditKey="document.institutionalProposal.cfdaNumber,document.institutionalProposal.sponsorProposalNumber" useRiceAuditMode="true">
+<kul:tab tabTitle="Sponsor & Program Information" defaultOpen="false" 
+	tabErrorKey="document.institutionalProposal.noticeOfOpportunityCode,document.institutionalProposal.programAnnouncementNumber,document.institutionalProposal.sponsorProposalNumber,document.institutionalProposal.nsfCode,document.institutionalProposal.cfdaNumber,document.institutionalProposal.sponsorCode,,document.institutionalProposalList[0].sponsorCode,document.institutionalProposal.deadlineTime, document.institutionalProposalList[0].deadlineTime,document.institutionalProposal.primeSponsorCode,document.institutionalProposalList[0].opportunity,document.institutionalProposalList[0].primeSponsorCode" 
+	auditCluster="sponsorProgramInformationAuditErrors,sponsorProgramInformationAuditWarnings" 
+	tabAuditKey="document.institutionalProposal.cfdaNumber,document.institutionalProposal.sponsorProposalNumber" useRiceAuditMode="true">
 	<div class="tab-container" align="center">
     	<h3>
     		<span class="subhead-left">Sponsor &amp; Program Information</span>
@@ -69,29 +72,29 @@
                 <td align="left" valign="middle">
                 	<kul:htmlControlAttribute property="document.institutionalProposal.deadlineDate" attributeEntry="${institutionalProposalAttributes.deadlineDate}"  />
                 </td>
-                <th><div align="right"><kul:htmlAttributeLabel attributeEntry="${institutionalProposalAttributes.deadlineType}" /></div></th>
+                <th><div align="right"><kul:htmlAttributeLabel attributeEntry="${institutionalProposalAttributes.deadlineTime}" /></div></th>
                 <td>
-                	<kul:htmlControlAttribute property="document.institutionalProposal.deadlineType" readOnly="${readOnly}" attributeEntry="${institutionalProposalAttributes.deadlineType}"  styleClass="fixed-size-200-select"/>
+                	<kul:htmlControlAttribute property="document.institutionalProposal.deadlineTime" attributeEntry="${institutionalProposalAttributes.deadlineTime}"  />
                 </td>
             </tr>
         	<tr>
+        		<th><div align="right"><kul:htmlAttributeLabel attributeEntry="${institutionalProposalAttributes.deadlineType}" /></div></th>
+                <td>
+                	<kul:htmlControlAttribute property="document.institutionalProposal.deadlineType" readOnly="${readOnly}" attributeEntry="${institutionalProposalAttributes.deadlineType}"  styleClass="fixed-size-200-select"/>
+                </td>
 				<th><div align="right"><kul:htmlAttributeLabel attributeEntry="${institutionalProposalAttributes.noticeOfOpportunityCode}" /></div></th>
                 <td>
                 	<kul:htmlControlAttribute property="document.institutionalProposal.noticeOfOpportunityCode" readOnly="${readOnly}" attributeEntry="${institutionalProposalAttributes.noticeOfOpportunityCode}"  styleClass="fixed-size-200-select" />
                 </td>
-           		<th><div align="right"><kul:htmlAttributeLabel attributeEntry="${institutionalProposalAttributes.awardTypeCode}" /></div></th>
-           		<td>
-           			<kul:htmlControlAttribute property="document.institutionalProposal.awardTypeCode" attributeEntry="${institutionalProposalAttributes.awardTypeCode}" />
-           		</td>
         	</tr>
      		<tr>
      		    <th><div align="right"><kul:htmlAttributeLabel attributeEntry="${institutionalProposalAttributes.subcontractFlag}" /></div></th>
                 <td align="left" valign="middle">
                 	<kul:htmlControlAttribute property="document.institutionalProposal.subcontractFlag" attributeEntry="${institutionalProposalAttributes.subcontractFlag}" readOnly="${readOnly}" />
                 </td>
-           		<th><div align="right"><kul:htmlAttributeLabel attributeEntry="${institutionalProposalAttributes.opportunity}" /></div></th>
+           		<th><div align="right"><kul:htmlAttributeLabel attributeEntry="${institutionalProposalAttributes.awardTypeCode}" /></div></th>
            		<td>
-           			<kul:htmlControlAttribute property="document.institutionalProposalList[0].opportunity" attributeEntry="${institutionalProposalAttributes.opportunity}" />
+           			<kul:htmlControlAttribute property="document.institutionalProposal.awardTypeCode" attributeEntry="${institutionalProposalAttributes.awardTypeCode}" />
            		</td>
      		</tr>
         	<tr>
@@ -107,9 +110,9 @@
     				</c:if>
     			</c:if>
                 </td>
-           		<th><div align="right">&nbsp;</div></th>
+           		<th><div align="right"><kul:htmlAttributeLabel attributeEntry="${institutionalProposalAttributes.opportunity}" /></div></th>
            		<td>
-           			&nbsp;
+           			<kul:htmlControlAttribute property="document.institutionalProposalList[0].opportunity" attributeEntry="${institutionalProposalAttributes.opportunity}" />
            		</td>
      		</tr>
         </table>

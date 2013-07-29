@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.kuali.kra.bo.KcPerson;
+import org.kuali.kra.bo.KraPersistableBusinessObjectBase;
 import org.kuali.kra.bo.Rolodex;
 import org.kuali.kra.common.notification.NotificationContext;
 import org.kuali.kra.common.notification.bo.KcNotification;
@@ -159,7 +160,7 @@ public class NotificationHelper<T extends NotificationContext> implements Serial
             }
         }
         
-        setNotification(getNotificationService().createNotification(context));
+        setNotification(getNotificationService().createNotificationObject(context));
         
         setNotificationContext(context);
     }
@@ -213,6 +214,11 @@ public class NotificationHelper<T extends NotificationContext> implements Serial
      */
     public void sendNotification() {
         getNotificationService().sendNotification(notificationContext, notification, notificationRecipients);
+    }
+    public void sendNotificationAndPersist(KcNotification notification, KraPersistableBusinessObjectBase object) {
+        notification.setMessage(getNotification().getMessage());
+        notification.setSubject(getNotification().getSubject());
+        getNotificationService().sendNotificationAndPersist(notificationContext, notification, notificationRecipients, object);
     }
 
     public KcNotificationService getNotificationService() {

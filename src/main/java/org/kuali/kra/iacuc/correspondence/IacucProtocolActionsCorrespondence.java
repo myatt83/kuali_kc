@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,14 @@ package org.kuali.kra.iacuc.correspondence;
 import org.kuali.kra.iacuc.actions.correspondence.IacucProtocolActionTypeToCorrespondenceTemplateService;
 import org.kuali.kra.iacuc.actions.print.IacucCorrespondenceXmlStream;
 import org.kuali.kra.iacuc.actions.print.IacucProtocolPrintWatermark;
+import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.KraServiceLocator;
-import org.kuali.kra.protocol.actions.correspondence.ProtocolActionsCorrespondence;
-import org.kuali.kra.protocol.actions.correspondence.ProtocolActionTypeToCorrespondenceTemplateService;
-import org.kuali.kra.protocol.actions.print.CorrespondenceXmlStream;
-import org.kuali.kra.protocol.actions.print.ProtocolPrintWatermark;
+import org.kuali.kra.infrastructure.RoleConstants;
+import org.kuali.kra.protocol.actions.correspondence.ProtocolActionsCorrespondenceBase;
+import org.kuali.kra.protocol.actions.print.CorrespondenceXmlStreamBase;
+import org.kuali.kra.protocol.actions.print.ProtocolPrintWatermarkBase;
 
-public class IacucProtocolActionsCorrespondence extends ProtocolActionsCorrespondence {
+public class IacucProtocolActionsCorrespondence extends ProtocolActionsCorrespondenceBase {
 
     private static final long serialVersionUID = 241798237383300450L;
     private String protocolActionType;
@@ -48,13 +49,23 @@ public class IacucProtocolActionsCorrespondence extends ProtocolActionsCorrespon
     }
     
     @Override
-    protected ProtocolPrintWatermark getNewProtocolPrintWatermarkInstanceHook() {
+    protected ProtocolPrintWatermarkBase getNewProtocolPrintWatermarkInstanceHook() {
         return new IacucProtocolPrintWatermark();
     }
 
     @Override
-    public CorrespondenceXmlStream getCorrespondenceXmlStream() {
+    public CorrespondenceXmlStreamBase getCorrespondenceXmlStream() {
         return KraServiceLocator.getService(IacucCorrespondenceXmlStream.class);
+    }
+
+    @Override
+    protected String getAdministratorType() {
+        return RoleConstants.IACUC_ADMINISTRATOR;
+    }
+
+    @Override
+    protected String getModuleNameSpace() {
+        return Constants.MODULE_NAMESPACE_IACUC;
     }    
 
 }

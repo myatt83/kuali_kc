@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,10 @@ package org.kuali.kra.protocol.auth;
 import org.kuali.kra.irb.actions.amendrenew.ProtocolModule;
 
 /**
- * The Modify Protocol Personnel Authorizer determines if
+ * The Modify ProtocolBase Personnel Authorizer determines if
  * the user can modify the personnel for a protocol.
  */
-public class ModifyProtocolPersonnelAuthorizer extends ModifyAmendmentAuthorizer {
+public class ModifyProtocolPersonnelAuthorizer extends ModifyAmendmentAuthorizerBase {
 
     public ModifyProtocolPersonnelAuthorizer() {
         super(ProtocolModule.PROTOCOL_PERSONNEL);

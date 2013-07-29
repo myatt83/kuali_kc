@@ -10,9 +10,9 @@
         <property name="useWorkflowPessimisticLocking" value="false"/>
         
         <property name="documentTypeName" value="CommonCommitteeDocument"/>
-        <property name="documentClass" value="org.kuali.kra.common.committee.document.CommonCommitteeDocument"/>
-        <property name="businessRulesClass" value="org.kuali.kra.common.committee.rules.CommitteeDocumentRule"/>
-        <property name="documentAuthorizerClass" value="org.kuali.kra.common.committee.document.authorization.CommitteeDocumentAuthorizer"/>
+        <property name="documentClass" value="org.kuali.kra.iacuc.committee.document.CommonCommitteeDocument"/>
+        <property name="businessRulesClass" value="org.kuali.kra.iacuc.committee.rules.IacucCommitteeDocumentRule"/>
+        <property name="documentAuthorizerClass" value="org.kuali.kra.iacuc.committee.document.authorization.IacucCommitteeDocumentAuthorizer"/>
                 
         <property name="allowsCopy" value="true"/>
         <property name="headerNavigationList">

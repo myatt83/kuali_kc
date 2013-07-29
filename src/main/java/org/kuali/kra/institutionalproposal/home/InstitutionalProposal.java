@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  *
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package org.kuali.kra.institutionalproposal.home;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -108,6 +109,7 @@ public class InstitutionalProposal extends KraPersistableBusinessObjectBase impl
     private KualiDecimal totalIndirectCostTotal;
     private String numberOfCopies;
     private Date deadlineDate;
+    private String deadlineTime;
     private Date createTimeStamp;
     private String deadlineType;
     private String mailBy;
@@ -173,6 +175,8 @@ public class InstitutionalProposal extends KraPersistableBusinessObjectBase impl
     private transient String lookupUnitNumber;
     private transient String lookupPersonNumber;
     private transient FiscalYearMonthService fiscalYearMonthService;
+    
+    private transient boolean allowUpdateTimestampToBeReset = true;
 
     public InstitutionalProposal() {
         super();
@@ -247,6 +251,10 @@ public class InstitutionalProposal extends KraPersistableBusinessObjectBase impl
 
     public boolean isActiveVersion() {
         return this.getProposalSequenceStatus().equals(VersionStatus.ACTIVE.toString());
+    }
+    
+    public boolean isCancelled() {
+        return this.getProposalSequenceStatus().equals(VersionStatus.CANCELED.toString());
     }
 
     /**
@@ -752,6 +760,14 @@ public class InstitutionalProposal extends KraPersistableBusinessObjectBase impl
 
     public void setDeadlineDate(Date deadlineDate) {
         this.deadlineDate = deadlineDate;
+    }
+
+    public String getDeadlineTime() {
+        return deadlineTime;
+    }
+
+    public void setDeadlineTime(String deadlineTime) {
+        this.deadlineTime = deadlineTime;
     }
 
     public String getDeadlineType() {
@@ -1538,6 +1554,7 @@ public class InstitutionalProposal extends KraPersistableBusinessObjectBase impl
     public void doProposalLogDataFeed(ProposalLog proposalLog) {
         this.setProposalNumber(proposalLog.getProposalNumber());
         this.setDeadlineDate(proposalLog.getDeadlineDate());
+        this.setDeadlineTime(proposalLog.getDeadlineTime());
         /**
          * per KRACOEUS-4647 we don't want to pull the log's month/year, we want to calculate it fresh.
          */
@@ -1843,5 +1860,27 @@ public class InstitutionalProposal extends KraPersistableBusinessObjectBase impl
             this.fiscalYearMonthService = KraServiceLocator.getService(FiscalYearMonthService.class);
         }
         return this.fiscalYearMonthService;
+    }
+    
+    public boolean isAllowUpdateTimestampToBeReset() {
+        return allowUpdateTimestampToBeReset;
+    }
+    
+    /**
+     * 
+     * Setting this value to false will prevent the update timestamp field from being upddate just once.  After that, the update timestamp field will update as regular.
+     * @param allowUpdateTimestampToBeReset
+     */
+    public void setAllowUpdateTimestampToBeReset(boolean allowUpdateTimestampToBeReset) {
+        this.allowUpdateTimestampToBeReset = allowUpdateTimestampToBeReset;
+    }
+
+    @Override
+    public void setUpdateTimestamp(Timestamp updateTimestamp) {
+        if (isAllowUpdateTimestampToBeReset()) {
+            super.setUpdateTimestamp(updateTimestamp);
+        } else {
+            setAllowUpdateTimestampToBeReset(true);
+        }
     }
 }

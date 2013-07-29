@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,6 +73,7 @@ import noNamespace.AwardType.AwardTransferringSponsors.TransferringSponsor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.kuali.kra.award.awardhierarchy.AwardHierarchy;
+import org.kuali.kra.award.awardhierarchy.AwardHierarchyService;
 import org.kuali.kra.award.commitments.AwardCostShare;
 import org.kuali.kra.award.commitments.AwardFandaRate;
 import org.kuali.kra.award.contacts.AwardPerson;
@@ -1001,7 +1002,7 @@ public abstract class AwardBaseStream implements XmlStream {
             }
         }
         if (award.getAwardTransactionTypeCode() != null) {
-            award.refresh();
+            award.refreshReferenceObject("awardTransactionType");  
             awardTransactionType.setTransactionTypeCode(award.getAwardTransactionTypeCode());
             if (award.getAwardTransactionType() != null) {
                 awardTransactionType.setTransactionTypeDesc(award.getAwardTransactionType().getDescription());
@@ -2698,10 +2699,15 @@ public abstract class AwardBaseStream implements XmlStream {
 							.setAccountTypeDesc(accountTypeDescription);
 				}
 			}
-		String rootAccountNumber = award.getAccountNumber();
-		if(rootAccountNumber!=null){
-		    otherHeaderDetails.setRootAccountNumber(rootAccountNumber);
-		}
+		AwardHierarchy hierarchy = award.getAwardHierarchyService().loadAwardHierarchy(awardDocument.getAward().getAwardNumber());
+        if (hierarchy != null) {
+            AwardHierarchy parent = hierarchy.getParent();
+            if (parent != null) {
+                otherHeaderDetails.setRootAccountNumber(parent.getAward().getAccountNumber());
+            } else {
+                otherHeaderDetails.setRootAccountNumber(award.getAccountNumber());
+            }
+        }
 		if (award.getUpdateUser() != null) {
 			otherHeaderDetails.setUpdateUser(award.getUpdateUser());
 		}

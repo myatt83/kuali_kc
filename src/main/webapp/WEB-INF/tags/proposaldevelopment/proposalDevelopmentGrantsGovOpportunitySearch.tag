@@ -1,5 +1,5 @@
 <%--
- Copyright 2005-2010 The Kuali Foundation
+ Copyright 2005-2013 The Kuali Foundation
  
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 <c:set var="textAreaFieldName" value="document.developmentProposalList[0].opportunityTitle" />
 <c:set var="action" value="proposalDevelopmentProposal" />
 
-<kul:tabTop tabTitle="Grants.gov" defaultOpen="true" tabErrorKey="proposalDevelopmentAttributes.cfdaNumber,proposalDevelopmentAttributes.programAnnouncementNumber ">
+<kul:tabTop tabTitle="S2S" defaultOpen="true" tabErrorKey="proposalDevelopmentAttributes.cfdaNumber,proposalDevelopmentAttributes.programAnnouncementNumber ">
     <div class="tab-container" align="center">
         <h3>
             <span class="subhead-left">Opportunity Search</span>
@@ -31,9 +31,13 @@
         <input type="hidden" name="document.developmentProposalList[0].cfdaNumber" value="${KualiForm.document.developmentProposalList[0].cfdaNumber}">    
         <input type="hidden" name="document.developmentProposalList[0].programAnnouncementNumber" value="${KualiForm.document.developmentProposalList[0].programAnnouncementNumber}">            
         
-        Grants.gov Lookup
+        S2S Lookup
         <c:if test="${!readOnly}" >
-        	<kul:lookup boClassName="org.kuali.kra.s2s.bo.S2sOpportunity" fieldConversions="opportunityId:newS2sOpportunity.opportunityId,cfdaNumber:newS2sOpportunity.cfdaNumber,opportunityTitle:newS2sOpportunity.opportunityTitle,s2sSubmissionTypeCode:newS2sOpportunity.s2sSubmissionTypeCode,revisionCode:newS2sOpportunity.revisionCode,competetionId:newS2sOpportunity.competetionId,openingDate:newS2sOpportunity.openingDate,closingDate:newS2sOpportunity.closingDate,instructionUrl:newS2sOpportunity.instructionUrl,schemaUrl:newS2sOpportunity.schemaUrl" anchor="${tabKey}" autoSearch="yes" lookupParameters="document.developmentProposalList[0].programAnnouncementNumber:opportunityId,document.developmentProposalList[0].cfdaNumber:cfdaNumber" readOnlyFields="yes"/>
+        	<kul:lookup boClassName="org.kuali.kra.s2s.bo.S2sOpportunity" 
+        	fieldConversions="opportunityId:newS2sOpportunity.opportunityId,cfdaNumber:newS2sOpportunity.cfdaNumber,opportunityTitle:newS2sOpportunity.opportunityTitle,s2sSubmissionTypeCode:newS2sOpportunity.s2sSubmissionTypeCode,revisionCode:newS2sOpportunity.revisionCode,competetionId:newS2sOpportunity.competetionId,openingDate:newS2sOpportunity.openingDate,closingDate:newS2sOpportunity.closingDate,instructionUrl:newS2sOpportunity.instructionUrl,schemaUrl:newS2sOpportunity.schemaUrl,providerCode:newS2sOpportunity.providerCode" 
+        	anchor="${tabKey}" autoSearch="no" 
+        	lookupParameters="document.developmentProposalList[0].programAnnouncementNumber:opportunityId,document.developmentProposalList[0].cfdaNumber:cfdaNumber,document.developmentProposalList[0].s2sOpportunity.providerCode:providerCode" 
+        	readOnlyFields="yes"/>
         </c:if>	
                
             

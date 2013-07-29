@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,15 +21,7 @@ import org.kuali.kra.irb.Protocol;
  * 
  * This class handles the persistence of an approval action to a protocol.
  */
-public interface ProtocolApproveService {
-    
-    /**
-     * Approves a full submission to a Protocol.
-     * @param protocol the current Protocol
-     * @param actionBean the bean that contains the comments and dates
-     * @throws Exception
-     */
-    void grantFullApproval(Protocol protocol, ProtocolApproveBean actionBean) throws Exception;
+public interface ProtocolApproveService extends org.kuali.kra.protocol.actions.approve.ProtocolApproveService {
 
     /**
      * Approves an expedited submission to a Protocol.
@@ -38,13 +30,4 @@ public interface ProtocolApproveService {
      * @throws Exception
      */
     void grantExpeditedApproval(Protocol protocol, ProtocolApproveBean actionBean) throws Exception;
-    
-    /**
-     * Approves a response submission to a Protocol.
-     * @param protocol the current Protocol
-     * @param actionBean the bean that contains the comments and dates
-     * @throws Exception
-     */
-    void grantResponseApproval(Protocol protocol, ProtocolApproveBean actionBean) throws Exception;
-
 }

@@ -1,6 +1,6 @@
  
  <%--
- Copyright 2005-2010 The Kuali Foundation
+ Copyright 2005-2013 The Kuali Foundation
 
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -34,14 +34,7 @@
 <kul:routeLog /> 
 <kul:panelFooter />
 </div>
-<c:choose>
-	<c:when test="${not KualiForm.editingMode['viewOnly']}">
-		<kul:documentControls transactionalDocument="true"  suppressCancelButton="true" />
-	</c:when>
-	<c:otherwise>
-		<kul:documentControls transactionalDocument="true" suppressRoutingControls="true" viewOnly= "true" suppressCancelButton="true" />
-	</c:otherwise>
-</c:choose> 
+<kul:documentControls transactionalDocument="true" viewOnly="${KualiForm.editingMode['viewOnly']}" suppressCancelButton="true" />
 <script language="javascript" src="scripts/kuali_application.js"></script>
 
 </kul:documentPage>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,11 @@
  */
 package org.kuali.kra.common.notification.bo;
 
+import java.text.SimpleDateFormat;
+
 import org.kuali.kra.bo.KraPersistableBusinessObjectBase;
+import org.kuali.kra.infrastructure.KraServiceLocator;
+import org.kuali.rice.krad.service.BusinessObjectService;
 
 /**
  * Defines a document-specific instance of a Notification Type.
@@ -30,12 +34,18 @@ public class KcNotification extends KraPersistableBusinessObjectBase {
 
     private String documentNumber;
 
+    private String recipients;
+    
     private String subject;
 
     private String message;
 
+    private Long owningDocumentIdFk;
+
     private NotificationType notificationType;
 
+    private String createUser;
+    
     public Long getNotificationId() {
         return notificationId;
     }
@@ -60,6 +70,14 @@ public class KcNotification extends KraPersistableBusinessObjectBase {
         this.documentNumber = documentNumber;
     }
 
+    public String getRecipients() {
+        return recipients;
+    }
+
+    public void setRecipients(String recipients) {
+        this.recipients = recipients;
+    }
+
     public String getSubject() {
         return subject;
     }
@@ -77,10 +95,44 @@ public class KcNotification extends KraPersistableBusinessObjectBase {
     }
 
     public NotificationType getNotificationType() {
+        if (notificationType == null) {
+            this.refreshReferenceObject("notificationType");
+        }
         return notificationType;
     }
 
     public void setNotificationType(NotificationType notificationType) {
         this.notificationType = notificationType;
+    }
+
+    public Long getOwningDocumentIdFk() {
+        return owningDocumentIdFk;
+    }
+
+    public void setOwningDocumentIdFk(Long owningDocumentIdFk) {
+        this.owningDocumentIdFk = owningDocumentIdFk;
+    }
+    
+    
+    public String getCreateUser() {
+        return createUser;
+    }
+
+    public void setCreateUser(String createUser) {
+        this.createUser = createUser;
+    }
+
+    public String getUpdateTimestampString() {
+        final SimpleDateFormat dateFormat = new SimpleDateFormat("MM-dd-yyyy");
+        return (getUpdateTimestamp() == null ? "" : dateFormat.format(getUpdateTimestamp()));
+    }
+
+    public void persistOwningObject(KraPersistableBusinessObjectBase object) {
+        KraServiceLocator.getService(BusinessObjectService.class).save(object);
+    }
+
+    public void resetPersistenceState() {
+        setNotificationId(null);
+        setOwningDocumentIdFk(null);
     }
 }

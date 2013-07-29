@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-	Copyright 2005-2010 The Kuali Foundation.
+	Copyright 2005-2013 The Kuali Foundation.
 
 	Licensed under the Educational Community License, Version 1.0 (the "License");
 	you may not use this file except in compliance with the License.
@@ -99,9 +99,6 @@
 		<property name="dateTimeService">
 			<ref bean="dateTimeService" />
 		</property>
-		<property name="grantsGovConnectorService">
-			<ref bean="grantsGovConnectorService" />
-		</property>
 	</bean>
 
 	<bean id="printService"
@@ -175,14 +172,46 @@
 	</bean>
 
 	<bean id="grantsGovConnectorService"
-		class="org.kuali.kra.s2s.service.impl.GrantsGovConnectorServiceImpl">
+		class="org.kuali.kra.s2s.service.impl.S2SConnectorServiceBase">
 		<property name="s2SUtilService">
 			<ref bean="s2SUtilService" />
 		</property>
 		<property name="businessObjectService">
 			<ref bean="businessObjectService" />
 		</property>
+		<property name="serviceHost" value="grants.gov.s2s.host"/>
+		<property name="servicePort" value="grants.gov.s2s.port"/>
+		<property name="s2sCertificateReader">
+			<bean class="org.kuali.kra.s2s.service.impl.S2SCertificateReader">
+				<property name="keyStoreLocation" value="s2s.keystore.location"/>
+				<property name="keyStorePassword" value="s2s.keystore.password"/>
+				<property name="trustStoreLocation" value="s2s.truststore.location"/>
+				<property name="trustStorePassword" value="s2s.truststore.password"/>
+				<property name="jksType" value="JKS"/>
+			</bean>
+		</property>
 	</bean>
+	
+	<bean id="researchGovConnectorService"
+		class="org.kuali.kra.s2s.service.impl.S2SConnectorServiceBase">
+		<property name="s2SUtilService">
+			<ref bean="s2SUtilService" />
+		</property>
+		<property name="businessObjectService">
+			<ref bean="businessObjectService" />
+		</property>
+		<property name="serviceHost" value="research.gov.s2s.host"/>
+		<property name="servicePort" value="research.gov.s2s.port"/>
+		<property name="s2sCertificateReader">
+			<bean class="org.kuali.kra.s2s.service.impl.S2SCertificateReader">
+				<property name="keyStoreLocation" value="research.gov.keystore.location"/>
+				<property name="keyStorePassword" value="research.gov.keystore.password"/>
+				<property name="trustStoreLocation" value="research.gov.truststore.location"/>
+				<property name="trustStorePassword" value="research.gov.truststore.password"/>
+				<property name="jksType" value="JKS"/>
+			</bean>
+		</property>		
+	</bean>	
 
 	<!--  S2S Scheduler configuration start -->
 	<bean id="preValidationTask"
@@ -200,7 +229,7 @@
 		<property name="mailInterval" value="20" />
 		<property name="statusMap">
 			<map>
-				<entry key="1" value="Submitted to Grants.Gov" />
+				<entry key="1" value="Submitted to S2S" />
 				<entry key="2" value="Receiving" />
 				<entry key="3" value="Received" />
 				<entry key="4" value="Processing" />
@@ -275,7 +304,7 @@
 		<property name="mailInterval" value="40" />
 		<property name="statusMap">
 			<map>
-				<entry key="10" value="Grants.Gov Submission Error" />
+				<entry key="10" value="S2S Submission Error" />
 			</map>
 		</property>
 		<property name="mailInfoList">
@@ -291,8 +320,8 @@
 		<property name="cc" value="" />
 		<property name="bcc" value="" />
 		<property name="footer" value="" />
-		<property name="message" value="Grants.Gov Submissions" />
-		<property name="subject" value="Grants.Gov Submissions" />
+		<property name="message" value="S2S Submissions" />
+		<property name="subject" value="S2S Submissions" />
 	</bean>
 		<bean id="preValidation"
 		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
@@ -320,35 +349,51 @@
 	</bean>
 
 	<bean id="preValidationTrigger"
-		class="org.kuali.kra.s2s.polling.S2SCronTrigger">
+		class="org.kuali.kra.scheduling.quartz.KcCronTriggerBean">
 		<property name="jobDetail" ref="preValidation" />
-		<property name="parameterService" ref="parameterService" />
-		<property name="dateTimeService" ref="dateTimeService" />
+    <property name="parameterService" ref="parameterService" />    
+    <property name="dateTimeService" ref="dateTimeService" />
+    <property name="defaultCronExpression" value="0 0/20 * * * ?" />
+    <property name="triggerEnabledParameterName" value="s2s.polling.scheduler.enabled" />
+    <property name="parameterNamespace" value="KC-PD" />
+    <property name="parameterComponent" value="Document" />
 		<property name="cronExpressionParameterName" value="s2sScheduler.preValidation.cronExpression"/>
 	</bean>
 	<bean id="validationTrigger"
-		class="org.kuali.kra.s2s.polling.S2SCronTrigger">
+		class="org.kuali.kra.scheduling.quartz.KcCronTriggerBean">
 		<property name="jobDetail" ref="validation" />
-		<property name="parameterService" ref="parameterService" />
-		<property name="dateTimeService" ref="dateTimeService" />
+    <property name="parameterService" ref="parameterService" />    
+    <property name="dateTimeService" ref="dateTimeService" />
+    <property name="defaultCronExpression" value="0 0/20 * * * ?" />
+    <property name="triggerEnabledParameterName" value="s2s.polling.scheduler.enabled" />
+    <property name="parameterNamespace" value="KC-PD" />
+    <property name="parameterComponent" value="Document" />
 		<property name="cronExpressionParameterName"
 			value="s2sScheduler.validation.cronExpression">
 		</property>
 	</bean>
 	<bean id="postValidationTrigger"
-		class="org.kuali.kra.s2s.polling.S2SCronTrigger">
+		class="org.kuali.kra.scheduling.quartz.KcCronTriggerBean">
 		<property name="jobDetail" ref="postValidation" />
-		<property name="parameterService" ref="parameterService" />
-		<property name="dateTimeService" ref="dateTimeService" />
+    <property name="parameterService" ref="parameterService" />    
+    <property name="dateTimeService" ref="dateTimeService" />
+    <property name="defaultCronExpression" value="0 0/20 * * * ?" />
+    <property name="triggerEnabledParameterName" value="s2s.polling.scheduler.enabled" />
+    <property name="parameterNamespace" value="KC-PD" />
+    <property name="parameterComponent" value="Document" />
 		<property name="cronExpressionParameterName"
 			value="s2sScheduler.postValidation.cronExpression">
 		</property>
 	</bean>
 	<bean id="errorOutTrigger"
-		class="org.kuali.kra.s2s.polling.S2SCronTrigger">
+		class="org.kuali.kra.scheduling.quartz.KcCronTriggerBean">
 		<property name="jobDetail" ref="errorOut" />
-		<property name="parameterService" ref="parameterService" />
-		<property name="dateTimeService" ref="dateTimeService" />
+    <property name="parameterService" ref="parameterService" />    
+    <property name="dateTimeService" ref="dateTimeService" />
+    <property name="defaultCronExpression" value="0 0/20 * * * ?" />
+    <property name="triggerEnabledParameterName" value="s2s.polling.scheduler.enabled" />
+    <property name="parameterNamespace" value="KC-PD" />
+    <property name="parameterComponent" value="Document" />
 		<property name="cronExpressionParameterName"
 			value="s2sScheduler.errorOut.cronExpression">
 		</property>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,13 +19,13 @@ import java.sql.Date;
 
 import org.kuali.kra.bo.RiskLevel;
 import org.kuali.kra.infrastructure.Constants;
-import org.kuali.kra.irb.ProtocolAssociate;
+import org.kuali.kra.protocol.ProtocolAssociateBase;
 
 /**
  * 
  * This is BO class of protocol risk levels. 
  */
-public class ProtocolRiskLevel extends ProtocolAssociate {
+public class ProtocolRiskLevel extends ProtocolAssociateBase {
 
     private static final long serialVersionUID = 4044241452792449333L;
 

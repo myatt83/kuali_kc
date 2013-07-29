@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,30 +16,40 @@
 
 package org.kuali.kra.iacuc;
 
+import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.kuali.kra.bo.ResearchArea;
+import org.kuali.kra.bo.DocumentCustomData;
+import org.kuali.kra.bo.ResearchAreaBase;
 import org.kuali.kra.iacuc.actions.IacucProtocolAction;
 import org.kuali.kra.iacuc.actions.IacucProtocolActionType;
 import org.kuali.kra.iacuc.actions.IacucProtocolStatus;
+import org.kuali.kra.iacuc.actions.genericactions.IacucProtocolGenericActionService;
 import org.kuali.kra.iacuc.actions.submit.IacucProtocolActionService;
 import org.kuali.kra.iacuc.actions.submit.IacucProtocolSubmission;
 import org.kuali.kra.iacuc.actions.submit.IacucProtocolSubmissionStatus;
+import org.kuali.kra.iacuc.notification.IacucProtocolNotification;
+import org.kuali.kra.iacuc.notification.IacucProtocolNotificationContext;
+import org.kuali.kra.iacuc.notification.IacucProtocolNotificationRenderer;
 import org.kuali.kra.iacuc.protocol.location.IacucProtocolLocationService;
 import org.kuali.kra.iacuc.protocol.research.IacucProtocolResearchAreaService;
-import org.kuali.kra.iacuc.rules.IacucProtocolFactBuilderService;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.krms.KcKrmsConstants;
-import org.kuali.kra.protocol.Protocol;
-import org.kuali.kra.protocol.ProtocolDocument;
+import org.kuali.kra.krms.service.KcKrmsFactBuilderService;
+import org.kuali.kra.protocol.ProtocolBase;
+import org.kuali.kra.protocol.ProtocolDocumentBase;
 import org.kuali.kra.protocol.ProtocolFinderDao;
 import org.kuali.kra.protocol.ProtocolVersionService;
-import org.kuali.kra.protocol.actions.ProtocolAction;
+import org.kuali.kra.protocol.actions.ProtocolActionBase;
+import org.kuali.kra.protocol.actions.genericactions.ProtocolGenericActionService;
 import org.kuali.kra.protocol.actions.submit.ProtocolActionService;
-import org.kuali.kra.protocol.actions.submit.ProtocolSubmission;
+import org.kuali.kra.protocol.actions.submit.ProtocolSubmissionBase;
+import org.kuali.kra.protocol.notification.ProtocolNotification;
+import org.kuali.kra.protocol.notification.ProtocolNotificationContextBase;
 import org.kuali.kra.protocol.protocol.location.ProtocolLocationService;
 import org.kuali.kra.protocol.protocol.research.ProtocolResearchAreaService;
 import org.kuali.rice.coreservice.framework.parameter.ParameterConstants;
@@ -53,27 +63,31 @@ import org.kuali.rice.krms.api.engine.Facts.Builder;
 
 /**
  * 
- * This class represents the Protocol Document Object.
- * ProtocolDocument has a 1:1 relationship with Protocol Business Object.
- * We have declared a list of Protocol BOs in the ProtocolDocument at the same time to
+ * This class represents the ProtocolBase Document Object.
+ * ProtocolDocumentBase has a 1:1 relationship with ProtocolBase Business Object.
+ * We have declared a list of ProtocolBase BOs in the ProtocolDocumentBase at the same time to
  * get around the OJB anonymous keys issue of primary keys of different data types.
  * Also we have provided convenient getter and setter methods so that to the outside world;
- * Protocol and ProtocolDocument can have a 1:1 relationship.
+ * ProtocolBase and ProtocolDocumentBase can have a 1:1 relationship.
  */
+@SuppressWarnings("unchecked")
 @NAMESPACE(namespace=Constants.MODULE_NAMESPACE_IACUC)
 @COMPONENT(component=ParameterConstants.DOCUMENT_COMPONENT)
-public class IacucProtocolDocument extends ProtocolDocument { 
+public class IacucProtocolDocument extends ProtocolDocumentBase { 
     /**
      * Comment for <code>serialVersionUID</code>
      */
     private static final long serialVersionUID = -1014286912251147390L;
+    @SuppressWarnings("unused")
     private static final Log LOG = LogFactory.getLog(IacucProtocolDocument.class);
     public static final String DOCUMENT_TYPE_CODE = "ICPR";
     
     private static final String CONTINUATION_KEY = "C";
+    
+    private static final String DISAPPROVED_CONTEXT_NAME = "Disapproved";
 	
     /**
-     * Constructs a ProtocolDocument object.
+     * Constructs a ProtocolDocumentBase object.
      */
 	public IacucProtocolDocument() { 
         super();
@@ -182,17 +196,19 @@ public class IacucProtocolDocument extends ProtocolDocument {
 
     @Override
     public void addFacts(Builder factsBuilder) {
-        IacucProtocolFactBuilderService fbService = KraServiceLocator.getService(IacucProtocolFactBuilderService.class);
+        KcKrmsFactBuilderService fbService = KraServiceLocator.getService("iacucProtocolFactBuilderService");
         fbService.addFacts(factsBuilder, this);
     }
 
     @Override
-    protected ProtocolAction getNewProtocolActionInstanceHook(Protocol protocol, ProtocolSubmission protocolSubmission, String protocolStatusCode) {
+    protected ProtocolActionBase getNewProtocolActionInstanceHook(ProtocolBase protocol, ProtocolSubmissionBase protocolSubmission, String protocolStatusCode) {
         String protocolActionTypeCode = IacucProtocolActionType.RENEWAL_CREATED; 
-        if(protocolStatusCode.equals(IacucProtocolStatus.AMENDMENT_MERGED)) {
+        if (protocolStatusCode.equals(IacucProtocolStatus.AMENDMENT_MERGED)) {
             protocolActionTypeCode = IacucProtocolActionType.AMENDMENT_CREATED;
-        }else if(protocolStatusCode.equals(IacucProtocolStatus.CONTINUATION_MERGED)) {
+        } else if (protocolStatusCode.equals(IacucProtocolStatus.CONTINUATION_MERGED)) {
             protocolActionTypeCode = IacucProtocolActionType.CONTINUATION;
+        } else if (protocolStatusCode.equals(IacucProtocolActionType.ADMINISTRATIVE_CORRECTION)) {
+            protocolActionTypeCode = IacucProtocolActionType.ADMINISTRATIVE_CORRECTION;
         }
         return new IacucProtocolAction((IacucProtocol) protocol, (IacucProtocolSubmission) protocolSubmission, protocolActionTypeCode);
     }
@@ -203,36 +219,36 @@ public class IacucProtocolDocument extends ProtocolDocument {
     }
 
     @Override
-    protected Class<? extends Protocol> getProtocolBOClassHook() {
+    protected Class<? extends ProtocolBase> getProtocolBOClassHook() {
         return IacucProtocol.class;
     }
 
-    @Override
+
     protected ProtocolFinderDao getProtocolFinderDaoHook() {
         return KraServiceLocator.getService(IacucProtocolFinderDao.class);
     }
 
-    @Override
+
     protected ProtocolVersionService getProtocolVersionServiceHook() {
         return KraServiceLocator.getService(IacucProtocolVersionService.class);
     }
 
-    @Override
+
     protected String getProtocolActionTypeApprovedHook() {
         return IacucProtocolActionType.IACUC_APPROVED;
     }
 
-    @Override
+
     protected String getProtocolStatusExemptHook() {
         return IacucProtocolStatus.ADMINISTRATIVELY_INCOMPLETE;
     }
 
-    @Override
+
     protected String getProtocolStatusActiveOpenToEnrollmentHook() {
         return IacucProtocolStatus.ACTIVE;
     }
 
-    @Override
+
     protected String getListOfStatusEligibleForMergingHook() {
       StringBuffer listOfStatusEligibleForMerging = new StringBuffer(); 
       listOfStatusEligibleForMerging.append(IacucProtocolStatus.SUBMITTED_TO_IACUC);
@@ -290,8 +306,99 @@ public class IacucProtocolDocument extends ProtocolDocument {
     }
 
     @Override
-    protected Class<? extends ResearchArea> getResearchAreaBoClassHook() {
+    protected Class<? extends ResearchAreaBase> getResearchAreaBoClassHook() {
         return IacucResearchArea.class;
+    }
+    
+    
+    /**
+     * Merge the amendment into the original protocol.  Actually, we must first make a new
+     * version of the original and then merge the amendment into that new version.
+     * Also merge changes into any versions of the protocol that are being amended/renewed.
+     * @param protocolStatusCode
+     * @throws Exception
+     */
+    protected void mergeAmendment(String protocolStatusCode, String type) {
+        ProtocolBase currentProtocol = getProtocolFinderDaoHook().findCurrentProtocolByNumber(getOriginalProtocolNumber());
+        final ProtocolDocumentBase newProtocolDocument;
+        try {
+            // workflowdocument is null, so need to use documentservice to retrieve it
+            currentProtocol.setProtocolDocument((ProtocolDocumentBase)getDocumentService().getByDocumentHeaderId(currentProtocol.getProtocolDocument().getDocumentNumber()));
+            currentProtocol.setMergeAmendment(true);
+            newProtocolDocument = getProtocolVersionServiceHook().versionProtocolDocument(currentProtocol.getProtocolDocument());
+        } catch (Exception e) {
+            throw new ProtocolMergeException(e);
+        }
+        
+        newProtocolDocument.getProtocol().merge(getProtocol());
+        getProtocol().setProtocolStatusCode(protocolStatusCode);
+        
+        ProtocolActionBase action = getNewProtocolActionInstanceHook(newProtocolDocument.getProtocol(), null, getProtocolActionTypeApprovedHook()); 
+        action.setComments(type + "-" + getProtocolNumberIndex() + ": Approved");
+        newProtocolDocument.setProtocolWorkflowType(ProtocolWorkflowType.APPROVED);
+        newProtocolDocument.getProtocol().getProtocolActions().add(action);
+        if (!currentProtocol.getProtocolStatusCode().equals(getProtocolStatusExemptHook())) {
+            newProtocolDocument.getProtocol().setProtocolStatusCode(getProtocolStatusActiveOpenToEnrollmentHook());
+        }
+        try {
+            getDocumentService().saveDocument(newProtocolDocument);
+            // blanket approve to make the new protocol document 'final'
+            newProtocolDocument.getDocumentHeader().getWorkflowDocument().route(type + "-" + getProtocolNumberIndex() + ": merged");
+        } catch (WorkflowException e) {
+            throw new ProtocolMergeException(e);
+        }
+        
+        this.getProtocol().setActive(false);
+        
+        // now that we've updated the approved protocol, we must find all others under modification and update them too.
+        for (ProtocolBase otherProtocol: getProtocolFinderDaoHook().findProtocols(getOriginalProtocolNumber())) {
+            String status = otherProtocol.getProtocolStatus().getProtocolStatusCode();
+            if (isEligibleForMerging(status, otherProtocol)) {
+                // then this protocol version is being amended so push changes to it
+                otherProtocol.merge(getProtocol(), false);
+                action = getNewProtocolActionInstanceHook(otherProtocol, null, protocolStatusCode);
+                action.setComments(type + "-" + getProtocolNumberIndex() + ": Merged");
+                otherProtocol.getProtocolActions().add(action);
+                getBusinessObjectService().save(otherProtocol);
+            }
+        }
+
+        finalizeAttachmentProtocol(this.getProtocol());
+        getBusinessObjectService().save(this);
+    }
+    
+    
+    protected boolean isEligibleForMerging(String status, ProtocolBase otherProtocol) {
+        return getListOfStatusEligibleForMergingHook().contains(status) && !StringUtils.equals(this.getProtocol().getProtocolNumber(), otherProtocol.getProtocolNumber());
+    }
+
+    @Override
+    public List<? extends DocumentCustomData> getDocumentCustomData() {
+        return getIacucProtocol().getIacucProtocolCustomDataList();
+    }
+
+    @Override
+    protected Class<? extends ProtocolGenericActionService> getProtocolGenericActionServiceClassHook() {
+        return IacucProtocolGenericActionService.class;
+    }
+
+    @Override
+    protected ProtocolNotification getNewProtocolNotificationInstanceHook() {
+        return new IacucProtocolNotification();
+    }
+
+    @Override
+    protected ProtocolNotificationContextBase getDisapproveNotificationContextHook(ProtocolBase protocol) {        
+        return new IacucProtocolNotificationContext((IacucProtocol) protocol, 
+                                                     IacucProtocolActionType.IACUC_DISAPPROVED, 
+                                                     DISAPPROVED_CONTEXT_NAME,
+                                                     new IacucProtocolNotificationRenderer((IacucProtocol) protocol)
+                                                    );
+    }
+
+    @Override
+    protected String getCommitteeDisapprovedStatusCodeHook() {
+        return IacucProtocolStatus.DISAPPROVED;
     }
 
 }

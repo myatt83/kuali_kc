@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -76,6 +76,16 @@ public interface AwardService {
      * @return
      */
     Award getActiveOrNewestAward(String awardNumber);
+    
+    
+    /**
+     * This method is to synch custom attributes. During copy process only existing custom attributes
+     * available in the old document is copied. We need to make sure we have all the latest custom attributes
+     * tied to the new document.
+     * @param newAward
+     * @param oldAward
+     */
+    public void synchNewCustomAttributes(Award newAward, Award oldAward);
     
     
 }

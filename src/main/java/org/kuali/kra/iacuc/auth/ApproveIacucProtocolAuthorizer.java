@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,7 @@
  */
 package org.kuali.kra.iacuc.auth;
 
-import org.kuali.kra.common.committee.bo.CommitteeDecisionMotionType;
 import org.kuali.kra.iacuc.actions.IacucProtocolAction;
-import org.kuali.kra.iacuc.actions.IacucProtocolActionType;
 import org.kuali.kra.iacuc.actions.submit.IacucProtocolSubmission;
 import org.kuali.kra.infrastructure.PermissionConstants;
 
@@ -38,14 +36,7 @@ public class ApproveIacucProtocolAuthorizer extends IacucProtocolAuthorizer {
     }
     
     private boolean canPerform(IacucProtocolAction lastAction, IacucProtocolSubmission lastSubmission) {
-        boolean canPerform = false;
-        
-        if (lastAction != null && lastSubmission != null) {
-            canPerform = IacucProtocolActionType.RECORD_COMMITTEE_DECISION.equals(lastAction.getProtocolActionTypeCode()) 
-                      && CommitteeDecisionMotionType.APPROVE.equals(lastSubmission.getCommitteeDecisionMotionTypeCode());
-        }
-        
-        return canPerform;
+        return canPerformApproval(lastAction, lastSubmission);
     }
-    
+
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,7 @@ public class AwardUnitContact extends AwardContact {
     private UnitAdministratorType unitAdministratorType;
     private String unitAdministratorTypeCode;
     private String unitAdministratorUnitNumber;
+    private boolean defaultUnitContact;
 
 
     /**
@@ -84,28 +85,28 @@ public class AwardUnitContact extends AwardContact {
     }
     
     /**
-     * Sets the personId attribute value.
-     * @param personId The personId to set.
+     * @see org.kuali.kra.award.contacts.AwardContact#setPersonId(java.lang.String)
      */
+    @Override
     public void setPersonId(String personId) {    
         super.setPersonId(personId);
         if (getPerson() != null && getPerson().getUnit() != null) {
             this.setUnitAdministratorUnitNumber(getPerson().getUnit().getUnitNumber());
         }
     }
+
+    /**
+     * @see org.kuali.kra.award.contacts.AwardContact#setPerson(org.kuali.kra.bo.KcPerson)
+     */
+    @Override
+    public void setPerson(KcPerson person) {
+        super.setPerson(person);
+        if (getPerson() != null && getPerson().getUnit() != null) {
+            this.setUnitAdministratorUnitNumber(getPerson().getUnit().getUnitNumber());
+        }        
+    }    
     
-    public String getUnitAdministratorUnitNumberByPersonId() {
-//        String unitAdministratorUnitNumber = null;
-//        List<UnitAdministrator> unitAdministrators = unitAdministratorType.getUnitAdministrators();
-//        for(UnitAdministrator unitAdministrator : unitAdministrators) {
-//            if (unitAdministrator.getUnitNumber() == getAward().getLeadUnitNumber() &&
-//                    unitAdministrator.getPersonId() == getPerson().getPersonId()) {
-//                unitAdministratorUnitNumber = unitAdministrator.getUnitNumber();
-//            }
-//        }
-//        return unitAdministratorUnitNumber;    
-//    }
-//    
+    public String getUnitAdministratorUnitNumberByPersonId() { 
             Map<String, String> criteria = new HashMap<String, String>();
             criteria.put("unitNumber", getAward().getLeadUnitNumber());
             criteria.put("personId", getPerson().getPersonId());
@@ -226,5 +227,13 @@ public class AwardUnitContact extends AwardContact {
     @Override
     protected String getContactRoleTypeIdentifier() {
         return  getUnitContactType() == UnitContactType.ADMINISTRATOR ? UNIT_ADMINISTRATOR_TYPE_CODE : CONTACT_TYPE_CODE;
+    }
+
+    public boolean isDefaultUnitContact() {
+        return defaultUnitContact;
+    }
+
+    public void setDefaultUnitContact(boolean defaultUnitContact) {
+        this.defaultUnitContact = defaultUnitContact;
     }
 }

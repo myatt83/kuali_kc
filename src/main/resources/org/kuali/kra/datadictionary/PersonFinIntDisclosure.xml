@@ -1,5 +1,5 @@
 <!--
- Copyright 2005-2010 The Kuali Foundation
+ Copyright 2005-2013 The Kuali Foundation
  
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -48,11 +48,14 @@
                 <ref bean="FinancialEntity-entityTypeCode" />
                 <ref bean="FinancialEntity-entityOwnershipType" />
                 <ref bean="FinancialEntity-relationshipTypeCode" />
-                <ref bean="FinancialEntity-relationshipDescription" />
                 <ref bean="FinancialEntity-relatedToOrganizationFlag" />
                 <ref bean="FinancialEntity-orgRelationDescription" />
                 <ref bean="FinancialEntity-principalBusinessActivity" />
                 <ref bean="FinancialEntity-sponsorCode" />
+                <ref bean="FinancialEntity-entitySponsorsResearch" />
+                <ref bean="FinancialEntity-studentInvolvement" />
+                <ref bean="FinancialEntity-staffInvolvement" />
+                <ref bean="FinancialEntity-facilityUse" />
                 <ref bean="FinancialEntity-versionNumber" />
          		<ref bean="Sponsor-sponsorName" />
             </list>
@@ -255,25 +258,6 @@
         <property name="description" value="Relationship Type Code" />
     </bean>
 
-    <bean id="FinancialEntity-relationshipDescription" parent="FinancialEntity-relationshipDescription-parentBean" />
-    <bean id="FinancialEntity-relationshipDescription-parentBean" abstract="true" parent="AttributeDefinition" >
-        <property name="name" value="relationshipDescription" />
-        <property name="forceUppercase" value="false" />
-        <property name="label" value="Relationship Description" />
-        <property name="shortLabel" value="Relationship Description" />
-        <property name="maxLength" value="2000" />
-        <property name="validationPattern" >
-            <bean parent="AnyCharacterValidationPattern" p:allowWhitespace="true" />
-        </property>
-		<property name="control" >
-      		<bean parent="TextareaControlDefinition"
-            	p:rows="3"
-            	p:cols="60" />
-		</property>
-        <property name="summary" value="Relationship Description" />
-        <property name="description" value="Relationship Description" />
-    </bean>
-
     <bean id="FinancialEntity-relatedToOrganizationFlag" parent="FinancialEntity-relatedToOrganizationFlag-parentBean" />
     <bean id="FinancialEntity-relatedToOrganizationFlag-parentBean" abstract="true" parent="AttributeReferenceDummy-genericBoolean" >
         <property name="name" value="relatedToOrganizationFlag" />
@@ -306,8 +290,8 @@
     <bean id="FinancialEntity-principalBusinessActivity-parentBean" abstract="true" parent="AttributeDefinition" >
         <property name="name" value="principalBusinessActivity" />
         <property name="forceUppercase" value="false" />
-        <property name="label" value="Entity Principal Business/Activity" />
-        <property name="shortLabel" value="Entity Principal Business/Activity" />
+        <property name="label" value="Describe the entity's area of business and your relationship to it" />
+        <property name="shortLabel" value="Desc the entity's business and your relationship " />
         <property name="maxLength" value="2000" />
         <property name="required" value="true" />
         <property name="validationPattern" >
@@ -318,8 +302,8 @@
                 p:rows="3"
                 p:cols="60" />
         </property>
-        <property name="summary" value="Entity Principal Business/Activity" />
-        <property name="description" value="Entity Principal Business/Activity" />
+        <property name="summary" value="Describe the entity's area of business and your relationship to it" />
+        <property name="description" value="Describe the entity's area of business and your relationship to it" />
     </bean>
 
     <bean id="FinancialEntity-sponsorCode" parent="FinancialEntity-sponsorCode-parentBean" />
@@ -338,6 +322,84 @@
         </property>
         <property name="summary" value="Sponsor Code" />
         <property name="description" value="Sponsor Code" />
+    </bean>
+    
+  <bean id="FinancialEntity-entitySponsorsResearch" parent="FinancialEntity-entitySponsorsResearch-parentBean" />
+  <bean id="FinancialEntity-entitySponsorsResearch-parentBean" abstract="true" parent="AttributeDefinition">
+    <property name="name" value="entitySponsorsResearch" />
+    <property name="forceUppercase" value="false" />
+    <property name="label" value="Does this entity sponsor any of your research?" />
+    <property name="shortLabel" value="Entity Sponsor Research?" />
+    <property name="maxLength" value="1" />
+    <property name="required" value="true"/>
+    <property name="validationPattern" >
+      <bean parent="AnyCharacterValidationPattern"
+            p:exactLength="1" />
+    </property>
+    <property name="control" >
+      <bean parent="RadioControlDefinition"
+            p:valuesFinderClass="org.kuali.kra.lookup.keyvalue.YnqAnswersValuesFinder"
+            p:includeKeyInLabel="false" />
+    </property>
+    <property name="summary" value="Does this entity sponsor any of your research?" />
+    <property name="description" value="Does this entity sponsor any of your research?" />
+  </bean> 
+  
+    <bean id="FinancialEntity-studentInvolvement" parent="FinancialEntity-studentInvolvement-parentBean" />
+    <bean id="FinancialEntity-studentInvolvement-parentBean" abstract="true" parent="AttributeDefinition" >
+        <property name="name" value="studentInvolvement" />
+        <property name="forceUppercase" value="false" />
+        <property name="label" value="Explain any involvement of students under your direction at this institution with this entity" />
+        <property name="shortLabel" value="Explain students involvement" />
+        <property name="maxLength" value="4000" />
+        <property name="validationPattern" >
+            <bean parent="AnyCharacterValidationPattern" p:allowWhitespace="true" />
+        </property>
+        <property name="control" >
+            <bean parent="TextareaControlDefinition"
+                p:rows="3"
+                p:cols="80" />
+        </property>
+        <property name="summary" value="Explain any involvement of students under your direction at this institution with this entity" />
+        <property name="description" value="Explain any involvement of students under your direction at this institution with this entity" />
+    </bean>
+    
+    <bean id="FinancialEntity-staffInvolvement" parent="FinancialEntity-staffInvolvement-parentBean" />
+    <bean id="FinancialEntity-staffInvolvement-parentBean" abstract="true" parent="AttributeDefinition" >
+        <property name="name" value="staffInvolvement" />
+        <property name="forceUppercase" value="false" />
+        <property name="label" value="Explain any involvement of staff or subordinates under your direction at this institution with this entity" />
+        <property name="shortLabel" value="Explain staff involvement" />
+        <property name="maxLength" value="4000" />
+        <property name="validationPattern" >
+            <bean parent="AnyCharacterValidationPattern" p:allowWhitespace="true" />
+        </property>
+        <property name="control" >
+            <bean parent="TextareaControlDefinition"
+                p:rows="3"
+                p:cols="80" />
+        </property>
+        <property name="summary" value="Explain any involvement of staff or subordinates under your direction at this institution with this entity" />
+        <property name="description" value="Explain any involvement of staff or subordinates under your direction at this institution with this entity" />
+    </bean>
+    
+    <bean id="FinancialEntity-facilityUse" parent="FinancialEntity-facilityUse-parentBean" />
+    <bean id="FinancialEntity-facilityUse-parentBean" abstract="true" parent="AttributeDefinition" >
+        <property name="name" value="facilityUse" />
+        <property name="forceUppercase" value="false" />
+        <property name="label" value="Explain any use of institutional resources and/or facilities relating to your work with this entity" />
+        <property name="shortLabel" value="Explain students involvement" />
+        <property name="maxLength" value="4000" />
+        <property name="validationPattern" >
+            <bean parent="AnyCharacterValidationPattern" p:allowWhitespace="true" />
+        </property>
+        <property name="control" >
+            <bean parent="TextareaControlDefinition"
+                p:rows="3"
+                p:cols="80" />
+        </property>
+        <property name="summary" value="Explain any use of institutional resources and/or facilities relating to your work with this entity" />
+        <property name="description" value="Explain any use of institutional resources and/or facilities relating to your work with this entity" />
     </bean>
 
     <bean id="FinancialEntity-versionNumber" parent="FinancialEntity-versionNumber-parentBean" />
@@ -378,8 +440,6 @@
                                 p:attributeName="entityOwnershipType" />
                             <bean parent="FieldDefinition"
                                 p:attributeName="relationshipTypeCode" />
-                            <bean parent="FieldDefinition"
-                                p:attributeName="relationshipDescription" />
                             <bean parent="FieldDefinition"
                                 p:attributeName="relatedToOrganizationFlag" />
                             <bean parent="FieldDefinition"
@@ -431,8 +491,6 @@
                 <bean parent="FieldDefinition"
                     p:attributeName="relationshipTypeCode" />
                 <bean parent="FieldDefinition"
-                    p:attributeName="relationshipDescription" />
-                <bean parent="FieldDefinition"
                     p:attributeName="relatedToOrganizationFlag" />
                 <bean parent="FieldDefinition"
                     p:attributeName="orgRelationDescription" />-->
@@ -463,8 +521,6 @@
                     p:attributeName="entityOwnershipType" />
                 <bean parent="FieldDefinition"
                     p:attributeName="relationshipTypeCode" />
-                <bean parent="FieldDefinition"
-                    p:attributeName="relationshipDescription" />
                 <bean parent="FieldDefinition"
                     p:attributeName="relatedToOrganizationFlag" />
                 <bean parent="FieldDefinition"

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import java.io.Serializable;
 
 import org.kuali.kra.iacuc.actions.IacucProtocolActionBean;
 import org.kuali.kra.infrastructure.KraServiceLocator;
-import org.kuali.kra.protocol.actions.ActionHelper;
+import org.kuali.kra.protocol.actions.ActionHelperBase;
 
 public class IacucProtocolAssignCmtBean extends  IacucProtocolActionBean implements Serializable {
 
@@ -38,7 +38,7 @@ public class IacucProtocolAssignCmtBean extends  IacucProtocolActionBean impleme
         }
     }
     
-    public IacucProtocolAssignCmtBean(ActionHelper actionHelper) {
+    public IacucProtocolAssignCmtBean(ActionHelperBase actionHelper) {
         super(actionHelper);
     }
 

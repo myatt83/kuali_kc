@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package org.kuali.kra.irb.actions.undo;
 
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;
@@ -38,7 +39,7 @@ import org.kuali.kra.irb.actions.assignagenda.ProtocolAssignToAgendaBean;
 import org.kuali.kra.irb.actions.assignagenda.ProtocolAssignToAgendaService;
 import org.kuali.kra.irb.actions.genericactions.ProtocolGenericActionBean;
 import org.kuali.kra.irb.actions.genericactions.ProtocolGenericActionService;
-import org.kuali.kra.irb.actions.notifyirb.ProtocolActionAttachment;
+// import org.kuali.kra.irb.actions.notifyirb.ProtocolActionAttachment;
 import org.kuali.kra.irb.actions.request.ProtocolRequestBean;
 import org.kuali.kra.irb.actions.request.ProtocolRequestService;
 import org.kuali.kra.irb.actions.submit.ProtocolActionService;
@@ -50,7 +51,9 @@ import org.kuali.kra.irb.actions.submit.ProtocolSubmissionStatus;
 import org.kuali.kra.irb.actions.submit.ProtocolSubmissionType;
 import org.kuali.kra.irb.actions.submit.ProtocolSubmitAction;
 import org.kuali.kra.irb.actions.submit.ProtocolSubmitActionService;
+import org.kuali.kra.irb.questionnaire.IrbSubmissionQuestionnaireHelper;
 import org.kuali.kra.irb.test.ProtocolFactory;
+import org.kuali.kra.protocol.actions.notify.ProtocolActionAttachment;
 import org.kuali.kra.questionnaire.answer.AnswerHeader;
 import org.kuali.kra.test.infrastructure.KcUnitTestBase;
 import org.kuali.kra.util.DateUtils;
@@ -430,9 +433,9 @@ public class UndoLastActionServiceTest extends KcUnitTestBase {
             allowing(bean).getComments();
             will(returnValue(COMMENTS));
             
-            allowing(bean).setActionsPerformed(protocol.getProtocolActions());
+            allowing(bean).setActionsPerformed((List)protocol.getProtocolActions());
             
-            allowing(bean).getLastPerformedAction();
+            allowing(bean).getLastAction();
             will(returnValue(protocol.getLastProtocolAction()));
         }});
         
@@ -455,6 +458,8 @@ public class UndoLastActionServiceTest extends KcUnitTestBase {
     
     private ProtocolRequestBean getMockProtocolRequestBean(final String protocolActionTypeCode, final String submissionTypeCode, final String beanName) {
         final ProtocolRequestBean bean = context.mock(ProtocolRequestBean.class);
+        final Protocol protocol = new Protocol();
+        protocol.setProtocolNumber("13049581");
         
         context.checking(new Expectations() {{
             allowing(bean).getProtocolActionTypeCode();
@@ -474,9 +479,9 @@ public class UndoLastActionServiceTest extends KcUnitTestBase {
             
             allowing(bean).getActionAttachments();
             will(returnValue(new ArrayList<ProtocolActionAttachment>()));
-
-            allowing(bean).getAnswerHeaders();
-            will(returnValue(new ArrayList<AnswerHeader>()));
+            
+            allowing(bean).getQuestionnaireHelper();
+            will(returnValue(new IrbSubmissionQuestionnaireHelper(protocol, protocolActionTypeCode, null, false)));
         }});
         
         return bean;

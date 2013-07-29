@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,6 +45,7 @@ import org.kuali.rice.kim.api.identity.PersonService;
 import org.kuali.rice.krad.UserSession;
 import org.kuali.rice.krad.service.BusinessObjectService;
 import org.kuali.rice.krad.util.GlobalVariables;
+import org.kuali.rice.krad.util.ObjectUtils;
 
 public class ActivePendingTransactionsServiceImpl implements ActivePendingTransactionsService {
     
@@ -66,16 +67,9 @@ public class ActivePendingTransactionsServiceImpl implements ActivePendingTransa
         List<Award> awardItems = new ArrayList<Award>();
         List<TransactionDetail> transactionDetailItems = new ArrayList<TransactionDetail>();
         replaceSessionWithRoutedBy(doc);//replace usersession so update user is logged in user rather than kr.
-        //if Single node, we don't need to process transactions since they have already been processed when created.
-        //if (doc.getAwardHierarchyNodes().size() > 1) {
-            List<AwardAmountTransaction> awardAmountTransactions = processTransactions(doc, newAwardAmountTransaction,
-                    awardAmountTransactionItems, awardItems, transactionDetailItems, false);
-            performSave(doc, transactionDetailItems, awardItems, awardAmountTransactions);
-        //}else {
-            //businessObjectService.save(transactionDetailItems);
-            //businessObjectService.save(awardItems);
-            //businessObjectService.save(doc);
-        //}
+        List<AwardAmountTransaction> awardAmountTransactions = processTransactions(doc, newAwardAmountTransaction,
+                awardAmountTransactionItems, awardItems, transactionDetailItems, false);
+        performSave(doc, transactionDetailItems, awardItems, awardAmountTransactions);
     }
 
     /**
@@ -95,9 +89,9 @@ public class ActivePendingTransactionsServiceImpl implements ActivePendingTransa
         List<PendingTransaction> pendingTransactionsToBeDeleted = new ArrayList<PendingTransaction>();
         updatedPendingTransactions.addAll(doc.getPendingTransactions());
         
+        Map<String, AwardHierarchyNode> awardHierarchyNodes = doc.getAwardHierarchyNodes();
         for(PendingTransaction pendingTransaction: doc.getPendingTransactions()){
-            if(pendingTransaction.getProcessedFlag() == false) {
-                Map<String, AwardHierarchyNode> awardHierarchyNodes = doc.getAwardHierarchyNodes();
+            if (pendingTransaction.getProcessedFlag() == false) {
                 AwardHierarchyNode sourceAwardNode = awardHierarchyNodes.get(pendingTransaction.getSourceAwardNumber());
                 AwardHierarchyNode destinationAwardNode = awardHierarchyNodes.get(pendingTransaction.getDestinationAwardNumber());            
                 AwardHierarchyNode parentNode = new AwardHierarchyNode();
@@ -897,7 +891,6 @@ public class ActivePendingTransactionsServiceImpl implements ActivePendingTransa
         newAwardAmountInfo.setAnticipatedChangeDirect(pendingTransaction.getAnticipatedDirectAmount());
         newAwardAmountInfo.setAnticipatedChangeIndirect(pendingTransaction.getAnticipatedIndirectAmount());
 
-        
         //updateAmountFields(updateAmounts, addOrSubtract, pendingTransaction, awardAmountInfo, newAwardAmountInfo);
         
         addAwardAmountTransaction(newAwardAmountInfo.getAwardNumber(), awardAmountTransactionItems, newAwardAmountTransaction, documentNumber);
@@ -1294,9 +1287,12 @@ public class ActivePendingTransactionsServiceImpl implements ActivePendingTransa
      */
     protected UserSession replaceSessionWithRoutedBy(TimeAndMoneyDocument doc) {
         String routedByUserId = doc.getDocumentHeader().getWorkflowDocument().getRoutedByPrincipalId();
-        Person person = getPersonService().getPerson(routedByUserId);
         UserSession oldSession = GlobalVariables.getUserSession();
-        GlobalVariables.setUserSession(new UserSession(person.getPrincipalName()));
+
+        if (ObjectUtils.isNotNull(routedByUserId)) {
+            Person person = getPersonService().getPerson(routedByUserId);
+            GlobalVariables.setUserSession(new UserSession(person.getPrincipalName()));
+        }
         return oldSession;
     }
     

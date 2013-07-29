@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,33 +22,16 @@ import org.kuali.kra.bo.versioning.VersionHistory;
 import org.kuali.kra.bo.versioning.VersionStatus;
 
 public interface VersionHistoryService {
-    
+
     /**
-     * Create a new VersiionHistory entry
+     * Update or create the version history to the appropriate status. If versionStatus is Active, then all other
+     * active versions are set to archived.
      * @param sequenceOwner
      * @param versionStatus
      * @param userId
      * @return
      */
-    VersionHistory createVersionHistory(SequenceOwner<? extends SequenceOwner<?>> sequenceOwner, VersionStatus versionStatus, String userId);
-    
-    /**
-     * Create a new VersiionHistory entry
-     * @param sequenceOwner
-     * @param versionStatus
-     * @param userId
-     * @return
-     */
-    VersionHistory updateVersionHistoryOnRouteToFinal(SequenceOwner<? extends SequenceOwner<?>> sequenceOwner, VersionStatus versionStatus, String userId);
-    
-    /**
-     * Create a new VersiionHistory entry
-     * @param sequenceOwner
-     * @param versionStatus
-     * @param userId
-     * @return
-     */
-    VersionHistory updateVersionHistoryOnCancel(SequenceOwner<? extends SequenceOwner<?>> sequenceOwner, VersionStatus versionStatus, String userId);
+    VersionHistory updateVersionHistory(SequenceOwner<? extends SequenceOwner<?>> sequenceOwner, VersionStatus versionStatus, String userId);
     
     /**
      * Find the active VersionHistory for a given SequenceOwner type and version name
@@ -86,5 +69,28 @@ public interface VersionHistoryService {
      * @param versionName
      * @return
      */
-    VersionHistory findPendingVersion(Class<? extends SequenceOwner> klass, String versionName);    
+    VersionHistory findPendingVersion(Class<? extends SequenceOwner> klass, String versionName);
+    
+    /**
+     * Find version histories without fetching the sequence owner. If you need sequence owner included in history list, use loadVersionHistory() method.
+     * @param klass
+     * @param versionName
+     * @return
+     */
+    List<VersionHistory> findVersionHistory(Class<? extends SequenceOwner> klass, String versionName);
+
+    /**
+     * 
+     * This method will load the appropriate sequenceOwner to the VersionHistory
+     * @param versionHistory
+     */
+    void loadSequenceOwner(Class<? extends SequenceOwner> klass,VersionHistory versionHistory);
+    
+    /**
+     * Finds the active(current FINAL version) or the newest version of the sequence owner if an active version does not exist.
+     * @param klass
+     * @param versionName
+     * @return
+     */
+    VersionHistory getActiveOrNewestVersion(Class<? extends SequenceOwner> klass, String versionName);
 }

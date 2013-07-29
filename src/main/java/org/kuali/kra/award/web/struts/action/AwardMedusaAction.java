@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,6 +40,7 @@ public class AwardMedusaAction extends AwardAction {
             awardForm.getMedusaBean().setMedusaViewRadio("0");
             awardForm.getMedusaBean().setModuleName("award");
             awardForm.getMedusaBean().setModuleIdentifier(awardForm.getAwardDocument().getAward().getAwardId());
+            awardForm.getMedusaBean().generateParentNodes();
             return mapping.findForward(Constants.MAPPING_AWARD_MEDUSA_PAGE);}
     public ActionForward refreshView(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
         

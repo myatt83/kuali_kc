@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ import org.kuali.kra.irb.actions.submit.ProtocolSubmission;
 import org.kuali.kra.irb.actions.submit.ProtocolSubmissionStatus;
 import org.kuali.kra.irb.onlinereview.ProtocolOnlineReviewService;
 import org.kuali.kra.meeting.CommitteeScheduleMinute;
+import org.kuali.kra.protocol.actions.submit.ProtocolSubmissionBase;
 import org.kuali.rice.krad.service.BusinessObjectService;
 
 /**
@@ -93,11 +94,29 @@ public class ProtocolAssignCmtSchedServiceImpl implements ProtocolAssignCmtSched
      * @see org.kuali.kra.irb.actions.assigncmtsched.ProtocolAssignCmtSchedService#assignToCommitteeAndSchedule(org.kuali.kra.irb.Protocol, org.kuali.kra.irb.actions.assigncmtsched.ProtocolAssignCmtSchedBean)
      */
     public void assignToCommitteeAndSchedule(Protocol protocol, ProtocolAssignCmtSchedBean actionBean) throws Exception {
-        ProtocolSubmission submission = findSubmission(protocol);
+        assignToCommitteeAndSchedule(protocol, actionBean, false);
+    }
+    
+    @Override
+    public void assignToCommitteeAndSchedulePostAgendaAssignment(Protocol protocol, ProtocolAssignCmtSchedBean cmtAssignBean) throws Exception {
+        assignToCommitteeAndSchedule(protocol, cmtAssignBean, true);
+    }
+    
+    // refactored common code for assigning protocol to a committee and schedule, with conditional logic based on the isPostAgendaAssignment parameter
+    private void assignToCommitteeAndSchedule(Protocol protocol, ProtocolAssignCmtSchedBean actionBean, boolean isPostAgendaAssignment) throws Exception {
+        ProtocolSubmission submission = null;
+        // we will include in-agenda submissions in our search depending on the parameter value
+        if(isPostAgendaAssignment) {
+            submission = findSubmissionIncludingInAgenda(protocol);
+        }
+        else {
+            submission = findSubmission(protocol);
+        }
         if (submission != null) {
-
             setSchedule(submission, actionBean.getNewCommitteeId(), actionBean.getNewScheduleId());
-            submission.setSubmissionStatusCode(ProtocolSubmissionStatus.SUBMITTED_TO_COMMITTEE);
+            if(!isPostAgendaAssignment) {
+                submission.setSubmissionStatusCode(ProtocolSubmissionStatus.SUBMITTED_TO_COMMITTEE);
+            }
             protocol.refreshReferenceObject("protocolStatus");
             //Lets migrate the review comments
             if (actionBean.scheduleHasChanged() && 
@@ -115,19 +134,18 @@ public class ProtocolAssignCmtSchedServiceImpl implements ProtocolAssignCmtSched
     }
 
     private void updateSubmission(Protocol protocol, ProtocolAssignCmtSchedBean actionBean) {
-        for (ProtocolSubmission submission : protocol.getProtocolSubmissions()) {
+        for (ProtocolSubmissionBase submission : protocol.getProtocolSubmissions()) {
             if (submission.getSubmissionNumber().equals(protocol.getLastProtocolAction().getSubmissionNumber())) {
-                setSchedule(submission, actionBean.getNewCommitteeId(), actionBean.getNewScheduleId());
+                setSchedule((ProtocolSubmission)submission, actionBean.getNewCommitteeId(), actionBean.getNewScheduleId());
                 break;
             }
         }
     }
     
     private void addNewAction(Protocol protocol, ProtocolAssignCmtSchedBean actionBean) {
-        ProtocolAction lastAction = protocol.getLastProtocolAction();
+        ProtocolAction lastAction = (ProtocolAction)protocol.getLastProtocolAction();
         ProtocolAction newAction = new ProtocolAction();
         // deep copy will replaced the last action with the new one after save
-       // ProtocolAction newAction = (ProtocolAction)ObjectUtils.deepCopy(protocol.getLastProtocolAction());
         newAction.setActionId(protocol.getNextValue(NEXT_ACTION_ID_KEY));
         newAction.setActualActionDate(new Timestamp(System.currentTimeMillis()));
         newAction.setActionDate(new Timestamp(System.currentTimeMillis()));
@@ -148,17 +166,40 @@ public class ProtocolAssignCmtSchedServiceImpl implements ProtocolAssignCmtSched
      * @return
      */
     protected ProtocolSubmission findSubmission(Protocol protocol) {
+        return findSubmission(protocol, false);
+    }
+    
+    
+    /**
+     * Find the submission.  It is the submission that is either currently pending or
+     * already submitted to a committee, or is in agenda.
+     * @param protocol
+     * @return
+     */
+    protected ProtocolSubmission findSubmissionIncludingInAgenda(Protocol protocol) {
+        return findSubmission(protocol, true);
+    }
+    
+    /**
+     * Find the submission.  It is the submission that is either currently pending or
+     * already submitted to a committee, or is in agenda if the includeInAgenda parameter is set. 
+     * @param protocol
+     * @return
+     */
+    private ProtocolSubmission findSubmission(Protocol protocol, boolean includeInAgenda) {
         // need to loop thru to find the last submission.
         // it may have submit/Wd/notify irb/submit, and this will cause problem if don't loop thru.
         ProtocolSubmission protocolSubmission = null;
-        for (ProtocolSubmission submission : protocol.getProtocolSubmissions()) {
-            if (StringUtils.equals(submission.getSubmissionStatusCode(), ProtocolSubmissionStatus.PENDING) ||
-                StringUtils.equals(submission.getSubmissionStatusCode(), ProtocolSubmissionStatus.SUBMITTED_TO_COMMITTEE)) {
-                protocolSubmission = submission;
+        for (ProtocolSubmissionBase submission : protocol.getProtocolSubmissions()) {
+            if ( StringUtils.equals(submission.getSubmissionStatusCode(), ProtocolSubmissionStatus.PENDING) 
+                 ||
+                 StringUtils.equals(submission.getSubmissionStatusCode(), ProtocolSubmissionStatus.SUBMITTED_TO_COMMITTEE) 
+                 ||
+                 (includeInAgenda && StringUtils.equals(submission.getSubmissionStatusCode(), ProtocolSubmissionStatus.IN_AGENDA)) ) {
+                protocolSubmission = (ProtocolSubmission)submission;
             }
         }
         return protocolSubmission;
-
     }
     
     /**
@@ -173,7 +214,7 @@ public class ProtocolAssignCmtSchedServiceImpl implements ProtocolAssignCmtSched
             submission.setCommitteeSchedule(null);
         }
         else {
-            CommitteeSchedule schedule = committeeService.getCommitteeSchedule(submission.getCommittee(), scheduleId);
+            CommitteeSchedule schedule = committeeService.getCommitteeSchedule((Committee)submission.getCommittee(), scheduleId);
             if (schedule == null) {
                 submission.setScheduleId(null);
                 submission.setScheduleIdFk(null);
@@ -197,7 +238,6 @@ public class ProtocolAssignCmtSchedServiceImpl implements ProtocolAssignCmtSched
     protected void updateDefaultSchedule(ProtocolSubmission submission) {
         Map<String, String> fieldValues = new HashMap<String, String>();
         fieldValues.put("protocolIdFk", submission.getProtocolId().toString());
-//        fieldValues.put("scheduleIdFk", CommitteeSchedule.DEFAULT_SCHEDULE_ID.toString());
         List<CommitteeScheduleMinute> minutes = (List<CommitteeScheduleMinute>) businessObjectService.findMatching(CommitteeScheduleMinute.class, fieldValues);
         if (!minutes.isEmpty()) {
             for (CommitteeScheduleMinute minute : minutes) {
@@ -231,4 +271,6 @@ public class ProtocolAssignCmtSchedServiceImpl implements ProtocolAssignCmtSched
             return true;
         }
     }
+
+   
 }

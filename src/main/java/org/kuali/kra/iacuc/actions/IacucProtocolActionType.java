@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,9 @@ package org.kuali.kra.iacuc.actions;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.kuali.kra.protocol.actions.ProtocolActionType;
+import org.kuali.kra.protocol.actions.ProtocolActionTypeBase;
 
-public class IacucProtocolActionType extends ProtocolActionType { 
+public class IacucProtocolActionType extends ProtocolActionTypeBase { 
     /**
      * Comment for <code>serialVersionUID</code>
      */
@@ -75,6 +75,7 @@ public class IacucProtocolActionType extends ProtocolActionType {
     public static final String MANAGE_REVIEW_COMMENTS = "310";
     public static final String IACUC_REQUEST_SUSPEND = "311";
     public static final String REMOVE_FROM_AGENDA = "312";
+    public static final String ASSIGNED_TO_COMMITTEE = "313";
 
     public static final String AMENDMENT_CREATED_NOTIFICATION = "323";
     public static final String RENEWAL_CREATED_NOTIFICATION = "322";
@@ -89,6 +90,8 @@ public class IacucProtocolActionType extends ProtocolActionType {
     
     public static final String MODIFY_AMENDMENT_SECTION = "125";
     
+    // action type to be used only by workflow disapproval post-processpor
+    public static final String REJECTED_IN_ROUTING = "401";
     
     //No corresponding actionTypeCode for these in Coeus  
     public static final String REVIEW_COMPLETE = "902";
@@ -97,6 +100,5 @@ public class IacucProtocolActionType extends ProtocolActionType {
     public static final String REVIEW_DELETED = "905";
     public static final String REVIEW_TYPE_DETERMINATION = "908";
     public static final String RENEWAL_WITH_AMENDMENT_CREATED = "909";
-    //public static final String CONTINUATION_WITH_AMENDMENT_CREATED = "910";
 
 }

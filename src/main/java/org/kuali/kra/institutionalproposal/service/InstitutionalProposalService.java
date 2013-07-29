@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,12 +15,17 @@
  */
 package org.kuali.kra.institutionalproposal.service;
 
+import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
 import org.kuali.kra.budget.core.Budget;
+import org.kuali.kra.institutionalproposal.document.InstitutionalProposalDocument;
 import org.kuali.kra.institutionalproposal.home.InstitutionalProposal;
 import org.kuali.kra.proposaldevelopment.bo.DevelopmentProposal;
+import org.kuali.kra.service.VersionException;
+import org.kuali.rice.kew.api.exception.WorkflowException;
 
 /**
  * This interface defines public services made available by the Institutional Proposal module.
@@ -119,4 +124,23 @@ public interface InstitutionalProposalService {
     List<DevelopmentProposal> getAllLinkedDevelopmentProposals(String proposalNumber); 
     
     String getNextInstitutionalProposalNumber();
+    
+    /**
+     * Return a list of valid proposal status codes for award funding as defined by the 'validFundingProposalStatusCodes' parm.
+     * @return
+     */
+    Collection<String> getValidFundingProposalStatusCodes();
+    
+    /**
+     * This method is to create a new version of an existing Institute Proposal
+     * @param currentInstitutionalProposal
+     * @param currentInstitutionalProposalDocument
+     * @return
+     * @throws VersionException
+     * @throws WorkflowException
+     * @throws IOException
+     */
+    InstitutionalProposalDocument createAndSaveNewVersion(InstitutionalProposal currentInstitutionalProposal, InstitutionalProposalDocument currentInstitutionalProposalDocument) throws VersionException, 
+    WorkflowException, IOException;
+
 }

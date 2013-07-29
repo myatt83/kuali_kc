@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,10 +57,17 @@ public class NegotiationAction extends KraTransactionalDocumentActionBase {
             HttpServletRequest request, HttpServletResponse response) throws Exception {
         ActionForward forward = super.docHandler(mapping, form, request, response);
         NegotiationForm negotiationForm = (NegotiationForm) form;
-        negotiationForm.getCustomDataHelper().negotiationCustomData(mapping, negotiationForm, request, response);
+//        negotiationForm.getCustomDataHelper().prepareCustomData();
+//        Negotiation negotiation = negotiationForm.getNegotiationDocument().getNegotiation();
+//        getNegotiationService().checkForPropLogPromotion(negotiation);
+        prepareNegotiation(negotiationForm);
+        return forward;
+    }
+    
+    protected void prepareNegotiation(NegotiationForm negotiationForm) {
+        negotiationForm.getCustomDataHelper().prepareCustomData();
         Negotiation negotiation = negotiationForm.getNegotiationDocument().getNegotiation();
         getNegotiationService().checkForPropLogPromotion(negotiation);
-        return forward;
     }
             
     /**

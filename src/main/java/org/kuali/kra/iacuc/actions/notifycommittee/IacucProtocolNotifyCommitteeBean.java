@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,13 @@ package org.kuali.kra.iacuc.actions.notifycommittee;
 
 import java.sql.Date;
 
-import org.kuali.kra.common.committee.bo.CommonCommittee;
+import org.kuali.kra.common.committee.bo.CommitteeBase;
 import org.kuali.kra.iacuc.actions.IacucProtocolActionBean;
-import org.kuali.kra.protocol.actions.ActionHelper;
+import org.kuali.kra.protocol.actions.ActionHelperBase;
 import org.kuali.kra.protocol.actions.notifycommittee.ProtocolNotifyCommitteeBean;
 
 /**
- * This class is really just a "form" for notifying the Committee.
+ * This class is really just a "form" for notifying the CommitteeBase.
  */
 public class IacucProtocolNotifyCommitteeBean extends IacucProtocolActionBean implements ProtocolNotifyCommitteeBean {
     
@@ -33,14 +33,14 @@ public class IacucProtocolNotifyCommitteeBean extends IacucProtocolActionBean im
     private static final long serialVersionUID = 3812176663326229406L;
     
     private String comment = "";
-    private CommonCommittee committee;
+    private CommitteeBase committee;
     private Date actionDate = new Date(System.currentTimeMillis());
     
     /**
      * Constructs a ProtocolNotifyCommitteeBean.
      * @param actionHelper Reference back to the action helper for this bean
      */
-    public IacucProtocolNotifyCommitteeBean(ActionHelper actionHelper) {
+    public IacucProtocolNotifyCommitteeBean(ActionHelperBase actionHelper) {
         super(actionHelper);
         committee = actionHelper.getProtocol().getProtocolSubmission().getCommittee();
     }
@@ -61,7 +61,7 @@ public class IacucProtocolNotifyCommitteeBean extends IacucProtocolActionBean im
         return committee.getCommitteeName();
     }
 
-    public void setCommittee(CommonCommittee committee) {
+    public void setCommittee(CommitteeBase committee) {
         this.committee = committee;
     }
 

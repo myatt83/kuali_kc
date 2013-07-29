@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,7 +51,6 @@ public class PersonFinIntDisclosure extends KraPersistableBusinessObjectBase imp
     private Integer entityTypeCode;
     private String entityOwnershipType;
     private String relationshipTypeCode;
-    private String relationshipDescription;
     private boolean relatedToOrganizationFlag;
     private String orgRelationDescription;
     private String principalBusinessActivity;
@@ -70,6 +69,10 @@ public class PersonFinIntDisclosure extends KraPersistableBusinessObjectBase imp
     private List<FinancialEntityAttachment> finEntityAttachments;
     private Sponsor sponsor;
     private String sponsorName;
+    private String entitySponsorsResearch;
+    private String studentInvolvement;
+    private String staffInvolvement;
+    private String facilityUse;
 
     private transient DateTimeService dateTimeService;
     
@@ -162,14 +165,6 @@ public class PersonFinIntDisclosure extends KraPersistableBusinessObjectBase imp
 
     public void setRelationshipTypeCode(String relationshipTypeCode) {
         this.relationshipTypeCode = relationshipTypeCode;
-    }
-
-    public String getRelationshipDescription() {
-        return relationshipDescription;
-    }
-
-    public void setRelationshipDescription(String relationshipDescription) {
-        this.relationshipDescription = relationshipDescription;
     }
 
     public boolean getRelatedToOrganizationFlag() {
@@ -393,6 +388,38 @@ public class PersonFinIntDisclosure extends KraPersistableBusinessObjectBase imp
         List managedLists = super.buildListOfDeletionAwareLists();
         managedLists.add(finEntityAttachments);
         return managedLists;
+    }
+
+    public String getEntitySponsorsResearch() {
+        return entitySponsorsResearch;
+    }
+
+    public void setEntitySponsorsResearch(String entitySponsorsResearch) {
+        this.entitySponsorsResearch = entitySponsorsResearch;
+    }
+
+    public String getStudentInvolvement() {
+        return studentInvolvement;
+    }
+
+    public void setStudentInvolvement(String studentInvolvement) {
+        this.studentInvolvement = studentInvolvement;
+    }
+
+    public String getStaffInvolvement() {
+        return staffInvolvement;
+    }
+
+    public void setStaffInvolvement(String staffInvolvement) {
+        this.staffInvolvement = staffInvolvement;
+    }
+
+    public String getFacilityUse() {
+        return facilityUse;
+    }
+
+    public void setFacilityUse(String facilityUse) {
+        this.facilityUse = facilityUse;
     }
 
 }

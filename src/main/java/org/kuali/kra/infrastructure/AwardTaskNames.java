@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ package org.kuali.kra.infrastructure;
  */
 public enum AwardTaskNames {
     MODIFY_AWARD("modifyAward"),VIEW_AWARD("viewAward"),MODIFY_AWARD_ROLES("modifyAwardRoles"),ADD_AWARD_NOTES("addAwardNotes"),
-    MAINTAIN_REPORT_TRACKING("maintainReportTracking");
+    MAINTAIN_REPORT_TRACKING("maintainReportTracking"),CREATE_AWARD_ACCOUNT("createAwardAccount");
 
     private String awardTaskName;   
      

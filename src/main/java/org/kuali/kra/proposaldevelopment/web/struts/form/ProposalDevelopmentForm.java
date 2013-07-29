@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  *
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,6 +60,7 @@ import org.kuali.kra.kim.service.ProposalRoleService;
 import org.kuali.kra.medusa.MedusaBean;
 import org.kuali.kra.proposaldevelopment.bo.DevelopmentProposal;
 import org.kuali.kra.proposaldevelopment.bo.Narrative;
+import org.kuali.kra.proposaldevelopment.bo.NarrativeType;
 import org.kuali.kra.proposaldevelopment.bo.NarrativeUserRights;
 import org.kuali.kra.proposaldevelopment.bo.PropScienceKeyword;
 import org.kuali.kra.proposaldevelopment.bo.ProposalAbstract;
@@ -87,6 +88,7 @@ import org.kuali.kra.proposaldevelopment.service.ProposalDevelopmentService;
 import org.kuali.kra.proposaldevelopment.specialreview.SpecialReviewHelper;
 import org.kuali.kra.proposaldevelopment.web.bean.ProposalDevelopmentRejectionBean;
 import org.kuali.kra.proposaldevelopment.web.bean.ProposalUserRoles;
+import org.kuali.kra.proposaldevelopment.web.struts.action.ProposalDevelopmentAction;
 import org.kuali.kra.questionnaire.MultiQuestionableFormInterface;
 import org.kuali.kra.questionnaire.QuestionableFormInterface;
 import org.kuali.kra.questionnaire.answer.AnswerHeader;
@@ -99,12 +101,14 @@ import org.kuali.kra.service.KraWorkflowService;
 import org.kuali.kra.service.TaskAuthorizationService;
 import org.kuali.kra.service.UnitService;
 import org.kuali.kra.web.struts.form.BudgetVersionFormBase;
+import org.kuali.kra.web.struts.form.CustomDataDocumentForm;
 import org.kuali.rice.core.api.config.property.ConfigurationService;
 import org.kuali.rice.core.api.criteria.Predicate;
 import org.kuali.rice.core.api.criteria.PredicateFactory;
 import org.kuali.rice.core.api.criteria.QueryByCriteria;
 import org.kuali.rice.core.api.util.type.KualiDecimal;
 import org.kuali.rice.coreservice.api.parameter.Parameter;
+import org.kuali.rice.coreservice.framework.parameter.ParameterConstants;
 import org.kuali.rice.coreservice.framework.parameter.ParameterService;
 import org.kuali.rice.kew.api.KewApiConstants;
 import org.kuali.rice.kew.api.WorkflowDocument;
@@ -130,7 +134,8 @@ import org.springframework.util.AutoPopulatingList;
 /**
  * This class is the Struts form bean for DevelopmentProposal
  */
-public class ProposalDevelopmentForm extends BudgetVersionFormBase implements ReportHelperBeanContainer, MultiQuestionableFormInterface {
+public class ProposalDevelopmentForm extends BudgetVersionFormBase implements ReportHelperBeanContainer, MultiQuestionableFormInterface, 
+                                                                        CustomDataDocumentForm {
     
     private static final long serialVersionUID = 7928293162992415894L;
     private static final String MISSING_PARAM_MSG = "Couldn't find parameter ";
@@ -185,13 +190,15 @@ public class ProposalDevelopmentForm extends BudgetVersionFormBase implements Re
     private String newHierarchyBudgetTypeCode;
     private List<HierarchyProposalSummary> hierarchyProposalSummaries;
     private DevelopmentProposal proposalToSummarize;
+    private HierarchyProposalSummary proposalSummary;
     private Budget budgetToSummarize;
     private String proposalNumberToSummarize;
     private String budgetNumberToSummarize;
     private transient boolean showSubmissionDetails;
     private transient boolean grantsGovSubmitFlag;
-    
-
+    private transient boolean saveXmlPermission; 
+    private transient boolean grantsGovSelectFlag; 
+   
     private String proposalFormTabTitle = "Print Sponsor Form Packages ";
     private transient ParameterService parameterService;
 
@@ -228,7 +235,10 @@ public class ProposalDevelopmentForm extends BudgetVersionFormBase implements Re
     private BudgetChangedData newBudgetChangedData;
    
     private String[] selectedBudgetPrint;
-   
+    private static final String PROPOSAL_SUMMARY_TAB_INDICATOR = "enableProposalSummaryTab";   
+    
+    private transient String currentPersonCountryCode = "";
+    private ProposalDevelopmentCustomDataHelper customDataHelper;
 
     public ProposalDevelopmentForm() {
         super();
@@ -301,6 +311,7 @@ public class ProposalDevelopmentForm extends BudgetVersionFormBase implements Re
         setNewInstituteAttachment(createNarrative());
         setNewPropPersonBio(new ProposalPersonBiography());
         setApproverViewTabTitle();
+        customDataHelper = new ProposalDevelopmentCustomDataHelper(this);
     }
 
     /**
@@ -863,20 +874,19 @@ public class ProposalDevelopmentForm extends BudgetVersionFormBase implements Re
         
         Collection<Role> roles = getKimProposalRoles();
         
-        PermissionService permissionService = KimApiServiceLocator.getPermissionService();
+        
         QueryByCriteria.Builder queryBuilder = QueryByCriteria.Builder.create();
         List<Predicate> predicates = new ArrayList<Predicate>();
         PermissionQueryResults permissionResults = null;
         
         for (Role role : roles) {
             if (!StringUtils.equals(role.getName(), RoleConstants.UNASSIGNED)) {
-                predicates.add(PredicateFactory.equal("assignedToRole.roleName", role.getName()));
-                predicates.add(PredicateFactory.equal("assignedToRoleNamespaceForLookup", role.getNamespaceCode()));
+                predicates.add(PredicateFactory.equal("rolePermissions.roleId", role.getId()));
                 queryBuilder.setPredicates(PredicateFactory.and(predicates.toArray(new Predicate[] {})));
-                permissionResults = permissionService.findPermissions(queryBuilder.build());
-                if(permissionResults != null && permissionResults.getTotalRowCount() > 0) {
+                permissionResults = getKimPermissionService().findPermissions(queryBuilder.build());
+                if (permissionResults != null && permissionResults.getResults().size() > 0) {
                     returnRoleBeans.add(new org.kuali.kra.common.permissions.web.bean.Role(
-                            role.getName(), role.getDescription(), permissionResults.getResults()));   
+                    		role.getName(), role.getDescription(),permissionResults.getResults()));
                 }
                 predicates.clear();
                 queryBuilder = QueryByCriteria.Builder.create();
@@ -1185,8 +1195,8 @@ public class ProposalDevelopmentForm extends BudgetVersionFormBase implements Re
             if(isCanSubmitToGrantsGov()) {
               if(doc.getDevelopmentProposal().getS2sOpportunity() != null 
                       && doc.getDevelopmentProposal().getS2sAppSubmission().size() == 0 ){ 
-                     String grantsGovSubmitImage = configurationService.getPropertyValueAsString(externalImageURL) + "buttonsmall_submitgrantsgov.gif";
-                     addExtraButton("methodToCall.submitToGrantsGov", grantsGovSubmitImage, "Submit To GrantsGov");
+                     String grantsGovSubmitImage = configurationService.getPropertyValueAsString(externalImageURL) + "buttonsmall_submittos2s.gif";
+                     addExtraButton("methodToCall.submitToGrantsGov", grantsGovSubmitImage, "Submit To S2S");
               }
             }
         }
@@ -1583,6 +1593,13 @@ public class ProposalDevelopmentForm extends BudgetVersionFormBase implements Re
         DevelopmentProposal devProposal = getProposalDevelopmentDocument().getDevelopmentProposal();
         boolean showHierarchy = devProposal.isInHierarchy();
         boolean disableGrantsGov = !isGrantsGovEnabled();
+
+        boolean showProposalSummary = true;        
+        Parameter proposalSummaryIndicatorParam = this.getParameterService().getParameter(Constants.MODULE_NAMESPACE_PROPOSAL_DEVELOPMENT, ParameterConstants.DOCUMENT_COMPONENT, PROPOSAL_SUMMARY_TAB_INDICATOR);
+        if ( proposalSummaryIndicatorParam != null && "N".equalsIgnoreCase(proposalSummaryIndicatorParam.getValue()) )
+        {
+            showProposalSummary = false;
+        }
         
         
         for (HeaderNavigation tab : tabs) {
@@ -1598,12 +1615,14 @@ public class ProposalDevelopmentForm extends BudgetVersionFormBase implements Re
 //                    newTabs.add(tab);
 //                }
 //            }
-            if((showHierarchy || !tab.getHeaderTabNavigateTo().equals("hierarchy"))) {
-                if (!tab.getHeaderTabNavigateTo().toUpperCase().equals("APPROVERVIEW") || canPerformWorkflowAction()) {
-                        newTabs.add(tab);
-                    }
+            if((showHierarchy || !tab.getHeaderTabNavigateTo().equals("hierarchy"))) 
+            {
+                if (!tab.getHeaderTabNavigateTo().toUpperCase().equals("APPROVERVIEW") || showProposalSummary || canPerformWorkflowAction()) 
+                {
+                    newTabs.add(tab);
                 }
             }
+        }
         tabs = newTabs.toArray(new HeaderNavigation[newTabs.size()]);
         return tabs;
     }
@@ -1787,6 +1806,34 @@ public class ProposalDevelopmentForm extends BudgetVersionFormBase implements Re
       */
      public void setGrantsGovSubmitFlag(boolean grantsGovSubmitFlag) {
          this.grantsGovSubmitFlag = grantsGovSubmitFlag;
+     }
+     /**
+      * Gets the SaveXmlPermission attribute. 
+      * @return Returns the SaveXmlPermission.
+      */
+     public boolean isSaveXmlPermission() {
+         return saveXmlPermission;
+     }
+     /**
+      * Sets the SaveXmlPermission attribute value.
+      * @param SaveXmlPermission The SaveXmlPermission to set.
+      */
+     public void setSaveXmlPermission(boolean saveXmlPermission) {
+         this.saveXmlPermission = saveXmlPermission;
+     }
+     /**
+      * Gets the GrantsGovSelectFlag attribute. 
+      * @return Returns the GrantsGovSelectFlag.
+      */
+     public boolean isGrantsGovSelectFlag() {
+         return grantsGovSelectFlag;
+     }
+     /**
+      * Sets the GrantsGovSelectFlag attribute value.
+      * @param GrantsGovSelectFlag The GrantsGovSelectFlag to set.
+      */
+     public void setGrantsGovSelectFlag(boolean grantsGovSelectFlag) {
+         this.grantsGovSelectFlag = grantsGovSelectFlag;
      }
 
     /**
@@ -1996,6 +2043,56 @@ public class ProposalDevelopmentForm extends BudgetVersionFormBase implements Re
             }
         }
 
+    }
+
+    public String getCurrentPersonCountryCode() {
+        return currentPersonCountryCode;
+    }
+
+    public void setCurrentPersonCountryCode(String pCurrentPersonCountryCode) {
+        this.currentPersonCountryCode = pCurrentPersonCountryCode;
+    }
+    
+    public String getValueFinderResultDoNotCache(){
+        if (this.getActionFormUtilMap() instanceof ActionFormUtilMap) {
+            ((ActionFormUtilMap) this.getActionFormUtilMap()).setCacheValueFinderResults(false);
+        }
+        return "";
+    }
+    
+    public String getValueFinderResultCache(){
+        if (this.getActionFormUtilMap() instanceof ActionFormUtilMap) {
+            ((ActionFormUtilMap) this.getActionFormUtilMap()).setCacheValueFinderResults(true);
+        }
+        return "";
+    }
+    
+    public Collection<NarrativeType> getAllNarrativeTypes() {
+        return getBusinessObjectService().findAll(NarrativeType.class);
+    }
+    
+    public boolean isHidePropDevDocDescriptionPanel() {
+        return getProposalDevelopmentDocument().isDefaultDocumentDescription();
+    }
+
+    public ProposalDevelopmentCustomDataHelper getCustomDataHelper() {
+        return customDataHelper;
+    }
+
+    public void setCustomDataHelper(ProposalDevelopmentCustomDataHelper customDataHelper) {
+        this.customDataHelper = customDataHelper;
+    }
+
+    public HierarchyProposalSummary getProposalSummary() {
+        return proposalSummary;
+    }
+
+    public void setProposalSummary(HierarchyProposalSummary proposalSummary) {
+        this.proposalSummary = proposalSummary;
+    }
+    
+    protected PermissionService getKimPermissionService() {
+        return KraServiceLocator.getService("kimPermissionService");
     }
    
 }

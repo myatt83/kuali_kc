@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -343,7 +343,15 @@ public class AwardPersonCreditSplitAuditRule implements DocumentAuditRule {
      * @return
      */
     private String getPersonKey(AwardPerson projectPerson) {
-        return projectPerson.getFullName().toString();
+        String personKey = "";
+        if (projectPerson != null) {
+            if (projectPerson.getIsRolodexPerson()) {
+                personKey = projectPerson.getRolodex().getOrganization();
+            } else {
+                personKey = projectPerson.getFullName();
+            }
+        }
+        return personKey;
     }
 
     /*

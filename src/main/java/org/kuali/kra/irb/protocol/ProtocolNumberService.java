@@ -1,6 +1,5 @@
-// TODO *********code has been moved to base class, should ultimately be removed**********
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +15,12 @@
  */
 package org.kuali.kra.irb.protocol;
 
+import org.kuali.kra.protocol.protocol.ProtocolNumberServiceBase;
+
 /**
  * ProtocolNumberService.
  */
-public interface ProtocolNumberService {
+public interface ProtocolNumberService extends ProtocolNumberServiceBase {
 
     /**
      * Generate a unique Protocol Number.  The Protocol Number
@@ -35,4 +36,3 @@ public interface ProtocolNumberService {
      */
     public String generateProtocolNumber();
 }
-// TODO **********************end************************

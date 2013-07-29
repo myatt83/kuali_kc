@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@ import java.util.ArrayList;
 
 import org.kuali.kra.committee.bo.Committee;
 import org.kuali.kra.committee.document.CommitteeDocument;
-import org.kuali.kra.common.committee.bo.CommonCommittee;
-import org.kuali.kra.common.committee.document.CommonCommitteeDocument;
+import org.kuali.kra.iacuc.committee.bo.IacucCommittee;
+import org.kuali.kra.iacuc.committee.document.CommonCommitteeDocument;
 import org.kuali.rice.krad.document.Document;
 import org.kuali.rice.krad.exception.ValidationException;
 import org.kuali.rice.krad.rules.rule.event.KualiDocumentEvent;
@@ -65,7 +65,7 @@ public class KraDocumentServiceImpl extends DocumentServiceImpl {
             }
             // TODO remove this else if block after committee backfitting
             else if (document instanceof CommonCommitteeDocument) {
-                CommonCommittee committee = ((CommonCommitteeDocument) document).getCommittee();
+                IacucCommittee committee = ((CommonCommitteeDocument) document).getCommittee();
                 ((CommonCommitteeDocument) document).setCommitteeList(new ArrayList());
                 getDocumentDao().save(document);
                 ((CommonCommitteeDocument) document).getCommitteeList().add(committee);

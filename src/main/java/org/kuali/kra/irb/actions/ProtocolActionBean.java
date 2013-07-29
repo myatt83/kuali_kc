@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,12 @@
 package org.kuali.kra.irb.actions;
 
 import org.kuali.kra.irb.Protocol;
+import org.kuali.kra.protocol.actions.ActionHelperBase;
 
 /**
  * Defines the superclass of all Protocol action beans.
  */
-public abstract class ProtocolActionBean {
+public abstract class ProtocolActionBean implements org.kuali.kra.protocol.actions.ProtocolActionBean {
     
     private ActionHelper actionHelper;
     
@@ -35,8 +36,8 @@ public abstract class ProtocolActionBean {
     public ProtocolActionBean() {
     }
 
-    public void setActionHelper(ActionHelper actionHelper) {
-        this.actionHelper = actionHelper;
+    public void setActionHelper(ActionHelperBase actionHelper) {
+        this.actionHelper = (ActionHelper) actionHelper;
     }
 
     public ActionHelper getActionHelper() {
@@ -44,7 +45,7 @@ public abstract class ProtocolActionBean {
     }
     
     public Protocol getProtocol() {
-        return actionHelper.getProtocol();
+        return (Protocol) actionHelper.getProtocol();
     }
 
 }

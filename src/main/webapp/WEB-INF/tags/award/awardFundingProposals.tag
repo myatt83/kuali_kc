@@ -1,5 +1,5 @@
 <%--
- Copyright 2005-2010 The Kuali Foundation
+ Copyright 2005-2013 The Kuali Foundation
  
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -117,10 +117,8 @@
  				<c:set var="isLastAward" value="${awardRowStatus.index == (KualiForm.fundingProposalBean.allAwardsForAwardNumberSize - 1)}" />
  				<c:forEach var="fundingProposal" items="${award.fundingProposals}" varStatus="fundingProposalRowStatus">
 			    	<c:set var="awardExpr" value="fundingProposalBean.allAwardsForAwardNumber[${awardRowStatus.index}]" />
-			    	<c:set var="tabKey" value="${kfunc:generateTabKey(parentTab)}:${kfunc:generateTabKey(tabTitle)}" scope="request"/>
 			    	<c:set var="parentTab" value="Funding Proposals" scope="request"/>
-                    <c:set var="tabTitle" value="${fundingProposalRowStatus.index}" scope="request"/>
-			    	<c:set var="versionTab" value="${tabKey}${fundingProposalRowStatus.index}"/>
+			    	<c:set var="versionTab" value="FundingProposals${awardRowStatus.index}${fundingProposalRowStatus.index}"/>
 			    	<c:set var="currentTab" value="${kfunc:getTabState(KualiForm, versionTab)}"/>
 			    	<c:choose>
                         <c:when test="${empty currentTab}">
@@ -227,7 +225,7 @@
 		      			</th>
 		      			<%-- To fix JIRA KRACOEUS-4366 --%>
 		      			<th align="right" style="padding-right:2px">
-		      				$<fmt:formatNumber value="${award.totalCostOfFundingProposals}" type="currency" currencySymbol="" maxFractionDigits="2" />
+		      				$<fmt:formatNumber value="${KualiForm.fundingProposalBean.totalCostOfFundingProposals}" type="currency" currencySymbol="" maxFractionDigits="2" />
 		      			</th>
 		      			<th></th>
 		      			

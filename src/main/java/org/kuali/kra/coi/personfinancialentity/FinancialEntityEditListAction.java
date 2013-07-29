@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@ import org.kuali.kra.service.VersionException;
 import org.kuali.rice.kns.question.ConfirmationQuestion;
 import org.kuali.rice.krad.util.GlobalVariables;
 import org.kuali.rice.krad.util.KRADConstants;
+import org.kuali.rice.krad.util.ObjectUtils;
 
 /**
  * 
@@ -246,6 +247,7 @@ public class FinancialEntityEditListAction extends FinancialEntityAction{
             status = ACTIVATE_ENTITY;
             // This is coming from coi, user may not be reporter, so user FE's personid to retrieve FEs for reporter
             ((FinancialEntityForm) form).getFinancialEntityHelper().setActiveFinancialEntities(getFinancialEntities(currentFinancialEntity.getPersonId(), true));
+            ((FinancialEntityForm) form).getFinancialEntityHelper().setInactiveFinancialEntities(getFinancialEntities(currentFinancialEntity.getPersonId(), false));
         } else if (StringUtils.equalsIgnoreCase(status, Constants.FINANCIAL_ENTITY_STATUS_INACTIVE)) {
             currentFinancialEntity = ((FinancialEntityForm) form).getFinancialEntityHelper().getInactiveFinancialEntities().get(entityIndex);
             currentVersionNumber = currentFinancialEntity.getVersions().size();
@@ -323,9 +325,9 @@ public class FinancialEntityEditListAction extends FinancialEntityAction{
                         DEACTIVATE_ENTITY_REASON_MAXLENGTH);
             } else {
 
-                PersonFinIntDisclosure personFinIntDisclosure = ((FinancialEntityForm) form).getFinancialEntityHelper()
-                        .getActiveFinancialEntities().get(entityIndex);
+                PersonFinIntDisclosure personFinIntDisclosure = ((FinancialEntityForm) form).getFinancialEntityHelper().getActiveFinancialEntities().get(entityIndex);
                 ((FinancialEntityForm) form).getFinancialEntityHelper().setEditRelationDetails(getFinancialEntityService().getFinancialEntityDataMatrixForEdit(personFinIntDisclosure.getPerFinIntDisclDetails()));
+                ((FinancialEntityForm) form).getFinancialEntityHelper().setFinEntityAttachmentList(getFinancialEntityService().retrieveFinancialEntityAttachmentsFor(personFinIntDisclosure.getPersonFinIntDisclosureId()));
                 versionFinancialEntity(form, personFinIntDisclosure,2, reason);
             }
         }
@@ -350,6 +352,7 @@ public class FinancialEntityEditListAction extends FinancialEntityAction{
         FinancialEntityHelper financialEntityHelper = ((FinancialEntityForm) form).getFinancialEntityHelper();
         PersonFinIntDisclosure personFinIntDisclosure = financialEntityHelper.getInactiveFinancialEntities().get(entityIndex);
         financialEntityHelper.setEditRelationDetails(getFinancialEntityService().getFinancialEntityDataMatrixForEdit(personFinIntDisclosure.getPerFinIntDisclDetails()));
+        financialEntityHelper.setFinEntityAttachmentList(getFinancialEntityService().retrieveFinancialEntityAttachmentsFor(personFinIntDisclosure.getPersonFinIntDisclosureId()));
         versionFinancialEntity(form, personFinIntDisclosure,1, Constants.EMPTY_STRING);
         financialEntityHelper.setEditEntityIndex(-1);
         return mapping.findForward(Constants.MAPPING_BASIC);
@@ -410,11 +413,12 @@ public class FinancialEntityEditListAction extends FinancialEntityAction{
                 financialEntityForm.getFinancialEntityHelper().setReporterId(null);
                 return new ActionForward(forward, true);
             }
+            /*
+             * initiate again or the edit button disappears and the tab is open.
+             */
+            financialEntityHelper.initiate();
         }
-        /*
-         * initiate again or the edit button disappears and the tab is open.
-         */
-        financialEntityHelper.initiate();
+       
         return mapping.findForward(Constants.MAPPING_BASIC);
     }
 
@@ -517,7 +521,7 @@ public class FinancialEntityEditListAction extends FinancialEntityAction{
     @Override
     public ActionForward whereToGoAfterCancel(ActionMapping mapping, ActionForm form, HttpServletRequest request,
             HttpServletResponse response) throws Exception {
-        return editList(mapping, form, request, response); 
+        return mapping.findForward(KRADConstants.MAPPING_PORTAL);
     }
 
 }

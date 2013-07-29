@@ -3,8 +3,11 @@ package org.kuali.kra.rules;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.kuali.kra.bo.KcPersonExtendedAttributes;
-import org.kuali.kra.rule.event.PersonSaveCustomDataEvent;
+import org.kuali.kra.bo.KcPersonExtendedAttributesMaintainableImpl;
+import org.kuali.kra.infrastructure.KeyConstants;
+import org.kuali.kra.rule.event.SaveCustomDataEvent;
 import org.kuali.rice.core.api.util.RiceKeyConstants;
 import org.kuali.rice.kns.document.MaintenanceDocument;
 import org.kuali.rice.krad.document.Document;
@@ -16,6 +19,7 @@ public class KcPersonExtendedAttributesMaintenanceDocumentRule extends KraMainte
     
     private static final String PRINCIPAL_ID = "principalId";
     private static final String CUSTOM_DATA_ERROR_PREFIX = KRADConstants.MAINTENANCE_NEW_MAINTAINABLE + "businessObject.personCustomDataList";
+    private static final int FIELD_ERA_COMMONS_USERNAME_MIN_LENGTH = 6;
     
     @Override
     public boolean processSaveDocument(Document document) {
@@ -27,10 +31,14 @@ public class KcPersonExtendedAttributesMaintenanceDocumentRule extends KraMainte
         if (LOG.isDebugEnabled()) {
             LOG.debug("new maintainable is: " + maintenanceDocument.getNewMaintainableObject().getClass());
         }
+        KcPersonExtendedAttributesMaintainableImpl maintainableImpl = (KcPersonExtendedAttributesMaintainableImpl) maintenanceDocument.getNewMaintainableObject();
         KcPersonExtendedAttributes kcPersonExtendedAttributes = (KcPersonExtendedAttributes) maintenanceDocument.getNewMaintainableObject().getDataObject();
 
         rulePassed &= checkExistence(kcPersonExtendedAttributes);
-        rulePassed &= processRules(new PersonSaveCustomDataEvent(CUSTOM_DATA_ERROR_PREFIX, document, kcPersonExtendedAttributes.getPersonCustomDataList()));
+        rulePassed &= processRules(new SaveCustomDataEvent(CUSTOM_DATA_ERROR_PREFIX, document, 
+                kcPersonExtendedAttributes.getPersonCustomDataList(),
+                maintainableImpl.getCustomDataHelper().getCustomAttributeDocuments()));
+        rulePassed &= checkEraCommonsUserName(kcPersonExtendedAttributes);
         
         return rulePassed;
     }
@@ -84,6 +92,24 @@ public class KcPersonExtendedAttributesMaintenanceDocumentRule extends KraMainte
         
         valid = checkExistenceFromTable(org.kuali.rice.kim.api.identity.Person.class, pkMap, PRINCIPAL_ID, "KcPersonExtendedAttributes Id");
 
+        return valid;
+    }
+    
+    /**
+     * This method is to check the minimum length of eRACommonUserName.
+     * 
+     * @param kcPersonExtendedAttributes
+     * @return
+     */
+    private boolean checkEraCommonsUserName(KcPersonExtendedAttributes kcPersonExtendedAttributes) {
+        boolean valid = true;
+
+        if(StringUtils.isNotBlank(kcPersonExtendedAttributes.getEraCommonUserName()) && kcPersonExtendedAttributes.getEraCommonUserName().length() < FIELD_ERA_COMMONS_USERNAME_MIN_LENGTH){
+            GlobalVariables.getMessageMap().putError(KRADConstants.MAINTENANCE_NEW_MAINTAINABLE +"eRACommonsUserName", KeyConstants.ERROR_MINLENGTH,
+                    new String[] {"eRA Commons User Name" , ""+ FIELD_ERA_COMMONS_USERNAME_MIN_LENGTH}); 
+            
+            valid = false;
+        }
         return valid;
     }
     

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,20 +21,18 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
-import org.kuali.kra.iacuc.IacucProtocolOnlineReviewDocument;
 import org.kuali.kra.iacuc.actions.submit.IacucProtocolReviewType;
-import org.kuali.kra.iacuc.actions.submit.IacucProtocolReviewerBean;
 import org.kuali.kra.iacuc.actions.submit.IacucProtocolReviewerType;
 import org.kuali.kra.iacuc.actions.submit.IacucProtocolSubmissionQualifierType;
 import org.kuali.kra.iacuc.actions.submit.IacucProtocolSubmissionType;
 import org.kuali.kra.iacuc.onlinereview.IacucProtocolOnlineReviewService;
+import org.kuali.kra.iacuc.onlinereview.IacucProtocolOnlineReviewStatus;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.KeyConstants;
 import org.kuali.kra.infrastructure.KraServiceLocator;
-import org.kuali.kra.protocol.ProtocolDocument;
-import org.kuali.kra.protocol.ProtocolOnlineReviewDocument;
-import org.kuali.kra.protocol.actions.submit.ProtocolReviewerBean;
-import org.kuali.kra.protocol.onlinereview.ProtocolOnlineReviewStatus;
+import org.kuali.kra.protocol.ProtocolDocumentBase;
+import org.kuali.kra.protocol.ProtocolOnlineReviewDocumentBase;
+import org.kuali.kra.protocol.actions.submit.ProtocolReviewerBeanBase;
 import org.kuali.kra.rules.ResearchDocumentRuleBase;
 
 import org.kuali.rice.kew.api.KewApiConstants;
@@ -52,7 +50,7 @@ public class IacucProtocolModifySubmissionRuleImpl extends ResearchDocumentRuleB
     private static final String SECONDARY_REVIEWER_TYPE = "2";
     
 
-    public boolean processModifySubmissionRule(ProtocolDocument document, IacucProtocolModifySubmissionBean actionBean) {
+    public boolean processModifySubmissionRule(ProtocolDocumentBase document, IacucProtocolModifySubmissionBean actionBean) {
         boolean valid = true;
         String errorParameters = null;
         if (StringUtils.isBlank(actionBean.getProtocolReviewTypeCode())) {
@@ -78,20 +76,15 @@ public class IacucProtocolModifySubmissionRuleImpl extends ResearchDocumentRuleB
         return valid;
     }
     
-    public boolean validAssignReviewers(ProtocolDocument document, IacucProtocolModifySubmissionBean actionBean) {
+    public boolean validAssignReviewers(ProtocolDocumentBase document, IacucProtocolModifySubmissionBean actionBean) {
         boolean isValid = true;
         int totalValidReviewers = 0;
                 
-        List<ProtocolReviewerBean> reviewers = actionBean.getReviewers();
-        
-        // Cannot have assigned reviewers with no schedule
-        if (StringUtils.isBlank(actionBean.getScheduleId()) &&  reviewers != null && reviewers.size() > 0) {
-            isValid=false;
-        }
+        List<ProtocolReviewerBeanBase> reviewers = actionBean.getReviewers();
 
-        List<ProtocolOnlineReviewDocument> protocolOnlineReviewDocuments = getProtocolOnlineReviewService().getProtocolReviewDocumentsForCurrentSubmission(document.getProtocol()); 
+        List<ProtocolOnlineReviewDocumentBase> protocolOnlineReviewDocuments = getProtocolOnlineReviewService().getProtocolReviewDocumentsForCurrentSubmission(document.getProtocol()); 
         for (int i = 0; i < reviewers.size(); i++) {
-            ProtocolReviewerBean reviewer = reviewers.get(i);
+            ProtocolReviewerBeanBase reviewer = reviewers.get(i);
             if (ObjectUtils.isNotNull(reviewer.getReviewerTypeCode())) {
                 if(reviewer.getReviewerTypeCode().equals(PRIMARY_REVIEWER_TYPE) || reviewer.getReviewerTypeCode().equals(SECONDARY_REVIEWER_TYPE)) {
                     totalValidReviewers++;
@@ -101,19 +94,17 @@ public class IacucProtocolModifySubmissionRuleImpl extends ResearchDocumentRuleB
                 isValid = false;
             } else if (StringUtils.isBlank(reviewer.getReviewerTypeCode())) {
                 //get the review
-                for (ProtocolOnlineReviewDocument pDocument : protocolOnlineReviewDocuments) {
+                for (ProtocolOnlineReviewDocumentBase pDocument : protocolOnlineReviewDocuments) {
                     if (reviewer.isProtocolReviewerBeanForReviewer(pDocument.getProtocolOnlineReview().getProtocolReviewer())) {
                         //the review exists and the user is asking to remove it...
                         isValid &= isValidRemovalRequest(pDocument, reviewer, i);
-                       // break;
                     }
                 }
             }
         }
         
-        if(actionBean.getProtocolReviewTypeCode().equals(IacucProtocolReviewType.DESIGNATED_MEMBER_REVIEW) &&
-                totalValidReviewers == 0) {
-            IacucProtocolReviewType protocolReviewType = (IacucProtocolReviewType)getBo(IacucProtocolReviewType.class, "reviewTypeCode", actionBean.getProtocolReviewTypeCode());
+        if(StringUtils.equals(actionBean.getProtocolReviewTypeCode(), IacucProtocolReviewType.DESIGNATED_MEMBER_REVIEW) && totalValidReviewers == 0) {
+            IacucProtocolReviewType protocolReviewType = getBo(IacucProtocolReviewType.class, "reviewTypeCode", actionBean.getProtocolReviewTypeCode());
             GlobalVariables.getMessageMap().putErrorWithoutFullErrorPath(Constants.IACUC_PROTOCOL_MODIFY_SUBMISSION_KEY + ".protocolReviewTypeCode", 
                     KeyConstants.ERROR_PROTOCOL_REVIEW_TYPE_REVIEWER_MISMATCH, protocolReviewType.getDescription());
             isValid = false;
@@ -121,7 +112,7 @@ public class IacucProtocolModifySubmissionRuleImpl extends ResearchDocumentRuleB
         return isValid;
     }
     
-    public boolean isValidRemovalRequest(ProtocolOnlineReviewDocument document, ProtocolReviewerBean reviewer, int reviewerIndex) {
+    public boolean isValidRemovalRequest(ProtocolOnlineReviewDocumentBase document, ProtocolReviewerBeanBase reviewer, int reviewerIndex) {
         boolean isValid = true;
         WorkflowDocument workflowDocument = document.getDocumentHeader().getWorkflowDocument();
         String propertyName =  Constants.IACUC_PROTOCOL_MODIFY_SUBMISSION_KEY + ".reviewer[" + reviewerIndex + "].reviewerTypeCode";
@@ -138,14 +129,14 @@ public class IacucProtocolModifySubmissionRuleImpl extends ResearchDocumentRuleB
             reportWarning(propertyName,KeyConstants.ERROR_PROTOCOL_REVIEWER_CANNOT_REMOVE_REVIEW_EXISTING_COMMENTS,reviewer.getFullName(),""+document.getProtocolOnlineReview().getCommitteeScheduleMinutes().size());
         }
         
-        if (StringUtils.equals(document.getProtocolOnlineReview().getProtocolOnlineReviewStatusCode(), ProtocolOnlineReviewStatus.FINAL_STATUS_CD)) {
+        if (StringUtils.equals(document.getProtocolOnlineReview().getProtocolOnlineReviewStatusCode(), IacucProtocolOnlineReviewStatus.FINAL_STATUS_CD)) {
             reportWarning(propertyName, KeyConstants.ERROR_PROTOCOL_REVIEWER_CANNOT_REMOVE_FINAL_REVIEW, reviewer.getFullName());
         }
         
         return isValid;
     }   
     
-    private boolean isReviewerValid(ProtocolReviewerBean reviewer, int reviewerIndex) {
+    private boolean isReviewerValid(ProtocolReviewerBeanBase reviewer, int reviewerIndex) {
         boolean isValid = true;
         String reviewerTypeCode = reviewer.getReviewerTypeCode();
         
@@ -197,8 +188,8 @@ public class IacucProtocolModifySubmissionRuleImpl extends ResearchDocumentRuleB
                 if (!reviewTypes.contains(submitAction.getProtocolReviewTypeCode())) {
                     GlobalVariables.getMessageMap().putError(Constants.IACUC_PROTOCOL_MODIFY_SUBMISSION_KEY + ".protocolReviewTypeCode",
                             KeyConstants.INVALID_SUBMISSION_REVIEW_TYPE,
-                            new String[] { ((IacucProtocolSubmissionType)getBo(IacucProtocolSubmissionType.class, "submissionTypeCode", submitAction.getSubmissionTypeCode())).getDescription(), 
-                            ((IacucProtocolReviewType)getBo(IacucProtocolReviewType.class, "reviewTypeCode", submitAction.getProtocolReviewTypeCode())).getDescription() });
+                            new String[] { (getBo(IacucProtocolSubmissionType.class, "submissionTypeCode", submitAction.getSubmissionTypeCode())).getDescription(), 
+                            (getBo(IacucProtocolReviewType.class, "reviewTypeCode", submitAction.getProtocolReviewTypeCode())).getDescription() });
                     valid = false;
                 }
 
@@ -224,14 +215,13 @@ public class IacucProtocolModifySubmissionRuleImpl extends ResearchDocumentRuleB
                 }
                 if (StringUtils.isBlank(submitAction.getSubmissionQualifierTypeCode()) || !typeQuals.contains(submitAction.getSubmissionQualifierTypeCode())) {
                     String desc = "";
-                    IacucProtocolSubmissionQualifierType typeQual = (IacucProtocolSubmissionQualifierType)getBo(IacucProtocolSubmissionQualifierType.class, "submissionQualifierTypeCode", submitAction.getSubmissionQualifierTypeCode());
+                    IacucProtocolSubmissionQualifierType typeQual = getBo(IacucProtocolSubmissionQualifierType.class, "submissionQualifierTypeCode", submitAction.getSubmissionQualifierTypeCode());
                     if (typeQual != null) {
                         desc = typeQual.getDescription();
                     }
                     GlobalVariables.getMessageMap().putError(Constants.IACUC_PROTOCOL_MODIFY_SUBMISSION_KEY + ".submissionQualifierTypeCode",
                             KeyConstants.INVALID_SUBMISSION_TYPE_QUALIFIER,
-                            new String[] { ((IacucProtocolSubmissionType)getBo(IacucProtocolSubmissionType.class, "submissionTypeCode", submitAction.getSubmissionTypeCode())).getDescription(), 
-                            desc});
+                            new String[] { (getBo(IacucProtocolSubmissionType.class, "submissionTypeCode", submitAction.getSubmissionTypeCode())).getDescription(), desc } );
                     valid = false;
                 }
 
@@ -240,11 +230,10 @@ public class IacucProtocolModifySubmissionRuleImpl extends ResearchDocumentRuleB
         return valid;
     }
 
-    @SuppressWarnings("unchecked")
-    private BusinessObject getBo(Class<? extends BusinessObject> boType, String propertyName, String keyField) {
+    private <BO extends BusinessObject> BO getBo(Class<BO> boType, String propertyName, String keyField) {
         Map<String,String> fieldValues = new HashMap<String,String>();
         fieldValues.put(propertyName, keyField);
-        List<BusinessObject> results = (List<BusinessObject>) getBusinessObjectService().findMatching(boType, fieldValues);
+        List<BO> results = (List<BO>) getBusinessObjectService().findMatching(boType, fieldValues);
         if (results.isEmpty()) {
             return null;
         } else {

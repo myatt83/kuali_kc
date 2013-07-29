@@ -1,5 +1,5 @@
 <%--
- Copyright 2005-2010 The Kuali Foundation
+ Copyright 2005-2013 The Kuali Foundation
  
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -17,6 +17,14 @@
 
 <channel:portalChannelTop channelTitle="Conflict of Interest" />
 <div class="body">
+<c:set var="cmotd" value="<%= (org.kuali.kra.infrastructure.KraServiceLocator.getService(org.kuali.kra.coi.service.CoiMessagesService.class)).getMessages() %>" scope="page"/>
+<c:if test="${!empty pageScope.cmotd}">
+	<c:forEach items = "${pageScope.cmotd}" var = "msg">
+		<div class="body" style="text-align:left;color:#FF0000;">			
+        	<strong><c:out value="${msg}" /></strong>
+        </div>
+   </c:forEach>
+</c:if>
   <strong>My Financial Entities </strong>
   <ul class="chan">
     <li><portal:portalLink displayTitle="false" title="Create New Financial Entity" url="${ConfigProperties.application.url}/financialEntityManagement.do?methodToCall=management&financialEntityHelper.reporterId=&coiDocId=">Financial Entity</portal:portalLink></li>
@@ -31,6 +39,7 @@
     <li><portal:portalLink displayTitle="false" title="New Project Disclosures" url="${ConfigProperties.application.url}/projectEventDisclosure.do?methodToCall=getDisclosuresToComplete">New Project Disclosures To Complete</portal:portalLink></li>
     <li><portal:portalLink displayTitle="false" title="Update Master Disclosure" url="${ConfigProperties.application.url}/coiDisclosure.do?methodToCall=docHandler&command=initiate_6&docTypeName=CoiDisclosureDocument">Update Master Disclosure</portal:portalLink></li>
     <li><portal:portalLink displayTitle="false" title="All My Disclosures" url="${ConfigProperties.application.url}/kr/lookup.do?methodToCall=search&businessObjectClassName=org.kuali.kra.coi.CoiDisclosure&docFormKey=88888888&returnLocation=${ConfigProperties.application.url}/portal.do&hideReturnLink=true&personId=${UserSession.principalId}">All My Disclosures</portal:portalLink></li>
+   	<li><portal:portalLink displayTitle="false" title="My Disclosure Reviews" url="${ConfigProperties.application.url}/kr/lookup.do?methodToCall=search&businessObjectClassName=org.kuali.kra.coi.CoiDisclosureReviews&docFormKey=88888888&returnLocation=${ConfigProperties.application.url}/portal.do&hideReturnLink=true" >All My Disclosure Reviews</portal:portalLink></li>
     <li><portal:portalLink displayTitle="false" title="Search Disclosures" url="${ConfigProperties.application.url}/kr/lookup.do?methodToCall=search&businessObjectClassName=org.kuali.kra.coi.CoiDisclosure&docFormKey=88888888&returnLocation=${ConfigProperties.application.url}/portal.do&hideReturnLink=true">Search Disclosures</portal:portalLink></li>
   </ul>
 </div>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,14 +23,19 @@ import org.apache.commons.lang.StringUtils;
 import org.kuali.kra.coi.CoiDisclosure;
 import org.kuali.kra.coi.CoiReviewer;
 import org.kuali.kra.coi.CoiUserRole;
-import org.kuali.kra.service.KcPersonService;
 import org.kuali.rice.krad.bo.BusinessObject;
 import org.kuali.rice.krad.util.GlobalVariables;
 
+@SuppressWarnings("unchecked")
 public class CoiDisclosureReviewsLookupableHelper extends CoiDisclosureLookupableHelperBase {
 
+    /**
+     * Comment for <code>serialVersionUID</code>
+     */
+    private static final long serialVersionUID = 5482769028074271782L;
 
-    public List<? extends BusinessObject> getSearchResults(Map<String, String> fieldValues) {
+    @Override
+    public List<? extends BusinessObject> getLookupSpecificSearchResults(Map<String, String> fieldValues) {
         List<CoiDisclosure> allDisclosures = (List<CoiDisclosure>) super.getResults(fieldValues);
         List<CoiDisclosure> coiDisclosureReviews = new ArrayList<CoiDisclosure>();
         String currentUser = GlobalVariables.getUserSession().getPrincipalName();
@@ -40,12 +45,17 @@ public class CoiDisclosureReviewsLookupableHelper extends CoiDisclosureLookupabl
             for (CoiUserRole userRole : userRoles) {
                 if (StringUtils.equalsIgnoreCase(userRole.getReviewerCode(), CoiReviewer.ASSIGNED_REVIEWER)) {
                     // userId is really the username . This should probably be "fixed" at some point.
-                    if (StringUtils.equalsIgnoreCase(currentUser, userRole.getUserId())) {
+                    if (StringUtils.equalsIgnoreCase(currentUser, userRole.getUserId()) && !userRole.isReviewCompleted()) {
                         coiDisclosureReviews.add(disclosure);
                     }
                 }
             }
         }
         return coiDisclosureReviews;
+    }
+    
+    @Override
+    protected boolean isAuthorizedForCoiLookups() {
+        return true;
     }
 }

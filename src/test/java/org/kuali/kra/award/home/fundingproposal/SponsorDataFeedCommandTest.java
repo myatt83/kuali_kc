@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,22 +17,31 @@ package org.kuali.kra.award.home.fundingproposal;
 
 import junit.framework.Assert;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.kuali.kra.bo.Sponsor;
+import org.kuali.kra.infrastructure.KraServiceLocator;
+import org.kuali.kra.service.SponsorService;
 
 public class SponsorDataFeedCommandTest extends BaseDataFeedCommandTest {
     
     private ProposalDataFeedCommandBase command;
     private Sponsor sponsor;
+    private SponsorService sponsorService;
     
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        sponsor = new Sponsor();
-        sponsor.setSponsorCode("12345");
-        sponsor.setSponsorName("Test Sponsor");
+        sponsorService = KraServiceLocator.getService(SponsorService.class);
+        sponsor = sponsorService.getSponsor("000107");
         initializeProposal();
+    }
+    
+    @After
+    public void tearDown() throws Exception {
+        sponsorService = null;
+        super.tearDown();
     }
     
     @Test

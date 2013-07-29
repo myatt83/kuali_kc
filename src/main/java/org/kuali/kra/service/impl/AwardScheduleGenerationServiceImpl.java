@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -125,8 +125,19 @@ public class AwardScheduleGenerationServiceImpl implements AwardScheduleGenerati
         java.util.Date startDate;
         java.util.Date endDate = null;
         Calendar calendar = new GregorianCalendar();
-        
-        startDate = getStartDate(awardReportTerm, mapOfDates);
+        final String SF_269_EXPENDITURE_REPORT_CODE = "33";
+        final String FREQUENCY_ANNUAL = "Annual";
+        if (awardReportTerm.getReportCode().equalsIgnoreCase(SF_269_EXPENDITURE_REPORT_CODE)
+                && awardReportTerm.getFrequencyBaseCode().equalsIgnoreCase(
+                        FrequencyBaseConstants.AWARD_EXPIRATION_DATE_OF_OBLIGATION.getfrequencyBase())
+                && awardReportTerm.getFrequency().getDescription().equalsIgnoreCase(FREQUENCY_ANNUAL)
+                && (mapOfDates.get(FrequencyBaseConstants.AWARD_EXPIRATION_DATE_OF_OBLIGATION.getfrequencyBase()) != null)) {
+            calendar.setTime(mapOfDates.get(FrequencyBaseConstants.AWARD_EXPIRATION_DATE_OF_OBLIGATION.getfrequencyBase()));
+            startDate = calendar.getTime();
+        }
+        else {
+            startDate = getStartDate(awardReportTerm, mapOfDates);
+        }
         if (StringUtils.isNotBlank(awardReportTerm.getFrequencyBaseCode())) {
             endDate = getEndDate(awardReportTerm.getFrequencyBaseCode(),startDate, mapOfDates);
         }
@@ -227,8 +238,8 @@ public class AwardScheduleGenerationServiceImpl implements AwardScheduleGenerati
      * @param calendar
      */
     protected void addOffSetPeriodToStartDate(Frequency frequency, Calendar calendar) {
-        if(frequency!= null){
-            if(frequency.getNumberOfDays()!=null){
+        if (frequency != null) {
+            if(frequency.getNumberOfDays()!=null) {
                 calendar.add(Calendar.DAY_OF_YEAR,frequency.getNumberOfDays());
             }else if(frequency.getAdvanceNumberOfDays()!=null){
                 calendar.add(Calendar.DAY_OF_YEAR,-frequency.getAdvanceNumberOfDays());

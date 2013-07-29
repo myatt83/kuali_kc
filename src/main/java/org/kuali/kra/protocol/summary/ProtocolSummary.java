@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.kuali.kra.protocol.actions.ProtocolAction;
+import org.kuali.kra.protocol.actions.ProtocolActionBase;
 
 
 
@@ -47,7 +47,7 @@ public class ProtocolSummary implements Serializable {
     private List<ResearchAreaSummary> researchAreas = new ArrayList<ResearchAreaSummary>();
     private List<AttachmentSummary> attachments = new ArrayList<AttachmentSummary>();
     private List<FundingSourceSummary> fundingSources = new ArrayList<FundingSourceSummary>();
-    private List<ParticipantSummary> participants = new ArrayList<ParticipantSummary>();
+ 
     private List<OrganizationSummary> organizations = new ArrayList<OrganizationSummary>();
     private List<SpecialReviewSummary> specialReviews = new ArrayList<SpecialReviewSummary>();
     private AdditionalInfoSummary additionalInfoSummary;
@@ -66,7 +66,7 @@ public class ProtocolSummary implements Serializable {
         
     }
     
-    public void setLastProtocolAction(ProtocolAction protocolAction) {
+    public void setLastProtocolAction(ProtocolActionBase protocolAction) {
         if (protocolAction == null) {
             lastProtocolActionDescription = "";
         }
@@ -195,14 +195,6 @@ public class ProtocolSummary implements Serializable {
     public void add(FundingSourceSummary fundingSourceSummary) {
         fundingSources.add(fundingSourceSummary);
     }
-    
-    public List<ParticipantSummary> getParticipants() {
-        return participants;
-    }
-    
-    public void add(ParticipantSummary participantSummary) {
-        participants.add(participantSummary);
-    }
 
     public List<OrganizationSummary> getOrganizations() {
         return organizations;
@@ -241,7 +233,7 @@ public class ProtocolSummary implements Serializable {
         
         comparePersonnel(other);
         compareResearchAreas(other);
-        compareParticipants(other);
+  
         compareSpecialReviews(other);
         compareFundingSources(other);
         compareOrganizations(other);
@@ -283,12 +275,6 @@ public class ProtocolSummary implements Serializable {
     private void compareResearchAreas(ProtocolSummary other) {
         for (ResearchAreaSummary researchArea : researchAreas) {
             researchArea.compare(other);
-        }
-    }
-    
-    private void compareParticipants(ProtocolSummary other) {
-        for (ParticipantSummary participant : participants) {
-            participant.compare(other);
         }
     }
     
@@ -341,15 +327,6 @@ public class ProtocolSummary implements Serializable {
         for (ResearchAreaSummary researchArea : researchAreas) {
             if (StringUtils.equals(researchArea.getResearchAreaCode(), researchAreaCode)) {
                 return researchArea;
-            }
-        }
-        return null;
-    }
-
-    public ParticipantSummary findParticipant(String description) {
-        for (ParticipantSummary participant : participants) {
-            if (StringUtils.equals(participant.getDescription(), description)) {
-                return participant;
             }
         }
         return null;

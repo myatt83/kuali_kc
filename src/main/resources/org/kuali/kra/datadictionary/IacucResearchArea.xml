@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?><!--
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,9 @@
 		<property name="lookupDefinition">
 			<ref bean="IacucResearchArea-lookupDefinition"/>
 		</property>
+		<property name="helpDefinition" >
+            <bean parent="HelpDefinition" p:parameterNamespace="KC-IACUC" p:parameterName="protocolAreaOfResearchHelpUrl" p:parameterDetailType="Document" />
+        </property>
 		<property name="titleAttribute" value="researchAreaCode"/>
 		<property name="attributes">
 			<list>
@@ -138,7 +141,7 @@
 	<!-- Business Object Lookup Definition -->
 	<bean id="IacucResearchArea-lookupDefinition" parent="IacucResearchArea-lookupDefinition-parentBean"/>
 	<bean abstract="true" id="IacucResearchArea-lookupDefinition-parentBean" parent="LookupDefinition">
-		<property name="title" value="Research Areas Lookup"/>
+		<property name="title" value="Iacuc Research Areas Lookup"/>
 		<property name="menubar" value="&lt;a href=&quot;index.jsp&quot;&gt;Main&lt;/a&gt;"/>
 
 		<property name="defaultSort">

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,13 @@ package org.kuali.kra.protocol.auth;
 import org.kuali.kra.infrastructure.PermissionConstants;
 
 /**
- * The View Protocol Authorizer determines if a user has the right
+ * The View ProtocolBase Authorizer determines if a user has the right
  * to view restricted notes protocol.
  */
-public class ViewRestrictedNotesProtocolAuthorizer extends ProtocolAuthorizer {
+public class ViewRestrictedNotesProtocolAuthorizer extends ProtocolAuthorizerBase {
 
     /** {@inheritDoc} */
-    public boolean isAuthorized(String userId, ProtocolTask task) {
+    public boolean isAuthorized(String userId, ProtocolTaskBase task) {
         return hasPermission(userId, task.getProtocol(), PermissionConstants.VIEW_RESTRICTED_NOTES);
     }
 }

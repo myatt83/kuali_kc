@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,8 @@ import org.junit.Test;
 import org.kuali.kra.committee.bo.Committee;
 import org.kuali.kra.committee.bo.CommitteeSchedule;
 import org.kuali.kra.committee.document.authorization.CommitteeScheduleTask;
-import org.kuali.kra.committee.document.authorization.CommitteeTask;
+import org.kuali.kra.common.committee.document.authorization.CommitteeTaskBase;
+import org.kuali.kra.infrastructure.TaskGroupName;
 import org.kuali.kra.infrastructure.TaskName;
 import org.kuali.kra.service.KraAuthorizationService;
 import org.kuali.kra.service.impl.mocks.KraAuthorizationServiceMock;
@@ -38,7 +39,7 @@ public class ViewScheduleAuthorizerTest {
         authorizer.setKraAuthorizationService(kraAuthorizationService);
         
         Committee committee = createCommittee("viewschedule1", "view schedule test");
-        CommitteeTask task = new CommitteeTask(TaskName.VIEW_SCHEDULE, committee);
+        CommitteeTaskBase<Committee> task = new CommitteeTaskBase<Committee>(TaskGroupName.COMMITTEE, TaskName.VIEW_SCHEDULE, committee) {};
         assertEquals(true, authorizer.isAuthorized(USERNAME, task));
         final KraAuthorizationService kraAuthorizationService1 = new KraAuthorizationServiceMock(false);
         authorizer.setKraAuthorizationService(kraAuthorizationService1);
@@ -49,10 +50,10 @@ public class ViewScheduleAuthorizerTest {
         CommitteeSchedule committeeSchedule = new CommitteeSchedule();
         final KraAuthorizationService kraAuthorizationService2 = new KraAuthorizationServiceMock(true);
         authorizer.setKraAuthorizationService(kraAuthorizationService2);        
-        task = new CommitteeScheduleTask(TaskName.VIEW_SCHEDULE, committeeSchedule.getCommittee(), committeeSchedule);
+        task = new CommitteeScheduleTask(TaskName.VIEW_SCHEDULE, committeeSchedule.getParentCommittee(), committeeSchedule);
         assertEquals(false, authorizer.isAuthorized(PERSON_ID, task));        
         committeeSchedule.setAvailableToReviewers(true);        
-        task = new CommitteeScheduleTask(TaskName.VIEW_SCHEDULE, committeeSchedule.getCommittee(), committeeSchedule);
+        task = new CommitteeScheduleTask(TaskName.VIEW_SCHEDULE, committeeSchedule.getParentCommittee(), committeeSchedule);
         assertEquals(true, authorizer.isAuthorized(PERSON_ID, task));
     }
     

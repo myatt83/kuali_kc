@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,11 @@
 package org.kuali.kra.iacuc.actions.amendrenew;
 
 import org.kuali.kra.iacuc.IacucProtocolDocument;
-import org.kuali.kra.protocol.actions.amendrenew.CreateAmendmentEvent;
+import org.kuali.kra.protocol.actions.amendrenew.CreateAmendmentEventBase;
 import org.kuali.kra.protocol.actions.amendrenew.ProtocolAmendmentBean;
 import org.kuali.kra.rule.BusinessRuleInterface;
 
-public class CreateIacucAmendmentEvent extends CreateAmendmentEvent {
+public class CreateIacucAmendmentEvent extends CreateAmendmentEventBase {
 
     public CreateIacucAmendmentEvent(IacucProtocolDocument document, String propertyName, ProtocolAmendmentBean amendmentBean) {
         super(document, propertyName, amendmentBean);

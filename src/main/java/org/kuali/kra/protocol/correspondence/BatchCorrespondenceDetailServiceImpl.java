@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,10 +28,10 @@ public class BatchCorrespondenceDetailServiceImpl implements BatchCorrespondence
     /**
      * 
      * @see org.kuali.kra.protocol.correspondence.BatchCorrespondenceDetailService#addBatchCorrespondenceDetail(
-     * org.kuali.kra.protocol.correspondence.BatchCorrespondence, org.kuali.kra.protocol.correspondence.BatchCorrespondenceDetail)
+     * org.kuali.kra.protocol.correspondence.BatchCorrespondenceBase, org.kuali.kra.protocol.correspondence.BatchCorrespondenceDetailBase)
      */
-    public void addBatchCorrespondenceDetail(BatchCorrespondence batchCorrespondence,
-            BatchCorrespondenceDetail newBatchCorrespondenceDetail) {
+    public void addBatchCorrespondenceDetail(BatchCorrespondenceBase batchCorrespondence,
+            BatchCorrespondenceDetailBase newBatchCorrespondenceDetail) {
 
         newBatchCorrespondenceDetail.setBatchCorrespondenceTypeCode(batchCorrespondence.getBatchCorrespondenceTypeCode());
         newBatchCorrespondenceDetail.refreshReferenceObject(REFERENCE_PROTOCOL_CORRESPONDENCE_TYPE);
@@ -42,9 +42,9 @@ public class BatchCorrespondenceDetailServiceImpl implements BatchCorrespondence
     /**
      * 
      * @see org.kuali.kra.protocol.correspondence.BatchCorrespondenceDetailService#saveBatchCorrespondenceDetails(
-     * org.kuali.kra.protocol.correspondence.BatchCorrespondence, java.util.List)
+     * org.kuali.kra.protocol.correspondence.BatchCorrespondenceBase, java.util.List)
      */
-    public void saveBatchCorrespondenceDetails(BatchCorrespondence batchCorrespondence, List<BatchCorrespondenceDetail> deletedBos) {
+    public void saveBatchCorrespondenceDetails(BatchCorrespondenceBase batchCorrespondence, List<BatchCorrespondenceDetailBase> deletedBos) {
         if (!deletedBos.isEmpty()) {
             businessObjectService.delete(deletedBos);
         }

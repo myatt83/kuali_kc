@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,8 @@ import org.kuali.rice.krad.util.GlobalVariables;
  * This defines the rules for AwardProjectPerson
  */
 public class AwardProjectPersonsSaveRuleImpl implements AwardProjectPersonsSaveRule {
+    
+    public static final String ERROR_UNIT_REQUIRED = "error.select.unit";
     
     /**
      * This method will be called when saving Award Project Persons
@@ -80,14 +82,30 @@ public class AwardProjectPersonsSaveRuleImpl implements AwardProjectPersonsSaveR
      */
     boolean checkForRequiredUnitDetails(List<AwardPerson> projectPersons) {
         boolean valid = true;
+        int personCount = 0;
         for(AwardPerson p: projectPersons) {
             if(p.isPrincipalInvestigator() || p.isCoInvestigator()
                     || (p.isKeyPerson() && p.isOptInUnitStatus())) {
+                personCount = personCount + 1;
                 if(p.getUnits().size() == 0) {
+                    personCount = personCount - 1;
                     valid = false;
-                    GlobalVariables.getMessageMap().putError(AWARD_PROJECT_PERSON_LIST_ERROR_KEY,
+                    if (p.getFullName() != null) {
+                        GlobalVariables.getMessageMap().putError(AWARD_PROJECT_PERSON_LIST_ERROR_KEY,
                                                                 ERROR_AWARD_PROJECT_PERSON_UNIT_DETAILS_REQUIRED,
                                                                 p.getFullName());
+                    } else {
+                        if (p.isEmployee()) { 
+                            GlobalVariables.getMessageMap().putError(AWARD_PROJECT_PERSON_LIST_ERROR_KEY,
+                                    ERROR_AWARD_PROJECT_PERSON_UNIT_DETAILS_REQUIRED,
+                                    p.getPerson().getUnit().getUnitName());                        
+                        } else {
+                            GlobalVariables.getMessageMap().putError(AWARD_PROJECT_PERSON_LIST_ERROR_KEY,
+                                    ERROR_AWARD_PROJECT_PERSON_UNIT_DETAILS_REQUIRED,
+                                    p.getRolodex().getOrganization());
+                        }
+                    }
+                    GlobalVariables.getMessageMap().putError(AWARD_PROJECT_PERSON_LIST_ERROR_KEY+"["+personCount+"].personUnitNumber", ERROR_UNIT_REQUIRED);
                 }
             }
         }

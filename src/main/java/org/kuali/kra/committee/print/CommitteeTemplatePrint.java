@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,13 @@
  */
 package org.kuali.kra.committee.print;
 
+import org.kuali.kra.common.committee.print.TemplatePrintBase;
+
 /**
  * 
  * This class identifies the template print functionality for committee reports.
  */
-public class CommitteeTemplatePrint extends TemplatePrint {
+public class CommitteeTemplatePrint extends TemplatePrintBase {
 
     private static final long serialVersionUID = 8819040007652342082L;
 

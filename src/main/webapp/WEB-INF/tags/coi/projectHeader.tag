@@ -1,5 +1,5 @@
 <%--
- Copyright 2005-2010 The Kuali Foundation
+ Copyright 2005-2013 The Kuali Foundation
 
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -38,6 +38,9 @@
 	<c:when test="${disclProject.protocolEvent}">
 		<c:set var="projectId" value="${disclProject.protocol.protocolNumber}"/>
 	</c:when>		
+	<c:when test="${disclProject.iacucProtocolEvent}">
+		<c:set var="projectId" value="${disclProject.iacucProtocol.protocolNumber}"/>
+	</c:when>		
 	<c:otherwise>
 		<c:set var="projectId" value="${disclProject.projectId}"/>
 	</c:otherwise>
@@ -49,15 +52,7 @@
 		<span style="text-align: right; float: right; padding-left: 20px; padding-right: 5px;">
 			<c:if test="${not empty disclProject.coiDispositionStatus.description}">
 			Disposition: 
-			<c:choose><c:when test="${not KualiForm.editingMode['approveCoiDisclosure'] || !KualiForm.document.coiDisclosure.updateEvent}">
-				<%-- the readOnlyAlternateDisplay isn't working properly with valuesfinder fields right now so using this instead. --%>
 				<c:out value="${disclProject.coiDispositionStatus.description}"/>
-			</c:when><c:otherwise>
-				<kul:htmlControlAttribute property="${boLocation}.disclosureDispositionCode" 
-				readOnly="false" 
-				attributeEntry="${coiDisclProjectAttributes.disclosureDispositionCode}"
-				styleClass="dispositionSelect"/>
-			</c:otherwise></c:choose>
 			</c:if>
 		</span>                    
 	</h3>
@@ -75,31 +70,36 @@
 		<c:when test="${disclProject.protocolEvent}">
 			<kra-coi:protocolHeader disclProject="${disclProject}"/>
 		</c:when>		
+		<c:when test="${disclProject.iacucProtocolEvent}">
+			<kra-coi:iacucProtocolHeader disclProject="${disclProject}"/>
+		</c:when>		
 		<c:otherwise>
-	    <table class=tab cellpadding="0" cellspacing="0" summary="">
-	        <tbody>
-	        <%-- Header --%>
-	    <c:forEach var="labelValue" items="${disclProject.headerItems}" varStatus="status">
-	        <c:if test="${(status.index mod 2) == 0}">
-	        <tr>
-	        </c:if>
-	           <th><div align="right">${labelValue.label}:</div></th> 
-	           <td align="left" valign="middle">
-	               <div align="left">
-	                  ${labelValue.value}
-	               </div>
-	         <c:if test="${(status.index mod 2) != 0}">
-	        </tr>
-	        </c:if>
-	    </c:forEach>
-	        <c:if test="${fn:length(disclProject.headerItems) mod 2 != 0}">
-	        <td/>
-	        <td/>
-	        </tr>
-	        </c:if>
-	
-	
-	</table>
-	</c:otherwise>
+	    	<table class=tab cellpadding="0" cellspacing="0" summary="">
+	        	<tbody>
+		        	<%-- Header --%>
+				    <c:forEach var="labelValue" items="${disclProject.headerItems}" varStatus="status">
+		        		<c:if test="${(status.index mod 2) == 0}">
+					        <tr>
+	        			</c:if>
+						<th width="15%">
+							<div align="right">
+								${labelValue.label}:
+							</div>
+						</th> 
+	    	       		<td align="left" valign="middle" width="35%">
+	        	       	<div align="left">
+	            	    	${labelValue.value}
+		            	</div>
+		         		<c:if test="${(status.index mod 2) != 0}">
+		        			</tr>
+	    	    		</c:if>
+	    			</c:forEach>
+	        		<c:if test="${fn:length(disclProject.headerItems) mod 2 != 0}">
+	        			<td/>
+		        		<td/>
+		        		</tr>
+		        	</c:if>
+			</table>
+		</c:otherwise>
 	</c:choose>
 </div>

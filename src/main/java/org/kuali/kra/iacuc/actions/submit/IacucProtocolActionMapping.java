@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,22 +23,20 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+import org.kuali.kra.common.committee.meeting.CommitteeScheduleMinuteBase;
 import org.kuali.kra.iacuc.actions.IacucProtocolActionType;
-import org.kuali.kra.protocol.actions.submit.ProtocolActionMapping;
+import org.kuali.kra.iacuc.committee.meeting.IacucCommitteeScheduleMinute;
+import org.kuali.kra.protocol.actions.submit.ProtocolActionMappingBase;
 
 /*
  * This class is for the condition attributes of of the protocol action.
  * i.e., the condition of protocol status, submissionstatus, action type code etc.
  */
-public class IacucProtocolActionMapping extends ProtocolActionMapping {
+public class IacucProtocolActionMapping extends ProtocolActionMappingBase {
     
     private static final Map<String, String> ACTION_TYPE_SUBMISSION_TYPE_MAP;
     static {
-        final Map<String, String> codeMap = new HashMap<String, String>();        
-//TODO: More to do here for IACUC.
-//TODO:IACUC        codeMap.put(IacucProtocolActionType.SUSPENDED, IacucProtocolSubmissionType.REQUEST_FOR_SUSPENSION);
-//        codeMap.put(IacucProtocolActionType.CLOSED_ADMINISTRATIVELY_CLOSED, IacucProtocolSubmissionType.REQUEST_TO_CLOSE);
-//        codeMap.put(IacucProtocolActionType.TERMINATED, IacucProtocolSubmissionType.REQUEST_FOR_TERMINATION);        
+        final Map<String, String> codeMap = new HashMap<String, String>();              
         ACTION_TYPE_SUBMISSION_TYPE_MAP = Collections.unmodifiableMap(codeMap);
     }
 
@@ -46,9 +44,6 @@ public class IacucProtocolActionMapping extends ProtocolActionMapping {
     static {
         final List<String> codes = new ArrayList<String>();     
         codes.add(IacucProtocolActionType.IACUC_APPROVED);
-//TODO: More here to do for IACUC. Must include "designated member approval" and any other similar approvals.
-//        codes.add(IacucProtocolActionType.EXPEDITE_APPROVAL);
-//        codes.add(IacucProtocolActionType.GRANT_EXEMPTION);
         APPROVE_ACTION_TYPES = codes;
     }
 
@@ -183,6 +178,12 @@ public class IacucProtocolActionMapping extends ProtocolActionMapping {
         }
         
         return retVal;
+    }
+
+
+    @Override
+    protected Class<? extends CommitteeScheduleMinuteBase> getCommitteeScheduleMinuteBOClassHook() {
+        return IacucCommitteeScheduleMinute.class;
     }
     
     

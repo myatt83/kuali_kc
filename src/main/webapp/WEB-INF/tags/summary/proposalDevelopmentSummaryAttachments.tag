@@ -1,5 +1,5 @@
 <%--
- Copyright 2005-2010 The Kuali Foundation
+ Copyright 2005-2013 The Kuali Foundation
  
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  limitations under the License.
 --%>
 <%@ include file="/WEB-INF/jsp/kraTldHeader.jsp"%>
-
+<%@ attribute name="transparentBackground" required="false" %>
 <c:set var="action" value="proposalDevelopmentApproverView" />
 <c:set var="proposalDevelopmentAttributes"
 	value="${DataDictionary.DevelopmentProposal.attributes}" />
@@ -33,7 +33,7 @@
 	</c:if>
 </c:forEach>
 
-<kul:tab tabTitle="Attachments" defaultOpen="false" tabErrorKey="">
+<kul:tab tabTitle="Attachments" defaultOpen="false" tabErrorKey="" transparentBackground="${transparentBackground }">
 
 	<kul:innerTab
 		tabTitle="Proposal Attachments(${proposalAttachementCount})"

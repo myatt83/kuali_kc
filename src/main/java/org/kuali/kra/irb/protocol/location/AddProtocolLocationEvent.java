@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,33 +17,18 @@ package org.kuali.kra.irb.protocol.location;
 
 import org.kuali.kra.irb.ProtocolDocument;
 import org.kuali.rice.krad.document.Document;
-import org.kuali.rice.krad.rules.rule.BusinessRule;
 
 /**
  * This class represents the AddProtocolLocationEvent
  */
-public class AddProtocolLocationEvent extends ProtocolLocationEventBase {
-    
-    public AddProtocolLocationEvent(String errorPathPrefix, ProtocolDocument document, ProtocolLocation protocolLocation) {
-        super("adding ProtocolLocation to document " + getDocumentId(document), errorPathPrefix, document, protocolLocation);
-    }
+public class AddProtocolLocationEvent extends org.kuali.kra.protocol.protocol.location.AddProtocolLocationEvent {
 
+    public AddProtocolLocationEvent(String errorPathPrefix, ProtocolDocument document, ProtocolLocation protocolLocation) {
+        super(errorPathPrefix, document, protocolLocation);
+    }
+    
     public AddProtocolLocationEvent(String errorPathPrefix, Document document, ProtocolLocation protocolLocation) {
         this(errorPathPrefix, (ProtocolDocument) document, protocolLocation);
-    }
-    
-    /**
-     * @see org.kuali.core.rule.event.KualiDocumentEvent#getRuleInterfaceClass()
-     */
-    public Class getRuleInterfaceClass() {
-        return AddProtocolLocationRule.class;
-    }
-
-    /**
-     * @see org.kuali.core.rule.event.KualiDocumentEvent#invokeRuleMethod(org.kuali.core.rule.BusinessRule)
-     */
-    public boolean invokeRuleMethod(BusinessRule rule) {
-        return ((AddProtocolLocationRule) rule).processAddProtocolLocationBusinessRules(this);
     }
 
 }

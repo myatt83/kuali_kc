@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  *
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import static org.kuali.kra.infrastructure.KeyConstants.AWARD_ATTACHMENT_FILE_RE
 import static org.kuali.kra.infrastructure.KeyConstants.AWARD_ATTACHMENT_TYPE_CODE_REQUIRED;
 
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -40,8 +41,6 @@ import org.kuali.kra.award.contacts.AwardProjectPersonsSaveRule;
 import org.kuali.kra.award.contacts.AwardProjectPersonsSaveRuleImpl;
 import org.kuali.kra.award.contacts.AwardSponsorContactAuditRule;
 import org.kuali.kra.award.contacts.SaveAwardProjectPersonsRuleEvent;
-import org.kuali.kra.award.customdata.AwardCustomDataRuleImpl;
-import org.kuali.kra.award.customdata.AwardSaveCustomDataRuleEvent;
 import org.kuali.kra.award.detailsdates.AddAwardTransferringSponsorEvent;
 import org.kuali.kra.award.detailsdates.AwardDetailsAndDatesRule;
 import org.kuali.kra.award.detailsdates.AwardDetailsAndDatesRuleImpl;
@@ -94,13 +93,23 @@ import org.kuali.kra.common.permissions.web.bean.User;
 import org.kuali.kra.common.specialreview.rule.event.SaveSpecialReviewEvent;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.KeyConstants;
+import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.rule.BusinessRuleInterface;
 import org.kuali.kra.rule.event.KraDocumentEventBaseExtension;
-import org.kuali.kra.rule.event.SaveCustomAttributeEvent;
+import org.kuali.kra.rule.event.SaveCustomDataEvent;
 import org.kuali.kra.rules.ResearchDocumentRuleBase;
+import org.kuali.kra.rules.CustomDataRule;
+import org.kuali.kra.service.SponsorService;
+import org.kuali.kra.timeandmoney.TimeAndMoneyForm;
+import org.kuali.kra.timeandmoney.rule.event.TimeAndMoneyAwardDateSaveEvent;
+import org.kuali.kra.timeandmoney.rules.TimeAndMoneyAwardDateSaveRuleImpl;
 import org.kuali.rice.core.api.util.KeyValue;
 import org.kuali.rice.coreservice.framework.parameter.ParameterConstants;
+import org.kuali.rice.kns.util.AuditCluster;
+import org.kuali.rice.kns.util.AuditError;
+import org.kuali.rice.kns.util.KNSGlobalVariables;
 import org.kuali.rice.krad.document.Document;
+import org.kuali.rice.krad.rules.rule.DocumentAuditRule;
 import org.kuali.rice.krad.util.GlobalVariables;
 import org.kuali.rice.krad.util.MessageMap;
 
@@ -125,7 +134,8 @@ public class AwardDocumentRule extends ResearchDocumentRuleBase implements Award
                                                                             AwardTemplateSyncRule,
                                                                             AwardCommentsRule,
                                                                             BusinessRuleInterface,
-                                                                            AddAwardAttachmentRule {
+                                                                            AddAwardAttachmentRule,
+                                                                            DocumentAuditRule{
     
     public static final String DOCUMENT_ERROR_PATH = "document";
     public static final String AWARD_ERROR_PATH = "awardList[0]";
@@ -136,6 +146,14 @@ public class AwardDocumentRule extends ResearchDocumentRuleBase implements Award
     private static final String AWARD_ERROR_PATH_PREFIX = "document.awardList[0].";
     
     private static final org.apache.commons.logging.Log LOG = org.apache.commons.logging.LogFactory.getLog(AwardDocumentRule.class);
+    
+    private List<AuditError> auditErrors;
+    private List<AuditError> auditWarnings;
+    
+    public AwardDocumentRule() {
+        auditErrors = new ArrayList<AuditError>();
+        auditWarnings = new ArrayList<AuditError>();
+    }
 
     /**
      * @see org.kuali.kra.award.paymentreports.specialapproval.approvedequipment.AwardApprovedEquipmentRule
@@ -295,13 +313,28 @@ public class AwardDocumentRule extends ResearchDocumentRuleBase implements Award
         retval &= processApprovedForeignTravelBusinessRules(errorMap, awardDocument);
 //        retval &= processAwardReportTermBusinessRules(document);
         retval &= processSaveAwardProjectPersonsBusinessRules(errorMap, awardDocument);
-        retval &= processSaveAwardCustomDataBusinessRules(awardDocument);
         retval &= processAwardCommentsBusinessRules(awardDocument);
         retval &= processAwardDetailsAndDatesSaveRules(document);
         retval &= processDateBusinessRule(errorMap, awardDocument);
         retval &=processKeywordBusinessRule(awardDocument);
+        //retval &= validateSponsors(errorMap, awardDocument);
         
         return retval;
+    }
+    
+    private boolean validateSponsors(MessageMap errorMap, AwardDocument awardDocument) {
+        boolean valid = true;
+        SponsorService ss = this.getSponsorService();
+        if (!ss.validateSponsor(awardDocument.getAward().getSponsor())) {
+            errorMap.putError("document.awardList[0].sponsorCode", KeyConstants.ERROR_INVALID_SPONSOR_CODE);
+            valid = false;
+        }
+        if (!StringUtils.isEmpty(awardDocument.getAward().getPrimeSponsorCode()) &&
+                !ss.validateSponsor(awardDocument.getAward().getPrimeSponsor())) {
+            errorMap.putError("document.awardList[0].primeSponsorCode", KeyConstants.ERROR_INVALID_SPONSOR_CODE);
+            valid = false;
+        }
+        return valid;
     }
 
     private boolean skipRuleProcessing(Document document) {
@@ -415,34 +448,6 @@ public class AwardDocumentRule extends ResearchDocumentRuleBase implements Award
         return valid;
     }
     
-
-    /**
-    *
-    * process save Custom Data Business Rules.
-    * @param awardDocument
-    * @return
-    */
-    private boolean processSaveAwardCustomDataBusinessRules(Document document) {
-        boolean valid = true;
-        
-        AwardDocument awardDocument = (AwardDocument) document;
-        
-        valid &= processRules(new SaveCustomAttributeEvent(Constants.EMPTY_STRING, awardDocument));
-        
-        MessageMap errorMap = GlobalVariables.getMessageMap();
-        errorMap.addToErrorPath(DOCUMENT_ERROR_PATH);
-        errorMap.addToErrorPath(AWARD_ERROR_PATH);
-        String errorPath = "awardCustomData";
-        errorMap.addToErrorPath(errorPath);
-        AwardSaveCustomDataRuleEvent event = new AwardSaveCustomDataRuleEvent(errorPath, 
-                                                               awardDocument);
-        valid &= new AwardCustomDataRuleImpl().processSaveAwardCustomDataBusinessRules(event);
-        errorMap.removeFromErrorPath(errorPath);
-        errorMap.removeFromErrorPath(AWARD_ERROR_PATH);
-        errorMap.removeFromErrorPath(DOCUMENT_ERROR_PATH);
-        return valid;
-    }
-    
     /**
      * This method checks the comments on an award
      * @param awardDocument
@@ -528,9 +533,9 @@ public class AwardDocumentRule extends ResearchDocumentRuleBase implements Award
     public boolean processRunAuditBusinessRules(Document document){
         boolean retval = true;
         
+        retval &= super.processRunAuditBusinessRules(document);
         retval &= new AwardReportAuditRule().processRunAuditBusinessRules(document);
         retval &= new AwardTermsAuditRule().processRunAuditBusinessRules(document);
-        retval &= new AwardCustomDataAuditRule().processRunAuditBusinessRules(document);
         retval &= new AwardPaymentAndInvoicesAuditRule().processRunAuditBusinessRules(document);
         retval &= new AwardCostShareAuditRule().processRunAuditBusinessRules(document);
         retval &= new AwardFandARateAuditRule().processRunAuditBusinessRules(document);
@@ -540,7 +545,8 @@ public class AwardDocumentRule extends ResearchDocumentRuleBase implements Award
         retval &= new AwardSyncAuditRule().processRunAuditBusinessRules(document);
         retval &= new AwardSponsorContactAuditRule().processRunAuditBusinessRules(document);
         retval &= new AwardBudgetLimitsAuditRule().processRunAuditBusinessRules(document);
-         
+        retval &= processDateBusinessRule(GlobalVariables.getMessageMap(), (AwardDocument)document);
+        reportAndCreateAuditCluster();
         return retval;
         
         
@@ -814,55 +820,54 @@ public class AwardDocumentRule extends ResearchDocumentRuleBase implements Award
      * and obligation end date >= obligation start date.
      */
     private boolean processDateBusinessRule(MessageMap errorMap, AwardDocument awardDocument) {
-        Award award = awardDocument.getAward();
-        errorMap.addToErrorPath(DOCUMENT_ERROR_PATH);
-        errorMap.addToErrorPath(AWARD_ERROR_PATH);
-
-        boolean success = true;
-        int lastIndex = award.getIndexOfLastAwardAmountInfo();
-        // make sure start dates are before end dates
-        Date effStartDate = award.getAwardEffectiveDate(); 
-        Date effEndDate = award.getAwardAmountInfos().get(lastIndex).getFinalExpirationDate();
         
-        // make sure Project Start Date <= Obligation Start Date <= Obligation End Date <= Project Start Date
-        if (effStartDate != null && effEndDate != null && effStartDate.after(effEndDate))  {
-            success = false;
-            errorMap.putError("awardAmountInfos["+lastIndex+"].finalExpirationDate", KeyConstants.ERROR_START_DATE_ON_OR_BEFORE,
-                    new String[] {"Project Start Date", "Project End Date"});
+        boolean isTimeAndMoneyDocument = KNSGlobalVariables.getKualiForm() instanceof TimeAndMoneyForm;
+        
+        if (isTimeAndMoneyDocument) {
+            TimeAndMoneyForm timeAndMoneyForm = (TimeAndMoneyForm) KNSGlobalVariables.getKualiForm();
+            TimeAndMoneyAwardDateSaveEvent event = new TimeAndMoneyAwardDateSaveEvent("", timeAndMoneyForm.getTimeAndMoneyDocument());
+            TimeAndMoneyAwardDateSaveRuleImpl rule = new TimeAndMoneyAwardDateSaveRuleImpl();
+            boolean result = rule.processSaveAwardDatesBusinessRules(event);
+            return result;
+            
+        } else {
+            Award award = awardDocument.getAward();
+            errorMap.addToErrorPath(DOCUMENT_ERROR_PATH);
+            errorMap.addToErrorPath(AWARD_ERROR_PATH);
+    
+            boolean success = true;
+            int lastIndex = award.getIndexOfLastAwardAmountInfo();
+            // make sure start dates are before end dates
+            Date effStartDate = award.getAwardEffectiveDate(); 
+            Date effEndDate = award.getAwardAmountInfos().get(lastIndex).getFinalExpirationDate();
+            String awardId = award.getAwardNumber();
+            
+            
+            Date oblStartDate = award.getAwardAmountInfos().get(lastIndex).getCurrentFundEffectiveDate(); 
+            Date oblEndDate = award.getAwardAmountInfos().get(lastIndex).getObligationExpirationDate();
+            
+            String fieldStarter = "awardAmountInfos["+lastIndex;
+            //String fieldStarter = "awardHierarchyNodeItems["+(lastIndex-1);
+            success = AwardDateRulesHelper.validateProjectStartBeforeProjectEnd(errorMap, effStartDate, effEndDate, fieldStarter+"].finalExpirationDate", awardId) && success;
+            success = AwardDateRulesHelper.validateObligationStartBeforeObligationEnd(errorMap, oblStartDate, oblEndDate, fieldStarter+"].currentFundEffectiveDate", awardId) && success;
+            success = AwardDateRulesHelper.validateProjectStartBeforeObligationStart(errorMap, effStartDate, oblStartDate, fieldStarter+"].currentFundEffectiveDate", awardId) && success;
+            success = AwardDateRulesHelper.validateProjectStartBeforeObligationEnd(errorMap, effStartDate, oblEndDate, fieldStarter+"].obligationExpirationDate", awardId) && success;
+            success = AwardDateRulesHelper.validateObligationStartBeforeProjectEnd(errorMap, oblStartDate, effEndDate, fieldStarter+"].currentFundEffectiveDate", awardId) && success;
+            success = AwardDateRulesHelper.validateObligationEndBeforeProjectEnd(errorMap, oblEndDate, effEndDate, fieldStarter+"].obligationExpirationDate", awardId) && success;
+            if (effStartDate == null) {
+               String link = Constants.MAPPING_AWARD_HOME_PAGE + "." + Constants.MAPPING_AWARD_HOME_DETAILS_AND_DATES_PAGE_ANCHOR;
+               String messageKey = KeyConstants.WARNING_AWARD_PROJECT_START_DATE_NULL;
+               String errorKey = "document.awardList[0].awardEffectiveDate";
+               auditWarnings.add(new AuditError(errorKey, messageKey, link));
+            }
+    
+            errorMap.removeFromErrorPath(AWARD_ERROR_PATH);
+            errorMap.removeFromErrorPath(DOCUMENT_ERROR_PATH);
+            return success;
         }
-        Date oblStartDate = award.getAwardAmountInfos().get(lastIndex).getCurrentFundEffectiveDate(); 
-        Date oblEndDate = award.getAwardAmountInfos().get(lastIndex).getObligationExpirationDate();
-        if (oblStartDate != null && oblEndDate != null && oblStartDate.after(oblEndDate)) {
-            success = false;
-            errorMap.putError("awardAmountInfos["+lastIndex+"].obligationExpirationDate", KeyConstants.ERROR_START_DATE_ON_OR_BEFORE,
-                    new String[] {"Obligation Start Date", "Obligation End Date"});
-        }
-        // make sure obligation dates are within effective dates
-        if (oblStartDate != null && effStartDate != null && oblStartDate.before(effStartDate)) {
-            success = false;
-            errorMap.putError("awardAmountInfos["+lastIndex+"].currentFundEffectiveDate", KeyConstants.ERROR_START_DATE_ON_OR_BEFORE,
-                    new String[] {"Project Start Date","Obligation Start Date"});
-        }
-        if (oblEndDate != null && effStartDate != null && oblEndDate.before(effStartDate)) {
-            success = false;
-            errorMap.putError("awardAmountInfos["+lastIndex+"].obligationExpirationDate", KeyConstants.ERROR_START_DATE_ON_OR_BEFORE,
-                    new String[] {"Project Start Date","Obligation End Date"});
-        }
-        if (oblStartDate != null && effEndDate != null && oblStartDate.after(effEndDate)) {
-            success = false;
-            errorMap.putError("awardAmountInfos["+lastIndex+"].currentFundEffectiveDate", KeyConstants.ERROR_START_DATE_ON_OR_BEFORE,
-                    new String[] {"Obligation Start Date", "Project End Date"});
-        }
-        if (oblEndDate != null && effEndDate != null && oblEndDate.after(effEndDate)) {
-            success = false;
-            errorMap.putError("awardAmountInfos["+lastIndex+"].obligationExpirationDate", KeyConstants.ERROR_START_DATE_ON_OR_BEFORE,
-                    new String[] {"Obligation End Date", "Project End Date"});
-        }
-
-        errorMap.removeFromErrorPath(AWARD_ERROR_PATH);
-        errorMap.removeFromErrorPath(DOCUMENT_ERROR_PATH);
-        return success;
     }
+    
+
 
     /**
      * @see org.kuali.kra.rule.BusinessRuleInterface#processRules(org.kuali.kra.rule.event.KraDocumentEventBaseExtension)
@@ -894,5 +899,18 @@ public class AwardDocumentRule extends ResearchDocumentRuleBase implements Award
         }
         
         return valid;
+    }
+    
+    protected void reportAndCreateAuditCluster() {
+        if (auditErrors.size() > 0) {
+            KNSGlobalVariables.getAuditErrorMap().put("homePageAuditErrors", new AuditCluster(Constants.MAPPING_AWARD_HOME_DETAILS_AND_DATES_PAGE_NAME, auditErrors, Constants.AUDIT_ERRORS));
+        }
+        if (auditWarnings.size() > 0) {
+            KNSGlobalVariables.getAuditErrorMap().put("homePageAuditWarnings", new AuditCluster(Constants.MAPPING_AWARD_HOME_DETAILS_AND_DATES_PAGE_NAME, auditWarnings, Constants.AUDIT_WARNINGS));            
+        }
+    }
+    
+    private SponsorService getSponsorService() {
+        return KraServiceLocator.getService(SponsorService.class);
     }
 }

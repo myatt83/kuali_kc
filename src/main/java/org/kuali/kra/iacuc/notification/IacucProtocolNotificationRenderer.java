@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.kuali.kra.common.committee.bo.CommitteeBase;
 import org.kuali.kra.iacuc.IacucProtocol;
 import org.kuali.kra.iacuc.actions.IacucProtocolAction;
 import org.kuali.kra.iacuc.actions.IacucProtocolActionType;
@@ -27,13 +28,14 @@ import org.kuali.kra.iacuc.actions.submit.IacucProtocolReviewType;
 import org.kuali.kra.iacuc.actions.submit.IacucProtocolSubmission;
 import org.kuali.kra.iacuc.actions.submit.IacucProtocolSubmissionQualifierType;
 import org.kuali.kra.iacuc.actions.submit.IacucProtocolSubmissionType;
-import org.kuali.kra.protocol.notification.ProtocolNotificationRenderer;
+import org.kuali.kra.iacuc.committee.bo.IacucCommittee;
+import org.kuali.kra.protocol.notification.ProtocolNotificationRendererBase;
 import org.kuali.kra.protocol.notification.ProtocolReplacementParameters;
 
 /**
  * Renders fields for the IRB and IACUC notifications.
  */
-public class IacucProtocolNotificationRenderer extends ProtocolNotificationRenderer {
+public class IacucProtocolNotificationRenderer extends ProtocolNotificationRendererBase {
 
     private static final long serialVersionUID = 44807703047564273L;
 
@@ -113,6 +115,11 @@ public class IacucProtocolNotificationRenderer extends ProtocolNotificationRende
             result = protocolReviewTypes.get(0).getDescription();
         }        
         return result;
+    }
+
+    @Override
+    protected Class<? extends CommitteeBase> getCommonCommitteeBOClassHook() {
+        return IacucCommittee.class;
     }
     
 }

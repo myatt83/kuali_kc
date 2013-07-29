@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,7 +52,10 @@ public class MedusaBean implements Serializable{
      * @param medudaViewRadio The medudaViewRadio to set.
      */
     public void setMedusaViewRadio(String medusaViewRadio) {
-        this.medusaViewRadio = medusaViewRadio;
+        if (!StringUtils.equals(this.medusaViewRadio, medusaViewRadio)) {
+            this.medusaViewRadio = medusaViewRadio;
+            generateParentNodes();
+        }
     }
 
     /**
@@ -94,15 +97,21 @@ public class MedusaBean implements Serializable{
     private MedusaService getMedusaService() {
         return KraServiceLocator.getService(MedusaService.class);
     }
-
-
-    public List<MedusaNode> getParentNodes() {
+    
+    public void generateParentNodes() {
         if(StringUtils.equalsIgnoreCase("0", getMedusaViewRadio())){
             setParentNodes(getMedusaService().getMedusaByProposal(getModuleName(), getModuleIdentifier()));    
         }else if(StringUtils.equalsIgnoreCase("1", getMedusaViewRadio())){
             setParentNodes(getMedusaService().getMedusaByAward(getModuleName(), getModuleIdentifier()));    
-        } 
-        sortNodes(parentNodes);
+        }
+        sortNodes(parentNodes);        
+    }
+
+
+    public List<MedusaNode> getParentNodes() {
+        if (parentNodes == null) {
+            generateParentNodes();
+        }
         return parentNodes;
     }
     

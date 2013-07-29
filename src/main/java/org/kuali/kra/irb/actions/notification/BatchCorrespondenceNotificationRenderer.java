@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -80,7 +80,6 @@ public class BatchCorrespondenceNotificationRenderer extends IRBNotificationRend
         Map<String, String> params = super.getDefaultReplacementParameters();
         params.put("{DETAIL_ID}", detailId.toString());
         params.put("{PROTOCOL_CORRESPONDENCE_TYPE}", protocolCorrespondenceType);
-        //params.put("{USER_FULLNAME}", userFullName);
         return params;
     }
 

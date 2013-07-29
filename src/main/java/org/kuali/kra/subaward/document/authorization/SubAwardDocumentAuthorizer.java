@@ -1,5 +1,5 @@
 /*.
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -94,17 +94,7 @@ extends KcTransactionalDocumentAuthorizerBase {
         return getTaskAuthorizationService().isAuthorized(userId, task);
     }
 
-    /**.
-     * @see org.kuali.kra.authorization.KcTransactionalDocumentAuthorizerBase
-     * #canReload(org.kuali.rice.kns.document.Document,
-     *  org.kuali.rice.kim.api.identity.Person)
-     */
-    @Override
-    public boolean canReload(Document document, Person user) {
-        return canEdit(document, user);
-    }
-
-    /**.
+    /**
      * This method is for checking whether user can open
      * @param document the Document
      * @param user the Person

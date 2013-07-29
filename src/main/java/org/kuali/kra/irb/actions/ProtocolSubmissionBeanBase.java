@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,18 +18,19 @@ package org.kuali.kra.irb.actions;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.kuali.kra.irb.actions.notifyirb.ProtocolActionAttachment;
+//import org.kuali.kra.irb.actions.notifyirb.ProtocolActionAttachment;
+import org.kuali.kra.protocol.actions.notify.ProtocolActionAttachment;
 import org.kuali.kra.questionnaire.answer.AnswerHeader;
 
 /**
  * 
  * This class for the base property of request/notify irb action
  */
-public abstract class ProtocolSubmissionBeanBase extends ProtocolActionBean {
+public abstract class ProtocolSubmissionBeanBase extends ProtocolActionBean implements org.kuali.kra.protocol.actions.ProtocolSubmissionBeanBase {
+    
     private String committeeId;
     private ProtocolActionAttachment newActionAttachment;
     private List<ProtocolActionAttachment> actionAttachments = new ArrayList<ProtocolActionAttachment>();
-    private List<AnswerHeader> answerHeaders;
 
     public ProtocolSubmissionBeanBase(ActionHelper actionHelper) {
         super(actionHelper);
@@ -55,16 +56,8 @@ public abstract class ProtocolSubmissionBeanBase extends ProtocolActionBean {
         return actionAttachments;
     }
 
-    public void setActionAttachments(List<ProtocolActionAttachment> actionAttachments) {
+    public void setActionAttachments(List<org.kuali.kra.protocol.actions.notify.ProtocolActionAttachment> actionAttachments) {
         this.actionAttachments = actionAttachments;
-    }
-
-    public List<AnswerHeader> getAnswerHeaders() {
-        return answerHeaders;
-    }
-
-    public void setAnswerHeaders(List<AnswerHeader> answerHeaders) {
-        this.answerHeaders = answerHeaders;
     }
 
 }

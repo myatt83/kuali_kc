@@ -1,5 +1,5 @@
 <!--
- Copyright 2005-2010 The Kuali Foundation.
+ Copyright 2005-2013 The Kuali Foundation.
  
  Licensed under the Educational Community License, Version 1.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -36,9 +36,9 @@
 	
 	<class-descriptor class="org.kuali.kra.award.home.Award" table="AWARD">
 		<field-descriptor name="awardId" column="AWARD_ID" jdbc-type="BIGINT" primarykey="true" autoincrement="true" sequence-name="SEQUENCE_AWARD_ID" />		
+		<field-descriptor id="1" name="awardNumber" column="AWARD_NUMBER" jdbc-type="VARCHAR" />
+		<field-descriptor id="2" name="sequenceNumber" column="SEQUENCE_NUMBER" jdbc-type="INTEGER"/>
 		<field-descriptor name="documentNumber" column="DOCUMENT_NUMBER" jdbc-type="VARCHAR" access="anonymous" />
-		<field-descriptor name="awardNumber" column="AWARD_NUMBER" jdbc-type="VARCHAR" />
-		<field-descriptor name="sequenceNumber" column="SEQUENCE_NUMBER" jdbc-type="INTEGER"/>
 		<field-descriptor name="sponsorCode" column="SPONSOR_CODE" jdbc-type="VARCHAR"/>
 		<field-descriptor name="statusCode" column="STATUS_CODE" jdbc-type="INTEGER"/>
 		<field-descriptor name="templateCode" column="TEMPLATE_CODE" jdbc-type="INTEGER"/>
@@ -90,8 +90,7 @@
     	<field-descriptor name="financialChartOfAccountsCode" column="FIN_CHART_OF_ACCOUNTS_CODE" jdbc-type="VARCHAR" />
     	<field-descriptor name="syncChild" column="HIERARCHY_SYNC_CHILD" jdbc-type="CHAR" conversion="org.kuali.rice.core.framework.persistence.ojb.conversion.OjbCharBooleanConversion"/>
     	<field-descriptor name="awardSequenceStatus" column="AWARD_SEQUENCE_STATUS" jdbc-type="VARCHAR"/>
-    	
-    	<collection-descriptor name="awardComments" proxy="true" element-class-ref="org.kuali.kra.award.home.AwardComment" collection-class="org.apache.ojb.broker.util.collections.ManageableArrayList" auto-retrieve="true" auto-update="object" auto-delete="object">
+     	<collection-descriptor name="awardComments" proxy="true" element-class-ref="org.kuali.kra.award.home.AwardComment" collection-class="org.apache.ojb.broker.util.collections.ManageableArrayList" auto-retrieve="true" auto-update="object" auto-delete="object">
             <inverse-foreignkey field-ref="awardId"/>
         </collection-descriptor>
         
@@ -129,7 +128,7 @@
         	<inverse-foreignkey field-ref="awardId" />
     	</collection-descriptor>
     	
-   		<collection-descriptor name="keywords" element-class-ref="org.kuali.kra.award.home.keywords.AwardScienceKeyword" auto-retrieve="true" auto-update="object" auto-delete="object">
+   		<collection-descriptor name="keywords" proxy="true" element-class-ref="org.kuali.kra.award.home.keywords.AwardScienceKeyword" auto-retrieve="true" auto-update="object" auto-delete="object">
 			<inverse-foreignkey field-ref="awardId" />
 		</collection-descriptor>
    		<collection-descriptor name="specialReviews" proxy="true" element-class-ref="org.kuali.kra.award.specialreview.AwardSpecialReview" collection-class="org.apache.ojb.broker.util.collections.ManageableArrayList" auto-retrieve="true" auto-update="object" auto-delete="object">
@@ -224,6 +223,10 @@
        		 <orderby name="organizationName" sort="ASC" />
        	 	<inverse-foreignkey field-ref="awardId" />
 		</collection-descriptor>
+         <reference-descriptor name="versionHistory" class-ref="org.kuali.kra.bo.versioning.VersionHistorySearchBo" auto-retrieve="true" auto-update="none" auto-delete="none">
+            <foreignkey field-id-ref="1" />
+            <foreignkey field-id-ref="2" />
+        </reference-descriptor>
 	</class-descriptor>
 	
 	<class-descriptor class="org.kuali.kra.award.contacts.AwardPerson" table="AWARD_PERSONS">
@@ -653,6 +656,7 @@
 		<field-descriptor name="objectId" column="OBJ_ID" jdbc-type="VARCHAR" />
 		<field-descriptor name="versionNumber" column="VER_NBR" jdbc-type="BIGINT" locking="false" />
 		<field-descriptor name="unitAdministratorUnitNumber" column="UNIT_ADMINISTRATOR_UNIT_NUMBER" jdbc-type="VARCHAR" />
+		<field-descriptor name="defaultUnitContact" column="DEFAULT_UNIT_CONTACT" jdbc-type="CHAR" conversion="org.kuali.rice.core.framework.persistence.ojb.conversion.OjbCharBooleanConversion"/>
 		<reference-descriptor name="unitAdministratorType" class-ref="org.kuali.kra.bo.UnitAdministratorType" auto-retrieve="true" auto-update="none" auto-delete="none"> 
 			<foreignkey field-ref="unitAdministratorTypeCode"/> 
 		</reference-descriptor>
@@ -1360,7 +1364,7 @@
 			<foreignkey field-ref="awardId" />
 		</reference-descriptor>
 		
-		<reference-descriptor name="proposal" class-ref="org.kuali.kra.institutionalproposal.home.InstitutionalProposal" auto-retrieve="true" auto-update="none" auto-delete="none"> 
+		<reference-descriptor name="proposal" class-ref="org.kuali.kra.institutionalproposal.home.InstitutionalProposalBoLite" auto-retrieve="true" auto-update="none" auto-delete="none"> 
 			<foreignkey field-ref="proposalId"/> 
 		</reference-descriptor>
     </class-descriptor>
@@ -1457,7 +1461,7 @@
     <field-descriptor name="objectId" column="OBJ_ID" jdbc-type="VARCHAR" index="true" />
     <field-descriptor name="versionNumber" column="VER_NBR" jdbc-type="BIGINT" locking="true" />
     <field-descriptor name="cfdaProgramTitleName" column="CFDA_PGM_TTL_NM" jdbc-type="VARCHAR" />
-    <field-descriptor name="activeFlag" column="ACTIVE_FLAG" jdbc-type="CHAR" conversion="org.kuali.rice.core.framework.persistence.ojb.conversion.OjbCharBooleanConversion"/>
+    <field-descriptor name="active" column="ACTIVE_FLAG" jdbc-type="CHAR" conversion="org.kuali.rice.core.framework.persistence.ojb.conversion.OjbCharBooleanConversion"/>
     <field-descriptor name="cfdaMaintenanceTypeId" column="CFDA_MAINT_TYP_ID" jdbc-type="VARCHAR" />
     
 	</class-descriptor>
@@ -1549,6 +1553,94 @@
 		<field-descriptor name="objectId" column="OBJ_ID" jdbc-type="VARCHAR" primarykey = "true"/>
 		<field-descriptor name="versionNumber" column="VER_NBR" jdbc-type="BIGINT" locking="false" />
     	
-    </class-descriptor>	    
+    </class-descriptor>
+    
+	
+	
+	<class-descriptor class="org.kuali.kra.award.subcontracting.goalsAndExpenditures.AwardSubcontractingBudgetedGoals" table="SUBCONTRACTING_BUD">
+		<field-descriptor name="awardNumber" column="AWARD_NUMBER" jdbc-type="VARCHAR" primarykey="true" />
+			
+		<field-descriptor name="largeBusinessGoalAmount" column="LARGE_BUSINESS_GOAL" jdbc-type="DECIMAL" conversion="org.kuali.rice.core.framework.persistence.ojb.conversion.OjbKualiDecimalFieldConversion"/>		
+		<field-descriptor name="smallBusinessGoalAmount" column="SMALL_BUSINESS_GOAL" jdbc-type="DECIMAL" conversion="org.kuali.rice.core.framework.persistence.ojb.conversion.OjbKualiDecimalFieldConversion"/>
+		<field-descriptor name="womanOwnedGoalAmount" column="WOMAN_OWNED_GOAL" jdbc-type="DECIMAL" conversion="org.kuali.rice.core.framework.persistence.ojb.conversion.OjbKualiDecimalFieldConversion"/>
+		<field-descriptor name="eightADisadvantageGoalAmount" column="SDB_GOAL" jdbc-type="DECIMAL" conversion="org.kuali.rice.core.framework.persistence.ojb.conversion.OjbKualiDecimalFieldConversion"/>
+		<field-descriptor name="hubZoneGoalAmount" column="HUB_ZONE_GOAL" jdbc-type="DECIMAL" conversion="org.kuali.rice.core.framework.persistence.ojb.conversion.OjbKualiDecimalFieldConversion"/>
+		<field-descriptor name="veteranOwnedGoalAmount" column="VETERAN_OWNED_GOAL" jdbc-type="DECIMAL" conversion="org.kuali.rice.core.framework.persistence.ojb.conversion.OjbKualiDecimalFieldConversion"/>
+		<field-descriptor name="serviceDisabledVeteranOwnedGoalAmount" column="SDV_GOAL" jdbc-type="DECIMAL" conversion="org.kuali.rice.core.framework.persistence.ojb.conversion.OjbKualiDecimalFieldConversion"/> 
+		<field-descriptor name="historicalBlackCollegeGoalAmount" column="HBCU_GOAL" jdbc-type="DECIMAL" conversion="org.kuali.rice.core.framework.persistence.ojb.conversion.OjbKualiDecimalFieldConversion"/>
+		
+		<field-descriptor name="comments" column="COMMENTS" jdbc-type="VARCHAR" />
+					
+		<field-descriptor name="updateTimestamp" column="UPDATE_TIMESTAMP" jdbc-type="TIMESTAMP" />
+		<field-descriptor name="updateUser" column="UPDATE_USER" jdbc-type="VARCHAR" />
+		<field-descriptor name="versionNumber" column="VER_NBR" jdbc-type="BIGINT" locking="false" />
+		<field-descriptor name="objectId" column="OBJ_ID" jdbc-type="VARCHAR" />		
+	</class-descriptor>
+	
+	
+	<class-descriptor class="org.kuali.kra.award.subcontracting.reporting.SubcontractingExpenditureCategoryAmounts" table="SUBCONTRACT_EXP_CAT">
+		<field-descriptor name="awardNumber" column="AWARD_NUMBER" jdbc-type="VARCHAR" primarykey="true" />
+		
+		<field-descriptor name="largeBusinessExpenditureAmount" column="LARGE_BUSINESS_AMT" jdbc-type="DECIMAL" conversion="org.kuali.rice.core.framework.persistence.ojb.conversion.OjbKualiDecimalFieldConversion"/>		
+		<field-descriptor name="smallBusinessExpenditureAmount" column="SMALL_BUSINESS_AMT" jdbc-type="DECIMAL" conversion="org.kuali.rice.core.framework.persistence.ojb.conversion.OjbKualiDecimalFieldConversion"/>
+		<field-descriptor name="womanOwnedExpenditureAmount" column="WOMAN_OWNED_AMT" jdbc-type="DECIMAL" conversion="org.kuali.rice.core.framework.persistence.ojb.conversion.OjbKualiDecimalFieldConversion"/>
+		<field-descriptor name="eightADisadvantageExpenditureAmount" column="A8_DISADVANTAGE_AMT" jdbc-type="DECIMAL" conversion="org.kuali.rice.core.framework.persistence.ojb.conversion.OjbKualiDecimalFieldConversion"/>
+		<field-descriptor name="hubZoneExpenditureAmount" column="HUB_ZONE_AMT" jdbc-type="DECIMAL" conversion="org.kuali.rice.core.framework.persistence.ojb.conversion.OjbKualiDecimalFieldConversion"/>
+		<field-descriptor name="veteranOwnedExpenditureAmount" column="VETERAN_OWNED_AMT" jdbc-type="DECIMAL" conversion="org.kuali.rice.core.framework.persistence.ojb.conversion.OjbKualiDecimalFieldConversion"/>
+		<field-descriptor name="serviceDisabledVeteranOwnedExpenditureAmount" column="SERVICE_DISABLED_VET_OWNED_AMT" jdbc-type="DECIMAL" conversion="org.kuali.rice.core.framework.persistence.ojb.conversion.OjbKualiDecimalFieldConversion"/> 
+		<field-descriptor name="historicalBlackCollegeExpenditureAmount" column="HISTORICAL_BLACK_COLLEGE_AMT" jdbc-type="DECIMAL" conversion="org.kuali.rice.core.framework.persistence.ojb.conversion.OjbKualiDecimalFieldConversion"/>
+					
+		<field-descriptor name="updateTimestamp" column="UPDATE_TIMESTAMP" jdbc-type="TIMESTAMP" />
+		<field-descriptor name="updateUser" column="UPDATE_USER" jdbc-type="VARCHAR" />
+		<field-descriptor name="versionNumber" column="VER_NBR" jdbc-type="BIGINT" locking="false" />
+		<field-descriptor name="objectId" column="OBJ_ID" jdbc-type="VARCHAR" />		
+	</class-descriptor>
+	
+	
+	<class-descriptor class="org.kuali.kra.award.subcontracting.reporting.SubcontractingExpenditureCategoryAmountsInDateRange" table="SUB_EXP_CAT_BY_FY">
+		<field-descriptor name="awardNumber" column="AWARD_NUMBER" jdbc-type="VARCHAR" primarykey="true" />
+		
+		<field-descriptor name="rangeStartDate" column="START_DATE" jdbc-type="DATE" />
+		<field-descriptor name="rangeEndDate" column="END_DATE" jdbc-type="DATE" />
+		
+		<field-descriptor name="largeBusinessExpenditureAmount" column="LARGE_BUSINESS_AMT" jdbc-type="DECIMAL" conversion="org.kuali.rice.core.framework.persistence.ojb.conversion.OjbKualiDecimalFieldConversion"/>		
+		<field-descriptor name="smallBusinessExpenditureAmount" column="SMALL_BUSINESS_AMT" jdbc-type="DECIMAL" conversion="org.kuali.rice.core.framework.persistence.ojb.conversion.OjbKualiDecimalFieldConversion"/>
+		<field-descriptor name="womanOwnedExpenditureAmount" column="WOMAN_OWNED_AMT" jdbc-type="DECIMAL" conversion="org.kuali.rice.core.framework.persistence.ojb.conversion.OjbKualiDecimalFieldConversion"/>
+		<field-descriptor name="eightADisadvantageExpenditureAmount" column="A8_DISADVANTAGE_AMT" jdbc-type="DECIMAL" conversion="org.kuali.rice.core.framework.persistence.ojb.conversion.OjbKualiDecimalFieldConversion"/>
+		<field-descriptor name="hubZoneExpenditureAmount" column="HUB_ZONE_AMT" jdbc-type="DECIMAL" conversion="org.kuali.rice.core.framework.persistence.ojb.conversion.OjbKualiDecimalFieldConversion"/>
+		<field-descriptor name="veteranOwnedExpenditureAmount" column="VETERAN_OWNED_AMT" jdbc-type="DECIMAL" conversion="org.kuali.rice.core.framework.persistence.ojb.conversion.OjbKualiDecimalFieldConversion"/>
+		<field-descriptor name="serviceDisabledVeteranOwnedExpenditureAmount" column="SERVICE_DISABLED_VET_OWNED_AMT" jdbc-type="DECIMAL" conversion="org.kuali.rice.core.framework.persistence.ojb.conversion.OjbKualiDecimalFieldConversion"/> 
+		<field-descriptor name="historicalBlackCollegeExpenditureAmount" column="HISTORICAL_BLACK_COLLEGE_AMT" jdbc-type="DECIMAL" conversion="org.kuali.rice.core.framework.persistence.ojb.conversion.OjbKualiDecimalFieldConversion"/>
+					
+		<field-descriptor name="updateTimestamp" column="UPDATE_TIMESTAMP" jdbc-type="TIMESTAMP" />
+		<field-descriptor name="updateUser" column="UPDATE_USER" jdbc-type="VARCHAR" />
+		<field-descriptor name="versionNumber" column="VER_NBR" jdbc-type="BIGINT" locking="false" />
+		<field-descriptor name="objectId" column="OBJ_ID" jdbc-type="VARCHAR" />		
+	</class-descriptor>
+	
+	
+	<class-descriptor class="org.kuali.kra.award.subcontracting.reporting.SubcontractingExpenditureCategoryDetails" table="SUBCONTRACT_EXP_CAT_DET">
+		<field-descriptor name="id" column="ID" jdbc-type="BIGINT" primarykey="true" access="readonly" />
+		
+		<field-descriptor name="awardNumber" column="AWARD_NUMBER" jdbc-type="VARCHAR" />
+		<field-descriptor name="amount" column="AMOUNT" jdbc-type="DECIMAL" conversion="org.kuali.rice.core.framework.persistence.ojb.conversion.OjbKualiDecimalFieldConversion"/>
+		<field-descriptor name="fiscalPeriod" column="FISCAL_PERIOD" jdbc-type="DATE" />
+		
+		<field-descriptor name="largeBusiness" column="IS_LARGE_BUSINESS" jdbc-type="CHAR" conversion="org.kuali.rice.core.framework.persistence.ojb.conversion.OjbCharBooleanConversion"/>		
+		<field-descriptor name="smallBusiness" column="IS_SMALL_BUSINESS" jdbc-type="CHAR" conversion="org.kuali.rice.core.framework.persistence.ojb.conversion.OjbCharBooleanConversion"/>
+		<field-descriptor name="womanOwned" column="IS_WOMAN_OWNED" jdbc-type="CHAR" conversion="org.kuali.rice.core.framework.persistence.ojb.conversion.OjbCharBooleanConversion"/>
+		<field-descriptor name="eightADisadvantage" column="IS_8A_DISADVANTAGE" jdbc-type="CHAR" conversion="org.kuali.rice.core.framework.persistence.ojb.conversion.OjbCharBooleanConversion"/>
+		<field-descriptor name="hubZone" column="IS_HUB_ZONE" jdbc-type="CHAR" conversion="org.kuali.rice.core.framework.persistence.ojb.conversion.OjbCharBooleanConversion"/>
+		<field-descriptor name="veteranOwned" column="IS_VETERAN_OWNED" jdbc-type="CHAR" conversion="org.kuali.rice.core.framework.persistence.ojb.conversion.OjbCharBooleanConversion"/>
+		<field-descriptor name="serviceDisabledVeteranOwned" column="IS_SERVICE_DISABLED_VET_OWNED" jdbc-type="CHAR" conversion="org.kuali.rice.core.framework.persistence.ojb.conversion.OjbCharBooleanConversion"/> 
+		<field-descriptor name="historicalBlackCollege" column="IS_HISTORICAL_BLACK_COLLEGE" jdbc-type="CHAR" conversion="org.kuali.rice.core.framework.persistence.ojb.conversion.OjbCharBooleanConversion"/>
+					
+		<field-descriptor name="updateTimestamp" column="UPDATE_TIMESTAMP" jdbc-type="TIMESTAMP" />
+		<field-descriptor name="updateUser" column="UPDATE_USER" jdbc-type="VARCHAR" />
+		<field-descriptor name="versionNumber" column="VER_NBR" jdbc-type="BIGINT" locking="false" />
+		<field-descriptor name="objectId" column="OBJ_ID" jdbc-type="VARCHAR" />		
+	</class-descriptor>
+	
+	
 	
 </descriptor-repository>

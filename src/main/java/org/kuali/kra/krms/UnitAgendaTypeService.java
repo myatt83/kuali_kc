@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.kuali.kra.krms;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.kuali.kra.bo.Unit;
@@ -39,6 +40,9 @@ import org.kuali.rice.krms.impl.util.KRMSServiceLocatorInternal;
 
 public class UnitAgendaTypeService extends AgendaTypeServiceBase  {
 
+    public static final String UNIT_AGENDA_TYPE_ID = "KC1000";
+    public static final String QUESTIONNAIRE_AGENDA_TYPE_ID = "KC1004";
+    
     @Override
     public RemotableAttributeField translateTypeAttribute(KrmsTypeAttribute inputAttribute,
             KrmsAttributeDefinition attributeDefinition) {
@@ -128,20 +132,27 @@ public class UnitAgendaTypeService extends AgendaTypeServiceBase  {
             return null;
         }
         
-        return new UnitAgenda(agendaDefinition.getAttributes(), new LazyAgendaTree(agendaDefinition, repositoryToEngineTranslator));
+        return new UnitAgenda(agendaDefinition.getAttributes(), new LazyAgendaTree(agendaDefinition, repositoryToEngineTranslator), 
+                                            agendaDefinition.getTypeId(),agendaDefinition.isActive());
     }
     
     private static class UnitAgenda extends BasicAgenda {
         
         private Map<String, String> qualifiers;
-    
-        public UnitAgenda(Map<String, String> qualifiers, AgendaTree agendaTree) {
+        private boolean isActive;
+        
+        public UnitAgenda(Map<String, String> qualifiers, AgendaTree agendaTree, String agendaTypeId,boolean isActive) {
             super(qualifiers, agendaTree);
-            this.qualifiers = qualifiers;
+            this.isActive = isActive;
+            this.qualifiers = new HashMap<String, String>(qualifiers);
+            this.qualifiers.put("typeId", agendaTypeId);
         }
         
         @Override
         public boolean appliesTo(ExecutionEnvironment environment) {
+            if(!isActive){
+                return false;
+            }
             for (Map.Entry<String, String> agendaQualifier : environment.getSelectionCriteria().getAgendaQualifiers().entrySet()) {
                 String agendaQualifierValue = qualifiers.get(agendaQualifier.getKey());
                 String environmentQualifierValue = agendaQualifier.getValue();
@@ -164,5 +175,4 @@ public class UnitAgendaTypeService extends AgendaTypeServiceBase  {
         }
 
     }
-
 }

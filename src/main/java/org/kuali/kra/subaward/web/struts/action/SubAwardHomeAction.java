@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,9 @@
  */
 package org.kuali.kra.subaward.web.struts.action;
 
+import java.io.IOException;
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -26,13 +29,13 @@ import org.kuali.kra.bo.versioning.VersionStatus;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.subaward.SubAwardForm;
 import org.kuali.kra.subaward.bo.SubAward;
-import org.kuali.kra.subaward.bo.SubAwardAmountInfo;
 import org.kuali.kra.subaward.bo.SubAwardCloseout;
 import org.kuali.kra.subaward.bo.SubAwardContact;
 import org.kuali.kra.subaward.bo.SubAwardFundingSource;
 import org.kuali.kra.subaward.document.SubAwardDocument;
 import org.kuali.kra.subaward.subawardrule.SubAwardDocumentRule;
 import org.kuali.rice.kew.api.exception.WorkflowException;
+import org.kuali.rice.kns.question.ConfirmationQuestion;
 import org.kuali.rice.krad.util.GlobalVariables;
 import org.kuali.rice.krad.util.KRADConstants;
 
@@ -43,6 +46,7 @@ public class SubAwardHomeAction extends SubAwardAction{
 
 private static final String DOC_HANDLER_URL_PATTERN =
 "%s/DocHandler.do?command=displayDocSearchView&docId=%s";
+private static final String SUBAWARD_VERSION_EDITPENDING_PROMPT_KEY = "message.subaward.version.editpending.prompt";
 
     @Override
     public ActionForward execute(ActionMapping mapping,
@@ -101,16 +105,93 @@ private static final String DOC_HANDLER_URL_PATTERN =
      */
     public ActionForward editOrVersion(ActionMapping mapping, ActionForm form, HttpServletRequest request,
                                         HttpServletResponse response) throws Exception {
-        
         SubAwardForm subAwardForm = ((SubAwardForm)form);
         SubAwardDocument subAwardDocument = subAwardForm.getSubAwardDocument();
         SubAward subaward = subAwardDocument.getSubAward();
-        ActionForward forward;
+        ActionForward forward = null;
 
-        forward = createAndSaveNewSubAwardVersion(response,
-        subAwardForm, subAwardDocument, subaward);
+        VersionHistory foundPending = findPendingVersion(subaward);
+        if (foundPending != null) {
+            Object question = request.getParameter(KRADConstants.QUESTION_CLICKED_BUTTON);
+            if (question == null) {
+                forward = showPromptForEditingPendingVersion(mapping, form, request, response);
+            } else {
+                forward = processPromptForEditingPendingVersionResponse(mapping, request, response, subAwardForm, foundPending);
+            }
+        } else {
+            forward = createAndSaveNewSubAwardVersion(response, subAwardForm, subAwardDocument, subaward);
+        }
 
         return forward;
+    }
+    
+    /**
+     * This method find pending subaward versions.
+     * @param subaward
+     * @return VersionHistory
+     */
+    private VersionHistory findPendingVersion(SubAward subaward) {
+        List<VersionHistory> histories = getVersionHistoryService().loadVersionHistory(SubAward.class, subaward.getSubAwardCode());
+        VersionHistory foundPending = null;
+        for (VersionHistory history: histories) {
+            if (history.getStatus() == VersionStatus.PENDING && subaward.getSequenceNumber() < history.getSequenceOwnerSequenceNumber()) {
+                foundPending = history;
+                break;
+            }
+        }
+        return foundPending;
+    }
+    
+    /**
+     * This method shows prompt for editing pending subaward version.
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return ActionForward
+     * @throws Exception
+     */
+    private ActionForward showPromptForEditingPendingVersion(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+        return this.performQuestionWithoutInput(mapping, form, request, response, "EDIT_OR_VERSION_QUESTION_ID",
+                    getResources(request).getMessage(SUBAWARD_VERSION_EDITPENDING_PROMPT_KEY),
+                    KRADConstants.CONFIRMATION_QUESTION,
+                    KRADConstants.MAPPING_CANCEL, "");
+    }
+    
+    /**
+     * This method process the edit pending version prompt.
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return ActionForward
+     * @throws WorkflowException,IOException
+     */
+    private ActionForward processPromptForEditingPendingVersionResponse(ActionMapping mapping, HttpServletRequest request,
+            HttpServletResponse response, SubAwardForm subAwardForm, 
+            VersionHistory foundPending) throws WorkflowException, 
+                                                IOException {
+        ActionForward forward;
+        Object buttonClicked = request.getParameter(KRADConstants.QUESTION_CLICKED_BUTTON);
+        if (ConfirmationQuestion.NO.equals(buttonClicked)) {
+            forward = mapping.findForward(Constants.MAPPING_SUBAWARD_PAGE);            
+        } else {
+            initializeFormWithSubAward(subAwardForm, (SubAward) foundPending.getSequenceOwner());
+            response.sendRedirect(makeDocumentOpenUrl(subAwardForm.getSubAwardDocument()));
+            forward = null;
+        }
+        return forward;
+    }
+    
+    private void initializeFormWithSubAward(SubAwardForm subAwardForm, SubAward subAward) throws WorkflowException {
+        reinitializeSubAwardForm(subAwardForm, findDocumentForSubAward(subAward));
+    }
+    
+    private SubAwardDocument findDocumentForSubAward(SubAward subAward) throws WorkflowException {
+        SubAwardDocument document = (SubAwardDocument) getDocumentService().getByDocumentHeaderId(subAward.getSubAwardDocument().getDocumentNumber());
+        document.setSubAward(subAward);
+        return document;
     }
 
     /**.
@@ -129,7 +210,7 @@ private static final String DOC_HANDLER_URL_PATTERN =
        SubAwardDocument newSubAwardDocument = getSubAwardService().createNewSubAwardVersion(subAwardForm.getSubAwardDocument());
        getDocumentService().saveDocument(newSubAwardDocument);
        getSubAwardService().updateSubAwardSequenceStatus(newSubAwardDocument.getSubAward(), VersionStatus.PENDING);
-       getVersionHistoryService().createVersionHistory(newSubAwardDocument.getSubAward(), VersionStatus.PENDING, 
+       getVersionHistoryService().updateVersionHistory(newSubAwardDocument.getSubAward(), VersionStatus.PENDING, 
                GlobalVariables.getUserSession().getPrincipalName());
         reinitializeSubAwardForm(subAwardForm, newSubAwardDocument);
         return new ActionForward(makeDocumentOpenUrl(newSubAwardDocument), true);
@@ -223,7 +304,7 @@ private static final String DOC_HANDLER_URL_PATTERN =
 
         subAwardDocument.getSubAward().
         getSubAwardFundingSourceList().remove(selectedLineNumber);
-        this.getBusinessObjectService().delete(subAwardFundingSource);
+//      this.getBusinessObjectService().delete(subAwardFundingSource); // let save() do this
         return mapping.findForward(Constants.MAPPING_SUBAWARD_PAGE);
     }
 
@@ -291,7 +372,7 @@ private static final String DOC_HANDLER_URL_PATTERN =
         getSubAwardContactsList().get(selectedLineNumber);
         subAwardDocument.getSubAward().
         getSubAwardContactsList().remove(selectedLineNumber);
-        this.getBusinessObjectService().delete(subAwardContact);
+//      this.getBusinessObjectService().delete(subAwardContact); // let save() do this
         return mapping.findForward(Constants.MAPPING_SUBAWARD_PAGE);
     }
 
@@ -360,7 +441,7 @@ public ActionForward deleteCloseout(ActionMapping mapping,
         getSubAward().getSubAwardCloseoutList().get(selectedLineNumber);
         subAwardDocument.getSubAward().
         getSubAwardCloseoutList().remove(selectedLineNumber);
-        this.getBusinessObjectService().delete(subAwardCloseout);
+//        this.getBusinessObjectService().delete(subAwardCloseout); // let save() do this
         return mapping.findForward(Constants.MAPPING_SUBAWARD_PAGE);
     }
 

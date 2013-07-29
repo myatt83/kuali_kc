@@ -1,5 +1,5 @@
 <!--
- Copyright 2006-2009 The Kuali Foundation
+ Copyright 2005-2013 The Kuali Foundation
 
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@
         http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
 
     <bean id="ValidProtoSubTypeQualMaintenanceDocument" parent="ValidProtoSubTypeQualMaintenanceDocument-parentBean" />
-    <bean id="ValidProtoSubTypeQualMaintenanceDocument-parentBean" abstract="true" parent="MaintenanceDocumentEntry">
+    <bean id="ValidProtoSubTypeQualMaintenanceDocument-parentBean" abstract="true" parent="KcMaintenanceDocumentEntry">
         <property name="businessObjectClass" value="org.kuali.kra.irb.actions.submit.ValidProtoSubTypeQual" />
         <property name="maintainableClass" value="org.kuali.kra.maintenance.KraMaintainableImpl" />
         <property name="maintainableSections" >
@@ -36,7 +36,7 @@
         <property name="allowsRecordDeletion" value="true" />
         
         <property name="documentTypeName" value="ValidProtoSubTypeQualMaintenanceDocument" />
-        <property name="businessRulesClass" value="org.kuali.kra.irb.actions.submit.ValidProtoSubTypeQualMaintenanceDocumentRule"/>
+        <property name="businessRulesClass" value="org.kuali.kra.iacuc.actions.submit.IacucValidProtoSubTypeQualMaintenanceDocumentRule"/>
         <property name="documentAuthorizerClass" value="org.kuali.rice.kns.document.authorization.MaintenanceDocumentAuthorizerBase" />
     </bean>
 

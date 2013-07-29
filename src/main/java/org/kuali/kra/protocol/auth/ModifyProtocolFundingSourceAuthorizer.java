@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,10 @@ package org.kuali.kra.protocol.auth;
 import org.kuali.kra.irb.actions.amendrenew.ProtocolModule;
 
 /**
- * The Modify Protocol Funding Source Authorizer determines if
+ * The Modify ProtocolBase Funding Source Authorizer determines if
  * the user can modify the funding sources for a protocol.
  */
-public class ModifyProtocolFundingSourceAuthorizer extends ModifyAmendmentAuthorizer {
+public class ModifyProtocolFundingSourceAuthorizer extends ModifyAmendmentAuthorizerBase {
 
     public ModifyProtocolFundingSourceAuthorizer() {
         super(ProtocolModule.FUNDING_SOURCE);

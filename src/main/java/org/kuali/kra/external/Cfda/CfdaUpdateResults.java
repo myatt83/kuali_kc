@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,34 +38,19 @@ public class CfdaUpdateResults {
         setNumberOfRecordsNotUpdatedForHistoricalPurposes(0);
     }
     
-    // NumberOfRecordsRetrievedFromWebsite
-    public void increaseNumberOfRecordsRetrievedFromWebsite(int value) {
-        setNumberOfRecordsRetrievedFromWebSite(getNumberOfRecordsRetrievedFromWebSite() +  value);
-    }
-    
     public int getNumberOfRecordsRetrievedFromWebSite() {
         return numberOfRecordsRetrievedFromWebSite;
     }
     public void setNumberOfRecordsRetrievedFromWebSite(int numberOfRecordsRetrievedFromWebSite) {
         this.numberOfRecordsRetrievedFromWebSite = numberOfRecordsRetrievedFromWebSite;
     }
-    
-    // NumberOfRecordsInKcDatabase
-    public void increaseNumberOfRecordsInKcDatabase(int value) {
-        setNumberOfRecordsInKcDatabase(getNumberOfRecordsInKcDatabase() + value);
-    }
-    
+  
     public int getNumberOfRecordsInKcDatabase() {
         return numberOfRecordsInKcDatabase;
     }
     public void setNumberOfRecordsInKcDatabase(int numberOfRecordsInKcDatabase) {
         this.numberOfRecordsInKcDatabase = numberOfRecordsInKcDatabase;
-    }
-    
-    // NumberOfRecordsNotUpdatedForHistoricalPurposes
-    public void increaseNumberOfRecordsNotUpdatedForHistoricalPurposes(int value) {
-        setNumberOfRecordsNotUpdatedForHistoricalPurposes(getNumberOfRecordsNotUpdatedForHistoricalPurposes() + value);
-    }
+    } 
     
     public int getNumberOfRecordsNotUpdatedForHistoricalPurposes() {
         return numberOfRecordsNotUpdatedForHistoricalPurposes;
@@ -73,33 +58,21 @@ public class CfdaUpdateResults {
     public void setNumberOfRecordsNotUpdatedForHistoricalPurposes(int numberOfRecordsNotUpdatedForHistoricalPurposes) {
         this.numberOfRecordsNotUpdatedForHistoricalPurposes = numberOfRecordsNotUpdatedForHistoricalPurposes;
     }
-    
-    // NumberOfRecordsDeactivatedBecauseNoLongerOnWebSite
-    public void increaseNumberOfRecordsDeactivatedBecauseNoLongerOnWebSite(int value) {
-        setNumberOfRecordsDeactivatedBecauseNoLongerOnWebSite(getNumberOfRecordsDeactivatedBecauseNoLongerOnWebSite() + value);
-    }
+  
     public int getNumberOfRecordsDeactivatedBecauseNoLongerOnWebSite() {
         return numberOfRecordsDeactivatedBecauseNoLongerOnWebSite;
     }
     public void setNumberOfRecordsDeactivatedBecauseNoLongerOnWebSite(int numberOfRecordsDeactivatedBecauseNoLongerOnWebSite) {
         this.numberOfRecordsDeactivatedBecauseNoLongerOnWebSite = numberOfRecordsDeactivatedBecauseNoLongerOnWebSite;
-    }
+    }  
     
-    // NumberOfRecordsReActivated
-    public void increaseNumberOfRecordsReActivated(int value) {
-        setNumberOfRecordsReActivated(getNumberOfRecordsReActivated() + value);
-    }
     public int getNumberOfRecordsReActivated() {
         return numberOfRecordsReActivated;
     }
     public void setNumberOfRecordsReActivated(int numberOfRecordsReActivated) {
         this.numberOfRecordsReActivated = numberOfRecordsReActivated;
     }
-    
-    // NumberOfRecordsNotUpdatedBecauseManual
-    public void increaseNumberOfRecordsNotUpdatedBecauseManual(int value) {
-        setNumberOfRecordsNotUpdatedBecauseManual(getNumberOfRecordsNotUpdatedBecauseManual() + value);
-    }
+   
     public int getNumberOfRecordsNotUpdatedBecauseManual() {
         return numberOfRecordsNotUpdatedBecauseManual;
     }
@@ -107,10 +80,6 @@ public class CfdaUpdateResults {
         this.numberOfRecordsNotUpdatedBecauseManual = numberOfRecordsNotUpdatedBecauseManual;
     }
     
-    // NumberOfRecordsUpdatedBecauseAutomatic
-    public void increaseNumberOfRecordsUpdatedBecauseAutomatic(int value) {
-        setNumberOfRecordsUpdatedBecauseAutomatic(getNumberOfRecordsUpdatedBecauseAutomatic() + value);
-    }
     public int getNumberOfRecordsUpdatedBecauseAutomatic() {
         return numberOfRecordsUpdatedBecauseAutomatic;
     }
@@ -118,10 +87,6 @@ public class CfdaUpdateResults {
         this.numberOfRecordsUpdatedBecauseAutomatic = numberOfRecordsUpdatedBecauseAutomatic;
     }
     
-    // NumberOfRecordsNewlyAddedFromWebSite
-    public void increaseNumberOfRecordsNewlyAddedFromWebSite(int value) {
-        setNumberOfRecordsNewlyAddedFromWebSite(getNumberOfRecordsNewlyAddedFromWebSite() + value);
-    }
     public int getNumberOfRecordsNewlyAddedFromWebSite() {
         return numberOfRecordsNewlyAddedFromWebSite;
     }

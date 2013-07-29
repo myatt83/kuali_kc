@@ -1,5 +1,5 @@
 <%--
- Copyright 2005-2010 The Kuali Foundation
+ Copyright 2005-2013 The Kuali Foundation
 
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -51,7 +51,14 @@
                     <%-- ... show full name --%>
                     <td nowrap class="tab-subhead">
                         <strong>
-                            <kul:htmlControlAttribute property="${projectPersonProperty}.fullName" attributeEntry="${contactAttributes.fullName}" readOnly="true" />
+                        	<c:choose>
+                        		<c:when test="${projectPerson.isRolodexPerson}">
+                        			<c:out value="${projectPerson.rolodex.organization}"/>
+                        		</c:when>
+                        		<c:otherwise>
+                        			<kul:htmlControlAttribute property="${projectPersonProperty}.fullName" attributeEntry="${contactAttributes.fullName}" readOnly="true" />
+                        		</c:otherwise>
+                        	</c:choose>
                         </strong>
                     </td>
                     

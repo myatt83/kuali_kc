@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 import org.kuali.kra.committee.bo.Committee;
+import org.kuali.kra.common.committee.bo.CommitteeBase;
 import org.kuali.rice.core.api.util.ConcreteKeyValue;
 import org.kuali.rice.core.api.util.KeyValue;
 
@@ -47,7 +48,7 @@ public class CommitteeIdIdPairValuesFinderTest {
         committee4.setCommitteeId(this.CMT_4_ID);
         
         
-        final List<Committee> activeCommittees = new ArrayList<Committee>();
+        final List<CommitteeBase> activeCommittees = new ArrayList<CommitteeBase>();
         activeCommittees.add(committee1);
         activeCommittees.add(committee2);
         activeCommittees.add(committee3);
@@ -63,7 +64,7 @@ public class CommitteeIdIdPairValuesFinderTest {
         // superclass's getActiveCommittees() method, with our mock
         CommitteeIdIdPairValuesFinder finder = new CommitteeIdIdPairValuesFinder(){
             @Override
-            protected List<Committee> getActiveCommittees() {
+            public List<CommitteeBase> getActiveCommittees() {
                 return activeCommittees;
             }
         };

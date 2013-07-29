@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,11 +68,12 @@ public class UnitAclLoadServiceImpl implements UnitAclLoadService {
         for (RoleMembership kraRoleTemplate : kraRoleTemplates) {
             String personId = kraRoleTemplate.getMemberId();
             if (personId != null && !StringUtils.equals(personId, creatorUserId)) {
-                if(StringUtils.isEmpty(roleIdMap.get(kraRoleTemplate.getRoleId()))){
+                String key = kraRoleTemplate.getRoleId() + "|" + personId;
+                if (StringUtils.isEmpty(roleIdMap.get(key))) {
                     role = roleManagementService.getRole(kraRoleTemplate.getRoleId());
-                    roleIdMap.put(kraRoleTemplate.getRoleId(), role.getName());
+                    roleIdMap.put(key, role.getName());
+                    kraAuthorizationService.addRole(personId, role.getName(), permissionable); 
                 }
-                kraAuthorizationService.addRole(personId, roleIdMap.get(kraRoleTemplate.getRoleId()), permissionable); 
             }
         }
     }

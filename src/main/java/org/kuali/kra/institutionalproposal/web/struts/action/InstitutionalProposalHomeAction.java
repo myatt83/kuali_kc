@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -33,15 +31,13 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.apache.struts.action.ActionRedirect;
 import org.apache.struts.upload.FormFile;
-import org.kuali.kra.award.home.Award;
 import org.kuali.kra.award.home.fundingproposal.AwardFundingProposal;
 import org.kuali.kra.bo.CommentType;
-import org.kuali.kra.bo.versioning.VersionStatus;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.KeyConstants;
 import org.kuali.kra.infrastructure.KraServiceLocator;
-import org.kuali.kra.institutionalproposal.ProposalComment;
 import org.kuali.kra.institutionalproposal.document.InstitutionalProposalDocument;
 import org.kuali.kra.institutionalproposal.home.InstitutionalProposal;
 import org.kuali.kra.institutionalproposal.home.InstitutionalProposalComment;
@@ -53,6 +49,7 @@ import org.kuali.kra.institutionalproposal.proposallog.ProposalLogUtils;
 import org.kuali.kra.institutionalproposal.proposallog.service.ProposalLogService;
 import org.kuali.kra.institutionalproposal.rules.InstitutionalProposalNoteAddEvent;
 import org.kuali.kra.institutionalproposal.rules.InstitutionalProposalNoteEventBase.ErrorType;
+import org.kuali.kra.institutionalproposal.service.InstitutionalProposalService;
 import org.kuali.kra.institutionalproposal.service.InstitutionalProposalVersioningService;
 import org.kuali.kra.institutionalproposal.web.struts.form.InstitutionalProposalForm;
 import org.kuali.kra.negotiations.service.NegotiationService;
@@ -66,12 +63,11 @@ import org.kuali.rice.core.api.util.RiceKeyConstants;
 import org.kuali.rice.coreservice.framework.parameter.ParameterService;
 import org.kuali.rice.kew.api.exception.WorkflowException;
 import org.kuali.rice.kns.datadictionary.BusinessObjectEntry;
+import org.kuali.rice.kns.question.ConfirmationQuestion;
 import org.kuali.rice.kns.util.WebUtils;
 import org.kuali.rice.kns.web.struts.form.KualiDocumentFormBase;
 import org.kuali.rice.krad.bo.Attachment;
 import org.kuali.rice.krad.bo.Note;
-import org.kuali.rice.krad.bo.PersistableBusinessObject;
-import org.kuali.rice.kns.question.ConfirmationQuestion;
 import org.kuali.rice.krad.service.KRADServiceLocatorWeb;
 import org.kuali.rice.krad.util.GlobalVariables;
 import org.kuali.rice.krad.util.KRADConstants;
@@ -88,6 +84,7 @@ public class InstitutionalProposalHomeAction extends InstitutionalProposalAction
     private InstitutionalProposalNotepadBean institutionalProposalNotepadBean;
     private KcAttachmentService kcAttachmentService;
     private ParameterService parameterService;
+    private InstitutionalProposalService institutionalProposalService;
 
     /**
      * Constructs a InstitutionalProposalHomeAction.java.
@@ -129,7 +126,6 @@ public class InstitutionalProposalHomeAction extends InstitutionalProposalAction
                     */
                     
                     FormFile attachmentFile = institutionalProposalForm.getAttachmentFile();
-                    
                     if (attachmentFile == null) {
                         GlobalVariables.getMessageMap().putError(
                                 String.format("%s.%s",
@@ -137,24 +133,7 @@ public class InstitutionalProposalHomeAction extends InstitutionalProposalAction
                                         KRADConstants.NOTE_ATTACHMENT_FILE_PROPERTY_NAME),
                                 RiceKeyConstants.ERROR_UPLOADFILE_NULL);
                     }
-                    
-                    KcAttachmentService attachmentService = getKcAttachmentService();
-                    // Checking attachment file name for invalid characters.
-                    String invalidCharacters = attachmentService.getInvalidCharacters(attachmentFile.getFileName());
-                    if (ObjectUtils.isNotNull(invalidCharacters)) {
-                        String parameter = getParameterService().
-                            getParameterValueAsString(ProposalDevelopmentDocument.class, Constants.INVALID_FILE_NAME_CHECK_PARAMETER);    
-                        
-                        if (Constants.INVALID_FILE_NAME_ERROR_CODE.equals(parameter)) {
-                            GlobalVariables.getMessageMap().putError(Constants.INVALID_FILE_NAME_ERROR_TAB, KeyConstants.INVALID_FILE_NAME, 
-                                                                    attachmentFile.getFileName(), invalidCharacters);
-                        } else {
-                            GlobalVariables.getMessageMap().putWarning(Constants.INVALID_FILE_NAME_ERROR_TAB, KeyConstants.INVALID_FILE_NAME, 
-                                                                    attachmentFile.getFileName(), invalidCharacters);
-                        }
-                    }
-                    
-                    
+
                     Note newNote = new Note();
                     newNote.setNoteText("Default text, will never be shown to user.");
                     newNote.setNoteTypeCode(NoteType.BUSINESS_OBJECT.getCode());
@@ -366,6 +345,7 @@ public class InstitutionalProposalHomeAction extends InstitutionalProposalAction
         ct.setTemplateFlag(false);
         ct.setAwardCommentScreenFlag(false);
         ipForm.getInstitutionalProposalDocument().getInstitutionalProposal().setDeadlineDate(proposalLog.getDeadlineDate());
+        ipForm.getInstitutionalProposalDocument().getInstitutionalProposal().setDeadlineTime(proposalLog.getDeadlineTime());
         InstitutionalProposalComment ipCmt = new InstitutionalProposalComment(Constants.PROPOSAL_SUMMARY_COMMENT_TYPE_CODE);
         ipCmt.setCommentType(ct);
         ipCmt.setComments(proposalLog.getComments());
@@ -421,20 +401,35 @@ public class InstitutionalProposalHomeAction extends InstitutionalProposalAction
             InstitutionalProposalDocument institutionalProposalDocument, InstitutionalProposal institutionalProposal) throws VersionException, 
                                                                                                          WorkflowException, 
                                                                                                          IOException {
-        InstitutionalProposal newVersion = getVersioningService().createNewVersion(institutionalProposal);
-        newVersion.setProposalSequenceStatus(VersionStatus.PENDING.toString());
-        newVersion.setAwardFundingProposals(transferFundingProposals(institutionalProposal, newVersion));
-        InstitutionalProposalDocument newInstitutionalProposalDocument = 
-            (InstitutionalProposalDocument) getDocumentService().getNewDocument(InstitutionalProposalDocument.class);
-        newInstitutionalProposalDocument.getDocumentHeader().setDocumentDescription(institutionalProposalDocument.getDocumentHeader().getDocumentDescription());
-        newInstitutionalProposalDocument.setInstitutionalProposal(newVersion);
-        getDocumentService().saveDocument(newInstitutionalProposalDocument);
+//        InstitutionalProposal newVersion = getVersioningService().createNewVersion(institutionalProposal);
+//        
+//        synchNewCustomAttributes(newVersion, institutionalProposal);
+//        
+//        newVersion.setProposalSequenceStatus(VersionStatus.PENDING.toString());
+//        newVersion.setAwardFundingProposals(transferFundingProposals(institutionalProposal, newVersion));
+//        InstitutionalProposalDocument newInstitutionalProposalDocument = 
+//            (InstitutionalProposalDocument) getDocumentService().getNewDocument(InstitutionalProposalDocument.class);
+//        newInstitutionalProposalDocument.getDocumentHeader().setDocumentDescription(institutionalProposalDocument.getDocumentHeader().getDocumentDescription());
+//        newInstitutionalProposalDocument.setInstitutionalProposal(newVersion);
+//        getDocumentService().saveDocument(newInstitutionalProposalDocument);
         //getVersionHistoryService().createVersionHistory(newVersion, VersionStatus.PENDING, GlobalVariables.getUserSession().getPrincipalName());
+
+        InstitutionalProposalDocument newInstitutionalProposalDocument = getInstitutionalProposalService().createAndSaveNewVersion(institutionalProposal, institutionalProposalDocument);
         reinitializeForm(institutionalProposalForm, newInstitutionalProposalDocument);
-        response.sendRedirect(makeDocumentOpenUrl(newInstitutionalProposalDocument));
-        return null;
+       
+        return new ActionRedirect(makeDocumentOpenUrl(newInstitutionalProposalDocument));
     }
- 
+    
+    
+    
+    public InstitutionalProposalService getInstitutionalProposalService() {
+        if (institutionalProposalService == null) {
+            institutionalProposalService = KraServiceLocator.getService(InstitutionalProposalService.class);
+        }
+        return institutionalProposalService;
+    }
+    
+    
     /**
      * This method prepares the AwardForm with the document found via the Award lookup
      * Because the helper beans may have preserved a different AwardForm, we need to reset these too

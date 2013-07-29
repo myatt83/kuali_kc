@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 1.0 (the "License");
  * you may not use this file except inputStream compliance with the License.
@@ -18,10 +18,13 @@ package org.kuali.kra.budget.web.struts.action;
 import static org.kuali.kra.infrastructure.Constants.MAPPING_BASIC;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -49,19 +52,28 @@ import org.kuali.kra.budget.document.BudgetDocument;
 import org.kuali.kra.budget.nonpersonnel.BudgetJustificationService;
 import org.kuali.kra.budget.nonpersonnel.BudgetJustificationServiceImpl;
 import org.kuali.kra.budget.nonpersonnel.BudgetJustificationWrapper;
+import org.kuali.kra.budget.nonpersonnel.BudgetLineItem;
+import org.kuali.kra.budget.parameters.BudgetPeriod;
 import org.kuali.kra.budget.web.struts.form.BudgetForm;
 import org.kuali.kra.external.budget.BudgetAdjustmentClient;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.KeyConstants;
 import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.proposaldevelopment.bo.AttachmentDataSource;
+import org.kuali.kra.proposaldevelopment.bo.DevelopmentProposal;
 import org.kuali.kra.proposaldevelopment.budget.bo.BudgetSubAwardAttachment;
 import org.kuali.kra.proposaldevelopment.budget.bo.BudgetSubAwardFiles;
+import org.kuali.kra.proposaldevelopment.budget.bo.BudgetSubAwardPeriodDetail;
 import org.kuali.kra.proposaldevelopment.budget.bo.BudgetSubAwards;
 import org.kuali.kra.proposaldevelopment.budget.bo.BudgetSubAwardsRule;
+import org.kuali.kra.proposaldevelopment.budget.bo.ProposalDevelopmentBudgetExt;
 import org.kuali.kra.proposaldevelopment.budget.service.BudgetPrintService;
 import org.kuali.kra.proposaldevelopment.budget.service.BudgetSubAwardService;
+import org.kuali.kra.proposaldevelopment.hierarchy.ProposalHierarchyKeyConstants;
+import org.kuali.kra.proposaldevelopment.web.struts.form.ProposalDevelopmentForm;
+import org.kuali.kra.service.KcAttachmentService;
 import org.kuali.kra.web.struts.action.AuditActionHelper;
+import org.kuali.kra.web.struts.action.StrutsConfirmation;
 import org.kuali.kra.web.struts.action.AuditActionHelper.ValidationState;
 import org.kuali.rice.core.api.config.property.ConfigurationService;
 import org.kuali.rice.core.api.util.RiceKeyConstants;
@@ -74,6 +86,7 @@ import org.kuali.rice.kns.web.struts.form.KualiForm;
 import org.kuali.rice.kns.question.ConfirmationQuestion;
 import org.kuali.rice.krad.service.BusinessObjectService;
 import org.kuali.rice.krad.service.KRADServiceLocator;
+import org.kuali.rice.krad.util.ErrorMessage;
 import org.kuali.rice.krad.util.GlobalVariables;
 import org.kuali.rice.krad.util.KRADConstants;
 import org.kuali.rice.krad.util.ObjectUtils;
@@ -86,6 +99,7 @@ public class BudgetActionsAction extends BudgetAction implements AuditModeAction
     private static final String SUBAWARD_BUDGET_EDIT_LINE_ENDER = "]";
     private static final String UPDATE_COST_LIMITS_QUESTION = "UpdateCostLimitsQuestion";
     private BudgetJustificationService budgetJustificationService;
+    private BudgetSubAwardService budgetSubAwardService;
     private static final Log LOG = LogFactory.getLog(BudgetActionsAction.class);
     private BudgetAdjustmentClient budgetAdjustmentClient = null;
 
@@ -130,6 +144,14 @@ public class BudgetActionsAction extends BudgetAction implements AuditModeAction
         Budget budget = budgetForm.getBudgetDocument().getBudget();
         budgetJustificationService.preSave(budget, getBudgetJusticationWrapper(form));
         return super.save(mapping, form, request, response);
+    }
+    
+    public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        BudgetForm budgetForm = (BudgetForm) form;
+        for (BudgetSubAwards subAward : budgetForm.getBudgetDocument().getBudget().getBudgetSubAwards()) {
+            subAward.computePeriodDetails();
+        }
+        return super.execute(mapping, budgetForm, request, response);
     }
     
     /**
@@ -177,107 +199,39 @@ public class BudgetActionsAction extends BudgetAction implements AuditModeAction
         ActionForward forward = super.reload(mapping, form, request, response);
         BudgetForm budgetForm = (BudgetForm)form;
         Budget budget = budgetForm.getBudgetDocument().getBudget();
-        KraServiceLocator.getService(BudgetSubAwardService.class).populateBudgetSubAwardAttachments(budget);
+        getBudgetSubAwardService().populateBudgetSubAwardAttachments(budget);
         return forward;
     }
     
-    /**
-     * Adds a non XFD file to the Sub Award for manual (non-Grants.gov) budgets.
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws Exception
-     */
-    @SuppressWarnings("unchecked")
-    public ActionForward addNonXFD(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-        BudgetForm budgetForm = (BudgetForm) form;
-        BudgetDocument budgetDocument = budgetForm.getBudgetDocument();
-        BudgetSubAwards newBudgetSubAward = budgetForm.getNewSubAward();
-        
-        FormFile newBudgetSubAwardFile = newBudgetSubAward.getNewSubAwardFile();
-        
-        BudgetSubAwardsRule rule = new BudgetSubAwardsRule(newBudgetSubAward, "newSubAward");
-        boolean success = rule.processNonXFDAttachment();        
-        if (success) {
-            newBudgetSubAward.setBudgetId(budgetDocument.getBudget().getBudgetId());
-            newBudgetSubAward.setSubAwardNumber(generateSubAwardNumber(budgetDocument));
-            newBudgetSubAward.setBudgetVersionNumber(budgetDocument.getBudget().getBudgetVersionNumber());
-            newBudgetSubAward.setSubAwardStatusCode(1);
-            
-            BudgetSubAwardFiles newBudgetSubAwardFiles = new BudgetSubAwardFiles();
-            newBudgetSubAwardFiles.setSubAwardXfdFileName(newBudgetSubAwardFile.getFileName());
-            newBudgetSubAwardFiles.setSubAwardXfdFileData(newBudgetSubAwardFile.getFileData());
-            newBudgetSubAward.setSubAwardXfdFileName(newBudgetSubAwardFile.getFileName());
-            newBudgetSubAward.setSubAwardXfdFileData(newBudgetSubAwardFile.getFileData());
-            newBudgetSubAward.getBudgetSubAwardFiles().add(newBudgetSubAwardFiles);
-            
-            List listToBeSaved = new ArrayList();
-            listToBeSaved.add(newBudgetSubAward);
-            listToBeSaved.addAll(newBudgetSubAward.getBudgetSubAwardFiles());
-            listToBeSaved.addAll(newBudgetSubAward.getBudgetSubAwardAttachments());
-            getBusinessObjectService().save(listToBeSaved);
-            
-            budgetDocument.getBudget().getBudgetSubAwards().add(newBudgetSubAward);
-            
-            budgetForm.setNewSubAward(new BudgetSubAwards()); 
-        }
-        
-        newBudgetSubAward.getBudgetSubAwardFiles().clear();
-        List<BudgetSubAwardAttachment> attList = newBudgetSubAward.getBudgetSubAwardAttachments();
-        for (BudgetSubAwardAttachment budgetSubAwardAttachment : attList) {
-            budgetSubAwardAttachment.setAttachment(null);
-        }
-        Collections.sort(budgetDocument.getBudget().getBudgetSubAwards());
-        
-        return mapping.findForward(Constants.MAPPING_BASIC);        
-    }
-    
-    
-    @SuppressWarnings("unchecked")
-    public ActionForward translateXFD(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public ActionForward addSubAward(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
         BudgetForm budgetForm = (BudgetForm)form;
         BudgetDocument budgetDocument = budgetForm.getBudgetDocument();
         BudgetSubAwards newBudgetSubAward = budgetForm.getNewSubAward();
-        FormFile subAwardFile = newBudgetSubAward.getNewSubAwardFile();
-        byte[] subAwardData = subAwardFile.getFileData();
-        String subAwardFileName = subAwardFile.getFileName();
         newBudgetSubAward.setBudgetId(budgetDocument.getBudget().getBudgetId());
         newBudgetSubAward.setSubAwardNumber(generateSubAwardNumber(budgetDocument));
         newBudgetSubAward.setBudgetVersionNumber(budgetDocument.getBudget().getBudgetVersionNumber());
         newBudgetSubAward.setSubAwardStatusCode(1);
-        BudgetSubAwardFiles newBudgetsubAwardFiles = new BudgetSubAwardFiles();
-        newBudgetsubAwardFiles.setSubAwardXfdFileData(subAwardData);
-        newBudgetSubAward.getBudgetSubAwardFiles().add(newBudgetsubAwardFiles);
-        KraServiceLocator.getService(BudgetSubAwardService.class).populateBudgetSubAwardFiles(newBudgetSubAward);
-        BudgetSubAwardsRule rule = new BudgetSubAwardsRule(newBudgetSubAward, "newSubAward");
-        boolean success = rule.processXFDAttachment();
-        if(success){
-            newBudgetsubAwardFiles.setSubAwardXfdFileName(subAwardFileName);
-            newBudgetSubAward.setSubAwardXfdFileName(subAwardFileName);
-    //        new BudgetSubAwardReader().populateSubAward(budgetSubAwardBean)
-            budgetForm.setNewSubAward(new BudgetSubAwards());   
-            List listToBeSaved = new ArrayList();
-            listToBeSaved.add(newBudgetSubAward);
-            listToBeSaved.addAll(newBudgetSubAward.getBudgetSubAwardFiles());
-            listToBeSaved.addAll(newBudgetSubAward.getBudgetSubAwardAttachments());
-            
-            KraServiceLocator.getService(BusinessObjectService.class).save(listToBeSaved);
+        newBudgetSubAward.getBudgetSubAwardPeriodDetails().clear();
+        for (BudgetPeriod period : budgetDocument.getBudget().getBudgetPeriods()) {
+            newBudgetSubAward.getBudgetSubAwardPeriodDetails().add(new BudgetSubAwardPeriodDetail(newBudgetSubAward, period));
+        }
+        boolean success = true;
+        if (newBudgetSubAward.getNewSubAwardFile() != null) {
+            String fileName = newBudgetSubAward.getNewSubAwardFile().getFileName();
+            byte[] fileData = newBudgetSubAward.getNewSubAwardFile().getFileData(); 
+            success = updateBudgetAttachment(budgetDocument.getBudget(), newBudgetSubAward, fileName, fileData, "newSubAward");
+        }
+        String contentType = newBudgetSubAward.getNewSubAwardFile().getContentType();
+        if (success && contentType.equalsIgnoreCase(Constants.PDF_REPORT_CONTENT_TYPE)) {
+            budgetForm.setNewSubAward(new BudgetSubAwards());
             budgetDocument.getBudget().getBudgetSubAwards().add(newBudgetSubAward);
         }
-        newBudgetSubAward.getBudgetSubAwardFiles().clear();
-        List<BudgetSubAwardAttachment> attList = newBudgetSubAward.getBudgetSubAwardAttachments();
-        for (BudgetSubAwardAttachment budgetSubAwardAttachment : attList) {
-            budgetSubAwardAttachment.setAttachment(null);
-        }
-        Collections.sort(budgetDocument.getBudget().getBudgetSubAwards());
-        return mapping.findForward(Constants.MAPPING_BASIC);        
+        return mapping.findForward(Constants.MAPPING_BASIC);
     }
     
     public ActionForward viewXFD(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
         BudgetSubAwards subAward = getSelectedBudgetSubAward(form, request);
-        subAward.refreshReferenceObject("budgetSubAwardFiles");
+        subAward.refreshNonUpdateableReferences();
         if(!subAward.getBudgetSubAwardFiles().isEmpty()){
             BudgetSubAwardFiles subAwardFiles = subAward.getBudgetSubAwardFiles().get(0);
             downloadFile(form, request, response, subAwardFiles.getSubAwardXfdFileData(), subAward.getSubAwardXfdFileName(), CONTENT_TYPE_PDF);
@@ -288,22 +242,9 @@ public class BudgetActionsAction extends BudgetAction implements AuditModeAction
         return null;
     }
     
-    public ActionForward view(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-        BudgetSubAwards subAward = getSelectedBudgetSubAward(form, request);
-        subAward.refreshReferenceObject("budgetSubAwardFiles");
-        if(!subAward.getBudgetSubAwardFiles().isEmpty()){
-            BudgetSubAwardFiles subAwardFiles = subAward.getBudgetSubAwardFiles().get(0);
-            downloadFile(form, request, response, subAwardFiles.getSubAwardXfdFileData(), subAward.getSubAwardXfdFileName(), null);
-        }else{
-            return mapping.findForward(Constants.MAPPING_BASIC);
-        }
-//        downloadFile(form, request, response, subAward.getSubAwardXfdFileData(), subAward.getSubAwardXfdFileName(), CONTENT_TYPE_PDF);
-        return null;
-    }
-    
     public ActionForward viewXML(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
         BudgetSubAwards subAward = getSelectedBudgetSubAward(form, request);
-        subAward.refreshReferenceObject("budgetSubAwardFiles");
+        subAward.refreshNonUpdateableReferences();
         if(!subAward.getBudgetSubAwardFiles().isEmpty()){
             BudgetSubAwardFiles subAwardFiles = subAward.getBudgetSubAwardFiles().get(0);
             downloadFile(form, request, response, subAwardFiles.getSubAwardXmlFileData().getBytes(), createXMLFileName(subAward), CONTENT_TYPE_XML);
@@ -316,127 +257,117 @@ public class BudgetActionsAction extends BudgetAction implements AuditModeAction
         BudgetForm budgetForm = (BudgetForm)form;
         BudgetDocument budgetDocument = budgetForm.getBudgetDocument();
         int selectedLineNumber = getSelectedLine(request);
+        BudgetSubAwards subAward = budgetDocument.getBudget().getBudgetSubAwards().get(selectedLineNumber);
+        for (BudgetPeriod period : budgetDocument.getBudget().getBudgetPeriods()) {
+            Iterator<BudgetLineItem> iter = period.getBudgetLineItems().iterator();
+            while (iter.hasNext()) {
+                BudgetLineItem item = iter.next();
+                if (org.apache.commons.lang.ObjectUtils.equals(subAward.getSubAwardNumber(), item.getSubAwardNumber())) {
+                    iter.remove();
+                }
+            }
+        }
         budgetDocument.getBudget().getBudgetSubAwards().remove(selectedLineNumber);
         Collections.sort(budgetDocument.getBudget().getBudgetSubAwards());
         return mapping.findForward(Constants.MAPPING_BASIC);
     }
     
-    public ActionForward editSubawardBudgetLine(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-        BudgetSubAwards subAward = getSelectedBudgetSubAward(form, request);
-        subAward.setEdit(true);
-        return mapping.findForward(Constants.MAPPING_BASIC);
-    }
-    
-    public ActionForward applyEditSubawardBudgetLine(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-        BudgetSubAwards subAward = getSelectedBudgetSubAward(form, request);
-        
-        BudgetSubAwardsRule rule = new BudgetSubAwardsRule(subAward, SUBAWARD_BUDGET_EDIT_LINE_STARTER + getSelectedLine(request) + SUBAWARD_BUDGET_EDIT_LINE_ENDER);
-        if (rule.processApply()) {
-            subAward.setEdit(false);
-        }
-        return mapping.findForward(Constants.MAPPING_BASIC);
-    }
-    
-    public ActionForward addNonXFDBudgetLine(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-        BudgetSubAwards subAward = getSelectedBudgetSubAward(form, request);
-        BudgetSubAwardsRule rule = new BudgetSubAwardsRule(subAward, SUBAWARD_BUDGET_EDIT_LINE_STARTER + getSelectedLine(request) + SUBAWARD_BUDGET_EDIT_LINE_ENDER);
-        
-        BudgetForm budgetForm = (BudgetForm) form;
+    public ActionForward deleteSubAwardAttachment(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        BudgetForm budgetForm = (BudgetForm)form;
         BudgetDocument budgetDocument = budgetForm.getBudgetDocument();
-        
-        FormFile newBudgetSubAwardFile = subAward.getNewSubAwardFile();
-        boolean success = rule.processNonXFDAttachment();
-        if (success) {
-            BudgetSubAwardFiles bsaf;
-            if (!subAward.getBudgetSubAwardFiles().isEmpty()) {
-                bsaf = subAward.getBudgetSubAwardFiles().get(0);
-            } else {
-                bsaf = new BudgetSubAwardFiles();
-                subAward.getBudgetSubAwardFiles().add(bsaf);
-                bsaf.setBudgetId(subAward.getBudgetId());
-            }
-            bsaf.setSubAwardXfdFileName(newBudgetSubAwardFile.getFileName());
-            bsaf.setSubAwardXfdFileData(newBudgetSubAwardFile.getFileData());
-            subAward.setSubAwardXfdFileName(newBudgetSubAwardFile.getFileName());
-            subAward.setSubAwardXfdFileData(newBudgetSubAwardFile.getFileData());
-            subAward.setSubAwardXmlFileData("");
-            subAward.setFormName("");
-            subAward.setXfdUpdateTimestamp(null);
-            subAward.setXmlUpdateTimestamp(null);
-            subAward.setSubAwardStatusCode(1);
-            subAward.setNamespace("");
-            List listToBeSaved = new ArrayList();
-            listToBeSaved.add(subAward);
-            listToBeSaved.addAll(subAward.getBudgetSubAwardFiles());
-            
-            getBusinessObjectService().save(listToBeSaved);
-            if (subAward.getBudgetSubAwardAttachments() != null && !subAward.getBudgetSubAwardAttachments().isEmpty()) {
-                getBusinessObjectService().delete(subAward.getBudgetSubAwardAttachments());
-                subAward.getBudgetSubAwardAttachments().clear();
-            }
-            subAward.setEdit(false);
-        }
-        Collections.sort(budgetDocument.getBudget().getBudgetSubAwards());
-        
-        return mapping.findForward(Constants.MAPPING_BASIC);        
+        int selectedLineNumber = getSelectedLine(request);
+        BudgetSubAwards subAward = budgetDocument.getBudget().getBudgetSubAwards().get(selectedLineNumber);
+        getBudgetSubAwardService().removeSubAwardAttachment(subAward);
+        return mapping.findForward(Constants.MAPPING_BASIC);
     }
     
-    public ActionForward translateXFDBudgetLine(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-        
+    public ActionForward updateBudgetAttachment(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
         BudgetForm budgetForm = (BudgetForm)form;
         BudgetDocument budgetDocument = budgetForm.getBudgetDocument();
         BudgetSubAwards subAward = getSelectedBudgetSubAward(form, request);
         FormFile subAwardFile = subAward.getNewSubAwardFile();
         byte[] subAwardData = subAwardFile.getFileData();
         String subAwardFileName = subAwardFile.getFileName();
-        subAward.setBudgetVersionNumber(budgetDocument.getBudget().getBudgetVersionNumber());
-        subAward.setSubAwardStatusCode(1);
-        BudgetSubAwardFiles newBudgetsubAwardFiles = new BudgetSubAwardFiles();
-        newBudgetsubAwardFiles.setSubAwardXfdFileData(subAwardData);
-        if (subAward.getBudgetSubAwardAttachments() != null && !subAward.getBudgetSubAwardAttachments().isEmpty()) {
-            getBusinessObjectService().delete(subAward.getBudgetSubAwardAttachments());
-            subAward.getBudgetSubAwardAttachments().clear();
-        }
-        subAward.getBudgetSubAwardFiles().clear();
-        subAward.getBudgetSubAwardFiles().add(newBudgetsubAwardFiles);
-        KraServiceLocator.getService(BudgetSubAwardService.class).populateBudgetSubAwardFiles(subAward);
-        BudgetSubAwardsRule rule = new BudgetSubAwardsRule(subAward, SUBAWARD_BUDGET_EDIT_LINE_STARTER + getSelectedLine(request) + SUBAWARD_BUDGET_EDIT_LINE_ENDER);
-        boolean success = rule.processXFDAttachment();
-        if(success){
-            newBudgetsubAwardFiles.setSubAwardXfdFileName(subAwardFileName);
-            subAward.setSubAwardXfdFileName(subAwardFileName);
-            budgetForm.setNewSubAward(new BudgetSubAwards());   
-            List listToBeSaved = new ArrayList();
-            listToBeSaved.add(subAward);
-            listToBeSaved.addAll(subAward.getBudgetSubAwardFiles());
-            listToBeSaved.addAll(subAward.getBudgetSubAwardAttachments());
-            
-            KraServiceLocator.getService(BusinessObjectService.class).save(listToBeSaved);
-            subAward.setEdit(false);
-        }
+        updateBudgetAttachment(budgetDocument.getBudget(), subAward, subAwardFileName, subAwardData, 
+                SUBAWARD_BUDGET_EDIT_LINE_STARTER + getSelectedLine(request) + SUBAWARD_BUDGET_EDIT_LINE_ENDER);
         Collections.sort(budgetDocument.getBudget().getBudgetSubAwards());
         return mapping.findForward(Constants.MAPPING_BASIC);        
     }
     
-    
-    public ActionForward cancelEditSubawardBudgetLine(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-        
+    public ActionForward syncFromBudgetAttachment(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
         BudgetForm budgetForm = (BudgetForm)form;
         BudgetDocument budgetDocument = budgetForm.getBudgetDocument();
-        
         BudgetSubAwards subAward = getSelectedBudgetSubAward(form, request);
-        Map primaryKeys = new HashMap();
-        primaryKeys.put("SUB_AWARD_NUMBER", subAward.getSubAwardNumber());
-        BudgetSubAwards dbSubAwardBudget = this.getBusinessObjectService().findByPrimaryKey(BudgetSubAwards.class, primaryKeys);
-        
-        budgetDocument.getBudget().getBudgetSubAwards().remove(subAward);
-        budgetDocument.getBudget().getBudgetSubAwards().add(dbSubAwardBudget);
-        Collections.sort(budgetDocument.getBudget().getBudgetSubAwards());
-        
-        return mapping.findForward(Constants.MAPPING_BASIC);
+        String errorPath = SUBAWARD_BUDGET_EDIT_LINE_STARTER + getSelectedLine(request) + SUBAWARD_BUDGET_EDIT_LINE_ENDER;
+        GlobalVariables.getMessageMap().addToErrorPath(errorPath);
+        updateSubAwardBudgetDetails(budgetDocument.getBudget(), subAward);
+        GlobalVariables.getMessageMap().removeFromErrorPath(errorPath);
+        return mapping.findForward(Constants.MAPPING_BASIC);        
     }
     
+    protected boolean updateSubAwardBudgetDetails(Budget budget, BudgetSubAwards subAward) throws Exception {
+        List<String[]> errorMessages = new ArrayList<String[]>();
+        BudgetSubAwardsRule rule = new BudgetSubAwardsRule(subAward);
+        boolean success = true;
+        if (subAward.getNewSubAwardFile().getFileData().length == 0) {
+            success = false;
+            }
+        if (rule.processXFDAttachment()) {
+            success = getBudgetSubAwardService().updateSubAwardBudgetDetails(budget, subAward, errorMessages);
+        }
+        if (!errorMessages.isEmpty()) {
+            for (String[] message : errorMessages) {
+                String[] messageParameters = null;
+                if (message.length > 1) {
+                    messageParameters = Arrays.copyOfRange(message, 1, message.length);
+                }
+                if (success) {
+                    GlobalVariables.getMessageMap().putWarning(Constants.SUBAWARD_FILE_FIELD_NAME, message[0], messageParameters);
+                } else {
+                    GlobalVariables.getMessageMap().putError(Constants.SUBAWARD_FILE_FIELD_NAME, message[0], messageParameters);
+                }
+            }
+        }
+        if (success && errorMessages.isEmpty() && rule.processNonXFDAttachment()) {
+            GlobalVariables.getMessageMap().putInfo(Constants.SUBAWARD_FILE_FIELD_NAME, Constants.SUBAWARD_FILE_DETAILS_UPDATED);
+        }
+        return success;
+    }
     
+    protected boolean updateBudgetAttachment(Budget budget, BudgetSubAwards subAward, String fileName, byte[] fileData, String errorPath) throws Exception {
+
+        GlobalVariables.getMessageMap().addToErrorPath(errorPath);
+        subAward.setSubAwardXmlFileData(null);
+        subAward.setFormName(null);
+        subAward.setNamespace(null);
+        if (subAward.getNewSubAwardFile().getContentType().equalsIgnoreCase(Constants.PDF_REPORT_CONTENT_TYPE)) {
+            getBudgetSubAwardService().populateBudgetSubAwardFiles(budget, subAward, fileName, fileData);
+        }
+        boolean success = updateSubAwardBudgetDetails(budget, subAward);
+        BudgetSubAwardsRule rule = new BudgetSubAwardsRule(subAward);
+        success &= rule.processXFDAttachment();
+        if (success) {
+            if (rule.checkSpecialCharacters(subAward.getSubAwardXmlFileData().toString())) {
+                subAward.getBudgetSubAwardFiles().get(0).setSubAwardXmlFileData(KraServiceLocator.getService(KcAttachmentService.class).
+                        checkAndReplaceSpecialCharacters(subAward.getBudgetSubAwardFiles().get(0).getSubAwardXmlFileData().toString()));
+                subAward.setSubAwardXmlFileData(subAward.getBudgetSubAwardFiles().get(0).getSubAwardXmlFileData());
+            }
+        }
+        GlobalVariables.getMessageMap().removeFromErrorPath(errorPath);
+        if(rule.processNonXFDAttachment()){
+             success = rule.processNonXFDAttachment();
+        }
+        return success;
+    }
+    
+    protected ErrorMessage convertStringArrayToErrorMessage(String[] message) {
+        ErrorMessage error = new ErrorMessage();
+        error.setErrorKey(message[0]);
+        if (message.length > 1) {
+            error.setMessageParameters(Arrays.copyOfRange(message, 1, message.length-1));
+        }
+        return error;
+    }
 
     public ActionForward printBudgetForm(ActionMapping mapping,
             ActionForm form, HttpServletRequest request,
@@ -740,13 +671,25 @@ public class BudgetActionsAction extends BudgetAction implements AuditModeAction
     /** {@inheritDoc} */
     public ActionForward activate(ActionMapping mapping, ActionForm form, HttpServletRequest request, 
             HttpServletResponse response) throws Exception {
-        return new AuditActionHelper().setAuditMode(mapping, (AwardBudgetForm) form, true);
+        ActionForward forward;
+        if (form instanceof AwardBudgetForm) {
+            forward = new AuditActionHelper().setAuditMode(mapping, (AwardBudgetForm) form, true);
+        } else {
+            forward = new AuditActionHelper().setAuditMode(mapping, (BudgetForm) form, true);
+        }
+        return forward;
     }
 
     /** {@inheritDoc} */
     public ActionForward deactivate(ActionMapping mapping, ActionForm form, HttpServletRequest request, 
             HttpServletResponse response) throws Exception {
-        return new AuditActionHelper().setAuditMode(mapping, (AwardBudgetForm) form, false);
+        ActionForward forward;
+        if (form instanceof AwardBudgetForm) {
+            forward = new AuditActionHelper().setAuditMode(mapping, (AwardBudgetForm) form, false);
+        } else {
+            forward = new AuditActionHelper().setAuditMode(mapping, (BudgetForm) form, false);
+        }
+        return forward;
     }
 
     /**
@@ -793,4 +736,61 @@ public class BudgetActionsAction extends BudgetAction implements AuditModeAction
         return super.rates(mapping, form, request, response);
     }
 
+    public ActionForward syncBudgetToParent(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        BudgetForm budgetForm = (BudgetForm) form;
+        DevelopmentProposal childProposal = (DevelopmentProposal) budgetForm.getBudgetDocument().getParentDocument().getBudgetParent();
+        getHierarchyHelper().syncBudgetToParent((ProposalDevelopmentBudgetExt) budgetForm.getBudgetDocument().getBudget(), childProposal, false);
+        if (GlobalVariables.getMessageMap().containsMessageKey(ProposalHierarchyKeyConstants.QUESTION_EXTEND_PROJECT_DATE_CONFIRM)) {
+            return doEndDateConfirmation(mapping, form, request, response, "syncBudgetToParent", "syncToHierarchyParentConfirm");
+        }
+        return mapping.findForward(Constants.MAPPING_BASIC);
+
+    }
+    
+    private ActionForward doEndDateConfirmation(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response, String questionId, String yesMethodName) throws Exception {
+        List<ErrorMessage> errors = GlobalVariables.getMessageMap().getErrorMessagesForProperty(ProposalHierarchyKeyConstants.FIELD_CHILD_NUMBER);
+        List<String> proposalNumbers = new ArrayList<String>();
+        for (ErrorMessage error : errors) {
+            if (error.getErrorKey().equals(ProposalHierarchyKeyConstants.QUESTION_EXTEND_PROJECT_DATE_CONFIRM)) {
+                proposalNumbers.add(error.getMessageParameters()[0]);
+            }
+        }
+        String proposalNumberList = StringUtils.join(proposalNumbers, ',');
+        StrutsConfirmation question = buildParameterizedConfirmationQuestion(mapping, form, request, response, questionId, ProposalHierarchyKeyConstants.QUESTION_EXTEND_PROJECT_DATE_CONFIRM, proposalNumberList);
+        GlobalVariables.getMessageMap().getErrorMessages().clear();
+        GlobalVariables.getMessageMap().getWarningMessages().clear();
+        GlobalVariables.getMessageMap().getInfoMessages().clear();
+        return confirm(question, yesMethodName, "hierarchyActionCanceled");
+    }
+    
+    public ActionForward syncBudgetToParentConfirm(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        BudgetForm budgetForm = (BudgetForm) form;
+        DevelopmentProposal childProposal = (DevelopmentProposal) budgetForm.getBudgetDocument().getParentDocument().getBudgetParent();
+        getHierarchyHelper().syncBudgetToParent((ProposalDevelopmentBudgetExt) budgetForm.getBudgetDocument().getBudget(), childProposal, true);
+        return mapping.findForward(Constants.MAPPING_BASIC);
+    }
+
+    public BudgetSubAwardService getBudgetSubAwardService() {
+        if (budgetSubAwardService == null) {
+            budgetSubAwardService = KraServiceLocator.getService(BudgetSubAwardService.class);
+        }
+        return budgetSubAwardService;
+    }
+
+    public void setBudgetSubAwardService(BudgetSubAwardService budgetSubAwardService) {
+        this.budgetSubAwardService = budgetSubAwardService;
+    }  
+    
+    public ActionForward budgetVersions(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+        final BudgetForm budgetForm = (BudgetForm) form;
+        final String headerTabCall = getHeaderTabDispatch(request);
+        if(StringUtils.isEmpty(headerTabCall)) {
+            budgetForm.getDocument().refreshPessimisticLocks();
+        }  
+        final BudgetTDCValidator tdcValidator = new BudgetTDCValidator(request);
+        //return mapping.findForward(Constants.BUDGET_PERIOD_PAGE);
+        return mapping.findForward(Constants.BUDGET_VERSIONS_PAGE);
+        //return mapping.findForward("parameters");
+    }
+    
 }

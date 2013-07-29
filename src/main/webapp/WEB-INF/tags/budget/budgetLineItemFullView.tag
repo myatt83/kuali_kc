@@ -1,5 +1,5 @@
 <%--
- Copyright 2005-2010 The Kuali Foundation
+ Copyright 2005-2013 The Kuali Foundation
 
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -76,7 +76,7 @@
 				        		<c:when test="${KualiForm.document.budget.costSharingSubmissionEnabled}">
 							    	<th width="25%"><div align="right"><kul:htmlAttributeLabel attributeEntry="${budgetLineItemAttributes.submitCostSharingFlag}" noColon="true" /></div></th>
 							        <td width="25%">
-							        	<div align="left"><kul:htmlControlAttribute property="document.budget.budgetPeriods[${budgetPeriod - 1}].budgetLineItems[${budgetLineItemNumber}].submitCostSharingFlag" attributeEntry="${budgetLineItemAttributes.submitCostSharingFlag}" readOnly="${!KualiForm.document.budget.submitCostSharingFlag or budgetExpensePanelReadOnlyIfBudgetVersionIsFinal}"/>
+							        	<div align="left"><kul:htmlControlAttribute property="document.budget.budgetPeriods[${budgetPeriod - 1}].budgetLineItems[${budgetLineItemNumber}].submitCostSharingFlag" attributeEntry="${budgetLineItemAttributes.submitCostSharingFlag}" readOnly="${!KualiForm.document.budget.submitCostSharingFlag or readOnly}"/>
 							        	</div>
 				        			</td>
 				        		</c:when>

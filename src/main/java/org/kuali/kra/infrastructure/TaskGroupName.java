@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,6 @@ public interface TaskGroupName {
     public static final String COIDISCLOSURE = "coiDisclosure";
     public static final String SUBAWARD = "subAward";
     public static final String IACUC_PROTOCOL_ONLINEREVIEW = "iacucProtocolOnlineReview";
-    public static final String COMMON_COMMITTEE = "commonCommittee";
+    public static final String IACUC_COMMITTEE = "iacucCommittee";
 
 }

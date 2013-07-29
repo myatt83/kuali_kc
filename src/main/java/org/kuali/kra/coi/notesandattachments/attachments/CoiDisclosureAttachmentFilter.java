@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,7 +67,7 @@ public class CoiDisclosureAttachmentFilter implements Serializable {
     
     private class CoiDisclosureAttachmentLastUpdatedComparator implements Comparator<CoiDisclosureAttachment> {
         public int compare(CoiDisclosureAttachment o1, CoiDisclosureAttachment o2) {
-            return o1.getUpdateTimestamp().compareTo(o2.getUpdateTimestamp());
+            return o2.getUpdateTimestamp().compareTo(o1.getUpdateTimestamp());
         }
     }
     

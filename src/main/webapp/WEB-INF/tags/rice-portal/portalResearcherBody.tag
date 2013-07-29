@@ -1,5 +1,5 @@
 <%--
- Copyright 2005-2010 The Kuali Foundation
+ Copyright 2005-2013 The Kuali Foundation
  
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -19,23 +19,16 @@
 	  	<channel:messageOfTheDay/>
       <channel:researcherProposals />
       <channel:researcherAwards />
-      <!-- AAP: removed for menu cleanup -->
-      <!-- channel:researcherNegotiations /-->
+      <channel:researcherNegotiations />
 </td>
-<!-- AAP: removed for menu cleanup -->
-<!-- td class="content" valign="top">
+<td class="content" valign="top">
       <channel:researcherIRBProtocols/>
       <channel:researcherCompliance/>
       <channel:researcherIACUCProtocols/>   
-</td -->
+</td>
 
 <td class="content" valign="top">
       <channel:researcherQuicklinks />
-      <!-- AAP: removed for menu cleanup -->
-      <!-- channel:researcherPersonnel / -->
+      <channel:researcherPersonnel />
       <channel:researcherWorkflow />
-</td>
-<!-- AAP: report links -->
-<td class="content" valign="top">
-      <channel:researcherReportLinks />
 </td>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,8 @@ import java.util.Map;
 import org.kuali.kra.infrastructure.PermissionConstants;
 import org.kuali.kra.iacuc.actions.submit.IacucProtocolSubmission;
 import org.kuali.kra.iacuc.actions.submit.IacucProtocolSubmitActionService;
-import org.kuali.kra.protocol.ProtocolSubmissionLookupableHelperServiceImpl;
+import org.kuali.kra.iacuc.committee.bo.IacucCommitteeSchedule;
+import org.kuali.kra.protocol.ProtocolSubmissionLookupableHelperServiceImplBase;
 import org.kuali.rice.kns.lookup.HtmlData;
 import org.kuali.rice.kns.lookup.HtmlData.AnchorHtmlData;
 import org.kuali.rice.krad.bo.BusinessObject;
@@ -32,7 +33,7 @@ import org.kuali.rice.krad.bo.BusinessObject;
  * This class is to create action links and inquiry url for protocolsubmission lookup. 
  */
 @SuppressWarnings({ "serial", "unchecked" })
-public class IacucProtocolSubmissionLookupableHelperServiceImpl extends ProtocolSubmissionLookupableHelperServiceImpl {
+public class IacucProtocolSubmissionLookupableHelperServiceImpl extends ProtocolSubmissionLookupableHelperServiceImplBase {
 
     protected IacucProtocolSubmitActionService protocolSubmitActionService;
  
@@ -83,6 +84,11 @@ public class IacucProtocolSubmissionLookupableHelperServiceImpl extends Protocol
         }catch (Exception e) {
             e.printStackTrace();
            LOG.info("submissionLookupData Lookup : " + submissionLookupData.size() + " parsing error");
+        }
+        for (IacucProtocolSubmission submission : submissionLookupData) {
+            if (submission.getCommitteeSchedule() == null) {
+                submission.setCommitteeSchedule(new IacucCommitteeSchedule());
+            }
         }
         return submissionLookupData;
     }   

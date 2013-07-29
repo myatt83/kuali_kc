@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,19 +15,19 @@
  */
 package org.kuali.kra.protocol.personnel;
 
-import org.kuali.kra.protocol.ProtocolDocument;
+import org.kuali.kra.protocol.ProtocolDocumentBase;
 import org.kuali.rice.krad.rules.rule.event.KualiDocumentEvent;
 
 /**
  * Event triggered when a protocol unit state is modified on a 
- * <code>{@link ProtocolDocument}</code>
+ * <code>{@link ProtocolDocumentBase}</code>
  *
  */
 public interface ProtocolUnitEvent extends KualiDocumentEvent {
     /**
-     * @return <code>{@link ProtocolUnit}</code> that triggered this event.
+     * @return <code>{@link ProtocolUnitBase}</code> that triggered this event.
      */
-    public ProtocolUnit getProtocolUnit();
+    public ProtocolUnitBase getProtocolUnit();
     
     public int getPersonIndex();
 

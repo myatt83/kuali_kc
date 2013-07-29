@@ -1,5 +1,5 @@
 <%--
- Copyright 2005-2010 The Kuali Foundation
+ Copyright 2005-2013 The Kuali Foundation
  
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -132,7 +132,6 @@
 						<div align="center">
 	                		<kul:htmlControlAttribute property="document.subAwardList[0].subAwardAmountInfoList[${status.index}].anticipatedChange" attributeEntry="${subAwardAmountInfoAttributes.anticipatedChange}"   />
 						</div>
-						<%-- </td><kra:fileicon attachment="${subAward.fileName}"/><td> --%>
 					
 						<td width="9%" valign="middle">
 
@@ -159,15 +158,15 @@
 					<div align="center">Attachment Actions :
 					</div><br></br>
 						<div align="center">
+						  <c:if test="${newSubAwardAmountInfo.fileName!=null}">
+                                    <html:image
+                                        styleId="downloadHistoryOfChangesAttachment.line${status.index}"
+                                        property="methodToCall.downloadHistoryOfChangesAttachment.line${status.index}.anchor${currentTabIndex}"
+                                        src='${ConfigProperties.kra.externalizable.images.url}tinybutton-view.gif'
+                                        styleClass="tinybutton"
+                                        onclick="javascript: openNewWindow('${action}','downloadHistoryOfChangesAttachment','${status.index}',${KualiForm.formKey},'${KualiForm.document.sessionDocument}'); return false" />
+                            </c:if>
 							<c:if test="${!readOnly}">
-								<c:if test="${newSubAwardAmountInfo.fileName!=null}">
-									<html:image
-										styleId="downloadHistoryOfChangesAttachment.line${status.index}"
-										property="methodToCall.downloadHistoryOfChangesAttachment.line${status.index}.anchor${currentTabIndex}"
-										src='${ConfigProperties.kra.externalizable.images.url}tinybutton-view.gif'
-										styleClass="tinybutton"
-										onclick="javascript: openNewWindow('${action}','downloadHistoryOfChangesAttachment','${status.index}',${KualiForm.formKey},'${KualiForm.document.sessionDocument}'); return false" />
-								</c:if>
 								<html:image
 									styleId="replaceHistoryOfChangesAttachment.line${status.index}"
 									onclick="javascript: showHide('fileDiv${status.index}','replaceDiv${status.index}') ; return false"

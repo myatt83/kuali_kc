@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,8 @@ public class PersonnelAttachmentReplaceAuthorizer extends ProposalAuthorizer {
             boolean hasPerm = hasProposalPermission(userId, doc, PermissionConstants.MODIFY_NARRATIVE);
             boolean isInProgress = StringUtils.equalsIgnoreCase(doc.getDevelopmentProposal().getProposalState().getDescription(), "In Progress");
             boolean isApprovalPending = StringUtils.equalsIgnoreCase(doc.getDevelopmentProposal().getProposalState().getDescription(), "Approval Pending");
-            result = hasPerm && (isInProgress || isApprovalPending);
+            boolean isRevisionRequested = StringUtils.equalsIgnoreCase(doc.getDevelopmentProposal().getProposalState().getDescription(), "Revisions Requested");
+            result = hasPerm && (isInProgress || isApprovalPending || isRevisionRequested);
         }
         return result;
     }

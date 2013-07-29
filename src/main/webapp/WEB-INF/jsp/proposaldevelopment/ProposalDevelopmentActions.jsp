@@ -1,5 +1,5 @@
 <%--
-Copyright 2005-2010 The Kuali Foundation
+Copyright 2005-2013 The Kuali Foundation
 
 Licensed under the Educational Community License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -101,6 +101,8 @@ http://www.osedu.org/licenses/ECL-2.0
 		<c:if test="${hierarchyStatus != hierarchyChildStatus}">
 			<kul:routeLog />
 			<kul:adHocRecipients />
+			<kul:superUserActions showTab="false"/>
+			
 		</c:if>
 	
 		<kul:panelFooter />
@@ -114,7 +116,14 @@ http://www.osedu.org/licenses/ECL-2.0
 	           </c:if> 
 	
 	</c:if> --%>
-	
+	<c:if test="${KualiForm.saveXmlPermission and KualiForm.grantsGovSelectFlag}">
+			<div id="btn_img_content">
+  			<html:image
+						property="methodToCall.saveXml"
+						src="${ConfigProperties.kra.externalizable.images.url}buttonsmall_savexml.gif" alt="Save Grants.Gov Xml" onclick="excludeSubmitRestriction=true" style="border:none;" styleId="saveXml" />
+						</div> 
+  		
+  	</c:if>
 		<p><kul:documentControls transactionalDocument="true"
 			extraButtonSource="${extraButtonSource}"
 			extraButtonProperty="${extraButtonProperty}"
@@ -127,6 +136,14 @@ http://www.osedu.org/licenses/ECL-2.0
 		<SCRIPT type="text/javascript">
 			var kualiForm = document.forms['KualiForm'];
 			var kualiElements = kualiForm.elements;
+			function addToGlobalButtons() {
+	  			var imgdata=jQuery("#btn_img_content").html();
+	  			jQuery("#btn_img_content").remove();
+	  			setTimeout(function(){ 				
+	  				jQuery("#globalbuttons").prepend(imgdata); 
+	  			},100);
+	  		}
+	  		window.onload=addToGlobalButtons();
 		</SCRIPT>
 			
 		</c:otherwise>

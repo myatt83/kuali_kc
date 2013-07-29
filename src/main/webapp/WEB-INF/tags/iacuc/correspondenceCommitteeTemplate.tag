@@ -1,5 +1,5 @@
 <%--
- Copyright 2005-2010 The Kuali Foundation
+ Copyright 2005-2013 The Kuali Foundation
 
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@
                     </c:forEach>
                     <c:set target="${paramMap}" property="correspondenceTemplates" value="${KualiForm.correspondenceTypes[index].committeeProtocolCorrespondenceTemplates}" />
                     <html:select property="newCorrespondenceTemplates[${index}].committeeId" tabindex="0"  >                               
-                        <c:forEach items="${krafn:getOptionList('org.kuali.kra.committee.lookup.keyvalue.CommitteeIdValuesFinder', paramMap)}" var="option">
+                        <c:forEach items="${krafn:getOptionList('org.kuali.kra.iacuc.committee.lookup.keyvalue.IacucCommitteeIdValuesFinder', paramMap)}" var="option">
                             <c:choose>                      
                                 <c:when test="${KualiForm.newCorrespondenceTemplates[index].committeeId == option.key}">
                                     <option value="${option.key}" selected>${option.value}</option>

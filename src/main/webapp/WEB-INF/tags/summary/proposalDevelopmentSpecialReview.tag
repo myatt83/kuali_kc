@@ -1,5 +1,5 @@
 <%--
- Copyright 2005-2010 The Kuali Foundation
+ Copyright 2005-2013 The Kuali Foundation
  
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@
 	description="The property name of the collection that holds all the current Special Reviews"%>
 <%@ attribute name="action" required="true" 
 	description="The name of the action class"%>
+<%@ attribute name="transparentBackground" required="false" %>
 <c:set var="canModify"
 	value="${KualiForm.specialReviewHelper.canModifySpecialReview}" />
 <c:set var="enableIrbProtocolLinking"
@@ -36,7 +37,7 @@
 	value="<%=org.kuali.kra.infrastructure.Constants.SPECIAL_REVIEW_COMMENT_LENGTH%>" />
 <c:set var="count" value="${fn:length(collectionReference)}" />
 <kul:tab
-	tabTitle="Special Review (${count})"
+	tabTitle="Special Review (${count})" transparentBackground="${transparentBackground }"
 	defaultOpen="false">
 	<div class="tab-container" align="center">
 		<h3>

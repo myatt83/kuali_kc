@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@ package org.kuali.kra.common.committee.notification;
 import java.util.List;
 
 import org.kuali.kra.bo.CoeusModule;
-import org.kuali.kra.common.committee.bo.CommonCommittee;
-import org.kuali.kra.common.committee.bo.CommonCommitteeSchedule;
+import org.kuali.kra.common.committee.bo.CommitteeBase;
+import org.kuali.kra.common.committee.bo.CommitteeScheduleBase;
 import org.kuali.kra.common.notification.NotificationRenderer;
 import org.kuali.kra.common.notification.NotificationContextBase;
 import org.kuali.kra.common.notification.bo.NotificationTypeRecipient;
@@ -39,28 +39,28 @@ public class CommitteeNotificationContext extends NotificationContextBase {
 
     private static final long serialVersionUID = 6642334312368480034L;
 
-    private CommonCommittee committee;
-    private CommonCommitteeSchedule committeeSchedule;
+    private CommitteeBase committee;
+    private CommitteeScheduleBase committeeSchedule;
     private String actionTypeCode;
     private String contextName;
     
     /**
-     * Constructs a Committee notification context and sets the necessary services.
+     * Constructs a CommitteeBase notification context and sets the necessary services.
      * @param protocol
      * @param actionTypeCode
      * @param contextName
      */
-    public CommitteeNotificationContext(CommonCommitteeSchedule committeeSchedule, String actionTypeCode, String contextName, NotificationRenderer renderer) {
+    public CommitteeNotificationContext(CommitteeScheduleBase committeeSchedule, String actionTypeCode, String contextName, NotificationRenderer renderer) {
         super(renderer);
 
-        this.committee = committeeSchedule.getCommittee();
+        this.committee = committeeSchedule.getParentCommittee();
         this.committeeSchedule = committeeSchedule;
         this.actionTypeCode = actionTypeCode;
         this.contextName = contextName;
         
         setNotificationService(KraServiceLocator.getService(KcNotificationService.class));
         setNotificationModuleRoleService(KraServiceLocator.getService(KcNotificationModuleRoleService.class));
-        CommitteeNotificationRoleQualifierService committeeNotificationRoleQualifierService = getCommitteeNotificationRoleQualifierService();
+        CommonCommitteeNotificationRoleQualifierService committeeNotificationRoleQualifierService = getCommitteeNotificationRoleQualifierService();
         setNotificationRoleQualifierService(committeeNotificationRoleQualifierService);
         committeeNotificationRoleQualifierService.setCommitteeSchedule(this.committeeSchedule);
         committeeNotificationRoleQualifierService.setCommittee(this.committee);
@@ -123,8 +123,8 @@ public class CommitteeNotificationContext extends NotificationContextBase {
         return null;
     }
  
-    public CommitteeNotificationRoleQualifierService getCommitteeNotificationRoleQualifierService() {
-        //return committeeNotificationRoleQualifierService;
-        return KraServiceLocator.getService(CommitteeNotificationRoleQualifierServiceImpl.COMMON_COMMITTEE_NOTIFICATION_ROLE_QUALIFER_SERVICE_SPRING_NAME);
+    public CommonCommitteeNotificationRoleQualifierService getCommitteeNotificationRoleQualifierService() {
+        // return KraServiceLocator.getService(CommonCommitteeNotificationRoleQualifierServiceImpl.COMMON_COMMITTEE_NOTIFICATION_ROLE_QUALIFER_SERVICE_SPRING_NAME);
+        return KraServiceLocator.getService(CommonCommitteeNotificationRoleQualifierService.class);
     }
 }

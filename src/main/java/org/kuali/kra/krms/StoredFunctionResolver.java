@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,8 +33,10 @@ public class StoredFunctionResolver extends FunctionTermResolver {
         super(orderedInputParams, parameterNames, output);
     }
 
-    protected String executeFunction(Map<String, Object> resolvedPrereqs,Map<String,String> resolvedParameters) {
-        String functionName = getOutput();
+    protected String executeFunction(String packageName,String functionName,Map<String, Object> resolvedPrereqs,Map<String,String> resolvedParameters) {
+        if(packageName!=null) {
+            functionName = packageName+"."+functionName;
+        }
         List<Object> orderedParamValues = extractParamValues(resolvedPrereqs,resolvedParameters);
         return callFunction(functionName,orderedParamValues);
     }

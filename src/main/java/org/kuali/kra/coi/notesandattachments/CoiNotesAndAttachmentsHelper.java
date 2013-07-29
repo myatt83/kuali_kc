@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,11 +28,13 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.struts.upload.FormFile;
 import org.kuali.kra.bo.AttachmentFile;
+import org.kuali.kra.bo.KcPerson;
 import org.kuali.kra.bo.KraPersistableBusinessObjectBase;
 import org.kuali.kra.coi.CoiDisclosure;
 import org.kuali.kra.coi.CoiDisclosureDocument;
 import org.kuali.kra.coi.CoiDisclosureEventType;
 import org.kuali.kra.coi.CoiDisclosureForm;
+import org.kuali.kra.coi.CoiNoteType;
 import org.kuali.kra.coi.auth.CoiDisclosureDeleteUpdateAttachmentTask;
 import org.kuali.kra.coi.auth.CoiDisclosureDeleteUpdateNoteTask;
 import org.kuali.kra.coi.auth.CoiDisclosureTask;
@@ -45,6 +47,8 @@ import org.kuali.kra.infrastructure.TaskName;
 import org.kuali.kra.service.TaskAuthorizationService;
 import org.kuali.kra.util.CollectionUtil;
 import org.kuali.rice.kim.api.identity.IdentityService;
+import org.kuali.rice.kim.api.identity.Person;
+import org.kuali.rice.kim.api.identity.PersonService;
 import org.kuali.rice.kim.api.identity.principal.Principal;
 import org.kuali.rice.krad.service.BusinessObjectService;
 import org.kuali.rice.core.api.datetime.DateTimeService;
@@ -68,11 +72,15 @@ public class CoiNotesAndAttachmentsHelper {
     private final IdentityService identityService;
 
     private static final String CONFIRM_YES_DELETE_ATTACHMENT = "confirmDeleteCoiDisclosureAttachment";
+    private static final String PERSON_NOT_FOUND_FORMAT_STRING = "%s (not found)";
     // Currently setting this to 1 since there are no CoiDisclosure attachment types
     private static final String ATTACHMENT_TYPE_CD = "1";
     private boolean viewRestricted;
+    private boolean addAttachments;
+    private boolean addNotepads;
     private boolean modifyAttachments;
     private boolean modifyNotepads;
+    private boolean addCoiReviewerComments;
     //private List<Boolean> canDeleteUpdateNote = new ArrayList<Boolean>(); 
     private Map<Integer, Boolean> canDeleteUpdateAttachment = new HashMap<Integer, Boolean>(); 
     private Map<Integer, Boolean> canDeleteUpdateNote = new HashMap<Integer, Boolean>();
@@ -95,20 +103,46 @@ public class CoiNotesAndAttachmentsHelper {
     }
 
     public void prepareView() {
-        this.initializePermissions();      
+        this.initializePermissions();   
+        initializeNotePaseUserNames(this.getCoiDisclosure().getCoiDisclosureNotepads());
     }
 
     /**
      * Initialize the permissions for viewing/editing the Custom Data web page.
      */
     private void initializePermissions() {
+        addAttachments = canAddCoiDisclosureAttachments();
+        addNotepads = canAddCoiDisclosureNotes();
         modifyAttachments = canMaintainCoiDisclosureAttachments();
         modifyNotepads = canMaintainCoiDisclosureNotes();
         viewRestricted = canViewRestrictedProtocolNotepads();
+        addCoiReviewerComments = canAddCoiReviewerComments();
         
         // initialize individual permissions for notes and attachments
         canDeleteUpdateNotes();
         canDeleteUpdateAttachments();
+    }
+    
+    protected void initializeNotePaseUserNames(List<CoiDisclosureNotepad> notepads) {
+        for (CoiDisclosureNotepad notePad : notepads) {
+            Person person = this.getPersonService().getPersonByPrincipalName(notePad.getUpdateUser());
+            notePad.setUpdateUserFullName(person==null?String.format(PERSON_NOT_FOUND_FORMAT_STRING, notePad.getUpdateUser()):person.getName());
+            
+            if (StringUtils.isNotBlank(notePad.getCreateUser())) {
+                Person creator = this.getPersonService().getPersonByPrincipalName(notePad.getCreateUser());
+                notePad.setCreateUserFullName(creator==null?String.format(PERSON_NOT_FOUND_FORMAT_STRING, notePad.getCreateUser()):creator.getName());
+            } else {
+                notePad.setCreateUserFullName("");
+            }
+        }
+    }
+
+    public boolean isCanAddAttachment() {
+        return this.addAttachments;
+    }
+
+    public boolean isAddNotepads() {
+        return addNotepads;
     }
 
     public boolean isModifyAttachments() {
@@ -203,6 +237,38 @@ public class CoiNotesAndAttachmentsHelper {
             CoiDisclosureTask task = new CoiDisclosureTask(TaskName.VIEW_COI_DISCLOSURE_RESTRICTED_NOTES, getCoiDisclosure());
             return getTaskAuthorizationService().isAuthorized(getUserIdentifier(), task);
         }
+    }
+
+    protected boolean canAddCoiDisclosureNotes() {
+        CoiDisclosureTask task = new CoiDisclosureTask(TaskName.ADD_COI_DISCLOSURE_NOTES, getCoiDisclosure());
+        return getTaskAuthorizationService().isAuthorized(getUserIdentifier(), task); 
+    }
+       
+    protected boolean canViewCoiDisclosure(){
+        CoiDisclosureTask task = new CoiDisclosureTask(TaskName.VIEW_COI_DISCLOSURE, getCoiDisclosure());
+        return getTaskAuthorizationService().isAuthorized(getUserIdentifier(), task); 
+    }
+    
+    public boolean isPerformCoiDisclosureActions(){
+        CoiDisclosureTask task = new CoiDisclosureTask(TaskName.PERFORM_COI_DISCLOSURE_ACTIONS, getCoiDisclosure());
+        return getTaskAuthorizationService().isAuthorized(getUserIdentifier(), task); 
+    }
+    
+    /**
+     * If Assigned Reviewers create a comment in the Review Actions ==> Add Review Comment, pre-set the Note Type drop down to Reviewer Comment
+     * @return
+     */
+    protected boolean canAddCoiReviewerComments() {   
+        boolean userIsCoiReviewer = false; 
+        if (canViewCoiDisclosure() && canMaintainCoiDisclosureNotes() && canMaintainCoiDisclosureAttachments() && isPerformCoiDisclosureActions()){            
+            userIsCoiReviewer = true;
+        }
+        return userIsCoiReviewer;
+    }
+
+    protected boolean canAddCoiDisclosureAttachments() {
+        CoiDisclosureTask task = new CoiDisclosureTask(TaskName.ADD_COI_DISCLOSURE_ATTACHMENTS, getCoiDisclosure());
+        return getTaskAuthorizationService().isAuthorized(getUserIdentifier(), task); 
     }
 
     protected boolean canMaintainCoiDisclosureNotes() {
@@ -512,6 +578,8 @@ public class CoiNotesAndAttachmentsHelper {
         final AddCoiDisclosureNotepadEvent event = new AddCoiDisclosureNotepadEvent((CoiDisclosureDocument) coiDisclosureForm.getDocument(), this.newCoiDisclosureNotepad);
 
         if (rule.processAddCoiDisclosureNotepadRules(event)) {
+            newCoiDisclosureNotepad.setCreateUser(GlobalVariables.getUserSession().getPrincipalName());
+            newCoiDisclosureNotepad.setCreateTimestamp(((DateTimeService) KraServiceLocator.getService(Constants.DATE_TIME_SERVICE_NAME)).getCurrentTimestamp());
             addNewNotepad(newCoiDisclosureNotepad);
             initCoiDisclosureNotepad();
         }
@@ -535,6 +603,10 @@ public class CoiNotesAndAttachmentsHelper {
             notepad.setProjectId(projectId);
         }
         notepad.setEventTypeCode(event);
+        //If Assigned Reviewers create a comment in the Review Actions ==> Add Review Comment, pre-set the Note Type drop down to Reviewer Comment
+        if (canAddCoiDisclosureNotes() && coiDisclosure.isSubmitted() && addCoiReviewerComments){
+            notepad.setNoteTypeCode(CoiNoteType.REVIEWER_COMMENT_NOTE_TYPE_CODE);
+        }
         setNewCoiDisclosureNotepad(notepad);
     }
 
@@ -547,6 +619,12 @@ public class CoiNotesAndAttachmentsHelper {
         notepad.setCoiDisclosureNumber(getCoiDisclosure().getCoiDisclosureNumber());
         notepad.setSequenceNumber(getCoiDisclosure().getSequenceNumber());        
         notepad.setEntryNumber(getNextEntryNumber());
+        if (notepad.getFinancialEntity() == null && notepad.getFinancialEntityId() != null) {
+            //due to the readonly view change for disabled fin ents, we need to make sure to have a
+            // financial entity otherwise the fin ent will be blank on add.
+            notepad.refreshReferenceObject("financialEntity");
+        }
+        getBusinessObjectService().save(notepad);
         getCoiDisclosure().getCoiDisclosureNotepads().add(notepad);   
 
     }
@@ -588,6 +666,10 @@ public class CoiNotesAndAttachmentsHelper {
     
     private void deleteNotepad(int noteToDelete) {
         this.getCoiDisclosure().getCoiDisclosureNotepads().remove(noteToDelete);
+    }
+    
+    public PersonService getPersonService() {
+        return KraServiceLocator.getService(PersonService.class);
     }
 
 }

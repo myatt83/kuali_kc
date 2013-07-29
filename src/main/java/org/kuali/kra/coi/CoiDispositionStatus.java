@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,18 +27,19 @@ public class CoiDispositionStatus extends KraPersistableBusinessObjectBase {
      */
     private static final long serialVersionUID = -7876291367875185011L;
     public static final String IN_PROGRESS = "100";
-    public static final String SUBMITTED_FOR_REVIEW = "200";
-    public static final String UNDER_REVIEW_BY_COI_REVIEWER = "201";
-    public static final String BEST_PRACTICES_MEMO = "300";
-    public static final String NO_FURTHER_ACTION = "301";
-    public static final String DISCLOSED_INTERESTS_ELIMINATED = "302";
-    public static final String DISCLOSED_INTERESTS_REDUCED = "303";
-    public static final String DISCLOSED_INTERESTS_MANAGED = "304";
-    public static final String NO_CONFLICT_EXISTS = "305";
-    public static final String EXEMPT = "306";
+    public static final String SUBMITTED_FOR_REVIEW = "300";
+    public static final String UNDER_REVIEW_BY_COI_REVIEWER = "301";
+    public static final String BEST_PRACTICES_MEMO = "215";
+    public static final String NO_FURTHER_ACTION = "211";
+    public static final String DISCLOSED_INTERESTS_ELIMINATED = "220";
+    public static final String DISCLOSED_INTERESTS_REDUCED = "230";
+    public static final String DISCLOSED_INTERESTS_MANAGED = "240";
+    public static final String NO_CONFLICT_EXISTS = "210";
+    public static final String EXEMPT = "200";
     public static final String DISCLOSED_INTERESTS_UNMANAGEABLE = "400";
     private String coiDispositionCode; 
     private String description; 
+    private boolean displayToReporter;
     
     private CoiDisclosure coiDisclosure; 
     private CoiDisclosureStatus coiDisclosureStatus;
@@ -86,6 +87,14 @@ public class CoiDispositionStatus extends KraPersistableBusinessObjectBase {
 
     public String getCoiDisclosureStatusCode() {
         return coiDisclosureStatusCode;
+    }
+
+    public boolean isDisplayToReporter() {
+        return displayToReporter;
+    }
+
+    public void setDisplayToReporter(boolean displayToReporter) {
+        this.displayToReporter = displayToReporter;
     }
 
 }

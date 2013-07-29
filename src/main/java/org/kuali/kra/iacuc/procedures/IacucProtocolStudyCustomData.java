@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,10 @@ package org.kuali.kra.iacuc.procedures;
 
 import org.kuali.kra.iacuc.IacucProcedureCategoryCustomData;
 import org.kuali.kra.infrastructure.Constants;
-import org.kuali.kra.protocol.ProtocolAssociate;
+import org.kuali.kra.protocol.ProtocolAssociateBase;
 import org.kuali.rice.krad.util.ObjectUtils;
 
-public class IacucProtocolStudyCustomData extends ProtocolAssociate { 
+public class IacucProtocolStudyCustomData extends ProtocolAssociateBase { 
     
     private static final long serialVersionUID = 1L;
 

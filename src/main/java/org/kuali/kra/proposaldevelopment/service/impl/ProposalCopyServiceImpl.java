@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,6 +46,7 @@ import org.kuali.kra.proposaldevelopment.bo.CongressionalDistrict;
 import org.kuali.kra.proposaldevelopment.bo.DevelopmentProposal;
 import org.kuali.kra.proposaldevelopment.bo.Narrative;
 import org.kuali.kra.proposaldevelopment.bo.NarrativeAttachment;
+import org.kuali.kra.proposaldevelopment.bo.NarrativeUserRights;
 import org.kuali.kra.proposaldevelopment.bo.ProposalAbstract;
 import org.kuali.kra.proposaldevelopment.bo.ProposalCopyCriteria;
 import org.kuali.kra.proposaldevelopment.bo.ProposalPerson;
@@ -63,6 +64,7 @@ import org.kuali.kra.proposaldevelopment.budget.bo.BudgetSubAwards;
 import org.kuali.kra.proposaldevelopment.budget.modular.BudgetModular;
 import org.kuali.kra.proposaldevelopment.document.ProposalDevelopmentDocument;
 import org.kuali.kra.proposaldevelopment.hierarchy.HierarchyStatusConstants;
+import org.kuali.kra.proposaldevelopment.questionnaire.ProposalDevelopmentModuleQuestionnaireBean;
 import org.kuali.kra.proposaldevelopment.rule.event.CopyProposalEvent;
 import org.kuali.kra.proposaldevelopment.service.KeyPersonnelService;
 import org.kuali.kra.proposaldevelopment.service.NarrativeService;
@@ -227,9 +229,9 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
             //copy existing questionnaires (if we can, otherwise copy the pieces of the questionnaires that we can. )
             //if (criteria.getIncludeQuestionnaires()) {
             if (criteria.getIncludeQuestionnaire()) {
-                ModuleQuestionnaireBean moduleQuestionnaireBean = new ModuleQuestionnaireBean(CoeusModule.PROPOSAL_DEVELOPMENT_MODULE_CODE, doc.getDevelopmentProposal().getProposalNumber(), "0" ,"0", true);
+                ModuleQuestionnaireBean moduleQuestionnaireBean = new ProposalDevelopmentModuleQuestionnaireBean(doc.getDevelopmentProposal(), true);
                 List<AnswerHeader> answerHeaders = questionnaireAnswerService.getQuestionnaireAnswer(moduleQuestionnaireBean);
-                ModuleQuestionnaireBean destModuleQuestionnaireBean = new ModuleQuestionnaireBean(CoeusModule.PROPOSAL_DEVELOPMENT_MODULE_CODE,newDoc.getDevelopmentProposal().getProposalNumber(),"0","0",false);
+                ModuleQuestionnaireBean destModuleQuestionnaireBean = new ProposalDevelopmentModuleQuestionnaireBean(newDoc.getDevelopmentProposal(), false);
                 questionnaireAnswerService.copyAnswerHeaders(moduleQuestionnaireBean, destModuleQuestionnaireBean);
             }
             
@@ -842,8 +844,21 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
                 destNarrative.setModuleStatusCode(Constants.NARRATIVE_MODULE_STATUS_INCOMPLETE);
             else
                 destNarrative.setModuleStatusCode(Constants.NARRATIVE_MODULE_STATUS_COMPLETE);
-            
+ 
+            //remove the user performing the copy from the narrative permissions in case they had permissions other than modify.
+            //they will default to modify during the copy as they are the aggregator of the new document.
+            removePersonNarrativePermission(GlobalVariables.getUserSession().getPrincipalId(), destNarrative);
             narrativeService.addNarrative(dest, destNarrative);
+        }
+    }
+    
+    protected void removePersonNarrativePermission(String personId, Narrative narrative) {
+        Iterator<NarrativeUserRights> iter = narrative.getNarrativeUserRights().iterator();
+        while (iter.hasNext()) {
+            NarrativeUserRights right = iter.next();
+            if (StringUtils.equals(right.getUserId(), personId)) {
+                iter.remove();
+            }
         }
     }
     
@@ -971,6 +986,8 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
         objectMap.clear();
         fixNumericProperty(budgetDocument, "setBudgetSubawardAttachmentId", Long.class, null, objectMap);
         objectMap.clear();
+        fixNumericProperty(budgetDocument, "setBudgetSubAwardDetailId", Long.class, null, objectMap);
+        objectMap.clear();
         fixNumericProperty(budgetDocument, "setVersionNumber", Integer.class, null, objectMap);
         objectMap.clear();
 
@@ -982,7 +999,7 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
         }
         //Temporary workaround ends here
         
-        ObjectUtils.materializeAllSubObjects(budgetDocument.getBudget());
+        ObjectUtils.materializeAllSubObjects(budgetDocument.getBudget()); 
 
         Budget budget = budgetDocument.getBudget();
         
@@ -1089,18 +1106,26 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
         for (Map.Entry<String, CustomAttributeDocument> entry: src.getCustomAttributeDocuments().entrySet()) {
             // Find the attribute value
             CustomAttributeDocument customAttributeDocument = entry.getValue();
-            Map<String, Object> primaryKeys = new HashMap<String, Object>();
-            primaryKeys.put(KRADPropertyConstants.DOCUMENT_NUMBER, src.getDocumentNumber());
-            primaryKeys.put(Constants.CUSTOM_ATTRIBUTE_ID, customAttributeDocument.getCustomAttributeId());
-            CustomAttributeDocValue customAttributeDocValue = (CustomAttributeDocValue)businessObjectService.findByPrimaryKey(CustomAttributeDocValue.class, primaryKeys);
-            
-            // Store a new CustomAttributeDocValue using the new document's document number
-            if (customAttributeDocValue != null) {
-                CustomAttributeDocValue newDocValue = new CustomAttributeDocValue();
-                newDocValue.setDocumentNumber(dest.getDocumentNumber());
-                newDocValue.setCustomAttributeId(customAttributeDocument.getCustomAttributeId());
-                newDocValue.setValue(customAttributeDocValue.getValue());
-                KraServiceLocator.getService(BusinessObjectService.class).save(newDocValue);
+            if(customAttributeDocument.isActive()) {
+                Map<String, Object> primaryKeys = new HashMap<String, Object>();
+                primaryKeys.put(KRADPropertyConstants.DOCUMENT_NUMBER, src.getDocumentNumber());
+                primaryKeys.put(Constants.CUSTOM_ATTRIBUTE_ID, customAttributeDocument.getCustomAttributeId());
+                CustomAttributeDocValue customAttributeDocValue = (CustomAttributeDocValue)businessObjectService.findByPrimaryKey(CustomAttributeDocValue.class, primaryKeys);
+                
+                // Store a new CustomAttributeDocValue using the new document's document number
+                if (customAttributeDocValue != null) {
+                    CustomAttributeDocValue newDocValue = new CustomAttributeDocValue();
+                    newDocValue.setDocumentNumber(dest.getDocumentNumber());
+                    newDocValue.setCustomAttributeId(customAttributeDocument.getCustomAttributeId().longValue());
+                    newDocValue.setValue(customAttributeDocValue.getValue());
+                    dest.getCustomDataList().add(newDocValue);
+                } else {
+                    CustomAttributeDocValue newDocValue = new CustomAttributeDocValue();
+                    newDocValue.setDocumentNumber(dest.getDocumentNumber());
+                    newDocValue.setCustomAttributeId(customAttributeDocument.getCustomAttributeId().longValue());
+                    newDocValue.setValue(customAttributeDocument.getCustomAttribute().getDefaultValue());
+                    dest.getCustomDataList().add(newDocValue);                    
+                }
             }
         }
     }

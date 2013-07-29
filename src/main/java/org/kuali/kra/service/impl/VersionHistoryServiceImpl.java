@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,14 +36,14 @@ public class VersionHistoryServiceImpl implements VersionHistoryService {
     public static final String SEQUENCE_OWNER_CLASS_NAME_FIELD = "sequenceOwnerClassName";
     public static final String SEQUENCE_OWNER_REFERENCE_VERSION_NAME = "sequenceOwnerVersionNameValue";
     public static final String SEQUENCE_OWNER_REFERENCE_SEQ_NUMBER = "sequenceOwnerSequenceNumber";
-    public static final String SEQUENCE_OWNER_SEQUENCE_NUMBER_FIELD = "sequenceNumber";
+    public static final String SEQUENCE_OWNER_SEQUENCE_NUMBER_FIELD = "sequenceOwnerSequenceNumber";
     
     private BusinessObjectService bos;
     
     /**
      * @see org.kuali.kra.service.VersionHistoryService#createVersionHistory(org.kuali.kra.SequenceOwner, org.kuali.kra.bo.versioning.VersionStatus, java.lang.String)
      */
-    public VersionHistory createVersionHistory(SequenceOwner<? extends SequenceOwner<?>> sequenceOwner, VersionStatus versionStatus, String userId) {
+    protected VersionHistory createVersionHistory(SequenceOwner<? extends SequenceOwner<?>> sequenceOwner, VersionStatus versionStatus, String userId) {
         VersionHistory versionHistory = new VersionHistory(sequenceOwner, versionStatus, userId, new Date(new java.util.Date().getTime()));
         
         List<VersionHistory> list = new ArrayList<VersionHistory>();
@@ -52,38 +52,45 @@ public class VersionHistoryServiceImpl implements VersionHistoryService {
         return versionHistory;
     }
     
-    /**
-     * @see org.kuali.kra.service.VersionHistoryService#createVersionHistory(org.kuali.kra.SequenceOwner, org.kuali.kra.bo.versioning.VersionStatus, java.lang.String)
-     */
-    public VersionHistory updateVersionHistoryOnRouteToFinal(SequenceOwner<? extends SequenceOwner<?>> sequenceOwner, VersionStatus versionStatus, String userId) {
-        List<VersionHistory> existingEntries = loadVersionHistory(sequenceOwner.getClass(), getVersionName(sequenceOwner));
-        VersionHistory activeVersionHistory = getActiveVersionHistory(existingEntries);
-        VersionHistory pendingVersionHistory = getPendingVersionHistory(existingEntries);
-        if(!(activeVersionHistory == null)) {
-            activeVersionHistory.setStatus(VersionStatus.ARCHIVED);
-            bos.save(activeVersionHistory);
+    public VersionHistory updateVersionHistory(SequenceOwner<? extends SequenceOwner<?>> sequenceOwner, VersionStatus versionStatus, String userId) {
+        VersionHistory currentVersion = getVersionHistory(sequenceOwner.getClass(), getVersionName(sequenceOwner), sequenceOwner.getSequenceNumber());
+        if (currentVersion == null) {
+            currentVersion = createVersionHistory(sequenceOwner,versionStatus, userId);
         }
-        if(!(pendingVersionHistory == null)) {
-            pendingVersionHistory.setStatus(VersionStatus.ACTIVE);
-            bos.save(pendingVersionHistory);
-        } else {
-            //create version history even if no pending version exists -- important for award sync
-            bos.save(createVersionHistory(sequenceOwner,versionStatus, userId));
+        currentVersion.setStatus(versionStatus);
+        
+        //if newly active, clear any other active version histories
+        if (versionStatus == VersionStatus.ACTIVE) {
+            archiveActiveVersions(sequenceOwner.getClass(), getVersionName(sequenceOwner), currentVersion);
         }
-        return pendingVersionHistory;
+        bos.save(currentVersion);
+
+        return currentVersion;
+    }
+    protected void archiveActiveVersions(Class klass, String versionName, VersionHistory currentVersion) {
+        Map<String, Object> fieldValues = new HashMap<String, Object>();
+        fieldValues.put(SEQUENCE_OWNER_CLASS_NAME_FIELD, klass.getName());
+        fieldValues.put(SEQUENCE_OWNER_REFERENCE_VERSION_NAME, versionName);  
+        fieldValues.put(VERSION_STATUS_FIELD, VersionStatus.ACTIVE.toString());
+        for (VersionHistory version : bos.findMatching(VersionHistory.class, fieldValues)) {
+            if (!version.equals(currentVersion)) {
+                version.setStatus(VersionStatus.ARCHIVED);
+                bos.save(version);
+            }
+        }
     }
     
-    /**
-     * @see org.kuali.kra.service.VersionHistoryService#createVersionHistory(org.kuali.kra.SequenceOwner, org.kuali.kra.bo.versioning.VersionStatus, java.lang.String)
-     */
-    public VersionHistory updateVersionHistoryOnCancel(SequenceOwner<? extends SequenceOwner<?>> sequenceOwner, VersionStatus versionStatus, String userId) {
-        List<VersionHistory> existingEntries = loadVersionHistory(sequenceOwner.getClass(), getVersionName(sequenceOwner));
-        VersionHistory pendingVersionHistory = getPendingVersionHistory(existingEntries);
-        if(!(pendingVersionHistory == null)) {
-            pendingVersionHistory.setStatus(VersionStatus.CANCELED);
-            bos.save(pendingVersionHistory);
+    protected VersionHistory getVersionHistory(Class klass, String versionName, Integer sequenceNumber) {
+        Map<String, Object> fieldValues = new HashMap<String, Object>();
+        fieldValues.put(SEQUENCE_OWNER_CLASS_NAME_FIELD, klass.getName());
+        fieldValues.put(SEQUENCE_OWNER_REFERENCE_VERSION_NAME, versionName);     
+        fieldValues.put(SEQUENCE_OWNER_SEQUENCE_NUMBER_FIELD, sequenceNumber);
+        List<VersionHistory> history = (List<VersionHistory>) getBusinessObjectService().findMatching(VersionHistory.class, fieldValues);
+        if (history != null && !history.isEmpty()) {
+            return history.get(0);
+        } else {
+            return null;
         }
-        return pendingVersionHistory;
     }
     
     private VersionHistory getPendingVersionHistory (List<VersionHistory> list) {
@@ -106,7 +113,6 @@ public class VersionHistoryServiceImpl implements VersionHistoryService {
         return returnVal;
     }
 
-
     /**
      * @see org.kuali.kra.service.VersionHistoryService#findActiveVersion(java.lang.Class, java.lang.String)
      */
@@ -120,14 +126,7 @@ public class VersionHistoryServiceImpl implements VersionHistoryService {
          * 
          */
 //        VersionHistory activeVersionHistory = histories.size() == 1 ? histories.get(0) : null;        
-        VersionHistory activeVersionHistory = findActiveVersionHistory(histories);
-        
-        if(activeVersionHistory != null) {
-            String versionFieldName = activeVersionHistory.getSequenceOwnerVersionNameField();
-            SequenceOwner<?> owner = findSequenceOwners(klass, versionFieldName, versionName).get(activeVersionHistory.getSequenceOwnerSequenceNumber());
-            activeVersionHistory.setSequenceOwner(owner);
-        }
-        
+        VersionHistory activeVersionHistory = findActiveVersionHistory(histories);        
         return activeVersionHistory;
     }
 
@@ -136,10 +135,7 @@ public class VersionHistoryServiceImpl implements VersionHistoryService {
      */
     @SuppressWarnings("unchecked")
     public List<VersionHistory> loadVersionHistory(Class<? extends SequenceOwner> klass, String versionName) {
-        Map<String, Object> fieldValues = new HashMap<String, Object>();
-        fieldValues.put(SEQUENCE_OWNER_CLASS_NAME_FIELD, klass.getName());
-        fieldValues.put(SEQUENCE_OWNER_REFERENCE_VERSION_NAME, versionName);        
-        List<VersionHistory> histories = new ArrayList<VersionHistory>(bos.findMatching(VersionHistory.class, fieldValues));
+        List<VersionHistory> histories = findVersionHistory(klass, versionName);
         if(histories.size() > 0) {
             String versionFieldName = histories.get(0).getSequenceOwnerVersionNameField();
             Map<Integer, SequenceOwner<? extends SequenceOwner<?>>> map = findSequenceOwners(klass, versionFieldName, versionName);
@@ -159,6 +155,10 @@ public class VersionHistoryServiceImpl implements VersionHistoryService {
     public void setBusinessObjectService(BusinessObjectService bos) {
         this.bos = bos;
     }
+    
+    protected BusinessObjectService getBusinessObjectService() {
+        return bos;
+    }
 
     @SuppressWarnings("unchecked")
     public VersionHistory findPendingVersion(Class<? extends SequenceOwner> klass, String versionName, String sequenceNumber) {
@@ -173,9 +173,6 @@ public class VersionHistoryServiceImpl implements VersionHistoryService {
         List<VersionHistory> histories = new ArrayList<VersionHistory>(bos.findMatching(VersionHistory.class, fieldValues));
         if(CollectionUtils.isNotEmpty(histories)) {
             pendingVersionHistory = histories.get(0);
-            String versionFieldName = pendingVersionHistory.getSequenceOwnerVersionNameField();
-            SequenceOwner<?> owner = findSequenceOwners(klass, versionFieldName, versionName).get(pendingVersionHistory.getSequenceOwnerSequenceNumber());
-            pendingVersionHistory.setSequenceOwner(owner);
         }
         
         return pendingVersionHistory;
@@ -193,9 +190,6 @@ public class VersionHistoryServiceImpl implements VersionHistoryService {
         List<VersionHistory> histories = new ArrayList<VersionHistory>(bos.findMatching(VersionHistory.class, fieldValues));
         if(CollectionUtils.isNotEmpty(histories)) {
             pendingVersionHistory = histories.get(0);
-            String versionFieldName = pendingVersionHistory.getSequenceOwnerVersionNameField();
-            SequenceOwner<?> owner = findSequenceOwners(klass, versionFieldName, versionName).get(pendingVersionHistory.getSequenceOwnerSequenceNumber());
-            pendingVersionHistory.setSequenceOwner(owner);
         }
         
         return pendingVersionHistory;
@@ -239,6 +233,7 @@ public class VersionHistoryServiceImpl implements VersionHistoryService {
         return activeVersionHistory;
     }
     
+    @Deprecated
     @SuppressWarnings("unchecked")
     protected Map<Integer, SequenceOwner<? extends SequenceOwner<?>>> findSequenceOwners(Class klass, String versionField, String versionName) {
         Map<String, Object> fieldValues = new HashMap<String, Object>();
@@ -264,5 +259,43 @@ public class VersionHistoryServiceImpl implements VersionHistoryService {
     
     protected String getVersionName(SequenceOwner<? extends SequenceOwner<?>> sequenceOwner) {
         return ObjectUtils.getPropertyValue(sequenceOwner, sequenceOwner.getVersionNameField()).toString();
+    }
+
+    @Override
+    public List<VersionHistory> findVersionHistory(Class<? extends SequenceOwner> klass, String versionName) {
+        Map<String, Object> fieldValues = new HashMap<String, Object>();
+        fieldValues.put(SEQUENCE_OWNER_CLASS_NAME_FIELD, klass.getName());
+        fieldValues.put(SEQUENCE_OWNER_REFERENCE_VERSION_NAME, versionName);        
+        return new ArrayList<VersionHistory>(bos.findMatching(VersionHistory.class, fieldValues));
+        
+    }
+
+    @Override
+    public void loadSequenceOwner(Class klass,VersionHistory versionHistory) {
+        Map<String, Object> fieldValues = new HashMap<String, Object>();
+        fieldValues.put(versionHistory.getSequenceOwnerVersionNameField(), versionHistory.getSequenceOwnerVersionNameValue());
+        fieldValues.put("sequenceNumber", versionHistory.getSequenceOwnerSequenceNumber());
+        Collection<SequenceOwner<? extends SequenceOwner<?>>> c = bos.findMatching(klass, fieldValues);
+        
+        for (SequenceOwner<? extends SequenceOwner<?>> sequenceOwner : c) {
+            versionHistory.setSequenceOwner(sequenceOwner);
+        }
+    }
+    
+    public VersionHistory getActiveOrNewestVersion(Class<? extends SequenceOwner> klass, String versionName) {
+        List<VersionHistory> versions = findVersionHistory(klass, versionName);
+        VersionHistory history = null;
+        for (VersionHistory version : versions) {
+            if (history == null) {
+                history = version;
+            } else if (version.isActiveVersion()) {
+                history = version;
+            } else if (!history.isActiveVersion() 
+                    && version.getSequenceOwnerSequenceNumber() > history.getSequenceOwnerSequenceNumber()
+                    && version.getStatus() != VersionStatus.CANCELED) {
+                history = version;
+            }
+        }
+        return history;
     }
 }

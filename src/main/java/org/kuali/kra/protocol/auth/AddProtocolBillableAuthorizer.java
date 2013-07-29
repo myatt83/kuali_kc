@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,17 @@
 package org.kuali.kra.protocol.auth;
 
 import org.kuali.kra.infrastructure.PermissionConstants;
-import org.kuali.kra.protocol.Protocol;
+import org.kuali.kra.protocol.ProtocolBase;
 
 
-public class AddProtocolBillableAuthorizer extends ProtocolAuthorizer {
+public class AddProtocolBillableAuthorizer extends ProtocolAuthorizerBase {
 
     /**
-     * @see org.kuali.kra.protocol.auth.ProtocolAuthorizer#isAuthorized(java.lang.String, org.kuali.kra.protocol.auth.ProtocolTask)
+     * @see org.kuali.kra.protocol.auth.ProtocolAuthorizerBase#isAuthorized(java.lang.String, org.kuali.kra.protocol.auth.ProtocolTaskBase)
      */
     @Override
-    public boolean isAuthorized(String userId, ProtocolTask task) {
-        Protocol protocol = task.getProtocol();
+    public boolean isAuthorized(String userId, ProtocolTaskBase task) {
+        ProtocolBase protocol = task.getProtocol();
         return hasPermission(userId, protocol, PermissionConstants.EDIT_PROTOCOL_BILLABLE);
     }
 

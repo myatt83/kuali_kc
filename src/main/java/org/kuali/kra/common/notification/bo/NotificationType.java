@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,9 @@ import org.springframework.util.AutoPopulatingList;
 public class NotificationType extends KraPersistableBusinessObjectBase implements MutableInactivatable {
 
     private static final long serialVersionUID = 1777340179839083316L;
+    
+    public static final String AD_HOC_CONTEXT = "Ad-Hoc Notification";
+    public static final String AD_HOC_NOTIFICATION_TYPE = "999";
     
     private Long notificationTypeId;
     private String moduleCode;

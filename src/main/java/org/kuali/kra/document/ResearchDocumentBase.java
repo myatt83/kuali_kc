@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  *
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.kuali.kra.bo.CustomAttributeDocument;
+import org.kuali.kra.bo.DocumentCustomData;
 import org.kuali.kra.bo.DocumentNextvalue;
 import org.kuali.kra.bo.RolePersons;
 import org.kuali.kra.budget.core.BudgetService;
@@ -62,11 +63,10 @@ public abstract class ResearchDocumentBase extends TransactionalDocumentBase {
     public ResearchDocumentBase() {
         super();
         documentNextvalues = new ArrayList<DocumentNextvalue>();
-        customAttributeDocuments = new HashMap<String, CustomAttributeDocument>();
     }
 
     public void initialize() {
-        populateCustomAttributes();
+
     }
 
     @Override
@@ -82,8 +82,8 @@ public abstract class ResearchDocumentBase extends TransactionalDocumentBase {
         setUpdateTimestamp((this.getService(DateTimeService.class)).getCurrentTimestamp());
         setUpdateUser(updateUser);
 
-        CustomAttributeService customAttributeService = this.getService(CustomAttributeService.class);
-        customAttributeService.saveCustomAttributeValues(this);
+        //CustomAttributeService customAttributeService = this.getService(CustomAttributeService.class);
+        //customAttributeService.saveCustomAttributeValues(this);
         if (this.getVersionNumber() == null) this.setVersionNumber(new Long(0));
         
         // Since we aren't doing optimistic locking, might need to update doc header's version number
@@ -96,7 +96,6 @@ public abstract class ResearchDocumentBase extends TransactionalDocumentBase {
     @Override
     public void processAfterRetrieve() {
         super.processAfterRetrieve();
-        populateCustomAttributes();
     }
 
     /**
@@ -127,11 +126,15 @@ public abstract class ResearchDocumentBase extends TransactionalDocumentBase {
     /**
      * This method populates the customAttributes for this document.
      */
-    protected void populateCustomAttributes() {
-        CustomAttributeService customAttributeService = KraServiceLocator.getService(CustomAttributeService.class);
-        Map<String, CustomAttributeDocument> customAttributeDocuments = customAttributeService.getDefaultCustomAttributesForDocumentType(getDocumentTypeCode(), documentNumber);
-        setCustomAttributeDocuments(customAttributeDocuments);
+    public Map<String, CustomAttributeDocument> getCustomAttributeDocuments() {
+        if (customAttributeDocuments == null) {
+            CustomAttributeService customAttributeService = KraServiceLocator.getService(CustomAttributeService.class);
+            customAttributeDocuments = customAttributeService.getDefaultCustomAttributeDocuments(getDocumentTypeCode(), getDocumentCustomData());
+        }
+        return customAttributeDocuments;
     }
+    
+    public abstract List<? extends DocumentCustomData> getDocumentCustomData();
 
     public Timestamp getUpdateTimestamp() {
         return updateTimestamp;
@@ -202,22 +205,6 @@ public abstract class ResearchDocumentBase extends TransactionalDocumentBase {
      * Gets the customAttributeDocuments attribute.
      * @return Returns the customAttributeDocuments.
      */
-    public Map<String, CustomAttributeDocument> getCustomAttributeDocuments() {
-        return customAttributeDocuments;
-    }
-
-    /**
-     * Gets the customAttributeDocuments attribute.
-     * @return Returns the customAttributeDocuments.
-     */
-    public CustomAttributeDocument getCustomAttributeDocuments(String key) {
-        return customAttributeDocuments.get(key);
-    }
-
-    /**
-     * Gets the customAttributeDocuments attribute.
-     * @return Returns the customAttributeDocuments.
-     */
     public CustomAttributeDocument getCustomAttributeDocument(String key) {
         return customAttributeDocuments.get(key);
     }
@@ -240,7 +227,6 @@ public abstract class ResearchDocumentBase extends TransactionalDocumentBase {
         KraDocumentXMLMaterializer xmlWrapper = new KraDocumentXMLMaterializer(); 
         xmlWrapper.setDocument(this); 
         xmlWrapper.setKualiTransactionalDocumentInformation(transInfo); 
-        xmlWrapper.setRolepersons(getAllRolePersons()); 
         return xmlWrapper; 
     }
 

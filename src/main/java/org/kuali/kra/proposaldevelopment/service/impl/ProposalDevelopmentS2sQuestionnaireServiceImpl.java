@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import org.kuali.kra.bo.CoeusModule;
 import org.kuali.kra.bo.CoeusSubModule;
 import org.kuali.kra.bo.S2sOppFormQuestionnaire;
 import org.kuali.kra.proposaldevelopment.bo.DevelopmentProposal;
+import org.kuali.kra.proposaldevelopment.questionnaire.ProposalDevelopmentModuleQuestionnaireBean;
 import org.kuali.kra.proposaldevelopment.questionnaire.ProposalDevelopmentS2sModuleQuestionnaireBean;
 import org.kuali.kra.proposaldevelopment.service.ProposalDevelopmentS2sQuestionnaireService;
 import org.kuali.kra.questionnaire.QuestionnaireService;
@@ -81,7 +82,7 @@ public class ProposalDevelopmentS2sQuestionnaireServiceImpl implements ProposalD
                 for (S2sOppForms oppForms : opp.getS2sOppForms()) {
                     if ((oppNameSpace == null || StringUtils.equals(oppForms.getOppNameSpace(), oppNameSpace))
                             && (formName==null||StringUtils.equals(oppForms.getFormName(), formName))) {
-                        List<QuestionnaireUsage> usages = getQuestionnaireUsages(oppForms.getOppNameSpace(),oppForms.getFormName()); 
+                        List<QuestionnaireUsage> usages = getQuestionnaireUsages(oppForms.getOppNameSpace(),oppForms.getFormName(), developmentProposal); 
                         for (QuestionnaireUsage usage : usages) {
                             if (header.getQuestionnaire().getQuestionnaireId().equals(usage.getQuestionnaire().getQuestionnaireId())) {
                                 results.add(header);
@@ -99,11 +100,11 @@ public class ProposalDevelopmentS2sQuestionnaireServiceImpl implements ProposalD
     /**
      * @see org.kuali.kra.proposaldevelopment.service.ProposalDevelopmentS2sQuestionnaireService#getQuestionnaireUsages(java.lang.String, java.lang.String)
      */
-    public List<QuestionnaireUsage> getQuestionnaireUsages(String oppNameSpace, String formName) {
+    public List<QuestionnaireUsage> getQuestionnaireUsages(String oppNameSpace, String formName, DevelopmentProposal proposal) {
         Set<QuestionnaireUsage> result = new HashSet<QuestionnaireUsage>();
-        List<QuestionnaireUsage> usages = getQuestionnaireAnswerService().getPublishedQuestionnaire(CoeusModule.PROPOSAL_DEVELOPMENT_MODULE_CODE, 
-                                                                                                    CoeusSubModule.PROPOSAL_S2S_SUBMODULE, 
-                                                                                                    true);
+        ModuleQuestionnaireBean questionnaireBean = new ProposalDevelopmentModuleQuestionnaireBean(proposal);
+        questionnaireBean.setModuleSubItemCode(CoeusSubModule.PROPOSAL_S2S_SUBMODULE);
+        List<QuestionnaireUsage> usages = getQuestionnaireAnswerService().getPublishedQuestionnaire(questionnaireBean);
         List<S2sOppFormQuestionnaire> s2sOppFormQuestionnaires = findOppFormToQuestionnaires(oppNameSpace,formName);
         
         for (QuestionnaireUsage usage : usages) {    
@@ -133,7 +134,7 @@ public class ProposalDevelopmentS2sQuestionnaireServiceImpl implements ProposalD
         params.put(S2sOppFormQuestionnaire.FORM_NAME_FIELD, formName);
         List<S2sOppFormQuestionnaire> oppFormToQuestionnaires = (List<S2sOppFormQuestionnaire>)getBusinessObjectService().findMatching(S2sOppFormQuestionnaire.class, params);
         if (LOG.isDebugEnabled()) {
-            LOG.debug(String.format("Found %s S2sOppFormQuestionnaire records for (%s,%s)",oppNameSpace,formName));
+            LOG.debug(String.format("Found S2sOppFormQuestionnaire records for (%s,%s)",oppNameSpace,formName));
             for (S2sOppFormQuestionnaire oppFormQuest : oppFormToQuestionnaires) {
                 LOG.debug(oppFormQuest);
             }

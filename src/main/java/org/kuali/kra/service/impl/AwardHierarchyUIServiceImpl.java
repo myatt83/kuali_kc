@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,6 +72,10 @@ public class AwardHierarchyUIServiceImpl implements AwardHierarchyUIService {
             awardNode = awardHierarchyNodes.get(awardNumber);
         }else{
             AwardHierarchy hierarchy = awardHierarchyService.loadAwardHierarchy(awardNumber);
+            if (hierarchy == null) {
+                // create temp new hierarchy
+                hierarchy = AwardHierarchy.createRootNode(currentAwardNumber);
+            }
             awardNode = awardHierarchyService.createAwardHierarchyNode(hierarchy, currentAwardNumber, currentSequenceNumber); 
         }
         return "[" + buildJavascriptRecord(awardNumber, awardNode) + "]"; 
@@ -96,8 +100,14 @@ public class AwardHierarchyUIServiceImpl implements AwardHierarchyUIService {
         appendJson(sb, "principalInvestigatorName", aNode.getPrincipalInvestigatorName());
         sb.append(",");
         appendJson(sb, "leadUnitName", aNode.getLeadUnitName());
-        sb.append(",");
-        appendJson(sb, "title", aNode.getTitle());
+        sb.append(","); 
+        
+        //remove any and all carriage returns, and add leading and trailing spaces to '<' & '>'
+        String titleCleaned = aNode.getTitle().replaceAll("[\\r\\n]", " ");   
+        titleCleaned = titleCleaned.replaceAll(">", " > ");
+        titleCleaned = titleCleaned.replaceAll("<", " < ");
+        appendJson(sb, "title", titleCleaned);
+        
         sb.append(",");
         appendJson(sb, "awardId", aNode.getAwardId().toString());
         sb.append(",");

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ package org.kuali.kra.krms;
 
 import org.kuali.kra.bo.KraPersistableBusinessObjectBase;
 
-public class KcKrmsTermFunctionParam extends KraPersistableBusinessObjectBase implements Comparable<KcKrmsTermFunctionParam>{
+public class KcKrmsTermFunctionParam extends KraPersistableBusinessObjectBase implements Comparable<KcKrmsTermFunctionParam> {
 
     /**
      * Comment for <code>serialVersionUID</code>
@@ -32,35 +32,45 @@ public class KcKrmsTermFunctionParam extends KraPersistableBusinessObjectBase im
     public Long getKcKrmsTermFunctionParamId() {
         return kcKrmsTermFunctionParamId;
     }
+
     public void setKcKrmsTermFunctionParamId(Long kcKrmsTermFunctionParamId) {
         this.kcKrmsTermFunctionParamId = kcKrmsTermFunctionParamId;
     }
+
     public Long getKcKrmsTermFunctionId() {
         return kcKrmsTermFunctionId;
     }
+
     public void setKcKrmsTermFunctionId(Long kcKrmsTermFunctionId) {
         this.kcKrmsTermFunctionId = kcKrmsTermFunctionId;
     }
+
     public String getParamName() {
         return paramName;
     }
+
     public void setParamName(String paramName) {
         this.paramName = paramName;
     }
+
     public String getParamType() {
         return paramType;
     }
+
     public void setParamType(String paramType) {
         this.paramType = paramType;
     }
+
     public Integer getParamOrder() {
         return paramOrder;
     }
+
     public void setParamOrder(Integer paramOrder) {
         this.paramOrder = paramOrder;
     }
+
     @Override
     public int compareTo(KcKrmsTermFunctionParam termToCompare) {
-        return getParamOrder()<termToCompare.getParamOrder()?0:1;
+        return getParamOrder().compareTo(termToCompare.getParamOrder());
     }
 }

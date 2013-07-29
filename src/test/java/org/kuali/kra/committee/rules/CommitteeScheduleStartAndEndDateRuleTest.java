@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,12 +26,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.kuali.kra.committee.document.CommitteeDocument;
 import org.kuali.kra.committee.rule.event.CommitteeScheduleStartAndEndDateEvent;
-import org.kuali.kra.committee.web.struts.form.schedule.DailyScheduleDetails;
-import org.kuali.kra.committee.web.struts.form.schedule.MonthlyScheduleDetails;
-import org.kuali.kra.committee.web.struts.form.schedule.ScheduleData;
-import org.kuali.kra.committee.web.struts.form.schedule.StyleKey;
-import org.kuali.kra.committee.web.struts.form.schedule.WeeklyScheduleDetails;
-import org.kuali.kra.committee.web.struts.form.schedule.YearlyScheduleDetails;
+import org.kuali.kra.common.committee.web.struts.form.schedule.DailyScheduleDetails;
+import org.kuali.kra.common.committee.web.struts.form.schedule.MonthlyScheduleDetails;
+import org.kuali.kra.common.committee.web.struts.form.schedule.ScheduleData;
+import org.kuali.kra.common.committee.web.struts.form.schedule.StyleKey;
+import org.kuali.kra.common.committee.web.struts.form.schedule.WeeklyScheduleDetails;
+import org.kuali.kra.common.committee.web.struts.form.schedule.YearlyScheduleDetails;
 import org.kuali.rice.kns.util.KNSGlobalVariables;
 import org.kuali.rice.krad.util.GlobalVariables;
 import org.kuali.rice.krad.util.MessageMap;

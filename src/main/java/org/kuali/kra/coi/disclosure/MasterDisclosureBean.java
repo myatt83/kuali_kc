@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import org.kuali.kra.coi.CoiDisclosureEventType;
 import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.questionnaire.answer.AnswerHeader;
 import org.kuali.rice.krad.service.BusinessObjectService;
+import org.kuali.rice.krad.util.ObjectUtils;
 
 public class MasterDisclosureBean implements Serializable {
 
@@ -37,6 +38,7 @@ public class MasterDisclosureBean implements Serializable {
     private List<CoiDisclosureProjectBean> awardProjects;
     private List<CoiDisclosureProjectBean> proposalProjects;
     private List<CoiDisclosureProjectBean> protocolProjects;
+    private List<CoiDisclosureProjectBean> iacucProtocolProjects;
     private List<CoiDisclosureProjectBean> manualAwardProjects;
     private List<CoiDisclosureProjectBean> manualProposalProjects;
     private List<CoiDisclosureProjectBean> manualProtocolProjects;
@@ -46,11 +48,16 @@ public class MasterDisclosureBean implements Serializable {
     private List<CoiDisclosureProjectBean> otherManualProjects;
     private List<AnswerHeader> answerHeaders;
 
+    private List<CoiDisclosureProjectBean> allDisclosureProjects;
+    private List<CoiGroupedMasterDisclosureBean> allDisclosuresGroupedByProjects;
+    private boolean disclosureGroupedByEvent;
+
     
     public MasterDisclosureBean() {
         awardProjects = new ArrayList<CoiDisclosureProjectBean>();
         proposalProjects = new ArrayList<CoiDisclosureProjectBean>();
         protocolProjects = new ArrayList<CoiDisclosureProjectBean>();
+        iacucProtocolProjects = new ArrayList<CoiDisclosureProjectBean>();
         manualAwardProjects = new ArrayList<CoiDisclosureProjectBean>();
         manualProposalProjects = new ArrayList<CoiDisclosureProjectBean>();
         manualProtocolProjects = new ArrayList<CoiDisclosureProjectBean>();
@@ -58,6 +65,10 @@ public class MasterDisclosureBean implements Serializable {
         manualTravelProjects = new ArrayList<CoiDisclosureProjectBean>();
         otherManualProjects = new ArrayList<CoiDisclosureProjectBean>();
         allProjects = new ArrayList<CoiDisclosureProjectBean>();
+        
+        setAllDisclosureProjects(new ArrayList<CoiDisclosureProjectBean>());
+        setAllDisclosuresGroupedByProjects(new ArrayList<CoiGroupedMasterDisclosureBean>());
+        setDisclosureGroupedByEvent(true);
     }
     
     public CoiDisclosure getCoiDisclosure() {
@@ -90,6 +101,14 @@ public class MasterDisclosureBean implements Serializable {
 
     public void setProtocolProjects(List<CoiDisclosureProjectBean> protocolProjects) {
         this.protocolProjects = protocolProjects;
+    }
+
+    public List<CoiDisclosureProjectBean> getIacucProtocolProjects() {
+        return iacucProtocolProjects;
+    }
+
+    public void setIacucProtocolProjects(List<CoiDisclosureProjectBean> protocolProjects) {
+        this.iacucProtocolProjects = protocolProjects;
     }
 
     public List<CoiDisclosureProjectBean> getManualAwardProjects() {
@@ -130,7 +149,6 @@ public class MasterDisclosureBean implements Serializable {
      * table but since it is not the PK, better to use the codes directly.
      */
     public void addProject(CoiDisclosureProjectBean coiDisclosureProjectBean, String projectTypeCode) {
-//        allProjects.add(coiDisclosureProjectBean);
         int typeCode = Integer.parseInt(projectTypeCode);
         switch (typeCode) {
             case 1 :
@@ -144,6 +162,10 @@ public class MasterDisclosureBean implements Serializable {
             case 3 :
                 getProtocolProjects().add(coiDisclosureProjectBean);
                 coiDisclosureProjectBean.setExcludeFE(isEventExcludFE(CoiDisclosureEventType.IRB_PROTOCOL));
+                break;
+            case 4 :
+                getIacucProtocolProjects().add(coiDisclosureProjectBean);
+                coiDisclosureProjectBean.setExcludeFE(isEventExcludFE(CoiDisclosureEventType.IACUC_PROTOCOL));
                 break;
             case 10 :
                 getProposalProjects().add(coiDisclosureProjectBean);
@@ -170,20 +192,21 @@ public class MasterDisclosureBean implements Serializable {
                 coiDisclosureProjectBean.setExcludeFE(isEventExcludFE(CoiDisclosureEventType.MANUAL_IACUC_PROTOCOL));
                 break;
             default:
+                // create temp string to pass other values
                 getOtherManualProjects().add(coiDisclosureProjectBean);
-                coiDisclosureProjectBean.setExcludeFE(isEventExcludFE(CoiDisclosureEventType.OTHER));
-
+                coiDisclosureProjectBean.setExcludeFE(isEventExcludFE(""+typeCode));
         }
+        getAllDisclosureProjects().add(coiDisclosureProjectBean);
     }
-
+    
     /*
-     * excluded FE from event.  this is specifically for annual project check
+     * excluded FE from event.  this is specifically for annual project check or manual events
      */
     private boolean isEventExcludFE(String eventTypeCode) {
         Map<String, Object> fieldValues = new HashMap<String, Object>();
         fieldValues.put("eventTypeCode", eventTypeCode);
-        CoiDisclosureEventType CoiDisclosureEventType =  KraServiceLocator.getService(BusinessObjectService.class).findByPrimaryKey(CoiDisclosureEventType.class, fieldValues);
-        return CoiDisclosureEventType.isExcludeFinancialEntities();
+        CoiDisclosureEventType coiDisclosureEventType =  KraServiceLocator.getService(BusinessObjectService.class).findByPrimaryKey(CoiDisclosureEventType.class, fieldValues);
+        return coiDisclosureEventType == null ? false : coiDisclosureEventType.isExcludeFinancialEntities();
     }
 
     public List<CoiDisclosureProjectBean> getAllProjects() {
@@ -199,6 +222,7 @@ public class MasterDisclosureBean implements Serializable {
         projects.add(awardProjects);
         projects.add(proposalProjects);
         projects.add(protocolProjects);
+        projects.add(iacucProtocolProjects);
         projects.add(manualAwardProjects);
         projects.add(manualProposalProjects);
         projects.add(manualProtocolProjects);
@@ -232,5 +256,28 @@ public class MasterDisclosureBean implements Serializable {
         return otherManualProjects;
     }
 
+    public List<CoiGroupedMasterDisclosureBean> getAllDisclosuresGroupedByProjects() {
+        return allDisclosuresGroupedByProjects;
+    }
+
+    public void setAllDisclosuresGroupedByProjects(List<CoiGroupedMasterDisclosureBean> allDisclosuresGroupedByProjects) {
+        this.allDisclosuresGroupedByProjects = allDisclosuresGroupedByProjects;
+    }
+
+    public List<CoiDisclosureProjectBean> getAllDisclosureProjects() {
+        return allDisclosureProjects;
+    }
+
+    public void setAllDisclosureProjects(List<CoiDisclosureProjectBean> allDisclosureProjects) {
+        this.allDisclosureProjects = allDisclosureProjects;
+    }
+
+    public boolean isDisclosureGroupedByEvent() {
+        return disclosureGroupedByEvent;
+    }
+
+    public void setDisclosureGroupedByEvent(boolean disclosureGroupedByEvent) {
+        this.disclosureGroupedByEvent = disclosureGroupedByEvent;
+    }
 
 }

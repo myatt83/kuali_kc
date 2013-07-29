@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,9 +67,11 @@ import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.proposaldevelopment.budget.bo.BudgetPrintForm;
 import org.kuali.kra.proposaldevelopment.budget.bo.BudgetSubAwardAttachment;
 import org.kuali.kra.proposaldevelopment.budget.bo.BudgetSubAwardFiles;
+import org.kuali.kra.proposaldevelopment.budget.bo.BudgetSubAwardPeriodDetail;
 import org.kuali.kra.proposaldevelopment.budget.bo.BudgetSubAwards;
 import org.kuali.kra.proposaldevelopment.budget.modular.BudgetModular;
 import org.kuali.kra.proposaldevelopment.budget.modular.BudgetModularIdc;
+import org.kuali.kra.proposaldevelopment.budget.service.ProposalBudgetNumberOfMonthsService;
 import org.kuali.rice.core.api.util.KeyValue;
 import org.kuali.rice.core.api.util.type.KualiDecimal;
 import org.kuali.rice.coreservice.framework.parameter.ParameterService;
@@ -481,11 +483,11 @@ public class Budget extends BudgetVersionOverview {
         //        } 
         List<BudgetSubAwardFiles> subAwardFiles = new ArrayList<BudgetSubAwardFiles>();
         List<BudgetSubAwardAttachment> subAwardAttachments = new ArrayList<BudgetSubAwardAttachment>();
+        List<BudgetSubAwardPeriodDetail> subAwardPeriodDetails = new ArrayList<BudgetSubAwardPeriodDetail>();
         for (BudgetSubAwards budgetSubAward : getBudgetSubAwards()) {
-            budgetSubAward.refreshReferenceObject("budgetSubAwardAttachments");
-            budgetSubAward.refreshReferenceObject("budgetSubAwardFiles");
             subAwardFiles.addAll(budgetSubAward.getBudgetSubAwardFiles());
             subAwardAttachments.addAll(budgetSubAward.getBudgetSubAwardAttachments());
+            subAwardPeriodDetails.addAll(budgetSubAward.getBudgetSubAwardPeriodDetails());
         }
         managedLists.add(budgetModularIdcs);
         managedLists.add(budgetModular);
@@ -502,6 +504,7 @@ public class Budget extends BudgetVersionOverview {
         managedLists.add(getBudgetRates());
         managedLists.add(subAwardAttachments);
         managedLists.add(subAwardFiles);
+        managedLists.add(subAwardPeriodDetails);
         managedLists.add(getBudgetSubAwards());
         return managedLists;
     }
@@ -1687,6 +1690,14 @@ public class Budget extends BudgetVersionOverview {
 
     public boolean isCostSharingSubmissionEnabled() {
         return getParameterService().getParameterValueAsString(BudgetDocument.class, Constants.ENABLE_COST_SHARE_SUBMIT).equals(PARAM_VALUE_ENABLED);
+    }
+    
+    public String getSummaryNumberOfMonths() {
+        return String.valueOf(this.getProposalBudgetNumberOfMonthsService().getNumberOfMonth(this.getSummaryPeriodStartDate(), this.getSummaryPeriodEndDate()));
+    }
+    
+    protected ProposalBudgetNumberOfMonthsService getProposalBudgetNumberOfMonthsService() {
+        return KraServiceLocator.getService(ProposalBudgetNumberOfMonthsService.class);
     }
 }
 

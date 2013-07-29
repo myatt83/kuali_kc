@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,8 @@ public final class KcKrmsConstants {
     public static final String MESSAGE_SEPARATOR = ":";
     public static final String MESSAGE_TYPE_ERROR = "E";
     public static final String MESSAGE_TYPE_WARNING = "W";
+    public static final String KC_KRMS_FUNCTION_RESOLVER_SERVICE_NAME="KC KRMS Function Resolver Service Name";
+    public static final String KRMS_PROPERTY_TYPE_NM = "Property";
     
     /**
      * private utility class ctor.
@@ -35,6 +37,8 @@ public final class KcKrmsConstants {
     public static final class ProposalDevelopment {
         
         public static final String PROPOSAL_DEVELOPMENT_CONTEXT = "KC Proposal Development Context";
+
+        public static final String PROPOSAL_DEVELOPMENT_CONTEXT_ID = "KC-PD-CONTEXT";
         
         public static final String TOTAL_COST = "totalCost";
         
@@ -49,7 +53,7 @@ public final class KcKrmsConstants {
         public static final String TOTAL_COST_INITIAL = "totalCostInitial";
         
         public static final String TOTAL_DIRECT_COST_LIMIT = "totalDirectCostLimit";
-        
+         
         public static final String CFDA_NUMBER = "cfdaNumber";
         
         public static final String OPPORTUNITY_ID = "opportunityId";
@@ -77,9 +81,16 @@ public final class KcKrmsConstants {
         public static final String PROPOSAL_NARRATIVES_COMPLETE = "proposalNarrativesComplete";
 
         public static final String DEVELOPMENT_PROPOSAL = "DevelopmentProposal";
+
     }
-    
+
+    public static final class Budget {
+        public static final String BUDGET_CONTEXT = "KC Budget Context";
+    }    
     public static final class Award {
+        public static final String AWARD_CONTEXT_ID = "KC-AWARD-CONTEXT";
+
+        public static final String AWARD = "award";
         
         public static final String AWARD_CONTEXT = "KC Award Context";
         
@@ -96,6 +107,10 @@ public final class KcKrmsConstants {
         public static final String FDA_APPLICATION_NUMBER = "fdaApplicationNumber";
         
         public static final String ALL_PROTOCOLS = "allProtocols";
+
+        public static final String IRB_PROTOCOL_CONTEXT_ID = "KC-PROTOCOL-CONTEXT";
+
+        public static final String IRB_PROTOCOL = "IrbProtocol";
     }
     
     public static final class IacucProtocol {
@@ -107,11 +122,17 @@ public final class KcKrmsConstants {
         public static final String IACUC_REFERENCE_NUMBER_2 = "iacucRefNum2";
         
         public static final String IACUC_FDA_APPLICATION_NUMBER = "fdaApplicationNumber";
+
+        public static final String IACUC_PROTOCOL_CONTEXT_ID = "KC-IACUC-CONTEXT";
+
+        public static final String IACUC_PROTOCOL = "IacucProtocol";
     }
     
     public static final class CoiDisclosure {
         
         public static final String COI_DISCLOSURE_CONTEXT = "KC Annual COI Disclosure Context";
+        public static final String COI_DISCLOSURE = "CoiDisclosure";
+        public static final String COI_DISCLOSURE_CONTEXT_ID = "KC-COIDISCLOSURE-CONTEXT";
         
     }
 

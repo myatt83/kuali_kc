@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,37 +15,37 @@
  */
 package org.kuali.kra.iacuc.actions;
 
-import org.kuali.kra.protocol.Protocol;
-import org.kuali.kra.protocol.actions.ActionHelper;
+import org.kuali.kra.protocol.ProtocolBase;
+import org.kuali.kra.protocol.actions.ActionHelperBase;
 import org.kuali.kra.protocol.actions.ProtocolActionBean;
 
 /**
- * Defines the superclass of all Protocol action beans.
+ * Defines the superclass of all ProtocolBase action beans.
  */
 public abstract class IacucProtocolActionBean implements ProtocolActionBean {
     
-    private ActionHelper actionHelper;
+    private ActionHelperBase actionHelper;
     
     /**
      * Constructs a ProtocolActionBean.
      * @param actionHelper Reference back to the action helper for this bean
      */
-    public IacucProtocolActionBean(ActionHelper actionHelper) {
+    public IacucProtocolActionBean(ActionHelperBase actionHelper) {
         this.setActionHelper(actionHelper);
     }
     
     public IacucProtocolActionBean() {
     }
 
-    public void setActionHelper(ActionHelper actionHelper) {
+    public void setActionHelper(ActionHelperBase actionHelper) {
         this.actionHelper = actionHelper;
     }
 
-    public ActionHelper getActionHelper() {
+    public ActionHelperBase getActionHelper() {
         return actionHelper;
     }
     
-    public Protocol getProtocol() {
+    public ProtocolBase getProtocol() {
         return actionHelper.getProtocol();
     }
 

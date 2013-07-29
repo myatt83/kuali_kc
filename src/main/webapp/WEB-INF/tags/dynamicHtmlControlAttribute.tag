@@ -1,5 +1,5 @@
 <%--
- Copyright 2005-2011 The Kuali Foundation
+ Copyright 2005-2013 The Kuali Foundation
 
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@
 		    </c:otherwise>
 		</c:choose>
 		
-		<span id="${property}.read.div" style="${initialReadStyle}">
+		<span class="dynamicReadDiv" style="${initialReadStyle}">
 		    <kul:htmlControlAttribute property="${property}" 
 		                              attributeEntry="${attributeEntry}" 
 		                              readOnly="true" 
@@ -47,7 +47,7 @@
 		    </kul:htmlControlAttribute>
 		</span>
 		
-		<span id="${property}.edit.div" style="${initialEditStyle}">
+		<span class="dynamicEditDiv" style="${initialEditStyle}">
 		    <kul:htmlControlAttribute property="${property}" 
 		                              attributeEntry="${attributeEntry}" 
 		                              readOnly="${readOnly}" 
@@ -60,7 +60,7 @@
 		    <c:if test="${empty errorBlockMessage}">
 		        <c:set var="errorBlockMessage" value="Error" />
 		    </c:if>
-			<div id="${property}.error.div" style="${initialErrorStyle}">
+			<div class="dynamicErrorDiv" style="${initialErrorStyle}">
 			    <span style="color: red;">${errorBlockMessage}</span>
 			</div>
 		</c:if>

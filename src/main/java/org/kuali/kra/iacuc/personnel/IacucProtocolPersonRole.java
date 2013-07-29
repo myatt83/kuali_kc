@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,15 @@
  */
 package org.kuali.kra.iacuc.personnel;
 
-import org.kuali.kra.protocol.personnel.ProtocolPersonRole;
+import org.kuali.kra.protocol.personnel.ProtocolPersonRoleBase;
 
-public class IacucProtocolPersonRole extends ProtocolPersonRole {
+public class IacucProtocolPersonRole extends ProtocolPersonRoleBase {
 
+    /**
+     * Comment for <code>serialVersionUID</code>
+     */
+    private static final long serialVersionUID = -3784889493594400151L;
+    
     public static final String ROLE_CORRESPONDENTS = "CRC";
     
 }

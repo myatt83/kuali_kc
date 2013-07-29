@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -845,6 +845,7 @@ AbstractResearchAndRelatedStream {
                 budgetPeriodType.setTravelTotal(getTravelTotal(budgetLineItems));
                 budgetPeriodType.setParticipantPatientCostsArray(getParticipantPatientCost(developmentProposal,budgetLineItems));
                 budgetPeriodType.setParticipantPatientTotal(getParticipantPatientTotal(budgetLineItems));
+                budgetPeriodType.setNumberOfParticipants(BigInteger.valueOf(budgetPeriod.getNumberOfParticipants() == null ? 0 : budgetPeriod.getNumberOfParticipants()));
                 budgetPeriodType.setPeriodDirectCostsTotal(budgetPeriod.getTotalDirectCost().bigDecimalValue());
                 budgetPeriodType.setIndirectCostsTotal(budgetPeriod.getTotalIndirectCost().bigDecimalValue());
                 setIndirectCostDetails(budgetPeriod,budgetPeriodType);
@@ -1283,7 +1284,7 @@ AbstractResearchAndRelatedStream {
         researchCoverPage
         .setSubmissionCategory(getSubmissionCategoryForResearchCoverPage(
                 developmentProposal.getActivityType().getDescription(),
-                developmentProposal.getCreationStatusCode()));
+                developmentProposal.getProposalStateTypeCode()));
         researchCoverPage
         .setApplicationCategory(getApplicationCategoryForResearchCoverPage(developmentProposal
                 .getProposalType().getDescription()));

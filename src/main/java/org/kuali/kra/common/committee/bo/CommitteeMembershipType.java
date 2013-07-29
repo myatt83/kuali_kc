@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  *
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,11 @@ import org.kuali.kra.bo.KraPersistableBusinessObjectBase;
  * @author Kuali Research Administration Team (kc.dev@kuali.org)
  */
 public class CommitteeMembershipType extends KraPersistableBusinessObjectBase {
+
+    /**
+     * Comment for <code>serialVersionUID</code>
+     */
+    private static final long serialVersionUID = 3650247534542592108L;
 
     private String membershipTypeCode;
 

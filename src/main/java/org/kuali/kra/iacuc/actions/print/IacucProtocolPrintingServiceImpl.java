@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,9 @@ import java.util.HashMap;
 
 import org.kuali.kra.protocol.actions.print.ProtocolPrintHelper;
 import org.kuali.kra.protocol.actions.print.ProtocolPrintType;
-import org.kuali.kra.protocol.actions.print.ProtocolPrintingServiceImpl;
+import org.kuali.kra.protocol.actions.print.ProtocolPrintingServiceImplBase;
 
-public class IacucProtocolPrintingServiceImpl extends ProtocolPrintingServiceImpl implements IacucProtocolPrintingService {
+public class IacucProtocolPrintingServiceImpl extends ProtocolPrintingServiceImplBase implements IacucProtocolPrintingService {
 
     public enum IacucPrintTypes {
         PROTOCOL_SUMMARY_VIEW_REPORT("IacucProtocolSummary.xsl", "IacucProtocolSummary", "Iacuc_Protocol_Summary_Report.pdf"), 

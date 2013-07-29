@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-    Copyright 2005-2010 The Kuali Foundation.
+    Copyright 2005-2013 The Kuali Foundation.
 
     Licensed under the Educational Community License, Version 1.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -152,6 +152,10 @@
         <property name="serviceName" value="unitAuthorizationService" />
     </bean>
     
+    <bean id="versionHistoryService" class="org.kuali.rice.krad.config.GlobalResourceLoaderServiceFactoryBean">
+        <property name="serviceName" value="versionHistoryService" />
+    </bean>    
+    
     <bean id="parentLookupableHelperService" abstract="true">
         <property name="persistenceStructureService" ref="persistenceStructureService" />
         <property name="businessObjectDictionaryService" ref="businessObjectDictionaryService" />
@@ -172,7 +176,8 @@
         <property name="awardBudgetService" ref="awardBudgetService" />
         <property name="institutionalProposalService" ref="institutionalProposalService" />   
         <property name="unitAdministratorDerivedRoleTypeServiceImpl" ref="unitAdministratorDerivedRoleTypeService" />
-        <property name="kcPersonService" ref="kcPersonService" />   
+        <property name="kcPersonService" ref="kcPersonService" />
+        <property name="versionHistoryService" ref="versionHistoryService" />   
     </bean>
     
     <bean id="negotiationLookupable" class="org.kuali.rice.kns.lookup.KualiLookupableImpl" scope="prototype">
@@ -183,11 +188,7 @@
           parent="parentLookupableHelperService" scope="prototype">
         <property name="negotiationDao" ref="negotiationDao" />
     </bean>
-    
-    <bean id="negotiationCustomAttributeService" class="org.kuali.kra.service.impl.NegotiationCustomAttributeServiceImpl">
-        <property name="businessObjectService" ref="businessObjectService" />
-    </bean>
-    
+        
     <bean id="negotiationDao" class="org.kuali.kra.negotiations.lookup.NegotiationDaoOjb" parent="platformAwareDao">
         <property name="negotiationService" ref="negotiationService" />
         <property name="persistenceStructureService" ref="persistenceStructureService" />
@@ -201,17 +202,19 @@
     
     <bean id="negotiationNegotiatorDerivedRoleType" class="org.kuali.kra.negotiations.service.NegotiationNegotiatorDerivedRoleTypeServiceImpl"/>    
     
-    <bean class="org.kuali.rice.ksb.api.bus.support.CallbackServiceExporter" p:serviceBus-ref="kc.import.serviceBus" 
-		p:callbackService-ref="negotiationNegotiatorDerivedRoleType" p:localServiceName="negotiationNegotiatorDerivedRoleType" 
-		p:serviceInterface="org.kuali.rice.kim.framework.role.RoleTypeService" p:serviceNameSpaceURI="" />
+    <bean id="negotiationNegotiatorDerivedRoleTypeCallback" parent="kcCallbackService"
+		p:callbackService-ref="negotiationNegotiatorDerivedRoleType" 
+		p:localServiceName="negotiationNegotiatorDerivedRoleType" 
+		p:serviceInterface="org.kuali.rice.kim.framework.role.RoleTypeService"/>
     
     <bean id="negotiationPersonDerivedRoleType" class="org.kuali.kra.negotiations.service.NegotiationPersonDerivedRoleTypeServiceImpl">
         <property name="negotiationService" ref="negotiationService" />
     </bean>
    
-    <bean class="org.kuali.rice.ksb.api.bus.support.CallbackServiceExporter" p:serviceBus-ref="kc.import.serviceBus" 
-		p:callbackService-ref="negotiationPersonDerivedRoleType" p:localServiceName="negotiationPersonDerivedRoleType" 
-		p:serviceInterface="org.kuali.rice.kim.framework.role.RoleTypeService" p:serviceNameSpaceURI="" />
+    <bean id="negotiationPersonDerivedRoleTypeCallback" parent="kcCallbackService"
+		p:callbackService-ref="negotiationPersonDerivedRoleType" 
+		p:localServiceName="negotiationPersonDerivedRoleType" 
+		p:serviceInterface="org.kuali.rice.kim.framework.role.RoleTypeService"/>
     
     <!-- Negotiation Printing Services -->
 

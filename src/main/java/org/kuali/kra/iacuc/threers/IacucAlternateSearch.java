@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,15 +20,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.kuali.kra.protocol.ProtocolAssociate;
+import org.kuali.kra.protocol.ProtocolAssociateBase;
 import org.kuali.rice.krad.bo.PersistableBusinessObject;
 
-public class IacucAlternateSearch extends ProtocolAssociate {
+public class IacucAlternateSearch extends ProtocolAssociateBase {
 
     private static final long serialVersionUID = -7711644839097962481L;
     
     private Integer iacucAltSearchId;
-//    private String searchRequired;   ** moved to IacucPrinciples **
     private Date searchDate;
     private List<IacucProtocolAlternateSearchDatabase> databases;
     private String yearsSearched;
@@ -47,14 +46,6 @@ public class IacucAlternateSearch extends ProtocolAssociate {
     public void setIacucAltSearchId(Integer iacucAltSearchId) {
         this.iacucAltSearchId = iacucAltSearchId;
     }
-
-//    public String getSearchRequired() {
-//        return searchRequired;
-//    }
-
-//    public void setSearchRequired(String searchRequired) {
-//        this.searchRequired = searchRequired;
-//    }
 
     public Date getSearchDate() {
         return searchDate;

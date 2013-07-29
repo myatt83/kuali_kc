@@ -1,5 +1,5 @@
 <%--
- Copyright 2007-2009 The Kuali Foundation
+ Copyright 2005-2013 The Kuali Foundation
  
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@
 <h3><a name="Acknowledgements-"></a><font color="maroon">Acknowledgments</font></h3>
 
 <p><img src="http://opensource.org/trademarks/osi-certified/web/osi-certified-60x50.png" align="right" border="0" /><br/>
-Copyright 2005-2009 The Kuali Foundation. All rights reserved. Kuali is licensed for use pursuant to the <a href="http://www.opensource.org/licenses/ecl2.php">Educational Community License, Version 2.0</a>. Portions of Kuali are copyrighted by other parties, including the parties listed below, and you should see the licenses directory for complete copyright and licensing information. Questions about licensing should be directed to <span class="nobr"><a href="mailto:licensing@kuali.org" title="Send mail to licensing@kuali.org" rel="nofollow">licensing@kuali.org</a>.</span></p>
+Copyright 2005-2013 The Kuali Foundation. All rights reserved. Kuali is licensed for use pursuant to the <a href="http://www.opensource.org/licenses/ecl2.php">Educational Community License, Version 2.0</a>. Portions of Kuali are copyrighted by other parties, including the parties listed below, and you should see the licenses directory for complete copyright and licensing information. Questions about licensing should be directed to <span class="nobr"><a href="mailto:licensing@kuali.org" title="Send mail to licensing@kuali.org" rel="nofollow">licensing@kuali.org</a>.</span></p>
 
 <h3><a name="LicensingandAcknowledgments-ThirdPartyContributions"></a>Third Party Contributions</h3>
 
@@ -75,6 +75,8 @@ Copyright 2005-2009 The Kuali Foundation. All rights reserved. Kuali is licensed
 <p>This product includes software licensed under the Mozilla Public License (<a href="http://www.mozilla.org/MPL/" rel="nofollow">http://www.mozilla.org/MPL/</a>). <!-- Rice 1.0.0 --></p>
 
 <p>This product includes software developed by Andy Clark. (<a href="http://people.apache.org/~andyc/neko/LICENSE" rel="nofollow">http://people.apache.org/~andyc/neko/LICENSE</a>) <!-- Rice 1.0.0 --></p>
+
+<p>This product includes icons created by Mark James. (<a href="http://www.famfamfam.com/lab/icons/silk/" rel="nofollow">http://www.famfamfam.com/lab/icons/silk</a>)</p>
 
 <p>Portions Copyright (c) 2000-2006 The Legion of the Bouncy Castle.  All Rights Reserved.   (<a href="http://www.bouncycastle.org" rel="nofollow">http://www.bouncycastle.org</a>) <!-- Rice 1.0.0 --></p>
 

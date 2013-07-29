@@ -1,5 +1,5 @@
 <%--
- Copyright 2005-2010 The Kuali Foundation
+ Copyright 2005-2013 The Kuali Foundation
  
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 <c:set var="protocolNotesAttributes" value="${DataDictionary.ProtocolNotepad.attributes}" />
 <c:set var="modifyPermission" value="${KualiForm.notesAttachmentsHelper.modifyNotepads}" />
 <c:set var="viewRestrictedNotes" value="${KualiForm.notesAttachmentsHelper.viewRestricted}" />
-<c:set var="irbAdmin" value="${KualiForm.notesAttachmentsHelper.irbAdmin}" />
+<c:set var="irbAdmin" value="${KualiForm.notesAttachmentsHelper.protocolAdmin}" />
 <c:set var="tabItemCount" value="0" />
 <c:forEach var="protocolNotepad" items="${KualiForm.document.protocol.notepads}" varStatus="status">
     <c:if test="${viewRestrictedNotes || !protocolNotepad.restrictedView}">               
@@ -35,8 +35,8 @@
         <table id="protocol-notepad-table" cellpadding="0" cellspacing="0" summary="Protocol Notepad">
 			<tr>
 				<th scope="row">&nbsp;</th>
-				<th><kul:htmlAttributeLabel attributeEntry="${protocolNotesAttributes.updateTimestamp}" useShortLabel="true" noColon="true" /></th>
-				<th><kul:htmlAttributeLabel attributeEntry="${protocolNotesAttributes.updateUser}" useShortLabel="true" noColon="true" /></th>
+				<th align="center">Created By</th>
+				<th align="center">Updated By</th>
 				<th align="left"><kul:htmlAttributeLabel attributeEntry="${protocolNotesAttributes.noteTopic}" useShortLabel="true" noColon="true"/></th>
 				<th align="left"><kul:htmlAttributeLabel attributeEntry="${protocolNotesAttributes.comments}" useShortLabel="true" noColon="true"/></th>
 				<th><kul:htmlAttributeLabel attributeEntry="${protocolNotesAttributes.restrictedView}" useShortLabel="true" noColon="true"/></th>
@@ -83,12 +83,14 @@
 							<c:out value="${status.index+1}" />
 						</th>
 		                <td valign="middle">
-                            <c:if test="${!protocolNotepad.editable}">
-							    <kul:htmlControlAttribute property="document.protocol.notepads[${status.index}].updateTimestamp" attributeEntry="${protocolNotesAttributes.updateTimestamp}" readOnly="true"/>
-                            </c:if>
+		                	${KualiForm.document.protocol.notepads[status.index].createUserFullName}
+							<Br/> 
+							<kul:htmlControlAttribute property="document.protocol.notepads[${status.index}].createTimestamp" attributeEntry="${protocolNotesAttributes.updateTimestamp}" readOnly="true"/>
 						</td>
 		                <td valign="middle">
-							${KualiForm.document.protocol.notepads[status.index].updateUserFullName}
+		                	${KualiForm.document.protocol.notepads[status.index].updateUserFullName}
+							<Br/> 
+							<kul:htmlControlAttribute property="document.protocol.notepads[${status.index}].updateTimestamp" attributeEntry="${protocolNotesAttributes.updateTimestamp}" readOnly="true"/>
 		                </td>
 		                <td valign="middle">                	
 							<div align="center">

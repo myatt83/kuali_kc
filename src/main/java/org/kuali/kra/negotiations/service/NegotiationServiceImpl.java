@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ import org.apache.commons.lang.StringUtils;
 import org.kuali.kra.award.budget.AwardBudgetService;
 import org.kuali.kra.award.home.Award;
 import org.kuali.kra.bo.KcPerson;
+import org.kuali.kra.bo.versioning.VersionHistory;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.RoleConstants;
 import org.kuali.kra.institutionalproposal.home.InstitutionalProposal;
@@ -46,11 +47,12 @@ import org.kuali.kra.negotiations.bo.NegotiationPersonDTO;
 import org.kuali.kra.negotiations.bo.NegotiationStatus;
 import org.kuali.kra.negotiations.bo.NegotiationUnassociatedDetail;
 import org.kuali.kra.negotiations.document.NegotiationDocument;
+import org.kuali.kra.negotiations.notifications.NegotiationNotification;
 import org.kuali.kra.service.KcPersonService;
+import org.kuali.kra.service.VersionHistoryService;
 import org.kuali.kra.subaward.bo.SubAward;
-import org.kuali.rice.core.api.membership.MemberType;
 import org.kuali.rice.coreservice.framework.parameter.ParameterService;
-import org.kuali.rice.kim.api.role.RoleMembership;
+import org.kuali.rice.kns.service.KNSServiceLocator;
 import org.kuali.rice.krad.bo.BusinessObject;
 import org.kuali.rice.krad.service.BusinessObjectService;
 
@@ -66,6 +68,7 @@ public class NegotiationServiceImpl implements NegotiationService {
     private InstitutionalProposalService institutionalProposalService;
     private UnitAdministratorDerivedRoleTypeServiceImpl unitAdministratorDerivedRoleTypeServiceImpl;
     private KcPersonService kcPersonService;
+    private VersionHistoryService versionHistoryService;
     
     private BusinessObjectService businessObjectService;
     
@@ -150,10 +153,12 @@ public class NegotiationServiceImpl implements NegotiationService {
     }
     
     private SubAward getSubAward(String subAwardId) {
-        Map<String, String> primaryKeys = new HashMap<String, String>();
-        primaryKeys.put("SUBAWARD_ID", subAwardId);
-        SubAward sa = (SubAward) this.getBusinessObjectService().findByPrimaryKey(SubAward.class, primaryKeys);
-        return sa;
+        VersionHistory versionHistory = getVersionHistoryService().getActiveOrNewestVersion(SubAward.class, subAwardId);
+        if (versionHistory != null) {
+            return (SubAward) versionHistory.getSequenceOwner();
+        } else {
+            return null;
+        }
     }
     
     private InstitutionalProposal getInstitutionalProposal(String proposalNumber) {
@@ -183,8 +188,10 @@ public class NegotiationServiceImpl implements NegotiationService {
         } else if (bo instanceof Award) {
             Award award = (Award) bo;
             return new ArrayList(getAssociatedNegotiations(award.getAwardNumber(), NegotiationAssociationType.AWARD_ASSOCIATION));            
+        } else if (bo instanceof SubAward) {
+            SubAward subAward = (SubAward) bo;
+            return new ArrayList(getAssociatedNegotiations(subAward.getSubAwardCode(), NegotiationAssociationType.SUB_AWARD_ASSOCIATION));
         }
-        //TODO: subaward links to be implemented here when subaward is implemented.
         return result;
     }  
     
@@ -357,6 +364,17 @@ public class NegotiationServiceImpl implements NegotiationService {
         return beansToReturn;
     }
     
+    public List<NegotiationNotification> getNegotiationNotifications(Negotiation negotiation) {
+        List<NegotiationNotification> notifications = new ArrayList<NegotiationNotification>();
+        if (negotiation.getNegotiationDocument() != null) {
+            Map<String, Object> fieldValues = new HashMap<String, Object>(); 
+            fieldValues.put("documentNumber", negotiation.getNegotiationDocument().getDocumentNumber());
+            notifications = (List<NegotiationNotification>)getBusinessObjectService().findMatching(NegotiationNotification.class, fieldValues);
+        }
+        return notifications;
+    }
+    
+
     private void setBeanStuff(NegotiationActivityHistoryLineBean bean, Date efectiveLocationStartDate, Date efectiveLocationEndDate, String locationDays) {
         bean.setEfectiveLocationEndDate(efectiveLocationEndDate);
         bean.setEfectiveLocationStartDate(efectiveLocationStartDate);
@@ -444,6 +462,14 @@ public class NegotiationServiceImpl implements NegotiationService {
 
     public void setKcPersonService(KcPersonService kcPersonService) {
         this.kcPersonService = kcPersonService;
+    }
+
+    public VersionHistoryService getVersionHistoryService() {
+        return versionHistoryService;
+    }
+
+    public void setVersionHistoryService(VersionHistoryService versionHistoryService) {
+        this.versionHistoryService = versionHistoryService;
     }
     
     

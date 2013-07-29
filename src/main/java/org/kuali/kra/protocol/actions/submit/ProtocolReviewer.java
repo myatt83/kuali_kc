@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.kuali.kra.SkipVersioning;
 import org.kuali.kra.protocol.ProtocolReviewerBase;
-import org.kuali.kra.protocol.onlinereview.ProtocolOnlineReview;
+import org.kuali.kra.protocol.onlinereview.ProtocolOnlineReviewBase;
 
 @SuppressWarnings("serial")
 public class ProtocolReviewer extends ProtocolReviewerBase {
@@ -40,7 +40,7 @@ public class ProtocolReviewer extends ProtocolReviewerBase {
 
     // transient property for submission detail display 
     @SkipVersioning
-    private transient List<ProtocolOnlineReview> protocolOnlineReviews = new ArrayList<ProtocolOnlineReview>();
+    private transient List<ProtocolOnlineReviewBase> protocolOnlineReviews = new ArrayList<ProtocolOnlineReviewBase>();
 
     public Long getProtocolReviewerId() {
         return protocolReviewerId;
@@ -97,7 +97,7 @@ public class ProtocolReviewer extends ProtocolReviewerBase {
      * Gets the protocolOnlineReviews attribute. 
      * @return Returns the protocolOnlineReviews.
      */
-    public List<ProtocolOnlineReview> getProtocolOnlineReviews() {
+    public List<ProtocolOnlineReviewBase> getProtocolOnlineReviews() {
         return protocolOnlineReviews;
     }
 
@@ -105,16 +105,17 @@ public class ProtocolReviewer extends ProtocolReviewerBase {
      * Sets the protocolOnlineReviews attribute value.
      * @param protocolOnlineReviews The protocolOnlineReviews to set.
      */
-    public void setProtocolOnlineReviews(List<ProtocolOnlineReview> protocolOnlineReviews) {
+    public void setProtocolOnlineReviews(List<ProtocolOnlineReviewBase> protocolOnlineReviews) {
         this.protocolOnlineReviews = protocolOnlineReviews;
     }
 
-//    @Override
-//    public List buildListOfDeletionAwareLists() {
-//        List managedLists = super.buildListOfDeletionAwareLists();
-//        if (protocolOnlineReviews != null) {
-//            managedLists.add(protocolOnlineReviews);
-//        }
-//        return managedLists;
-//    }
+    @Override
+    public List buildListOfDeletionAwareLists() {
+        List managedLists = super.buildListOfDeletionAwareLists();
+        if (protocolOnlineReviews != null) {
+            managedLists.add(protocolOnlineReviews);
+        }
+        return managedLists;
+    }
+    
 }

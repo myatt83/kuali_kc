@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  *
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,7 @@ public final class KeyConstants {
     public static final String ERROR_START_DATE_AFTER_END_DATE = "error.start.date.after.end.date";
     
     public static final String QUESTION_DELETE_CONFIRMATION = "document.question.delete.text";
+    public static final String INVALID_DEADLINE_TIME = "error.invalid.deadLineTime";
     
     // Notification
     public static final String ERROR_NOTIFICATION_MODULE_CODE_ACTION_CODE_COMBINATION_EXISTS = "error.notification.moduleCode.actionCode.combination.exists";
@@ -44,6 +45,7 @@ public final class KeyConstants {
     public static final String ERROR_NOTIFICATION_EMPTY_NOTIFICATION_RECIPIENT = "error.notification.empty.notifcation.recipient";
     public static final String ERROR_NOTIFICATION_DUPLICATE_NOTIFICATION_RECIPIENT = "error.notification.duplicate.notification.recipient";
     public static final String ERROR_NOTIFICATION_RECIPIENTS_REQUIRED = "error.notification.recipients.required";
+    public static final String LOCKED_DOCUMENT_MESSAGE = "locked.document.message";
     
     // Special Review
     public static final String ERROR_SPECIAL_REVIEW_PROTOCOL_NUMBER_INVALID = "error.special.review.protocol.number.invalid";
@@ -101,6 +103,7 @@ public final class KeyConstants {
     public static final String ERROR_ONE_UNIT="error.one.unit";
     public static final String ERROR_PERCENTAGE="error.percentage";
     
+    public static final String ERROR_ERA_COMMON_USER_NAME="error.investigators.eraCommonUserName";
     public static final String ERROR_REQUIRED_FOR_FILE_NAME="error.required.for.fileName";
     public static final String ERROR_ABSTRACT_TYPE_NOT_SELECTED = "error.abstractType.notselected";
     public static final String ERROR_ABSTRACT_TYPE_INVALID = "error.abstractType.invalid";
@@ -208,7 +211,8 @@ public final class KeyConstants {
     
     // Grants.gov
     public static final String ERROR_IF_PROPOSALTYPE_IS_REVISION = "error.s2sopportunity.revisiontype";
-    public static final String ERROR_IF_CFDANUMBER_AND_OPPORTUNITY_ID_IS_NULL = "error.s2sopportunity.cfdaNumber_opportunityId_null"; 
+    public static final String ERROR_IF_CFDANUMBER_AND_OPPORTUNITY_ID_IS_NULL = "error.s2sopportunity.cfdaNumber_opportunityId_null";
+    public static final String ERROR_S2S_PROVIDER_INVALID = "error.s2sopportunity.invalidProvider";
     public static final String ERROR_IF_REVISIONTYPE_IS_OTHER = "error.s2sopportunity.revisionTypeOther";
     public static final String ERROR_REQUIRED_REVISIONTYPE = "error.required.s2sopportunity.revisionType";
     public static final String ERROR_IF_CFDANUMBER_IS_INVALID = "error.s2sopportunity.cfdaNumberInvalid";
@@ -232,6 +236,7 @@ public final class KeyConstants {
     public static final String ERROR_GRANTSGOV_FORM_PARSING = "error.grantsgov.form.parsing";
     public static final String ERROR_GRANTSGOV_FORM_PARSING_SAXEXCEPTION = "error.grantsgov.form.xmlprocess";
     public static final String ERROR_GRANTSGOV_FORM_SCHEMA_NOT_FOUND = "error.grantsgov.form.schema.server.down";
+    public static final String ERROR_GRANTSGOV_NO_FORM_ELEMENT = "error.grantsgov.no.form.element";
     
     public static final String ERROR_PRINTING_UNKNOWN = "error.printing.unknown";
     public static final String ERROR_IF_COMPETITION_ID_IS_INVALID="error.s2sopportunity.competitionIdInvalid";
@@ -303,6 +308,9 @@ public final class KeyConstants {
     
     // delete proposal
     public static final String ERROR_DELETE_PROPOSAL_IN_HIERARCHY="error.proposalDevelopment.deleteproposal.inhierarchy";
+    
+    // parameter name to allow/disallow PD notes deletion
+    public static final String ALLOW_PROPOSAL_DEVELOPMENT_NOTES_DELETION="allowProposalDevelopmentNotesDeletion";
     
     // budget rates
     public static final String ERROR_REQUIRED_APPLICABLE_RATE = "error.required.applicableRate";
@@ -403,9 +411,16 @@ public final class KeyConstants {
     public static final String ERROR_ANTICIPATED_AMOUNT_NEGATIVE = "error.award.anticipated.negative";
     public static final String ERROR_DUPLICATE_AWARD_TRANSFERRING_SPONSOR = "error.sponsor.duplicate";
     public static final String ERROR_AWARD_EFFECTIVE_DATE = "error.award.effective.date";
+    public static final String ERROR_AWARD_EFFECTIVE_DATE_TOTAL = "error.award.effective.date.total";
     public static final String ERROR_OBLIGATION_EXPIRATION_DATE = "error.obligation.expiration.date";
+    public static final String ERROR_OBLIGATION_EXPIRATION_DATE_TOTAL = "error.obligation.expiration.date.total";
     public static final String ERROR_INVALID_CFDA = "error.award.cfda.invalid";
     public static final String ERROR_AWARD_EFFECTIVE_DATE_TIME_AND_MONEY = "error.award.effective.date.timeAndMoney";
+    
+    public static final String ERROR_ANTICIPATED_AMOUNT_FROM_TRANSACTIONS = "error.anticipated.amount.from.transactions";
+    public static final String ERROR_AWARD_OBLIGATED_NEGATIVE_FROM_TRANSACTIONS = "error.award.obligated.negative.from.transactions";
+    public static final String ERROR_AWARD_ANTICIPATED_NEGATIVE_FROM_TRANSACTIONS = "error.award.anticipated.negative.from.transactions";
+    public static final String ERROR_AWARD_OBLIGATED_DATES_FROM_TRANSACTIONS = "error.award.obligated.dates.from.transactions";
     
     //Award Budget
     public static final String WARNING_AWARD_BUDGET_COSTLIMIT_NOTEQUAL_OBLIGATED = "warning.awardbudget.limitNotEqual.obligated";
@@ -523,6 +538,7 @@ public final class KeyConstants {
     public static final String AWARD_ACTIVE_STATUS_CODES_PARM = "AWARD_ACTIVE_STATUS_CODES";
     public static final String AWARD_COST_SHARING_PARM = "AWARD_COST_SHARING";
     public static final String AWARD_FABRICATED_EQUPIMENT_PARM = "AWARD_FABRICATED_EQUIPMENT";
+    public static final String AUTO_GENERATE_TIME_MONEY_FUNDS_DIST_PERIODS = "AUTO_GENERATE_TIME_AND_MONEY_FUNDS_DIST_PERIODS";
     
     //Award Validation Error Messages
     public static final String INDIRECT_COST_RATE_NOT_IN_PAIR = "indirectCostRate.not.in.pair";
@@ -554,7 +570,6 @@ public final class KeyConstants {
     public static final String AWARD_ACCOUNT_NUMBER_NOT_SPECIFIED = "error.award.createAccount.invalid.accountNumber";
     public static final String BOTH_ACCOUNT_AND_CHART_REQUIRED = "error.award.account.number.and.chart.required";    
     public static final String CANNOT_CONNECT_TO_SERVICE = "error.award.createAccount.cannotConnect";
-    public static final String CURRENT_RATE_NOT_SPECIFIED = "error.award.createAccount.invalid.currentRate";
     public static final String DOCUMENT_NUMBER_NULL = "error.award.createAccount.nullDocumentNumber";
     public static final String DOCUMENT_SAVED_WITH_ERRORS = "error.award.createAccount.saved.with.errors";
     public static final String NO_PERMISSION_TO_LINK_ACCOUNT = "error.award.link.account.no.permission";
@@ -569,6 +584,8 @@ public final class KeyConstants {
     public static final String FINANCIAL_OBJECT_CODE_MAPPING_NOT_FOUND = "error.award.budget.adjustment.financial.objectCode.mapping.not.found";
     public static final String FINANCIAL_OBJECT_CODE_MAPPING_EXISTS = "error.award.budget.financial.objectCode.mapping.exists";
     public static final String ICR_TYPE_CODE_MAPPING_EXISTS = "error.award.budget.icr.type.code.mapping.exists";
+    public static final String BUDGET_DOCUMENT_SAVED_WITH_ERRORS = "error.budget.adjustment.saved.with.errors";
+
     
     //Award template validation errors
     public static final String ERROR_NO_TEMPLATE_CODE = "error.award.templateCode.notFound";
@@ -586,12 +603,28 @@ public final class KeyConstants {
     public static final String ERROR_SYNC_DESCENDANT_BLANK = "error.award.awardhierarchy.sync.whichdescendants";
     public static final String ERROR_SYNC_AWARD_STATUS = "error.award.awardhierarchy.sync.invalidstatus";
     
+    //Award sub-contracting errors
+    public static final String SUB_PLAN_AWARD_NOT_FOUND = "error.award.subcontracting.goalsAndExpenditures.awardNotFound";
+    public static final String EXPENDITURES_RANGE_START_DATE_AFTER_END_DATE = "error.award.subcontracting.reporting.startDateAfterEndDate";
+    
+    //Award sub-contracting messages
+    public static final String AWARD_GOALS_RELOADED = "message.award.subcontracting.goalsAndExpenditures.goalsReloaded";
+    public static final String AWARD_GOALS_CLEARED = "message.award.subcontracting.goalsAndExpenditures.goalsCleared";
+    public static final String AWARD_GOALS_SAVED = "message.award.subcontracting.goalsAndExpenditures.goalsSaved";
+    
+    public static final String EXPENDITURE_DATA_REGENERATED_ALL_DATES = "message.award.subcontracting.reporting.allDateDataRegenerated";
+    public static final String EXPENDITURE_DATA_REGENERATED_IN_RANGE = "message.award.subcontracting.reporting.dataRegeneratedInDateRange";
+    
     //COI Required Fields validation messages
     public static final String ERROR_COI_ATTACHMENT_MISSING_DESC = "error.coi.attachment.description.required";
     public static final String ERROR_COI_ATTACHMENT_MISSING_FILE = "error.coi.attachment.missing.file";
     public static final String ERROR_COI_INVALID_DISCLOSURE_STATUS_CODE = "error.coi.invalid.disclosure.status.code";
     public static final String ERROR_COI_DUPLICATE_DISPOSITION_CODE = "error.coi.duplicate.disposition.code";
     public static final String ERROR_COI_DUPLICATE_DISPOSITION_DESCRIPTION = "error.coi.duplicate.disposition.description";
+    public static final String MESSAGE_COI_CERT_SUBMITTED = "message.coi.cert.submitted";
+    public static final String ERROR_COI_NO_PERMISSION_APPROVE = "error.coi.nopermission.approve";
+    public static final String MESSAGE_COI_DISCLOSURE_QUICK_APPROVED = "message.coi.quick.approved";
+    public static final String ERROR_COI_VALIDATION="error.coi.validation";
     
     // IRB Protocol Research Area Validation messages
     public static final String ERROR_PROTOCOL_RESEARCH_AREA_REQUIRED = "error.protocol.researchArea.required";
@@ -868,6 +901,7 @@ public final class KeyConstants {
     public static final String ERROR_QUESTIONNAIRE_NAME_EXIST = "error.questionnaire.name.exist";
     public static final String ERROR_QUESTIONNAIRE_FILENAME_INVALID = "error.questionnaire.filename.invalid";    
     public static final String ERROR_QUESTIONNAIRE_QUESTION_INACTIVE = "error.questionnaire.question_inactive";
+    public static final String ERROR_QUESTIONNAIRE_DUPLICATE_USAGE = "error.questionnaire.duplicate.usage";
     
     // meeting
     public static final String ERROR_ADD_MEMBER_PRESENT = "error.add.member.present";
@@ -961,6 +995,7 @@ public final class KeyConstants {
     public static final String ERROR_START_DATE_ON_OR_AFTER = "error.start.date.on.or.after";
     public static final String ERROR_INVALID_UNITCONTACT_PERSON = "error.unitContact.invalid.person";
     public static final String ERROR_MISSING_UNITCONTACT_PERSON = "error.unitContact.missing.person";
+    public static final String WARNING_AWARD_PROJECT_START_DATE_NULL = "warn.awardProjectStartDate.null";
    
     //Organization
     public static final String ERROR_ORGANIZATION_QUESTIONYNQ_ANSWER_REQUIRED = "error.organization.questionYnq.answerRequired";
@@ -995,6 +1030,7 @@ public final class KeyConstants {
     public static final String ERROR_WATERMARK_STATUS_CODE_EXIST = "error.watermark.statuscode.exists";
     public static final String INSUFFICIENT_AMOUNT_TO_PERIOD_DIRECT_COST_LIMIT_SYNC = "insufficient.amount.to.period.direct.cost.limit.sync";
     public static final String TOTAL_DIRECT_COST_ALREADY_IN_SYNC = "total.direct.cost.already.sync";
+    public static final String ERROR_WATERMARK_TEXT_REQUIRED = "error.watermark.text.required";
     
     public static final String ERROR_DUPLICATE_PROPERTY = "error.duplicate.property";
     public static final String ERROR_DATA_GROUP_NOT_EXIST = "error.datagroup.not.exist";
@@ -1064,7 +1100,10 @@ public final class KeyConstants {
     public static final String ERROR_COI_DUPLICATE_PROJECT_ID = "error.coi.duplicate.projectid";
     public static final String ERROR_COI_DISPOSITON_STATUS_REQUIRED = "error.coi.disposition.status.required";
     public static final String ERROR_COI_DISCLOSURE_STATUS_REQUIRED = "error.coi.disclosure.status.required";
+    public static final String ERROR_COI_DISCLOSURE_STATUS_INVALID = "error.coi.disclosure.status.invalid";
     public static final String ERROR_FINANCIAL_ENTITY_STATUS_INCOMPLETE = "error.coi.financialentity.status.incomplete";
+    public static final String ERROR_COI_QUESTIONNAIRE_MANDATORY = "error.coi.questionnaire.mandatory";
+    public static final String ERROR_COI_QUESTIONNAIRE_NOTUPDATED = "error.coi.questionnaire.notupdated";
     
     public static final String REPORT_TRACKING_WARNING_UPDATE_FROM_DATE_CHANGE = "warning.reportTracking.updateFromDateChange";
     
@@ -1113,7 +1152,21 @@ public final class KeyConstants {
     
     public static final String ERROR_FORMULATED_UNIT_COST = "error.invalid.budget.formulated.unit.cost";
     public static final String ERROR_FORMULATED_CALCULATED_EXPENSES = "error.invalid.budget.formulated.calculated.expense";
+    public static final String ERROR_FORUMLATED_COST_DUPLICATE = "error.invalid.budget.formulated.duplicate";
     
+    public static final String WARNING_DOCUMENT_RELOAD_CONFIRMATION = "warning.document.reload.confirmation";
+    
+    // Birt Errors
+    public static final String ERROR_BIRT_REPORT_INPUT_MISSING = "error.missing.report.inputparameters";
+    
+    public static final String REPORT_INPUT_PARAMETER_DATE_TYPE = "error.invalid.report.date";
+        
+    public static final String INVALID_BIRT_REPORT = "error.invalid.report";
+    
+    public static final String REPORT_INPUT_PARAMETER_MISSING = "error.missing.report.inputparameters";
+
+    public static final String ERROR_SEARCH_INVALID_DATE = "error.search.invalid.date";
+
     /**
      * private utility class ctor.
      * @throws UnsupportedOperationException if called.

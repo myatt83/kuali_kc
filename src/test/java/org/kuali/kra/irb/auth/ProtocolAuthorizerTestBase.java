@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import org.kuali.kra.irb.actions.amendrenew.ProtocolAmendRenewService;
 import org.kuali.kra.irb.actions.submit.ProtocolActionService;
 import org.kuali.kra.irb.actions.submit.ProtocolSubmission;
 import org.kuali.kra.irb.test.ProtocolFactory;
+import org.kuali.kra.protocol.actions.submit.ProtocolSubmissionBase;
 import org.kuali.kra.service.KraAuthorizationService;
 import org.kuali.kra.service.KraWorkflowService;
 import org.kuali.kra.service.UnitAuthorizationService;
@@ -90,7 +91,7 @@ public abstract class ProtocolAuthorizerTestBase extends KcUnitTestBase {
         throws Exception {
         
         ProtocolDocument document = ProtocolFactory.createProtocolDocument(protocolNumber);
-        List<ProtocolSubmission> submissions = new ArrayList<ProtocolSubmission>();
+        List<ProtocolSubmissionBase> submissions = new ArrayList<ProtocolSubmissionBase>();
         ProtocolSubmission submission = new ProtocolSubmission();
         submission.setSubmissionStatusCode(submissionStatusCode);
         submissions.add(submission);

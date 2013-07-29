@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,7 +68,9 @@ public abstract class S2STestBase<T> extends KcUnitTestBase {
         generatorObject.setAttachments(new ArrayList<AttachmentData>());
         XmlObject object=generatorObject.getFormObject(document);
         getService(S2SValidatorService.class).validate(generatorObject.getFormObject(document), errors);
-        assertTrue(errors.isEmpty());
+        for (AuditError auditError : errors) {
+            assertNull(auditError.getMessageKey()+":"+auditError.getErrorKey(),auditError.getErrorKey());
+        }
     }
 
     private void saveProposalDocument(ProposalDevelopmentDocument pd) throws Exception {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,12 +22,12 @@ import org.kuali.kra.irb.actions.ProtocolActionType;
 /**
  * Is the user allowed to withdraw the protocol and the action is currently unavailable?
  */
-public class ProtocolWithdrawUnavailableAuthorizer extends ProtocolAuthorizer {
+public class ProtocolWithdrawUnavailableAuthorizer extends ProtocolAuthorizerBase {
 
     /**
-     * @see org.kuali.kra.protocol.auth.ProtocolAuthorizer#isAuthorized(java.lang.String, org.kuali.kra.protocol.auth.ProtocolTask)
+     * @see org.kuali.kra.protocol.auth.ProtocolAuthorizerBase#isAuthorized(java.lang.String, org.kuali.kra.protocol.auth.ProtocolTaskBase)
      */
-    public boolean isAuthorized(String userId, ProtocolTask task) {
+    public boolean isAuthorized(String userId, ProtocolTaskBase task) {
         if (!isAmendmentOrRenewal(task.getProtocol()) && hasPermission(userId, task.getProtocol(), PermissionConstants.SUBMIT_PROTOCOL)) {
             if (!kraWorkflowService.isInWorkflow(task.getProtocol().getProtocolDocument()) ||
                 !kraWorkflowService.isDocumentOnNode(task.getProtocol().getProtocolDocument(), Constants.PROTOCOL_IRBREVIEW_ROUTE_NODE_NAME) ||

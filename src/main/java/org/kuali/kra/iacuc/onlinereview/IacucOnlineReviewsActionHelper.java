@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,15 @@ package org.kuali.kra.iacuc.onlinereview;
 import org.kuali.kra.iacuc.IacucProtocolForm;
 import org.kuali.kra.iacuc.actions.reviewcomments.IacucReviewAttachmentsBean;
 import org.kuali.kra.iacuc.actions.reviewcomments.IacucReviewCommentsBean;
-import org.kuali.kra.protocol.actions.reviewcomments.ReviewAttachmentsBean;
-import org.kuali.kra.protocol.actions.reviewcomments.ReviewCommentsBean;
-import org.kuali.kra.protocol.onlinereview.OnlineReviewsActionHelper;
+import org.kuali.kra.iacuc.actions.reviewcomments.IacucReviewCommentsService;
+import org.kuali.kra.protocol.actions.reviewcomments.ReviewAttachmentsBeanBase;
+import org.kuali.kra.protocol.actions.reviewcomments.ReviewCommentsBeanBase;
+import org.kuali.kra.protocol.actions.reviewcomments.ReviewCommentsService;
+import org.kuali.kra.protocol.onlinereview.OnlineReviewsActionHelperBase;
+import org.kuali.kra.protocol.onlinereview.ProtocolOnlineReviewFormBase;
+import org.kuali.kra.protocol.onlinereview.ProtocolOnlineReviewService;
 
-public class IacucOnlineReviewsActionHelper  extends  OnlineReviewsActionHelper {
+public class IacucOnlineReviewsActionHelper  extends  OnlineReviewsActionHelperBase {
    
     /**
      * Comment for <code>serialVersionUID</code>
@@ -37,13 +41,31 @@ public class IacucOnlineReviewsActionHelper  extends  OnlineReviewsActionHelper 
 
     
     @Override
-    protected ReviewAttachmentsBean getNewReviewAttachmentsBeanHook(String errorPropertyKey) {
+    protected ReviewAttachmentsBeanBase getNewReviewAttachmentsBeanHook(String errorPropertyKey) {
         return new IacucReviewAttachmentsBean(errorPropertyKey);
     }
 
     @Override
-    protected ReviewCommentsBean getNewReviewCommentsBeanInstanceHook(String errorPropertyKey) {
+    protected ReviewCommentsBeanBase getNewReviewCommentsBeanInstanceHook(String errorPropertyKey) {
         return new IacucReviewCommentsBean(errorPropertyKey);
+    }
+
+
+    @Override
+    protected ProtocolOnlineReviewFormBase getNewProtocolOnlineReviewFormInstanceHook() throws Exception {
+        return new IacucProtocolOnlineReviewForm();
+    }
+
+
+    @Override
+    protected Class<? extends ProtocolOnlineReviewService> getProtocolOnlineReviewServiceClassHook() {
+        return IacucProtocolOnlineReviewService.class;
+    }
+
+
+    @Override
+    protected Class<? extends ReviewCommentsService> getReviewCommentsServiceClassHook() {
+        return IacucReviewCommentsService.class;
     }
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,35 +15,11 @@
  */
 package org.kuali.kra.irb.actions.submit;
 
-import org.kuali.kra.bo.KraPersistableBusinessObjectBase;
-
 @SuppressWarnings("serial")
-public class ProtocolReviewerType extends KraPersistableBusinessObjectBase {
+public class ProtocolReviewerType extends org.kuali.kra.protocol.actions.submit.ProtocolReviewerType {
 
     public static final String PRIMARY = "1";
 
     public static final String SECONDARY = "2";
 
-    private String reviewerTypeCode;
-
-    private String description;
-
-    public ProtocolReviewerType() {
-    }
-
-    public String getReviewerTypeCode() {
-        return reviewerTypeCode;
-    }
-
-    public void setReviewerTypeCode(String reviewerTypeCode) {
-        this.reviewerTypeCode = reviewerTypeCode;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
 }

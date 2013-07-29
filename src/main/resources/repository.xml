@@ -174,6 +174,7 @@
 		<field-descriptor name="multiCampusPrincipalId" column="MULTI_CAMPUS_PRINCIPAL_ID" jdbc-type="VARCHAR"/>
 		<field-descriptor name="multiCampusPrincipalName" column="MULTI_CAMPUS_PRINCIPAL_NAME" jdbc-type="VARCHAR"/>
 		<field-descriptor name="salaryAnniversaryDate" column="SALARY_ANNIVERSARY_DATE" jdbc-type="DATE"/>
+		<field-descriptor name="eraCommonUserName" column="ERA_COMMON_USER_NAME" jdbc-type="VARCHAR"/>
 		<field-descriptor name="updateTimestamp" column="UPDATE_TIMESTAMP" jdbc-type="TIMESTAMP" />
 		<field-descriptor name="updateUser" column="UPDATE_USER" jdbc-type="VARCHAR" />
 		<field-descriptor name="objectId" column="OBJ_ID" jdbc-type="VARCHAR" />
@@ -433,7 +434,11 @@
 		<reference-descriptor name="unit" class-ref="org.kuali.kra.bo.Unit" auto-retrieve="true" auto-update="none" auto-delete="none">
         	<foreignkey field-ref="ownedByUnit" />
     	</reference-descriptor>
-
+    	
+    	<reference-descriptor name="organizations" class-ref="org.kuali.kra.bo.Organization" auto-retrieve="true" auto-update="none" auto-delete="none">
+        	<foreignkey field-ref="organization" />
+    	</reference-descriptor>
+    	
 		<reference-descriptor name="sponsor" class-ref="org.kuali.kra.bo.Sponsor" auto-retrieve="true" auto-update="none" auto-delete="none">
         	<foreignkey field-ref="sponsorCode" />
     	</reference-descriptor>
@@ -648,6 +653,7 @@
 		<field-descriptor name="updateUser" column="UPDATE_USER" jdbc-type="VARCHAR"/>
 		<field-descriptor name="objectId" column="OBJ_ID" jdbc-type="VARCHAR" />
     	<field-descriptor name="versionNumber" column="VER_NBR" jdbc-type="BIGINT" locking="false" />
+    	<field-descriptor name="active" column="ACTV_IND" jdbc-type="VARCHAR" conversion="org.kuali.rice.core.framework.persistence.ojb.conversion.OjbCharBooleanConversion"/>
 		<!-- <collection-descriptor name="Award" proxy="true" element-class-ref="org.kuali.kra.award.bo.Award" collection-class="org.apache.ojb.broker.util.collections.ManageableArrayList" auto-retrieve="true" auto-update="object" auto-delete="object">
 			<inverse-foreignkey field-ref="sponsorCode"/>
 		</collection-descriptor>
@@ -683,6 +689,39 @@
         	<foreignkey field-ref="sponsorTypeCode" />
     	</reference-descriptor>
 
+		<reference-descriptor name="unit" class-ref="org.kuali.kra.bo.Unit" auto-retrieve="true" auto-update="none" auto-delete="none">
+        	<foreignkey field-ref="ownedByUnit" />
+    	</reference-descriptor>
+    	<reference-descriptor name="rolodex" class-ref="org.kuali.kra.bo.Rolodex" auto-retrieve="true" auto-update="none" auto-delete="none">
+        	<foreignkey field-ref="rolodexId" />
+    	</reference-descriptor>
+	</class-descriptor>
+	
+	
+	<class-descriptor class="org.kuali.kra.bo.SponsorSpecial" table="SPONSOR">
+		<field-descriptor id="1" name="sponsorCode" column="SPONSOR_CODE" jdbc-type="CHAR" primarykey="true" sequence-name="SEQ_SPONSOR_CODE" autoincrement="true" />
+		<field-descriptor name="acronym" column="ACRONYM" jdbc-type="VARCHAR"/>
+		<field-descriptor name="auditReportSentForFy" column="AUDIT_REPORT_SENT_FOR_FY" jdbc-type="CHAR"/>
+		<field-descriptor name="cageNumber" column="CAGE_NUMBER" jdbc-type="VARCHAR"/>
+		<field-descriptor name="countryCode" column="COUNTRY_CODE" jdbc-type="CHAR"/>
+		<field-descriptor name="createUser" column="CREATE_USER" jdbc-type="VARCHAR"/>
+		<field-descriptor name="dodacNumber" column="DODAC_NUMBER" jdbc-type="VARCHAR"/>
+		<field-descriptor name="dunAndBradstreetNumber" column="DUN_AND_BRADSTREET_NUMBER" jdbc-type="VARCHAR"/>
+		<field-descriptor name="dunsPlusFourNumber" column="DUNS_PLUS_FOUR_NUMBER" jdbc-type="VARCHAR"/>
+		<field-descriptor id="1" name="ownedByUnit" column="OWNED_BY_UNIT" jdbc-type="VARCHAR"/>
+		<field-descriptor name="postalCode" column="POSTAL_CODE" jdbc-type="VARCHAR"/>
+		<field-descriptor name="rolodexId" column="ROLODEX_ID" jdbc-type="INTEGER"/>
+		<field-descriptor name="sponsorName" column="SPONSOR_NAME" jdbc-type="VARCHAR"/>
+		<field-descriptor name="sponsorTypeCode" column="SPONSOR_TYPE_CODE" jdbc-type="VARCHAR"/>
+		<field-descriptor name="state" column="STATE" jdbc-type="VARCHAR"/>
+		<field-descriptor name="updateTimestamp" column="UPDATE_TIMESTAMP" jdbc-type="TIMESTAMP"/>
+		<field-descriptor name="updateUser" column="UPDATE_USER" jdbc-type="VARCHAR"/>
+		<field-descriptor name="objectId" column="OBJ_ID" jdbc-type="VARCHAR" />
+    	<field-descriptor name="versionNumber" column="VER_NBR" jdbc-type="BIGINT" locking="false" />
+    	<field-descriptor name="active" column="ACTV_IND" jdbc-type="VARCHAR" conversion="org.kuali.rice.core.framework.persistence.ojb.conversion.OjbCharBooleanConversion" />
+		<reference-descriptor name="sponsorType" class-ref="org.kuali.kra.bo.SponsorType" auto-retrieve="true" auto-update="none" auto-delete="none">
+        	<foreignkey field-ref="sponsorTypeCode" />
+    	</reference-descriptor>
 		<reference-descriptor name="unit" class-ref="org.kuali.kra.bo.Unit" auto-retrieve="true" auto-update="none" auto-delete="none">
         	<foreignkey field-ref="ownedByUnit" />
     	</reference-descriptor>
@@ -915,6 +954,7 @@
 		<field-descriptor name="revisionOtherDescription" column="REVISION_OTHER_DESCRIPTION" jdbc-type="VARCHAR"/>
 		<field-descriptor name="s2sSubmissionTypeCode" column="S2S_SUBMISSION_TYPE_CODE" jdbc-type="VARCHAR"/>
 		<field-descriptor name="schemaUrl" column="SCHEMA_URL" jdbc-type="VARCHAR"/>
+		<field-descriptor name="providerCode" column="PROVIDER" jdbc-type="VARCHAR"/>
 		<field-descriptor name="updateTimestamp" column="UPDATE_TIMESTAMP" jdbc-type="TIMESTAMP"/>
 		<field-descriptor name="updateUser" column="UPDATE_USER" jdbc-type="VARCHAR"/>
 		<field-descriptor name="objectId" column="OBJ_ID" jdbc-type="VARCHAR" />
@@ -927,6 +967,9 @@
 		</collection-descriptor>		
 		<reference-descriptor name="s2sRevisionType" class-ref="org.kuali.kra.bo.S2sRevisionType" auto-retrieve="true" auto-update="none" auto-delete="none"> 
 			<foreignkey field-ref="revisionCode"/> 
+		</reference-descriptor>
+		<reference-descriptor name="s2sProvider" class-ref="org.kuali.kra.s2s.bo.S2sProvider" auto-retrieve="true" auto-update="none" auto-delete="none"> 
+			<foreignkey field-ref="providerCode"/> 
 		</reference-descriptor>
 	</class-descriptor>    
 	
@@ -989,6 +1032,18 @@
 		<field-descriptor name="objectId" column="OBJ_ID" jdbc-type="VARCHAR" />		
 		
 	</class-descriptor>
+	
+	<class-descriptor class="org.kuali.kra.s2s.bo.S2sProvider" table="S2S_PROVIDERS">
+		<field-descriptor name="code" column="CODE" jdbc-type="VARCHAR" primarykey="true" />
+		<field-descriptor name="description" column="DESCRIPTION" jdbc-type="VARCHAR" />
+		<field-descriptor name="connectorServiceName" column="CONNECTOR_SERVICE_NAME" jdbc-type="VARCHAR" />
+		<field-descriptor name="active" column="ACTIVE" jdbc-type="VARCHAR" conversion="org.kuali.rice.core.framework.persistence.ojb.conversion.OjbCharBooleanConversion"/>
+		<field-descriptor name="updateTimestamp" column="UPDATE_TIMESTAMP" jdbc-type="TIMESTAMP"/>
+		<field-descriptor name="updateUser" column="UPDATE_USER" jdbc-type="VARCHAR"/>
+		<field-descriptor name="objectId" column="OBJ_ID" jdbc-type="VARCHAR"/>
+		<field-descriptor name="versionNumber" column="VER_NBR" jdbc-type="BIGINT" locking="false"/>
+	</class-descriptor>	
+	
 	
 	<!-- KIM OJB Mappings -->
     
@@ -1054,7 +1109,7 @@
 
 	<class-descriptor class="org.kuali.kra.bo.CustomAttributeDocValue" table="CUSTOM_ATTRIBUTE_DOC_VALUE">
 		<field-descriptor name="documentNumber" column="DOCUMENT_NUMBER" jdbc-type="VARCHAR" primarykey="true"/>
-		<field-descriptor name="customAttributeId" column="CUSTOM_ATTRIBUTE_ID" jdbc-type="INTEGER" primarykey="true"/>
+		<field-descriptor name="customAttributeId" column="CUSTOM_ATTRIBUTE_ID" jdbc-type="BIGINT" primarykey="true"/>
 		<field-descriptor name="objectId" column="OBJ_ID" jdbc-type="VARCHAR"/>
 		<field-descriptor name="updateTimestamp" column="UPDATE_TIMESTAMP" jdbc-type="TIMESTAMP"/>
 		<field-descriptor name="updateUser" column="UPDATE_USER" jdbc-type="VARCHAR"/>
@@ -1225,7 +1280,7 @@
 		<field-descriptor name="active" column="ACTIVE_FLAG" jdbc-type="CHAR" conversion="org.kuali.rice.core.framework.persistence.ojb.conversion.OjbCharBooleanConversion" />
 	</class-descriptor>
 	
-	<class-descriptor class="org.kuali.kra.bo.ResearchArea" table="RESEARCH_AREAS">
+	<class-descriptor class="org.kuali.kra.irb.ResearchArea" table="RESEARCH_AREAS">
 		<field-descriptor name="researchAreaCode" column="RESEARCH_AREA_CODE" jdbc-type="VARCHAR" primarykey="true"/>
 		<field-descriptor name="description" column="DESCRIPTION" jdbc-type="VARCHAR"/>
 		<field-descriptor name="hasChildrenFlag" column="HAS_CHILDREN_FLAG" jdbc-type="VARCHAR" conversion="org.kuali.rice.core.framework.persistence.ojb.conversion.OjbCharBooleanConversion"/>
@@ -1317,6 +1372,19 @@
 		<field-descriptor name="sequenceOwnerVersionNameField" column="SEQ_OWNER_VERSION_NAME_FIELD" jdbc-type="VARCHAR" />
 		<field-descriptor name="sequenceOwnerVersionNameValue" column="SEQ_OWNER_VERSION_NAME_VALUE" jdbc-type="VARCHAR" />
 		<field-descriptor name="sequenceOwnerSequenceNumber" column="SEQ_OWNER_SEQ_NUMBER" jdbc-type="INTEGER" />
+		<field-descriptor name="statusForOjb" column="VERSION_STATUS" jdbc-type="VARCHAR" />
+		<field-descriptor name="userId" column="USER_ID" jdbc-type="VARCHAR" />
+		<field-descriptor name="versionDate" column="VERSION_DATE" jdbc-type="DATE" />
+		<field-descriptor name="updateTimestamp" column="UPDATE_TIMESTAMP" jdbc-type="TIMESTAMP" />
+		<field-descriptor name="updateUser" column="UPDATE_USER" jdbc-type="VARCHAR" />
+		<field-descriptor name="versionNumber" column="VER_NBR" jdbc-type="BIGINT" locking="false" />
+		<field-descriptor name="objectId" column="OBJ_ID" jdbc-type="VARCHAR" />
+	</class-descriptor>
+	<class-descriptor class="org.kuali.kra.bo.versioning.VersionHistorySearchBo" table="VERSION_HISTORY">
+		<field-descriptor name="sequenceOwnerVersionNameValue" column="SEQ_OWNER_VERSION_NAME_VALUE" jdbc-type="VARCHAR"  primarykey="true"/>
+		<field-descriptor name="sequenceOwnerSequenceNumber" column="SEQ_OWNER_SEQ_NUMBER" jdbc-type="INTEGER"  primarykey="true"/>
+		<field-descriptor name="sequenceOwnerClassName" column="SEQ_OWNER_CLASS_NAME" jdbc-type="VARCHAR" />
+		<field-descriptor name="sequenceOwnerVersionNameField" column="SEQ_OWNER_VERSION_NAME_FIELD" jdbc-type="VARCHAR" />
 		<field-descriptor name="statusForOjb" column="VERSION_STATUS" jdbc-type="VARCHAR" />
 		<field-descriptor name="userId" column="USER_ID" jdbc-type="VARCHAR" />
 		<field-descriptor name="versionDate" column="VERSION_DATE" jdbc-type="DATE" />
@@ -1546,4 +1614,74 @@
         <field-descriptor name="versionNumber" column="VER_NBR" jdbc-type="BIGINT" locking="false" />
         <field-descriptor name="objectId" column="OBJ_ID" jdbc-type="VARCHAR" />
     </class-descriptor>
+
+
+	<class-descriptor class="org.kuali.kra.bo.PersonSignature" table="PERSON_SIGNATURE">
+		<field-descriptor name="personSignatureId" column="PERSON_SIGNATURE_ID" jdbc-type="BIGINT" primarykey="true" sequence-name="SEQ_PERSON_SIGNATURE_ID" autoincrement="true"/>
+		<field-descriptor name="personId" column="PERSON_ID" jdbc-type="VARCHAR" />
+		<field-descriptor name="defaultAdminSignature" column="DEFAULT_ADMIN_SIGNATURE" jdbc-type="CHAR" conversion="org.kuali.rice.core.framework.persistence.ojb.conversion.OjbCharBooleanConversion" />
+		<field-descriptor name="signatureActive" column="SIGNATURE_ACTIVE" jdbc-type="CHAR" conversion="org.kuali.rice.core.framework.persistence.ojb.conversion.OjbCharBooleanConversion" />
+		<field-descriptor name="attachmentContent" column="PERSON_AUTOGRAPH" jdbc-type="BLOB" />				
+		<field-descriptor name="fileName" column="FILE_NAME" jdbc-type="VARCHAR" />
+		<field-descriptor name="contentType" column="CONTENT_TYPE" jdbc-type="VARCHAR" />
+		<field-descriptor name="updateTimestamp" column="UPDATE_TIMESTAMP" jdbc-type="TIMESTAMP" />
+		<field-descriptor name="updateUser" column="UPDATE_USER" jdbc-type="VARCHAR" />
+		<field-descriptor name="objectId" column="OBJ_ID" jdbc-type="VARCHAR" />
+    	<field-descriptor name="versionNumber" column="VER_NBR" jdbc-type="BIGINT" locking="false" />
+	</class-descriptor>
+	
+	<class-descriptor class="org.kuali.kra.reporting.bo.CustReportDetails" table="CUST_REPORT_DETAILS">
+		<field-descriptor name="reportId" column="REPORT_ID" jdbc-type="INTEGER" primarykey="true" sequence-name="SEQ_REPORT_ID" autoincrement="true"/>
+		<field-descriptor name="reportLabel" column="REPORT_LABEL" jdbc-type="VARCHAR" />
+		<field-descriptor name="reportDescription" column="REPORT_DESCRIPTION" jdbc-type="VARCHAR" />
+		<field-descriptor name="reportTypeCode" column="REPORT_TYPE_CODE" jdbc-type="INTEGER" /> 
+		<field-descriptor name="permissionName" column="RIGHT_REQUIRED" jdbc-type="VARCHAR" />
+		<field-descriptor name="attachmentContent" column="REPORT_DESIGN" jdbc-type="CLOB" conversion="org.kuali.kra.infrastructure.OjbBlobClobFieldConersion"/>
+		<field-descriptor name="fileName" column="FILE_NAME" jdbc-type="VARCHAR" />
+		<field-descriptor name="contentType" column="CONTENT_TYPE" jdbc-type="VARCHAR" />
+		<field-descriptor name="updateTimestamp" column="UPDATE_TIMESTAMP" jdbc-type="TIMESTAMP" />
+		<field-descriptor name="updateUser" column="UPDATE_USER" jdbc-type="VARCHAR" />
+		<field-descriptor name="objectId" column="OBJ_ID" jdbc-type="VARCHAR" />
+    	<field-descriptor name="versionNumber" column="VER_NBR" jdbc-type="BIGINT" locking="false" />
+		<reference-descriptor name="custReportType" class-ref="org.kuali.kra.reporting.bo.CustReportType" auto-retrieve="true" auto-update="none" auto-delete="none"> 
+			<foreignkey field-ref="reportTypeCode"/> 
+		</reference-descriptor>
+	</class-descriptor>
+	
+	 <class-descriptor class="org.kuali.kra.reporting.bo.CustReportType" table="CUST_REPORT_TYPE">
+		<field-descriptor name="reportTypeCode" column="REPORT_TYPE_CODE" jdbc-type="INTEGER" primarykey="true" />
+		<field-descriptor name="reportTypeDesc" column="REPORT_TYPE_DESC" jdbc-type="VARCHAR" />
+		<field-descriptor name="updateUser" column="UPDATE_USER" jdbc-type="VARCHAR" />
+		<field-descriptor name="updateTimestamp" column="UPDATE_TIMESTAMP" jdbc-type="TIMESTAMP" />
+		<field-descriptor name="objectId" column="OBJ_ID" jdbc-type="VARCHAR" />
+    	<field-descriptor name="versionNumber" column="VER_NBR" jdbc-type="BIGINT" locking="false" />
+	</class-descriptor>
+	
+	<class-descriptor class="org.kuali.kra.reporting.bo.CustRptDefaultParms" table="CUST_RPT_DEFAULT_PARMS">
+		<field-descriptor name="parameterName" column="PARAMETER_NAME" jdbc-type="VARCHAR" primarykey="true"/>
+		<field-descriptor name="reportTypeCode" column="REPORT_TYPE_CODE" jdbc-type="INTEGER" primarykey="true"/>
+		<field-descriptor name="className" column="CLASS_NAME" jdbc-type="VARCHAR" primarykey="true"/>
+		<field-descriptor name="javaStatements" column="JAVA_STATEMENTS" jdbc-type="VARCHAR" />
+		<field-descriptor name="unitForAuthCheck" column="UNIT_FOR_AUTH_CHECK" jdbc-type="VARCHAR" conversion="org.kuali.rice.core.framework.persistence.ojb.conversion.OjbCharBooleanConversion"/>
+		<field-descriptor name="updateUser" column="UPDATE_USER" jdbc-type="VARCHAR" />
+		<field-descriptor name="updateTimestamp" column="UPDATE_TIMESTAMP" jdbc-type="TIMESTAMP" />
+		<field-descriptor name="objectId" column="OBJ_ID" jdbc-type="VARCHAR" />
+    	<field-descriptor name="versionNumber" column="VER_NBR" jdbc-type="BIGINT" locking="false" />
+		<reference-descriptor name="custReportType" class-ref="org.kuali.kra.reporting.bo.CustReportType" auto-retrieve="true" auto-update="none" auto-delete="none"> 
+			<foreignkey field-ref="reportTypeCode"/> 
+		</reference-descriptor>
+	</class-descriptor> 
+	
+ 	<class-descriptor class="org.kuali.kra.reporting.bo.CustRptTypeDocument" table="CUST_RPT_TYPE_DOCUMENT">
+		<field-descriptor name="reportTypeCode" column="REPORT_TYPE_CODE" jdbc-type="INTEGER" primarykey="true" />
+		<field-descriptor name="documentName" column="DOCUMENT_NAME" jdbc-type="VARCHAR" primarykey="true" />
+		<field-descriptor name="updateUser" column="UPDATE_USER" jdbc-type="VARCHAR" />
+		<field-descriptor name="updateTimestamp" column="UPDATE_TIMESTAMP" jdbc-type="TIMESTAMP" />
+		<field-descriptor name="objectId" column="OBJ_ID" jdbc-type="VARCHAR" />
+    	<field-descriptor name="versionNumber" column="VER_NBR" jdbc-type="BIGINT" locking="false" />
+		<reference-descriptor name="custReportType" class-ref="org.kuali.kra.reporting.bo.CustReportType" auto-retrieve="true" auto-update="none" auto-delete="none"> 
+			<foreignkey field-ref="reportTypeCode"/> 
+		</reference-descriptor>
+	</class-descriptor>	  
+	
 </descriptor-repository>

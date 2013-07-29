@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -76,7 +76,8 @@ public class TimeAndMoneyHistoryServiceImpl implements TimeAndMoneyHistoryServic
             award.refreshReferenceObject("awardDocument");
             //to get all docs, we must pass the root award number for the subject award.
             fieldValues1.put("rootAwardNumber", getRootAwardNumberForDocumentSearch(award.getAwardNumber()));
-            docs = (List<TimeAndMoneyDocument>)businessObjectService.findMatchingOrderBy(TimeAndMoneyDocument.class, fieldValues1, "documentNumber", true);
+            docs = (List<TimeAndMoneyDocument>)businessObjectService.findMatching(TimeAndMoneyDocument.class, fieldValues1);
+            Collections.sort(docs);
             timeAndMoneyHistory.put(buildForwardUrl(award.getAwardDocument().getDocumentNumber()), buildAwardDescriptionLine(award, null, docs.get(docs.size() -1)));
             for(TimeAndMoneyDocument tempDoc: docs){
                 TimeAndMoneyDocument doc = (TimeAndMoneyDocument) documentService.getByDocumentHeaderId(tempDoc.getDocumentNumber());
@@ -212,7 +213,7 @@ public class TimeAndMoneyHistoryServiceImpl implements TimeAndMoneyHistoryServic
         //we don't want canceled docs to show in history.
         removeCanceledDocs(docs);
         for(Award award : awardVersionList) {
-            AwardVersionHistory awardVersionHistory = new AwardVersionHistory();
+            AwardVersionHistory awardVersionHistory = new AwardVersionHistory(award);
             awardVersionHistory.setDocumentUrl(buildForwardUrl(award.getAwardDocument().getDocumentNumber()));
             awardVersionHistory.setAwardDescriptionLine(buildNewAwardDescriptionLine(award));
             awardVersionHistory.setTimeAndMoneyDocumentHistoryList(getDocHistoryAndValidInfosAssociatedWithAwardVersion(docs, award.getAwardAmountInfos(), award));
@@ -221,7 +222,7 @@ public class TimeAndMoneyHistoryServiceImpl implements TimeAndMoneyHistoryServic
         }  
     }
         
-    protected List<TimeAndMoneyDocumentHistory> getDocHistoryAndValidInfosAssociatedWithAwardVersion(List<TimeAndMoneyDocument> docs,
+    public List<TimeAndMoneyDocumentHistory> getDocHistoryAndValidInfosAssociatedWithAwardVersion(List<TimeAndMoneyDocument> docs,
             List<AwardAmountInfo> awardAmountInfos, Award award) throws WorkflowException {
         List<TimeAndMoneyDocumentHistory> timeAndMoneyDocumentHistoryList = new ArrayList<TimeAndMoneyDocumentHistory>();
         List<AwardAmountInfo> validInfos = getValidAwardAmountInfosAssociatedWithAwardVersion(awardAmountInfos, award);
@@ -355,15 +356,15 @@ public class TimeAndMoneyHistoryServiceImpl implements TimeAndMoneyHistoryServic
         if(!(aat.getNoticeDate() == null)) {
             noticeDate = aat.getNoticeDate().toString();
         }else {
-            noticeDate = "empty";
+            noticeDate = "None";
         }
         if(!(aat.getAwardTransactionType() == null)) {
             transactionTypeDescription = aat.getAwardTransactionType().getDescription();
         }else {
-            transactionTypeDescription = "empty";
+            transactionTypeDescription = "None";
         }
         return "Time And Money Document: " + transactionTypeDescription + 
-                    ": notice date: " + noticeDate + ", updated : " + getUpdateTimeAndUser(doc) + " Comments: " + aat.getComments();
+                    ", notice date: " + noticeDate + ", updated " + getUpdateTimeAndUser(doc) + ". Comments: " + (aat.getComments() == null ? "None" : aat.getComments());
     }
     
     protected List<AwardAmountInfo> getValidAwardAmountInfosAssociatedWithAwardVersion(List<AwardAmountInfo> awardAmountInfos, Award award) {
@@ -413,7 +414,17 @@ public class TimeAndMoneyHistoryServiceImpl implements TimeAndMoneyHistoryServic
         docs.removeAll(tempCanceledDocs);
     }
                      
-    
+    @SuppressWarnings("unchecked")
+    public List<TimeAndMoneyDocument> buildTimeAndMoneyListForAwardDisplay(Award award) throws WorkflowException {
+        Map<String, Object> fieldValues1 = new HashMap<String, Object>();
+        //get the award number.
+        fieldValues1.put("rootAwardNumber", award.getAwardNumber());
+        List<TimeAndMoneyDocument> docs = (List<TimeAndMoneyDocument>)businessObjectService.findMatchingOrderBy(TimeAndMoneyDocument.class, fieldValues1, "documentNumber", true);
+        //we don't want canceled docs to show in history.
+        removeCanceledDocs(docs);
+        return docs;
+    }
+        
     public AwardVersionService getAwardVersionService() {
         awardVersionService = KraServiceLocator.getService(AwardVersionService.class);
         return awardVersionService;
@@ -497,15 +508,14 @@ public class TimeAndMoneyHistoryServiceImpl implements TimeAndMoneyHistoryServic
         if(!(aat.getNoticeDate() == null)) {
             noticeDate = aat.getNoticeDate().toString();
         }else {
-            noticeDate = "empty";
+            noticeDate = "None";
         }
         if(!(award.getAwardTransactionType() == null)) {
             transactionTypeDescription = award.getAwardTransactionType().getDescription();
         }else {
-            transactionTypeDescription = "empty";
+            transactionTypeDescription = "None";
         }
-        return "Award Version " + versionNumber + ": " + transactionTypeDescription + 
-                    ": notice date : " + noticeDate + ", updated : " + getUpdateTimeAndUser(award); 
+        return "Award Version " + versionNumber + ", " + transactionTypeDescription + ", notice date: " + noticeDate + ", updated " + getUpdateTimeAndUser(award); 
     }
     
     protected String buildNewAwardDescriptionLine(Award award) {
@@ -518,26 +528,19 @@ public class TimeAndMoneyHistoryServiceImpl implements TimeAndMoneyHistoryServic
         if(!(award.getNoticeDate() == null)) {
             noticeDate = award.getNoticeDate().toString();
         }else {
-            noticeDate = "empty";
+            noticeDate = "None";
         }
         if(!(award.getAwardTransactionType() == null)) {
             transactionTypeDescription = award.getAwardTransactionType().getDescription();
         }else {
-            transactionTypeDescription = "empty";
+            transactionTypeDescription = "None";
         }
-        return "Award Version " + versionNumber + ": " + transactionTypeDescription + 
-                    ": notice date : " + noticeDate + ", updated : " + getUpdateTimeAndUser(award) 
-                    + " Comments:" + award.getAwardCurrentActionComments().getComments();
+        return "Award Version " + versionNumber + ", " + transactionTypeDescription + ", notice date: " + noticeDate + 
+            ", updated " + getUpdateTimeAndUser(award) + ". Comments:" + (award.getAwardCurrentActionComments().getComments() == null ? "None." : award.getAwardCurrentActionComments().getComments());
     }
     
     protected String getUpdateTimeAndUser(Award award) {
-        String createDateStr = null;
-        String updateUser = null;
-        if (award.getUpdateTimestamp() != null) {
-            createDateStr = CoreApiServiceLocator.getDateTimeService().toString(award.getUpdateTimestamp(), "MM/dd/yy");
-            updateUser = award.getUpdateUser().length() > NUMBER_30 ? award.getUpdateUser().substring(0, NUMBER_30) : award.getUpdateUser(); 
-        }
-        return createDateStr + ", " + updateUser;
+        return award.getUpdateTimeAndUser();
     }
     
     protected String getUpdateTimeAndUser(TimeAndMoneyDocument doc) {
@@ -547,7 +550,7 @@ public class TimeAndMoneyHistoryServiceImpl implements TimeAndMoneyHistoryServic
             createDateStr = CoreApiServiceLocator.getDateTimeService().toString(doc.getUpdateTimestamp(), "MM/dd/yy");
             updateUser = doc.getUpdateUser().length() > NUMBER_30 ? doc.getUpdateUser().substring(0, NUMBER_30) : doc.getUpdateUser(); 
         }
-        return createDateStr + ", " + updateUser;
+        return createDateStr + " by " + updateUser;
     }
     
     /**

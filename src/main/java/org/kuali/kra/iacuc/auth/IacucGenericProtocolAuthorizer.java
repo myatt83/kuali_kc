@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import org.apache.commons.lang.StringUtils;
 import org.kuali.kra.iacuc.actions.IacucProtocolActionType;
 import org.kuali.kra.infrastructure.PermissionConstants;
 import org.kuali.kra.protocol.auth.GenericProtocolAuthorizer;
-import org.kuali.kra.protocol.auth.ProtocolTask;
+import org.kuali.kra.protocol.auth.ProtocolTaskBase;
 
 /**
  * 
@@ -33,7 +33,6 @@ public class IacucGenericProtocolAuthorizer extends GenericProtocolAuthorizer {
     /**
      * deactivate protocol generic action.
      */
-    //public static final String DEACTIVATE_PROTOCOL = "iacucProtocolDeactivate";
     public static final String EXPIRE_PROTOCOL = "iacucProtocolExpire";
     public static final String EXPIRE_UNAVAILABLE_PROTOCOL = "iacucProtocolExpireUnavailable";
     public static final String SUSPEND_PROTOCOL = "iacucProtocolSuspend";
@@ -43,8 +42,6 @@ public class IacucGenericProtocolAuthorizer extends GenericProtocolAuthorizer {
 
     protected static final Map<String, String> TASK_NAME_TO_ACTION_TYPE_MAP = new HashMap<String,String>();
     static {
-        
-        //TASK_NAME_TO_ACTION_TYPE_MAP.put(DEACTIVATE_PROTOCOL, IacucProtocolActionType.DEACTIVATED);
         TASK_NAME_TO_ACTION_TYPE_MAP.put(EXPIRE_PROTOCOL, IacucProtocolActionType.EXPIRED);
         TASK_NAME_TO_ACTION_TYPE_MAP.put(EXPIRE_UNAVAILABLE_PROTOCOL, IacucProtocolActionType.EXPIRED);
         TASK_NAME_TO_ACTION_TYPE_MAP.put(SUSPEND_PROTOCOL, IacucProtocolActionType.SUSPENDED);
@@ -55,7 +52,6 @@ public class IacucGenericProtocolAuthorizer extends GenericProtocolAuthorizer {
     
     protected static final Map<String, String> TASK_NAME_TO_ROLE_NAME_MAP = new HashMap<String,String>();
     static {
-        //TASK_NAME_TO_ROLE_NAME_MAP.put(DEACTIVATE_PROTOCOL, IacucProtocolActionType.DEACTIVATED);
         TASK_NAME_TO_ROLE_NAME_MAP.put(EXPIRE_PROTOCOL, PermissionConstants.PERFORM_IACUC_ACTIONS_ON_PROTO);
         TASK_NAME_TO_ROLE_NAME_MAP.put(EXPIRE_UNAVAILABLE_PROTOCOL, PermissionConstants.PERFORM_IACUC_ACTIONS_ON_PROTO);
         TASK_NAME_TO_ROLE_NAME_MAP.put(SUSPEND_PROTOCOL, PermissionConstants.PERFORM_IACUC_ACTIONS_ON_PROTO);
@@ -71,7 +67,7 @@ public class IacucGenericProtocolAuthorizer extends GenericProtocolAuthorizer {
     
     /** {@inheritDoc} */
     @Override
-    public boolean isAuthorized(String userId, ProtocolTask task) {
+    public boolean isAuthorized(String userId, ProtocolTaskBase task) {
         if (StringUtils.isEmpty(this.genericTaskName)) {
             this.genericTaskName = task.getTaskName();
         }

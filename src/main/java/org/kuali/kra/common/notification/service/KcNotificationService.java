@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,14 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import org.kuali.kra.bo.KraPersistableBusinessObjectBase;
 import org.kuali.kra.common.notification.NotificationContext;
 import org.kuali.kra.common.notification.bo.KcNotification;
 import org.kuali.kra.common.notification.bo.NotificationType;
 import org.kuali.kra.common.notification.bo.NotificationTypeRecipient;
+import org.kuali.kra.protocol.ProtocolBase;
+import org.kuali.kra.protocol.notification.ProtocolNotification;
+import org.kuali.kra.protocol.notification.ProtocolNotificationContextBase;
 import org.kuali.rice.ken.api.notification.NotificationRecipient;
 
 /**
@@ -54,7 +58,7 @@ public interface KcNotificationService {
      * @param notificationContext
      * @return The KC Notification
      */
-    KcNotification createNotification(NotificationContext notificationContext);
+    KcNotification createNotificationObject(NotificationContext notificationContext);
     
     /**
      * Saves a KC Notifications.
@@ -63,6 +67,15 @@ public interface KcNotificationService {
      */
     void saveNotification(KcNotification notification);
     
+    /**
+     * Sends notification, completes notification object, and persists it.
+     * 
+     * @param notificationContext
+     * @return The KC Notification
+     */
+    public void sendNotificationAndPersist(NotificationContext context, KcNotification notification, KraPersistableBusinessObjectBase object);
+    public void sendNotificationAndPersist(NotificationContext context, KcNotification notification, List<NotificationTypeRecipient> notificationTypeRecipients, KraPersistableBusinessObjectBase object);
+        
     /**
      * Retrieves a list of KC Notifications based on a Document Number, a Module Code, and a set of Action Codes.
      * 
@@ -123,5 +136,10 @@ public interface KcNotificationService {
      */
     void sendNotification(String contextName, String subject, String message, Collection<NotificationRecipient.Builder> notificationRecipients);
 
+    /**
+     * Make a copy of an existing notification
+     * @param notification
+     */
+    KcNotification copy(KcNotification oldNotification);
     
 }

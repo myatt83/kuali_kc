@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,8 @@ public class HierarchyProposalSummary implements Serializable {
 
     private String proposalNumber;
     private Boolean synced;
+    private String syncableBudgetDocumentNumber;
+    private Boolean budgetSynced;
 
     /**
      * Gets the proposalNumber attribute.
@@ -64,5 +66,21 @@ public class HierarchyProposalSummary implements Serializable {
      */
     public Boolean getSynced() {
         return synced;
+    }
+
+    public Boolean getBudgetSynced() {
+        return budgetSynced;
+    }
+
+    public void setBudgetSynced(Boolean budgetSynced) {
+        this.budgetSynced = budgetSynced;
+    }
+
+    public String getSyncableBudgetDocumentNumber() {
+        return syncableBudgetDocumentNumber;
+    }
+
+    public void setSyncableBudgetDocumentNumber(String syncableBudgetDocumentNumber) {
+        this.syncableBudgetDocumentNumber = syncableBudgetDocumentNumber;
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,4 +26,14 @@ public class ProposalDevelopmentBudgetExt extends Budget {
      * Comment for <code>serialVersionUID</code>
      */
     private static final long serialVersionUID = 8234453927894053540L;
+    
+    private Integer hierarchyLastSyncHashCode;
+
+    public Integer getHierarchyLastSyncHashCode() {
+        return hierarchyLastSyncHashCode;
+    }
+
+    public void setHierarchyLastSyncHashCode(Integer hierarchyLastSyncHashCode) {
+        this.hierarchyLastSyncHashCode = hierarchyLastSyncHashCode;
+    }
 }

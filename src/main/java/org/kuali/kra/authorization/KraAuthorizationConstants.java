@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ public class KraAuthorizationConstants {
     public static final String ACTIVE_LOCK_REGION = "ACTIVE_LOCK_REGION";
     public static final String LOCK_REGION_CHANGE_IND = "ACTIVE_LOCK_REGION_CHANGED";
     
-    public static final String LOCK_DESCRIPTOR_PROPOSAL = "PROPOSAL";
+    public static final String LOCK_DESCRIPTOR_PROPOSAL = "PROPOSAL DEVELOPMENT";
     public static final String LOCK_DESCRIPTOR_BUDGET = "BUDGET";
     public static final String LOCK_DESCRIPTOR_NARRATIVES = "NARRATIVES";
     public static final String LOCK_DESCRIPTOR_AWARD = "AWARD";

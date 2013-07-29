@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 package org.kuali.kra.iacuc.protocol.reference;
 
 import org.kuali.kra.iacuc.IacucProtocolDocument;
-import org.kuali.kra.protocol.protocol.reference.AddProtocolReferenceEvent;
+import org.kuali.kra.protocol.protocol.reference.AddProtocolReferenceEventBase;
 
-public class AddIacucProtocolReferenceEvent extends AddProtocolReferenceEvent {
+public class AddIacucProtocolReferenceEvent extends AddProtocolReferenceEventBase {
 
     public AddIacucProtocolReferenceEvent(String errorPathPrefix, IacucProtocolDocument document, IacucProtocolReferenceBean protocolReferenceBean) {
         super(errorPathPrefix, document, protocolReferenceBean);

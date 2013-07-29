@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  *
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -37,6 +38,7 @@ import org.kuali.kra.coi.disclosure.DisclosurePersonUnit;
 import org.kuali.kra.coi.notesandattachments.attachments.CoiDisclosureAttachment;
 import org.kuali.kra.coi.notesandattachments.attachments.CoiDisclosureAttachmentFilter;
 import org.kuali.kra.coi.notesandattachments.notes.CoiDisclosureNotepad;
+import org.kuali.kra.coi.notification.CoiNotification;
 import org.kuali.kra.common.permissions.Permissionable;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.KraServiceLocator;
@@ -47,6 +49,7 @@ import org.kuali.rice.core.api.CoreApiServiceLocator;
 import org.kuali.rice.core.api.config.property.ConfigurationService;
 import org.kuali.rice.core.api.datetime.DateTimeService;
 import org.kuali.rice.coreservice.framework.parameter.ParameterService;
+import org.kuali.rice.krad.service.BusinessObjectService;
 import org.kuali.rice.krad.service.KRADServiceLocator;
 import org.kuali.rice.krad.service.SequenceAccessorService;
 import org.kuali.rice.krad.util.GlobalVariables;
@@ -130,9 +133,18 @@ public class CoiDisclosure extends KraPersistableBusinessObjectBase implements S
     // transient for award header label
     private transient String reporterCreated;
     private transient KcPersonService kcPersonService;
+    private transient BusinessObjectService businessObjectService;
+    
+    // must persist generated notifications
+    List<CoiNotification> disclosureNotifications;
 
-
-
+    
+    private String reviewStatusCode; 
+    private CoiReviewStatus coiReviewStatus; 
+    
+    // transient for header label
+    private transient String disclosureStatusReviewStatus;
+    
     public CoiDisclosure() { 
         super();
 //        disclosurePersons = new ArrayList<DisclosurePerson>();
@@ -144,6 +156,7 @@ public class CoiDisclosure extends KraPersistableBusinessObjectBase implements S
         getDisclosureReporter();
         initializeCoiAttachmentFilter();
         coiUserRoles = new ArrayList<CoiUserRole>();
+        initializeCoiReviewStatus();
 
     } 
     
@@ -161,6 +174,12 @@ public class CoiDisclosure extends KraPersistableBusinessObjectBase implements S
         return this.kcPersonService;
     }
     
+    protected BusinessObjectService getBusinessObjectService() {
+        if (this.businessObjectService == null) {
+            this.businessObjectService = KraServiceLocator.getService(BusinessObjectService.class);
+        }
+        return this.businessObjectService;
+    }
     
     public List<CoiDisclosureNotepad> getCoiDisclosureNotepads() {
         
@@ -378,6 +397,7 @@ public class CoiDisclosure extends KraPersistableBusinessObjectBase implements S
         // is pending equivalent to in progress?
         this.setDisclosureDispositionCode(CoiDispositionStatus.IN_PROGRESS);
         this.setDisclosureStatusCode(CoiDisclosureStatus.IN_PROGRESS);
+        this.setReviewStatusCode(CoiReviewStatus.IN_PROGRESS);
         this.setPersonId(this.getDisclosureReporter().getPersonId());
         initCoiDisclosureNumber();
         this.setExpirationDate(new Date(DateUtils.addDays(new Date(System.currentTimeMillis()), 365).getTime()));
@@ -485,6 +505,9 @@ public class CoiDisclosure extends KraPersistableBusinessObjectBase implements S
         return StringUtils.equals(CoiDisclosureEventType.UPDATE, this.getEventTypeCode());
     }
 
+    public boolean isExcludedFromAnnual() {
+        return coiDisclosureEventType.isExcludeFromMasterDisclosure();
+    }
     // Good gracious, this is inefficient...
     public boolean isManualEvent() {
         return !StringUtils.equals(CoiDisclosureEventType.ANNUAL, this.getEventTypeCode())
@@ -520,7 +543,7 @@ public class CoiDisclosure extends KraPersistableBusinessObjectBase implements S
                 if (CollectionUtils.isNotEmpty(coiDisclProject.getCoiDiscDetails())) {
                     detailSize += coiDisclProject.getCoiDiscDetails().size();
                     for (CoiDiscDetail coiDiscDetail : coiDisclProject.getCoiDiscDetails()) {
-                        if (StringUtils.isNotBlank(coiDiscDetail.getEntityStatusCode())) {
+                        if (coiDiscDetail.getEntityDispositionCode() != null && coiDiscDetail.getEntityDispositionCode() > 0) {
                             completeCount ++;
                         }
                     }
@@ -620,6 +643,12 @@ public class CoiDisclosure extends KraPersistableBusinessObjectBase implements S
         }        
     }
     
+    public void initializeCoiReviewStatus() {
+        setReviewStatusCode(CoiReviewStatus.IN_PROGRESS);
+        this.refreshReferenceObject("coiReviewStatus");
+    }
+    
+    
     public void setCoiDisclosureAttachmentFilter(CoiDisclosureAttachmentFilter newAttachmentFilter) {
         this.newAttachmentFilter = newAttachmentFilter;      
      }
@@ -653,7 +682,7 @@ public class CoiDisclosure extends KraPersistableBusinessObjectBase implements S
             for (CoiDisclProject coiDisclProject: this.getCoiDisclProjects()) {
                 if (CollectionUtils.isNotEmpty(coiDisclProject.getCoiDiscDetails())) {
                     for (CoiDiscDetail coiDiscDetail : coiDisclProject.getCoiDiscDetails()) {
-                        if (StringUtils.isBlank(coiDiscDetail.getEntityStatusCode())) {
+                        if (coiDiscDetail.getEntityDispositionCode() == null || coiDiscDetail.getEntityDispositionCode() == 0) {
                             isComplete = false;
                             break;
                         }
@@ -782,6 +811,10 @@ public class CoiDisclosure extends KraPersistableBusinessObjectBase implements S
         this.currentDisclosure = currentDisclosure;
     }
 
+    public boolean isOpenForNotesAndAttachments() {
+        return !isApprovedDisclosure() && !isDisapprovedDisclosure();
+    }
+    
     public boolean isApprovedDisclosure() {
         return StringUtils.equals(CoiDisclosureStatus.APPROVED, getDisclosureStatusCode());
     }
@@ -814,6 +847,16 @@ public class CoiDisclosure extends KraPersistableBusinessObjectBase implements S
         return coiDisclosureStatus;
     }
 
+    public boolean isUnderReview() {
+        CoiDisclosureStatus currentStatus = getCoiDisclosureStatus();
+        return StringUtils.equals(CoiDisclosureStatus.ROUTED_FOR_REVIEW, currentStatus.getCoiDisclosureStatusCode());
+    }
+    
+    public boolean isSubmittedForReview() {
+        CoiDisclosureStatus currentStatus = getCoiDisclosureStatus();
+        return StringUtils.equals(CoiDisclosureStatus.ROUTED_FOR_REVIEW, currentStatus.getCoiDisclosureStatusCode());
+    }
+    
     public void setCoiDisclosureStatus(CoiDisclosureStatus coiDisclosureStatus) {
         this.coiDisclosureStatus = coiDisclosureStatus;
     }
@@ -868,5 +911,88 @@ public class CoiDisclosure extends KraPersistableBusinessObjectBase implements S
     public void setCoiDisclProjectTitle(String coiDisclProjectTitle) {
         this.coiDisclProjectTitle = coiDisclProjectTitle;
     }
+
+    public List<CoiNotification> getDisclosureNotifications() {
+        if (disclosureNotifications == null) {
+            disclosureNotifications = new ArrayList<CoiNotification>();
+        }
+        return disclosureNotifications;
+    }
+
+    public List<CoiNotification> getFilteredDisclosureNotifications() {
+        return filterNotifications(getDisclosureNotifications());
+    }
+    
+    public List<CoiNotification> filterNotifications(List<CoiNotification>unfilteredList) {
+        String currentUser = GlobalVariables.getUserSession().getPrincipalName().trim();
+        if (!(StringUtils.equals(currentUser, getReporterUserName()))) {
+            return unfilteredList;
+        } else {
+            List<CoiNotification>filteredList = new ArrayList<CoiNotification>();
+            for (CoiNotification notification: unfilteredList) {
+                if (currentUser.equals(notification.getCreateUser())) {
+                    filteredList.add(notification);
+                } else {
+                    for (String recipient: notification.getRecipients().split(",")) {
+                        if (currentUser.equals(recipient.trim())) {
+                            filteredList.add(notification);
+                            break;
+                        }
+                    }
+                }
+            }
+            return filteredList;
+        }
+    }
+    
+    public List<CoiNotification> getNotificationsByDocId() {
+        Map<String, String> fieldValues = new HashMap<String, String>();
+        fieldValues.put("documentNumber", getCoiDisclosureDocument().getDocumentNumber());
+        return (List<CoiNotification>) getBusinessObjectService().findMatching(CoiNotification.class, fieldValues);
+    }
+
+    public List<CoiNotification> getFilteredNotificationsByDocId() {
+        return filterNotifications(getNotificationsByDocId());
+    }
+    
+    public void setDisclosureNotifications(List<CoiNotification> disclosureNotifications) {
+        this.disclosureNotifications = disclosureNotifications;
+    }
  
+    public void addNotification(CoiNotification notification) {
+        getDisclosureNotifications().add(notification);
+    }
+
+    public String getReporterUserName() {
+        DisclosurePerson reporter =  getDisclosureReporter();
+        return getKcPersonService().getKcPersonByPersonId(reporter.getPersonId()).getUserName();
+   }
+
+    public String getReviewStatusCode() {
+        return reviewStatusCode;
+    }
+
+    public void setReviewStatusCode(String reviewStatusCode) {
+        this.reviewStatusCode = reviewStatusCode;
+    }
+
+    public CoiReviewStatus getCoiReviewStatus() {
+        if (StringUtils.isNotEmpty(reviewStatusCode) && coiReviewStatus == null) {
+            this.refreshReferenceObject("coiReviewStatus");
+        }
+        return coiReviewStatus;
+    }
+
+    public void setCoiReviewStatus(CoiReviewStatus coiReviewStatus) {
+        this.coiReviewStatus = coiReviewStatus;
+    }
+
+    public String getDisclosureStatusReviewStatus() {
+        return disclosureStatusReviewStatus;
+    }
+    
+    public boolean isDisclosureSaved() {
+        return coiDisclosureId != null;
+    }
+
 }

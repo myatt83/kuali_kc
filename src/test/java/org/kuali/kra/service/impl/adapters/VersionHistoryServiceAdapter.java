@@ -14,10 +14,6 @@ import org.kuali.rice.krad.service.BusinessObjectService;
 public class VersionHistoryServiceAdapter implements VersionHistoryService {
     BusinessObjectService bos;
 
-    public VersionHistory createVersionHistory(SequenceOwner<? extends SequenceOwner<?>> sequenceOwner, VersionStatus versionStatus, String userId) {
-        return null;
-    }
-
     public VersionHistory findActiveVersion(Class<? extends SequenceOwner> klass, String versionName) {
         return null;
     }
@@ -38,20 +34,30 @@ public class VersionHistoryServiceAdapter implements VersionHistoryService {
         return null;
     }
 
-    public VersionHistory updateVersionHistoryOnCancel(SequenceOwner<? extends SequenceOwner<?>> sequenceOwner,
-            VersionStatus versionStatus, String userId) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public VersionHistory updateVersionHistoryOnRouteToFinal(SequenceOwner<? extends SequenceOwner<?>> sequenceOwner,
-            VersionStatus versionStatus, String userId) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
     public VersionHistory findPendingVersion(Class<? extends SequenceOwner> klass, String versionName) {
         return null;
+    }
+
+    @Override
+    public List<VersionHistory> findVersionHistory(Class<? extends SequenceOwner> klass, String versionName) {
+        return null;
+    }
+
+    @Override
+    public void loadSequenceOwner(Class<? extends SequenceOwner> klass, VersionHistory versionHistory) {
     }   
+    
+    @Override
+    public VersionHistory updateVersionHistory(SequenceOwner<? extends SequenceOwner<?>> sequenceOwner,
+            VersionStatus versionStatus, String userId) {
+        return null;
+    }
+
+    @Override
+    public VersionHistory getActiveOrNewestVersion(Class<? extends SequenceOwner> klass, String versionName) {
+        // TODO Auto-generated method stub
+        return null;
+    }   
+    
     
 }

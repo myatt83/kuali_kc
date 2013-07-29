@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.kuali.kra.infrastructure.KraServiceLocator;
+import org.kuali.kra.questionnaire.answer.Answer;
 import org.kuali.kra.questionnaire.answer.AnswerHeader;
 import org.kuali.kra.questionnaire.answer.ModuleQuestionnaireBean;
 import org.kuali.kra.questionnaire.answer.QuestionnaireAnswerService;
@@ -136,7 +136,7 @@ public abstract class QuestionnaireHelperBase implements Serializable {
      * @param headerIndex
      */
     public void updateChildIndicator(int headerIndex) {
-        getQuestionnaireAnswerService().setupChildAnswerIndicator(answerHeaders.get(headerIndex).getAnswers());
+        getQuestionnaireAnswerService().setupChildAnswerIndicator(answerHeaders.get(headerIndex));
     }
 
     /**
@@ -147,6 +147,12 @@ public abstract class QuestionnaireHelperBase implements Serializable {
         setAnswerHeaders(getQuestionnaireAnswerService().getQuestionnaireAnswer(getModuleQnBean()));
         resetHeaderLabels();
     }
+    
+    public void versionAnswers() {
+        setAnswerHeaders(getQuestionnaireAnswerService().getNewVersionOfQuestionnaireAnswer(getModuleQnBean()));
+        resetHeaderLabels();
+    }
+    
 
     public boolean isAnswerQuestionnaire() {
         return answerQuestionnaire;

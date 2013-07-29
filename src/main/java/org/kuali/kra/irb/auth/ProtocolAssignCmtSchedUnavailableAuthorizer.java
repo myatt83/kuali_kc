@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import org.kuali.kra.irb.Protocol;
 import org.kuali.kra.irb.actions.ProtocolActionType;
 import org.kuali.kra.irb.actions.submit.ProtocolSubmission;
 import org.kuali.kra.irb.actions.submit.ProtocolSubmissionStatus;
+import org.kuali.kra.protocol.actions.submit.ProtocolSubmissionBase;
 
 /**
  * Determine if a user can assign a protocol to a committee/schedule and the action is currently unavailable.
@@ -33,7 +34,6 @@ public class ProtocolAssignCmtSchedUnavailableAuthorizer extends ProtocolAuthori
     public boolean isAuthorized(String username, ProtocolTask task) {
         Protocol protocol = task.getProtocol();
         return (!kraWorkflowService.isInWorkflow(protocol.getProtocolDocument()) ||
-              //  !isPendingOrSubmittedToCommittee(protocol)) &&
                 !canExecuteAction(task.getProtocol(), ProtocolActionType.NOTIFIED_COMMITTEE)) &&
                hasPermission(username, protocol, PermissionConstants.PERFORM_IRB_ACTIONS_ON_PROTO);
     }
@@ -54,10 +54,10 @@ public class ProtocolAssignCmtSchedUnavailableAuthorizer extends ProtocolAuthori
      * @return
      */
     private ProtocolSubmission findSubmission(Protocol protocol) {
-        for (ProtocolSubmission submission : protocol.getProtocolSubmissions()) {
+        for (ProtocolSubmissionBase submission : protocol.getProtocolSubmissions()) {
             if (StringUtils.equals(submission.getSubmissionStatusCode(), ProtocolSubmissionStatus.PENDING) ||
                 StringUtils.equals(submission.getSubmissionStatusCode(), ProtocolSubmissionStatus.SUBMITTED_TO_COMMITTEE)) {
-                return submission;
+                return (ProtocolSubmission) submission;
             }
         }
         return null;

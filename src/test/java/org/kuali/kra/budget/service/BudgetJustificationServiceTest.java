@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -116,6 +116,7 @@ public class BudgetJustificationServiceTest {
             for (String costElementCode: costElementMap.keySet()) {  
                 BudgetLineItem lineItem = budgetPeriod.getNewBudgetLineItem();
                 lineItem.setBudgetPeriod(budgetPeriod.getBudgetPeriod());
+                lineItem.setLineItemNumber(new Integer(i));
                 lineItem.setLineItemSequence(new Integer(i));
                 lineItem.setBudgetJustification(String.format("Line Item %d justification", i++));
                 lineItem.setCostElement(costElementCode);

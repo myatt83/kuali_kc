@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,22 +15,10 @@
  */
 package org.kuali.kra.irb.actions.correspondence;
 
-import java.util.List;
-
-import org.kuali.kra.irb.correspondence.ProtocolCorrespondenceTemplate;
-
 /**
  * 
  * This class simply maps a protocol action type to a protocol correspondence template, and returns a list of ProtocolCorrespondenceTemplate objects.
  */
-public interface ProtocolActionTypeToCorrespondenceTemplateService {
-    
-    /**
-     * 
-     * This method maps a protocol action type to a protocol correspondence template, and returns a list of ProtocolCorrespondenceTemplate objects.
-     * @param protocolActionType a ProtocolActionType String
-     * @return a list of ProtocolCorrespondenceTemplate objects.
-     */
-    List<ProtocolCorrespondenceTemplate> getTemplatesByProtocolAction(String protocolActionType); 
+public interface ProtocolActionTypeToCorrespondenceTemplateService extends org.kuali.kra.protocol.actions.correspondence.ProtocolActionTypeToCorrespondenceTemplateService {
 
 }

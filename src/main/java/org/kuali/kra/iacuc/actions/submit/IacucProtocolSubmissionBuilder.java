@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,12 +25,13 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.struts.upload.FormFile;
-import org.kuali.kra.common.committee.bo.CommonCommittee;
-import org.kuali.kra.common.committee.bo.CommonCommitteeSchedule;
-import org.kuali.kra.common.committee.service.CommonCommitteeService;
+import org.kuali.kra.common.committee.bo.CommitteeBase;
+import org.kuali.kra.common.committee.bo.CommitteeScheduleBase;
+import org.kuali.kra.common.committee.service.CommitteeServiceBase;
 import org.kuali.kra.iacuc.IacucProtocol;
 import org.kuali.kra.iacuc.IacucProtocolFinderDao;
 import org.kuali.kra.iacuc.actions.IacucProtocolSubmissionDoc;
+import org.kuali.kra.iacuc.committee.service.IacucCommitteeService;
 import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.protocol.actions.notify.ProtocolActionAttachment;
 import org.kuali.rice.krad.service.BusinessObjectService;
@@ -106,8 +107,6 @@ public class IacucProtocolSubmissionBuilder {
             // need to investigate if this is good for app.
             // comment scheduleid&scheduleidfk.  this will cause confusing if selected a different committee (or no committee)
             // then this schedule will not match the selected committee
-            //protocolSubmission.setScheduleId(oldSubmission.getScheduleId());
-            //protocolSubmission.setScheduleIdFk(oldSubmission.getScheduleIdFk());
             protocolSubmission.setSubmissionTypeQualifierCode(oldSubmission.getSubmissionTypeQualifierCode());
             protocolSubmission.setComments(oldSubmission.getComments());
             protocolSubmission.setYesVoteCount(oldSubmission.getYesVoteCount());
@@ -174,7 +173,7 @@ public class IacucProtocolSubmissionBuilder {
      * @param committeeId
      */
     public void setCommittee(String committeeId) {
-        CommonCommittee committee = getCommitteeService().getCommitteeById(committeeId);
+        CommitteeBase committee = getCommitteeService().getCommitteeById(committeeId);
         if (committee != null) {
             protocolSubmission.setCommitteeId(committee.getCommitteeId());
             protocolSubmission.setCommitteeIdFk(committee.getId());
@@ -189,7 +188,7 @@ public class IacucProtocolSubmissionBuilder {
      */
     public void setSchedule(String scheduleId) {
         if (protocolSubmission.getCommittee() != null) {
-            CommonCommitteeSchedule schedule = getCommitteeService().getCommitteeSchedule(protocolSubmission.getCommittee(), scheduleId);
+            CommitteeScheduleBase schedule = getCommitteeService().getCommitteeSchedule(protocolSubmission.getCommittee(), scheduleId);
             if (schedule != null) {
                 protocolSubmission.setScheduleId(schedule.getScheduleId());
                 protocolSubmission.setScheduleIdFk(schedule.getId());
@@ -209,74 +208,6 @@ public class IacucProtocolSubmissionBuilder {
         protocolSubmission.setScheduleIdFk(null);
         protocolSubmission.setCommitteeSchedule(null); 
     }
-
-//TODO: Must implement for IACUC    
-//    /**
-//     * Add an exempt studies check list item to the submission.
-//     * @param exemptStudiesCheckListCode
-//     */
-//    public void addExemptStudiesCheckListItem(String exemptStudiesCheckListCode) {
-//        protocolSubmission.getExemptStudiesCheckList().add(createProtocolExemptStudiesCheckListItem(exemptStudiesCheckListCode));
-//    }
-//    
-//    /**
-//     * Create an exempt studies check list item.
-//     * @param exemptStudiesCheckListCode
-//     * @return
-//     */
-//    private ProtocolExemptStudiesCheckListItem createProtocolExemptStudiesCheckListItem(String exemptStudiesCheckListCode) {
-//        ProtocolExemptStudiesCheckListItem chkLstItem = new ProtocolExemptStudiesCheckListItem();
-//        chkLstItem.setProtocolId(protocolSubmission.getProtocolId());
-//        chkLstItem.setSubmissionIdFk(protocolSubmission.getSubmissionId());
-//        chkLstItem.setProtocolNumber(protocolSubmission.getProtocolNumber());
-//        chkLstItem.setSequenceNumber(protocolSubmission.getSequenceNumber());
-//        chkLstItem.setSubmissionNumber(protocolSubmission.getSubmissionNumber());
-//        chkLstItem.setExemptStudiesCheckListCode(exemptStudiesCheckListCode);
-//        return chkLstItem;
-//    }
-//    
-//    /**
-//     * Add an expedited review check list item to the submission.
-//     * @param expeditedReviewCheckListCode
-//     */
-//    public void addExpeditedReviewCheckListItem(String expeditedReviewCheckListCode) {
-//        protocolSubmission.getExpeditedReviewCheckList().add(createProtocolExpeditedReviewCheckListItem(expeditedReviewCheckListCode));
-//    }
-//    
-//    /**
-//     * Create an expedited review check list item.
-//     * @param expeditedReviewCheckListCode
-//     * @return
-//     */
-//    private ProtocolExpeditedReviewCheckListItem createProtocolExpeditedReviewCheckListItem(String expeditedReviewCheckListCode) {
-//        ProtocolExpeditedReviewCheckListItem chkLstItem = new ProtocolExpeditedReviewCheckListItem();
-//        chkLstItem.setProtocolId(protocolSubmission.getProtocolId());
-//        chkLstItem.setSubmissionIdFk(protocolSubmission.getSubmissionId());
-//        chkLstItem.setProtocolNumber(protocolSubmission.getProtocolNumber());
-//        chkLstItem.setSequenceNumber(protocolSubmission.getSequenceNumber());
-//        chkLstItem.setSubmissionNumber(protocolSubmission.getSubmissionNumber());
-//        chkLstItem.setExpeditedReviewCheckListCode(expeditedReviewCheckListCode);
-//        return chkLstItem;
-//    }
-    
-    /**
-     * Add an attachment to the submission.
-     * @param file
-     */
-//    public void addAttachment(FormFile file) {
-//        if (file != null) {
-//            attachments.add(file);
-//        }
-//    }
-    
-    /**
-     * Save the attachments to the database.
-     */
-//    private void saveAttachments() {
-//        for (FormFile file : attachments) {
-//            saveAttachment(file, "");
-//        }
-//    }
     
     /*
      * save notify irb attachments.
@@ -331,8 +262,8 @@ public class IacucProtocolSubmissionBuilder {
         return submissionDoc;
     }
     
-    private CommonCommitteeService getCommitteeService() {
-        return KraServiceLocator.getService(CommonCommitteeService.class);
+    private CommitteeServiceBase getCommitteeService() {
+        return KraServiceLocator.getService(IacucCommitteeService.class);
     }
     
     private BusinessObjectService getBusinessObjectService() {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
  */
 package org.kuali.kra.common.committee.rules;
 
-import org.kuali.kra.common.committee.bo.CommitteeBatchCorrespondence;
-import org.kuali.kra.common.committee.bo.CommitteeBatchCorrespondenceDetail;
+import org.kuali.kra.common.committee.bo.CommitteeBatchCorrespondenceBase;
+import org.kuali.kra.common.committee.bo.CommitteeBatchCorrespondenceDetailBase;
 import org.kuali.kra.common.committee.rule.event.CommitteeActionViewBatchCorrespondenceEvent;
 import org.kuali.kra.infrastructure.KeyConstants;
 import org.kuali.kra.rule.BusinessRuleInterface;
@@ -40,8 +40,8 @@ public class CommitteeActionViewBatchCorrespondenceRule extends ResearchDocument
      * @return true if validation passed the rules, false otherwise.
      */
     public boolean processRules(CommitteeActionViewBatchCorrespondenceEvent event) {
-        for (CommitteeBatchCorrespondence committeeBatchCorrespondence : event.getCommitteeBatchCorrespondences()) {
-            for (CommitteeBatchCorrespondenceDetail committeeBatchCorrespondenceDetail : 
+        for (CommitteeBatchCorrespondenceBase committeeBatchCorrespondence : event.getCommitteeBatchCorrespondences()) {
+            for (CommitteeBatchCorrespondenceDetailBase committeeBatchCorrespondenceDetail : 
                     committeeBatchCorrespondence.getCommitteeBatchCorrespondenceDetails()) {
                 if (committeeBatchCorrespondenceDetail.getSelected()) {
                     return true;

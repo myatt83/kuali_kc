@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ package org.kuali.kra.iacuc.auth;
 
 import org.apache.commons.lang.StringUtils;
 import org.kuali.kra.infrastructure.PermissionConstants;
-import org.kuali.kra.protocol.Protocol;
+import org.kuali.kra.protocol.ProtocolBase;
 import org.kuali.kra.iacuc.actions.IacucProtocolStatus;
 import org.kuali.rice.kim.api.identity.Person;
 import org.kuali.rice.krad.util.GlobalVariables;
@@ -34,20 +34,16 @@ public class IacucProtocolAmendRenewDeleteAuthorizer extends IacucProtocolAuthor
         return !task.getProtocol().getProtocolDocument().isViewOnly() &&
                inProgress(task.getProtocol()) 
                && (hasPermission(userId, task.getProtocol(), PermissionConstants.DELETE_IACUC_PROTOCOL));
-//               (   (hasPermission(userId, task.getProtocol(), PermissionConstants.DELETE_IACUC_PROTOCOL)) 
-//                || (isPrincipalInvestigator(task.getProtocol()))
-//               )
-               
     }
     
-    private boolean inProgress(Protocol protocol) {
+    private boolean inProgress(ProtocolBase protocol) {
         return StringUtils.equals(protocol.getProtocolStatusCode(), IacucProtocolStatus.IN_PROGRESS);
     }
     
     /*
      * check if user is PI
      */
-    private boolean isPrincipalInvestigator(Protocol protocol) {
+    private boolean isPrincipalInvestigator(ProtocolBase protocol) {
         Person user = GlobalVariables.getUserSession().getPerson();
         boolean isPi = false;
         if (user.getPrincipalId().equals(protocol.getPrincipalInvestigator().getPersonId())) {

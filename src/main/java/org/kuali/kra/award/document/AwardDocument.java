@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.kuali.kra.award.document;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -27,7 +28,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.kuali.kra.authorization.KraAuthorizationConstants;
 import org.kuali.kra.authorization.Task;
-import org.kuali.kra.award.AwardFactBuilderService;
 import org.kuali.kra.award.awardhierarchy.sync.service.AwardSyncService;
 import org.kuali.kra.award.budget.AwardBudgetService;
 import org.kuali.kra.award.budget.AwardBudgetVersionOverviewExt;
@@ -45,6 +45,7 @@ import org.kuali.kra.award.paymentreports.awardreports.AwardReportTermRecipient;
 import org.kuali.kra.award.specialreview.AwardSpecialReview;
 import org.kuali.kra.award.specialreview.AwardSpecialReviewExemption;
 import org.kuali.kra.bo.CustomAttributeDocument;
+import org.kuali.kra.bo.DocumentCustomData;
 import org.kuali.kra.bo.RolePersons;
 import org.kuali.kra.bo.versioning.VersionStatus;
 import org.kuali.kra.budget.document.BudgetDocument;
@@ -57,16 +58,20 @@ import org.kuali.kra.infrastructure.RoleConstants;
 import org.kuali.kra.infrastructure.TaskGroupName;
 import org.kuali.kra.institutionalproposal.ProposalStatus;
 import org.kuali.kra.institutionalproposal.home.InstitutionalProposal;
+import org.kuali.kra.institutionalproposal.home.InstitutionalProposalBoLite;
 import org.kuali.kra.institutionalproposal.service.InstitutionalProposalService;
 import org.kuali.kra.krms.KcKrmsConstants;
 import org.kuali.kra.krms.KrmsRulesContext;
-import org.kuali.kra.service.AwardCustomAttributeService;
+import org.kuali.kra.krms.service.KcKrmsFactBuilderService;
 import org.kuali.kra.service.KraAuthorizationService;
+import org.kuali.kra.service.KraWorkflowService;
+import org.kuali.kra.service.ResearchDocumentService;
 import org.kuali.kra.service.VersionHistoryService;
 import org.kuali.rice.core.api.config.property.ConfigurationService;
 import org.kuali.rice.coreservice.framework.parameter.ParameterConstants;
 import org.kuali.rice.coreservice.framework.parameter.ParameterConstants.COMPONENT;
 import org.kuali.rice.coreservice.framework.parameter.ParameterConstants.NAMESPACE;
+import org.kuali.rice.ken.util.NotificationConstants;
 import org.kuali.rice.kew.api.KewApiConstants;
 import org.kuali.rice.kew.api.WorkflowDocument;
 import org.kuali.rice.kew.framework.postprocessor.DocumentRouteLevelChange;
@@ -80,6 +85,7 @@ import org.kuali.rice.krad.document.Copyable;
 import org.kuali.rice.krad.document.SessionDocument;
 import org.kuali.rice.krad.rules.rule.event.KualiDocumentEvent;
 import org.kuali.rice.krad.rules.rule.event.SaveDocumentEvent;
+import org.kuali.rice.krad.service.BusinessObjectService;
 import org.kuali.rice.krad.service.KRADServiceLocator;
 import org.kuali.rice.krad.util.GlobalVariables;
 import org.kuali.rice.krad.util.ObjectUtils;
@@ -107,6 +113,8 @@ public class AwardDocument extends BudgetParentDocument<Award> implements  Copya
     private static final long serialVersionUID = 1668673531338660064L;
     
     public static final String DOCUMENT_TYPE_CODE = "AWRD";
+    private static final String DEFAULT_TAB = "Versions";
+    private static final String ALTERNATE_OPEN_TAB = "Parameters";
     
     private boolean canEdit;
     
@@ -255,14 +263,14 @@ public class AwardDocument extends BudgetParentDocument<Award> implements  Copya
 
             //getVersionHistoryService().createVersionHistory(getAward(), VersionStatus.ACTIVE, GlobalVariables.getUserSession().getPrincipalName());
             getAwardService().updateAwardSequenceStatus(getAward(), VersionStatus.ACTIVE);
-            getVersionHistoryService().updateVersionHistoryOnRouteToFinal(getAward(), VersionStatus.ACTIVE, GlobalVariables.getUserSession().getPrincipalName());
+            getVersionHistoryService().updateVersionHistory(getAward(), VersionStatus.ACTIVE, GlobalVariables.getUserSession().getPrincipalName());
         }
         if (newStatus.equalsIgnoreCase(KewApiConstants.ROUTE_HEADER_CANCEL_CD) || newStatus.equalsIgnoreCase(KewApiConstants.ROUTE_HEADER_DISAPPROVED_CD)) {
             revertFundedProposals();
             disableAwardComments();
             //getVersionHistoryService().createVersionHistory(getAward(), VersionStatus.CANCELED, GlobalVariables.getUserSession().getPrincipalName());
             getAwardService().updateAwardSequenceStatus(getAward(), VersionStatus.CANCELED);
-            getVersionHistoryService().updateVersionHistoryOnCancel(getAward(), VersionStatus.CANCELED, GlobalVariables.getUserSession().getPrincipalName());
+            getVersionHistoryService().updateVersionHistory(getAward(), VersionStatus.CANCELED, GlobalVariables.getUserSession().getPrincipalName());
         }
         
         //reset Award List with updated document - in some scenarios the change in status is not reflected.
@@ -303,7 +311,6 @@ public class AwardDocument extends BudgetParentDocument<Award> implements  Copya
         awardList.add(new Award());
         budgetDocumentVersions = new ArrayList<BudgetDocumentVersion>();
         actualBudgetDocumentVersions = new ArrayList<BudgetDocumentVersion>();
-        populateCustomAttributes();
     }
     
     @Override
@@ -345,32 +352,18 @@ public class AwardDocument extends BudgetParentDocument<Award> implements  Copya
         Set<String> modifiedProposals = new HashSet<String>();
         List<AwardFundingProposal> pendingVersions = new ArrayList<AwardFundingProposal>();
         for (AwardFundingProposal afp : getAward().getFundingProposals()) {
-            InstitutionalProposal proposal = afp.getProposal();
-            if (ProposalStatus.PENDING.equals(proposal.getStatusCode())) {
+            InstitutionalProposalBoLite proposal = afp.getProposal();
+            if (!ProposalStatus.FUNDED.equals(proposal.getStatusCode())) {
                 modifiedProposals.add(proposal.getProposalNumber());
                 pendingVersions.add(afp);
             }
         }
         if (modifiedProposals.size() > 0) {
-            List<InstitutionalProposal> fundedVersions = getInstitutionalProposalService().fundInstitutionalProposals(modifiedProposals);
-            getAward().getFundingProposals().removeAll(pendingVersions);
-            for (InstitutionalProposal institutionalProposal : fundedVersions) {
-                AwardFundingProposal awardFundingProposal = new AwardFundingProposal(getAward(), institutionalProposal);
-                getAward().getFundingProposals().add(awardFundingProposal);
-            }
+            getInstitutionalProposalService().fundInstitutionalProposals(modifiedProposals);
+            getAward().refreshReferenceObject("fundingProposals");
         }
     }
 
-    /**
-     * @see org.kuali.kra.document.ResearchDocumentBase#getAllRolePersons()
-     */
-    @Override
-    protected List<RolePersons> getAllRolePersons() {
-        KraAuthorizationService awardAuthService = 
-               (KraAuthorizationService) getKraAuthorizationService(); 
-        return awardAuthService.getAllRolePersons(getAward());
-    }
-    
     @SuppressWarnings("unchecked")
     private void addAwardPersonUnitsCollection(List managedLists, Award award) {
         List<AwardPersonUnit> personUnits = new ArrayList<AwardPersonUnit>();
@@ -382,16 +375,6 @@ public class AwardDocument extends BudgetParentDocument<Award> implements  Copya
     
     protected KraAuthorizationService getKraAuthorizationService(){
         return (KraAuthorizationService) KraServiceLocator.getService(KraAuthorizationService.class);
-    }
-    
-    /**
-     * This method populates the customAttributes for this document.
-     */
-    @Override
-    public void populateCustomAttributes() {
-        AwardCustomAttributeService awardCustomAttributeService = KraServiceLocator.getService(AwardCustomAttributeService.class);
-        Map<String, CustomAttributeDocument> customAttributeDocuments = awardCustomAttributeService.getDefaultAwardCustomAttributeDocuments();
-        setCustomAttributeDocuments(customAttributeDocuments);
     }
     
     /**
@@ -555,8 +538,12 @@ public class AwardDocument extends BudgetParentDocument<Award> implements  Copya
     @Override
     public String getCustomLockDescriptor(Person user) {
         String activeLockRegion = (String) GlobalVariables.getUserSession().retrieveObject(KraAuthorizationConstants.ACTIVE_LOCK_REGION);
+        String updatedTimestamp = "";
+        if (this.getUpdateTimestamp() != null) {
+            updatedTimestamp = (new SimpleDateFormat("MM/dd/yyyy KK:mm a").format(this.getUpdateTimestamp()));
+        }
         if (StringUtils.isNotEmpty(activeLockRegion)) {
-            return this.getDocumentNumber() + "-" + activeLockRegion; 
+            return this.getAward().getAwardNumber() + "-" + activeLockRegion + "-" + GlobalVariables.getUserSession().getPrincipalName() + "-" + updatedTimestamp;  
         }
 
         return null;
@@ -636,6 +623,9 @@ public class AwardDocument extends BudgetParentDocument<Award> implements  Copya
         for (AwardFundingProposal awardFundingProposal : this.getAward().getFundingProposals()) {
             proposalsToUpdate.add(awardFundingProposal.getProposal().getProposalNumber());
         }
+        //remove any funding proposals for this award
+        KraServiceLocator.getService(BusinessObjectService.class).delete(getAward().getFundingProposals());
+        getAward().getFundingProposals().clear();
         
         getInstitutionalProposalService().defundInstitutionalProposals(proposalsToUpdate, 
                 this.getAward().getAwardNumber(), this.getAward().getSequenceNumber());
@@ -666,8 +656,7 @@ public class AwardDocument extends BudgetParentDocument<Award> implements  Copya
              */
             if (getDocumentHeader().getWorkflowDocument().isFinal() 
                     || getDocumentHeader().getWorkflowDocument().isProcessed()
-                    || getDocumentHeader().getWorkflowDocument().isCompletionRequested()
-                    || getDocumentHeader().getWorkflowDocument().isApprovalRequested()) {
+                    || KraServiceLocator.getService(KraWorkflowService.class).hasPendingApprovalRequests(getDocumentHeader().getWorkflowDocument())) {
                 isComplete = true;
             } else if (!getAward().getSyncChanges().isEmpty() && getAward().getSyncStatuses().size() > 1) {
                 //if we are doing a sync(sync changes is not empty) and we have a sync status for an award
@@ -705,13 +694,51 @@ public class AwardDocument extends BudgetParentDocument<Award> implements  Copya
     }
     
     public void populateContextQualifiers(Map<String, String> qualifiers) {
-        qualifiers.put("namespaceCode", Constants.MODULE_NAMESPACE_AWARD);
-        qualifiers.put("name", KcKrmsConstants.Award.AWARD_CONTEXT);
+        qualifiers.put("namespaceCode", getNamespace());
+        qualifiers.put("name", getRuleContextName());
     }
     
     public void addFacts(Facts.Builder factsBuilder) {
-        AwardFactBuilderService fbService = KraServiceLocator.getService(AwardFactBuilderService.class);
+        KcKrmsFactBuilderService fbService = KraServiceLocator.getService("awardFactBuilderService");
         fbService.addFacts(factsBuilder, this);
     }
 
+    public String getRuleContextName() {
+        return KcKrmsConstants.Award.AWARD_CONTEXT;
+    }
+
+    @Override
+    public void populateAgendaQualifiers(Map<String, String> qualifiers) {
+        qualifiers.put(KcKrmsConstants.UNIT_NUMBER, getLeadUnitNumber());
+    }
+    
+    public String buildForwardUrl() {
+        ResearchDocumentService researchDocumentService = KraServiceLocator.getService(ResearchDocumentService.class);
+        String forward = researchDocumentService.getDocHandlerUrl(getDocumentNumber());
+        forward = forward.replaceFirst(DEFAULT_TAB, ALTERNATE_OPEN_TAB);
+        if (forward.indexOf("?") == -1) {
+            forward += "?";
+        }
+        else {
+            forward += "&";
+        }
+        forward += KewApiConstants.DOCUMENT_ID_PARAMETER + "=" + documentNumber;
+        forward += "&" + KewApiConstants.COMMAND_PARAMETER + "=" + NotificationConstants.NOTIFICATION_DETAIL_VIEWS.DOC_SEARCH_VIEW;
+        if (GlobalVariables.getUserSession().isBackdoorInUse()) {
+            forward += "&" + KewApiConstants.BACKDOOR_ID_PARAMETER + "=" + GlobalVariables.getUserSession().getPrincipalName();
+        }
+        
+        String returnVal = "<a href=\"" + forward + "\"target=\"_blank\">" + documentNumber + "</a>";
+        return returnVal;
+    }
+
+    @Override
+    public List<? extends DocumentCustomData> getDocumentCustomData() {
+        return getAward().getAwardCustomDataList();
+    }
+
+    public boolean isCanceled() {
+        WorkflowDocument workflow = getDocumentHeader().getWorkflowDocument();
+        return workflow.isCanceled();
+    }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,17 @@
  */
 package org.kuali.kra.coi.actions;
 
+import java.util.List;
+
+import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.kuali.kra.coi.CoiDisclosure;
 import org.kuali.kra.coi.CoiDisclosureDocument;
 import org.kuali.kra.coi.CoiDisclosureForm;
-import org.kuali.kra.coi.certification.SubmitDisclosureAction;
+import org.kuali.kra.coi.CoiDispositionStatus;
 import org.kuali.kra.coi.CoiUserRole;
+import org.kuali.kra.coi.certification.SubmitDisclosureAction;
 import org.kuali.rice.kew.api.exception.WorkflowException;
 
 /**
@@ -41,17 +45,21 @@ public interface CoiDisclosureActionService {
     
     /**
      * This method adds a coi reviewer to the disclosure
+     * @param mapping
+     * @param form
      * @param coiDisclosure
      * @param coiUserRole
      */
-    void addCoiUserRole(CoiDisclosure coiDisclosure, CoiUserRole coiUserRole);
+    ActionForward addCoiUserRole(ActionMapping mapping, ActionForm form, CoiDisclosure coiDisclosure, CoiUserRole coiUserRole);
     
     /**
      * This method removes a coi reviewer from the disclosure
+     * @param mapping
+     * @param form
      * @param coiDisclosure
      * @param index
      */
-    void deleteCoiUserRole(CoiDisclosure coiDisclosure, int index);
+    ActionForward deleteCoiUserRole(ActionMapping mapping, ActionForm form, CoiDisclosure coiDisclosure, int index);
 
     /**
      * This method submits a disclosure to workflow
@@ -66,6 +74,21 @@ public interface CoiDisclosureActionService {
 
     void disapproveDisclosure(CoiDisclosure coiDisclosure, String coiDispositionCode) throws WorkflowException, Exception;
 
-    void setStatus(CoiDisclosure coiDisclosure, String coiDispositionCode);
-
+    public void tagUserRolesToCompleteReview(List<CoiUserRole> completeUserRoles);
+    
+    public void completeCoiReview(CoiDisclosure disclosure);
+    
+    public void updateDisclosureReviewStatus(CoiDisclosure coiDisclosure);
+    
+    /**
+     * This method is to check whether all reviewers have completed their review
+     * @param completeUserRoles
+     * @return
+     */
+    public boolean isDisclosureReviewComplete(List<CoiUserRole> completeUserRoles);
+    
+    public void updateCoiDisclProjectStatus(CoiDisclosure coiDisclosure, String disclosureStatus);
+    
+    public void updateCoiDisclProjectDisposition(CoiDisclosure coiDisclosure, String dispositionStatus);
+    
 }

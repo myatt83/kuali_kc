@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-    Copyright 2005-2010 The Kuali Foundation.
+    Copyright 2005-2013 The Kuali Foundation.
 
     Licensed under the Educational Community License, Version 1.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -39,6 +39,10 @@
     <bean id="budgetCalculationService" class="org.kuali.rice.krad.config.GlobalResourceLoaderServiceFactoryBean">
         <property name="serviceName" value="budgetCalculationService" />
     </bean>
+    
+    <bean id="budgetSubAwardService" class="org.kuali.rice.krad.config.GlobalResourceLoaderServiceFactoryBean">
+        <property name="serviceName" value="budgetSubAwardService" />
+    </bean>    
                      
     <bean id="kraWorkflowService" class="org.kuali.rice.krad.config.GlobalResourceLoaderServiceFactoryBean">
         <property name="serviceName" value="kraWorkflowService" />
@@ -49,6 +53,10 @@
         <property name="documentService" ref="documentService" />
         <property name="parameterService" ref="parameterService" />
         <property name="budgetCalculationService" ref="budgetCalculationService" />
+        <property name="budgetSubAwardService" ref="budgetSubAwardService" />
+    </bean>
+    
+    <bean id="proposalBudgetNumberOfMonthsService" class="org.kuali.kra.proposaldevelopment.budget.service.impl.ProposalBudgetNumberOfMonthsServiceImpl" >
     </bean>
     
     <bean id="proposalStateService" class="org.kuali.kra.proposaldevelopment.service.impl.ProposalStateServiceImpl">
@@ -83,7 +91,9 @@
                     <property name="taskName" value="modifyProposalBudgetRates" />
                     <property name="requiresWritableDoc" value="true" />
                 </bean>
-                
+                <bean class="org.kuali.kra.proposaldevelopment.budget.document.authorizer.ProposalHierarchyBudgetAuthorizer" parent="parentBudgetAuthorizer">
+                    <property name="taskName" value="maintainProposalHierarchy" />
+                </bean>                                
                  <bean class="org.kuali.kra.proposaldevelopment.budget.document.authorizer.ViewProposalBudgetPersonSalaryAuthorizer" parent="parentBudgetAuthorizer">
                     <property name="taskName" value="viewPropPersonInstSalaries" />
                     <property name="requiresWritableDoc" value="true" />

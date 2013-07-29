@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-    Copyright 2005-2010 The Kuali Foundation.
+    Copyright 2005-2013 The Kuali Foundation.
 
     Licensed under the Educational Community License, Version 1.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -39,6 +39,7 @@
     <import resource="classpath:org/kuali/rice/core/RiceJTASpringBeans.xml" />
     <import resource="classpath:org/kuali/kra/KC-RiceDataSourceSpringBeans.xml" />
     <import resource="classpath:org/kuali/kra/core/CommonSpringBeans.xml" />
+    <util:constant id="kc.integrationServiceNamespace" static-field="org.kuali.kra.infrastructure.Constants.FINANCIAL_INTEGRATION_KC_SERVICE_NAMESPACE"/>
     
     <bean id="awardModule" class="org.kuali.rice.krad.service.impl.ModuleServiceBase">
         <property name="moduleConfiguration" ref="awardModuleConfiguration"/>
@@ -199,6 +200,10 @@
     <bean id="xmlObjectSerializerService" class="org.kuali.rice.krad.config.GlobalResourceLoaderServiceFactoryBean">
         <property name="serviceName" value="xmlObjectSerializerService" />
     </bean>
+
+    <bean id="versionHistoryLookupDao" class="org.kuali.rice.krad.config.GlobalResourceLoaderServiceFactoryBean">
+        <property name="serviceName" value="versionHistoryLookupDao" />
+    </bean>
     
     <bean id="parentLookupableHelperService" abstract="true">
         <property name="persistenceStructureService" ref="persistenceStructureService" />
@@ -226,11 +231,15 @@
     <bean id="awardLookupable" class="org.kuali.rice.kns.lookup.KualiLookupableImpl" scope="prototype">
         <property name="lookupableHelperService" ref="awardLookupableHelperService" />  
     </bean>
+
+    <bean id="awardLookupDao" parent="platformAwareDao" class="org.kuali.kra.dao.ojb.AwardLookupDaoOjb">
+    	<property name="versionHistoryLookupDao" ref="versionHistoryLookupDao" /> 
+    </bean>
     
     <bean id="awardLookupableHelperService" class="org.kuali.kra.award.lookup.AwardLookupableHelperServiceImpl" parent="parentLookupableHelperService" 
           scope="prototype">
         <property name="kcPersonService" ref="kcPersonService" /> 
-        <property name="versionHistoryService" ref="versionHistoryService" />
+        <property name="awardLookupDao" ref="awardLookupDao" />
     </bean>
     
     <bean id="awardPersonLookupable" class="org.kuali.rice.kns.lookup.KualiLookupableImpl" scope="prototype">
@@ -249,31 +258,30 @@
     <bean id="awardTemplateLookupableHelperServiceImpl" class="org.kuali.kra.award.lookup.AwardTemplateLookupableHelperServiceImpl" 
           parent="parentLookupableHelperService" scope="prototype" />
           
+   <!-- Exposing the award account service as a SOAP service and as a java service -->
     <bean id="awardAccountService" class="org.kuali.kra.external.award.impl.AwardAccountServiceImpl">
         <property name="businessObjectService" ref="businessObjectService" />
         <property name="parameterService" ref="parameterService" />
     </bean>
-    <bean id="awardAccountServiceJavaExporter" class="org.kuali.rice.ksb.api.bus.support.ServiceBusExporter">
+   <bean id="awardAccountServiceJavaExporter" class="org.kuali.rice.ksb.api.bus.support.ServiceBusExporter">
         <property name="serviceDefinition">
-            <bean class="org.kuali.rice.ksb.api.bus.support.JavaServiceDefinition">
-                <property name="service" ref="awardAccountService" />
-                <property name="serviceNameSpaceURI" value="KC" />
-                <property name="localServiceName" value="awardAccountService" />
-                <property name="serviceInterface" value="org.kuali.kra.external.award.AwardAccountService" />
-                <property name="busSecurity" value="false" />
-                <property name="retryAttempts" value="1" />
-            </bean>
+            <bean class="org.kuali.rice.ksb.api.bus.support.JavaServiceDefinition"
+                p:service-ref="awardAccountService"
+                p:serviceNameSpaceURI-ref="kc.integrationServiceNamespace"
+                p:localServiceName="awardAccountService"
+                p:serviceInterface="org.kuali.kra.external.award.AwardAccountService"
+                p:busSecurity="${fin.system.integration.bus.security.on}"
+                p:retryAttempts="1" />
         </property>
     </bean>
     <bean id="awardAccountServiceSoapExporter" class="org.kuali.rice.ksb.api.bus.support.ServiceBusExporter">
         <property name="serviceDefinition">
-            <bean class="org.kuali.rice.ksb.api.bus.support.SoapServiceDefinition">
-                <property name="service" ref="awardAccountService" />
-                <property name="serviceNameSpaceURI" value="KC" />
-                <property name="localServiceName" value="awardAccountSoapService" />
-                <property name="busSecurity" value="false" />
-                <property name="jaxWsService" value="true" />
-            </bean>
+            <bean class="org.kuali.rice.ksb.api.bus.support.SoapServiceDefinition"
+                p:service-ref="awardAccountService"
+                p:serviceNameSpaceURI-ref="kc.integrationServiceNamespace"
+                p:localServiceName="awardAccountSoapService"
+                p:busSecurity="${fin.system.integration.bus.security.on}"
+                p:jaxWsService="true" />      
         </property>
     </bean>
     
@@ -282,9 +290,10 @@
         <property name="unitService" ref="unitService"/>
     </bean>
    
-    <bean class="org.kuali.rice.ksb.api.bus.support.CallbackServiceExporter" p:serviceBus-ref="kc.import.serviceBus" 
-		p:callbackService-ref="awardAllUnitAdministratorDerivedRoleTypeService" p:localServiceName="awardAllUnitAdministratorDerivedRoleTypeService" 
-		p:serviceInterface="org.kuali.rice.kim.framework.role.RoleTypeService" p:serviceNameSpaceURI="" />
+    <bean id= "awardAllUnitAdministratorDerivedRoleTypeServiceCallback" parent="kcCallbackService" 
+		p:callbackService-ref="awardAllUnitAdministratorDerivedRoleTypeService" 
+		p:localServiceName="awardAllUnitAdministratorDerivedRoleTypeService" 
+		p:serviceInterface="org.kuali.rice.kim.framework.role.RoleTypeService"/>
     
     <bean id="awardAmountInfoService" class="org.kuali.kra.award.AwardAmountInfoServiceImpl">   
         <property name="businessObjectService" ref="businessObjectService" />
@@ -299,11 +308,7 @@
     <bean id="awardCommentService" class="org.kuali.kra.service.impl.AwardCommentServiceImpl">
         <property name="businessObjectService" ref="businessObjectService" />
     </bean>
-    
-    <bean id="awardCustomAttributeService" class="org.kuali.kra.service.impl.AwardCustomAttributeServiceImpl">
-        <property name="businessObjectService" ref="businessObjectService" />
-    </bean>
-    
+        
     <bean id="awardDirectFandADistributionService" class="org.kuali.kra.service.impl.AwardDirectFandADistributionServiceImpl" />
     
     <bean id="awardFandaRateService" class="org.kuali.kra.award.commitments.AwardFandaRateServiceImpl">
@@ -337,9 +342,9 @@
         <property name="awardService" ref="awardService"/>
     </bean>
     
-    <bean class="org.kuali.rice.ksb.api.bus.support.CallbackServiceExporter" p:serviceBus-ref="kc.import.serviceBus" 
+    <bean id="awardInvestigatorsRoleTypeServiceCallback" parent="kcCallbackService"
 		p:callbackService-ref="awardInvestigatorsRoleTypeService" p:localServiceName="awardInvestigatorsRoleTypeService" 
-		p:serviceInterface="org.kuali.rice.kim.framework.role.RoleTypeService" p:serviceNameSpaceURI="" />
+		p:serviceInterface="org.kuali.rice.kim.framework.role.RoleTypeService"/>
     
     <bean id="awardLockService" class="org.kuali.kra.award.AwardLockServiceImpl">
         <property name="businessObjectService" ref="businessObjectService" />
@@ -641,6 +646,7 @@
         <property name="awardSyncHelpersService" ref="awardSyncHelpersService"/>
         <property name="pessimisticLockService" ref="awardLockService" />
         <property name="kraWorkflowService" ref="kraWorkflowService"/>
+        <property name="kraAuthorizationService" ref="kraAuthorizationService"/>
         <property name="syncExecutor">
             <!-- 
                 Leaving this as an executor, but care should be taken before making this a concurrent executor as database synchronization bugs still exist
@@ -707,6 +713,32 @@
         <property name="dateTimeService" ref="dateTimeService" />
     </bean>
     
+     <!-- Exposing the CFDA number service as a Java service and SOAP service -->
+    <bean id="cfdaNumberService" class="org.kuali.kra.external.Cfda.service.impl.CfdaNumberServiceImpl">
+        <property name="businessObjectService" ref="businessObjectService" />
+    </bean>
+    <bean id="cfdaNumberServiceJavaExporter" class="org.kuali.rice.ksb.api.bus.support.ServiceBusExporter">
+        <property name="serviceDefinition">
+            <bean class="org.kuali.rice.ksb.api.bus.support.JavaServiceDefinition"
+                p:service-ref="cfdaNumberService" 
+                p:serviceNameSpaceURI-ref="kc.integrationServiceNamespace"
+                p:localServiceName="cfdaNumberService"
+                p:serviceInterface="org.kuali.kra.external.Cfda.service.CfdaNumberService"
+                p:busSecurity="${fin.system.integration.bus.security.on}"
+                p:retryAttempts="1" />
+        </property>
+    </bean>
+    <bean id="cfdaNumberServiceSoapExporter" class="org.kuali.rice.ksb.api.bus.support.ServiceBusExporter">
+        <property name="serviceDefinition">
+            <bean class="org.kuali.rice.ksb.api.bus.support.SoapServiceDefinition"
+                p:service-ref="cfdaNumberService" 
+                p:serviceNameSpaceURI-ref="kc.integrationServiceNamespace"
+                p:localServiceName="cfdaNumberSoapService" 
+                p:busSecurity="${fin.system.integration.bus.security.on}"
+                p:jaxWsService="true" />
+        </property>
+    </bean>
+    
     <!-- Quartz configuration for CFDA batch job-->
     <!-- Use JobDetail here since the MethodInvokingJobDetailFactoryBean does not support persistent storage-->
     <bean id="cfdaBatchJobDetail" class="org.quartz.JobDetail" >
@@ -714,36 +746,15 @@
         <property name="name" value="cfdaBatchJobDetail" />
     </bean>
     
-    <bean id="cfdaNumberService" class="org.kuali.kra.external.Cfda.service.impl.CfdaNumberServiceImpl">
-        <property name="businessObjectService" ref="businessObjectService" />
-    </bean>
-    <bean id="cfdaNumberServiceJavaExporter" class="org.kuali.rice.ksb.api.bus.support.ServiceBusExporter">
-        <property name="serviceDefinition">
-            <bean class="org.kuali.rice.ksb.api.bus.support.JavaServiceDefinition">
-                <property name="service" ref="cfdaNumberService" />
-                <property name="serviceNameSpaceURI" value="KC" />
-                <property name="localServiceName" value="cfdaNumberService" />
-                <property name="serviceInterface" value="org.kuali.kra.external.Cfda.service.CfdaNumberService" />
-                <property name="busSecurity" value="false" />
-                <property name="retryAttempts" value="1" />
-            </bean>
-        </property>
-    </bean>
-    <bean id="cfdaNumberServiceSoapExporter" class="org.kuali.rice.ksb.api.bus.support.ServiceBusExporter">
-        <property name="serviceDefinition">
-            <bean class="org.kuali.rice.ksb.api.bus.support.SoapServiceDefinition">
-                <property name="service" ref="cfdaNumberService" />
-                <property name="serviceNameSpaceURI" value="KC" />
-                <property name="localServiceName" value="cfdaNumberSoapService" />
-                <property name="busSecurity" value="false" />
-                <property name="jaxWsService" value="true" />
-            </bean>
-        </property>
-    </bean>
-    
-    <bean id="cfdaTrigger" class="org.kuali.kra.external.Cfda.CfdaCronTrigger">
+    <bean id="cfdaTrigger" class="org.kuali.kra.scheduling.quartz.KcCronTriggerBean">
         <property name="jobDetail" ref="cfdaBatchJobDetail" />
-        <property name="parameterService" ref="parameterService" />
+        <property name="parameterService" ref="parameterService" />    
+        <property name="dateTimeService" ref="dateTimeService" />
+        <property name="cronExpressionParameterName" value="CFDA_BATCH_JOB_CRON_EXPRESSION" />
+        <property name="triggerEnabledParameterName" value="FIN_SYSTEM_INTEGRATION_ON" />
+        <property name="startTimeParameterName" value="CFDA_BATCH_JOB_CRON_START_TIME" />
+        <property name="parameterNamespace" value="KC-AWARD" />
+        <property name="parameterComponent" value="Document" />
     </bean>
 
     <bean id="schedulerFactory" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
@@ -818,7 +829,10 @@
                 </bean>                
                 <bean class="org.kuali.kra.award.document.authorizer.MaintainAwardReportTrackingAuthorizer" parent="parentAwardAuthorizer">
                     <property name="taskName" value="maintainReportTracking" />
-                </bean>              
+                </bean>    
+                <bean class="org.kuali.kra.award.document.authorizer.CreateAwardAccountAuthorizer" parent="parentAwardAuthorizer">
+                    <property name="taskName" value="createAwardAccount" />
+                </bean>          
             </list>
          </property>
      </bean>
@@ -1054,7 +1068,19 @@
 	
 	<bean id="awardFactBuilderService" class="org.kuali.kra.award.AwardFactBuilderServiceImpl">
         <property name="documentService" ref="documentService" />
+    </bean>
+    
+    
+    <bean id="awardSubcontractingGoalsExpendituresService" class="org.kuali.kra.award.subcontracting.goalsAndExpenditures.AwardSubcontractingGoalsExpendituresServiceImpl">
         <property name="businessObjectService" ref="businessObjectService" />
+    </bean>
+    
+    <bean id ="subcontractingExpenditureCategoryService" class="org.kuali.kra.award.subcontracting.reporting.SubcontractingExpenditureCategoryServiceImpl">
+    	<property name="detailsDao" ref="subcontractingExpenditureCategoryDetailsDao" />
+    	<property name="businessObjectService" ref="businessObjectService" />
+    </bean>
+    
+    <bean id ="subcontractingExpenditureCategoryDetailsDao" parent="platformAwareDao" class="org.kuali.kra.award.subcontracting.reporting.dao.SubcontractingExpenditureCategoryDetailsDaoOjb">
     </bean>
     
 </beans>

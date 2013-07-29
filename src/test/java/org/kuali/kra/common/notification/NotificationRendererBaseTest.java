@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,10 +74,11 @@ public class NotificationRendererBaseTest extends KcUnitTestBase {
         NotificationRendererBase renderer = new NotificationRendererBase() {};
         Map<String, String> nameValueMap = renderer.getDefaultReplacementParameters();
         
-        assertEquals(2, nameValueMap.size());
+        assertEquals(3, nameValueMap.size());
         assertEquals(USER_FULLNAME_VAL, nameValueMap.get(NotificationRendererBase.USER_FULLNAME));
         // not testing actual value of the application URL since that would make this test quite fragile
         assertTrue(nameValueMap.containsKey(NotificationRendererBase.DOCHANDLER_PREFIX));
+        assertTrue(nameValueMap.containsKey(NotificationRendererBase.APP_LINK_PREFIX));
     }
     
 }

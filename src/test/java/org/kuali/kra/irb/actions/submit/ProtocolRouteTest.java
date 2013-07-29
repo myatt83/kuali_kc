@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -129,7 +129,7 @@ public class ProtocolRouteTest extends KcUnitTestBase {
         assertTrue(getWorkflowDocument(protocolDocument).isDisapproved());
         //assertEquals(protocolDocument.getProtocol().getProtocolStatusCode(), ProtocolStatus.DISAPPROVED);
         
-        assertTrue(protocolDocument.getProtocol().isActive());
+        //assertTrue(protocolDocument.getProtocol().isActive());
         
         //verifyProtocolAction(protocolDocument.getProtocol().getProtocolId(), ProtocolActionType.DISAPPROVED);
     }
@@ -180,8 +180,9 @@ public class ProtocolRouteTest extends KcUnitTestBase {
     /**
      * Verfy that the protocol has the given protocol action.
      */
+    @SuppressWarnings("unchecked")
     private void verifyProtocolAction(Protocol protocol, String actionTypeCode) {
-        List<ProtocolAction> actions = protocol.getProtocolActions();
+        List<ProtocolAction> actions = (List)protocol.getProtocolActions();
         for (ProtocolAction action : actions) {
             if (StringUtils.equals(actionTypeCode, action.getProtocolActionTypeCode())) {
                 return;

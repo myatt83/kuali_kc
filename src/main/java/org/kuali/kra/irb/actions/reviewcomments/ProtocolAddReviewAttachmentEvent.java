@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,50 +17,21 @@ package org.kuali.kra.irb.actions.reviewcomments;
 
 import org.kuali.kra.irb.ProtocolDocument;
 import org.kuali.kra.irb.onlinereview.ProtocolReviewAttachment;
-import org.kuali.kra.rule.BusinessRuleInterface;
-import org.kuali.kra.rule.event.KraDocumentEventBaseExtension;
+import org.kuali.kra.protocol.actions.reviewcomments.ProtocolAddReviewAttachmentEventBase;
 
 /**
  * 
  * This class is validate the new review attachment when 'add' is clicked
  */
-public class ProtocolAddReviewAttachmentEvent extends KraDocumentEventBaseExtension {
-    
-    // TODO : technically, this can be refactored to share with ProtocolAddReviewCommentEvent/rule
-    // Since, we are waiting for KRMS, so probably just live with this for now.
-    private String propertyName;
-    private ProtocolReviewAttachment reviewAttachment;
+@SuppressWarnings("unchecked")
+public class ProtocolAddReviewAttachmentEvent extends ProtocolAddReviewAttachmentEventBase<ProtocolReviewAttachment> {
 
-    /**
-     * Constructs a ProtocolAddReviewAttachmentEvent.
-     * 
-     * @param document The document to validate
-     * @param propertyName The error path property prefix
-     * @param reviewAttachment The added Reviewer Attachment
-     */
     public ProtocolAddReviewAttachmentEvent(ProtocolDocument document, String propertyName, ProtocolReviewAttachment reviewAttachment) {
-        super("Enter reviewer attachment", "", document);
-        this.propertyName = propertyName;
-        this.reviewAttachment = reviewAttachment;
-    }
-    
-    public ProtocolDocument getProtocolDocument() {
-        return (ProtocolDocument) getDocument();
-    }
-    
-    public String getPropertyName() {
-        return propertyName;
-    }
-    
-    public ProtocolReviewAttachment getReviewAttachment() {
-        return reviewAttachment;
+        super(document, propertyName, reviewAttachment);
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public BusinessRuleInterface getRule() {
+    protected ProtocolAddReviewAttachmentRule getNewProtocolAddReviewAttachmentRuleInstancehook() {
         return new ProtocolAddReviewAttachmentRule();
     }
-
-
 }

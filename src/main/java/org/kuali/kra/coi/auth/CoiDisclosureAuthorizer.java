@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -104,5 +104,17 @@ public abstract class CoiDisclosureAuthorizer extends TaskAuthorizerImpl {
                 && !kraWorkflowService.isInWorkflow(coiDisclosure.getCoiDisclosureDocument())
                 && !coiDisclosure.isApprovedDisclosure();
     }
+    
+    protected boolean isEditableByAdminReviewer(CoiDisclosure coiDisclosure) {
+        return (coiDisclosure != null)
+        && !coiDisclosure.getCoiDisclosureDocument().isViewOnly()
+        && !isPessimisticLocked(coiDisclosure.getCoiDisclosureDocument())
+        && !coiDisclosure.isApprovedDisclosure()
+        && !coiDisclosure.isDisapprovedDisclosure();
+    }    
+    
+    protected boolean isDocumentViewOnly(CoiDisclosure coiDisclosure) {
+        return coiDisclosure.getCoiDisclosureDocument().isViewOnly();
+    }    
 
 }

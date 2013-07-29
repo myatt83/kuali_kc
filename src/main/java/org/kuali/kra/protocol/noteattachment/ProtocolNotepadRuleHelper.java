@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import org.kuali.rice.kns.service.DictionaryValidationService;
 import org.kuali.rice.kns.service.KNSServiceLocator;
 
 /**
- * This class contains methods to "help" in validating {@link ProtocolNotepad ProtocolNotepad}.
+ * This class contains methods to "help" in validating {@link ProtocolNotepadBase ProtocolNotepadBase}.
  */
 class ProtocolNotepadRuleHelper {
 
@@ -75,7 +75,7 @@ class ProtocolNotepadRuleHelper {
      * 
      * @return true if valid.
      */
-    boolean validPrimitiveFields(final ProtocolNotepad notepad) {
+    boolean validPrimitiveFields(final ProtocolNotepadBase notepad) {
         return this.validationService.isBusinessObjectValid(notepad, this.propertyPrefix);
     }
 }

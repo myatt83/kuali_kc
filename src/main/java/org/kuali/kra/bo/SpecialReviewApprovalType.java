@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ public class SpecialReviewApprovalType extends KraPersistableBusinessObjectBase 
      */
     public static final String PENDING = "1";
     public static final String APPROVED = "2";
+    public static final String NOT_YET_APPLIED = "3";
     public static final String EXEMPT = "4";
 
     /**

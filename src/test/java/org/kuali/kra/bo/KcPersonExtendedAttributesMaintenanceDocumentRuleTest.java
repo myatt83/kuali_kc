@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,10 @@ import org.kuali.kra.maintenance.MaintenanceRuleTestBase;
 import org.kuali.kra.rules.KcPersonExtendedAttributesMaintenanceDocumentRule;
 import org.kuali.rice.core.api.util.RiceKeyConstants;
 import org.kuali.rice.kns.document.MaintenanceDocument;
+import org.kuali.rice.kns.maintenance.KualiMaintainableImpl;
 import org.kuali.rice.krad.UserSession;
+import org.kuali.rice.krad.bo.PersistableBusinessObject;
+import org.kuali.rice.krad.maintenance.MaintainableImpl;
 import org.kuali.rice.krad.util.ErrorMessage;
 import org.kuali.rice.krad.util.GlobalVariables;
 import org.kuali.rice.krad.util.KRADConstants;
@@ -54,6 +57,16 @@ public class KcPersonExtendedAttributesMaintenanceDocumentRuleTest extends Maint
         assertEquals(0, eMap.getErrorCount());
         assertTrue(rule.processSaveDocument(kcPesonExtendedAttribuesDocument));
         assertEquals(0, eMap.getErrorCount());
+    }
+    
+    protected MaintainableImpl getNewMaintainableImpl(PersistableBusinessObject bo) {
+        if (bo == null) {
+            return new KcPersonExtendedAttributesMaintainableImpl();
+        } else {
+            MaintainableImpl result = new KcPersonExtendedAttributesMaintainableImpl();
+            result.setDataObject(bo);
+            return result;
+        }
     }
 
     @Test

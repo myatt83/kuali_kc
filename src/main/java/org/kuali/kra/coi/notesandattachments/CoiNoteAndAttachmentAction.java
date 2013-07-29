@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,10 +31,11 @@ import org.kuali.kra.coi.service.CoiPrintingService;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.KeyConstants;
 import org.kuali.kra.infrastructure.KraServiceLocator;
-import org.kuali.kra.irb.noteattachment.ProtocolAttachmentBase;
+// import org.kuali.kra.irb.noteattachment.ProtocolAttachmentBase;
 import org.kuali.kra.irb.noteattachment.ProtocolAttachmentProtocol;
 import org.kuali.kra.printing.Printable;
 import org.kuali.kra.printing.service.WatermarkService;
+import org.kuali.kra.protocol.noteattachment.ProtocolAttachmentBase;
 import org.kuali.kra.util.watermark.WatermarkConstants;
 import org.kuali.kra.web.struts.action.StrutsConfirmation;
 import org.kuali.rice.kns.service.DictionaryValidationService;
@@ -64,10 +65,7 @@ public class CoiNoteAndAttachmentAction extends CoiAction {
     
     public ActionForward addAttachmentCoi(ActionMapping mapping, ActionForm form, HttpServletRequest request,
             HttpServletResponse response) throws Exception {
-        CoiNotesAndAttachmentsHelper helper = ((CoiDisclosureForm) form).getCoiNotesAndAttachmentsHelper();
-
-        helper.addNewCoiDisclosureAttachment();
-
+        ((CoiDisclosureForm) form).getCoiNotesAndAttachmentsHelper().addNewCoiDisclosureAttachment();
         return mapping.findForward(Constants.MAPPING_BASIC);
     }
     
@@ -145,12 +143,12 @@ public class CoiNoteAndAttachmentAction extends CoiAction {
         final AttachmentFile file = attachment.getFile();
         byte[] attachmentFile = null;
         String attachmentFileType = file.getType().replace("\"", "");
-        if (attachmentFileType.equalsIgnoreCase(WatermarkConstants.ATTACHMENT_TYPE_PDF)){
-            attachmentFile = getCoiDisclosureAttachmentFile(form,attachment);
-            if (attachmentFile != null){
-                this.streamToResponse(attachmentFile, getValidHeaderString(file.getName()),  getValidHeaderString(file.getType()), response);}
-            return RESPONSE_ALREADY_HANDLED;
-        }        
+//        if (attachmentFileType.equalsIgnoreCase(WatermarkConstants.ATTACHMENT_TYPE_PDF)){
+//            attachmentFile = getCoiDisclosureAttachmentFile(form,attachment);
+//            if (attachmentFile != null){
+//                this.streamToResponse(attachmentFile, getValidHeaderString(file.getName()),  getValidHeaderString(file.getType()), response);}
+//            return RESPONSE_ALREADY_HANDLED;
+//        }        
         this.streamToResponse(file.getData(), getValidHeaderString(file.getName()),  getValidHeaderString(file.getType()), response);
 
         return RESPONSE_ALREADY_HANDLED;
@@ -196,8 +194,8 @@ public class CoiNoteAndAttachmentAction extends CoiAction {
     public final ActionForward save(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
     throws Exception {
         CoiNotesAndAttachmentsHelper helper = ((CoiDisclosureForm) form).getCoiNotesAndAttachmentsHelper();        
-        helper.fixReloadedAttachments(request.getParameterMap());
         super.save(mapping, form, request, response);
+        helper.fixReloadedAttachments(request.getParameterMap());
         return mapping.findForward(Constants.MAPPING_BASIC);
 
     }
@@ -221,11 +219,46 @@ public class CoiNoteAndAttachmentAction extends CoiAction {
     
     public ActionForward addNote(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
         CoiNotesAndAttachmentsHelper helper = ((CoiDisclosureForm) form).getCoiNotesAndAttachmentsHelper();   
-        // add authorization here
         helper.addNewNote();
         helper.setManageNotesOpen();
+        helper.prepareView();
         return mapping.findForward(Constants.MAPPING_BASIC);
 
+    }
+    
+    public ActionForward editNote(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        final int selection = this.getSelectedLine(request);
+        CoiDisclosureForm disclosureForm = (CoiDisclosureForm) form;   
+        CoiNotesAndAttachmentsHelper helper = disclosureForm.getCoiNotesAndAttachmentsHelper();   
+        helper.editNote(selection);
+        return mapping.findForward(Constants.MAPPING_BASIC);
+    }
+    
+    public ActionForward deleteNote(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        CoiNotesAndAttachmentsHelper helper = ((CoiDisclosureForm) form).getCoiNotesAndAttachmentsHelper();   
+        return confirmDeleteNote(mapping, (CoiDisclosureForm) form, request, response);        
+    }
+    
+    protected ActionForward confirmDeleteNote(ActionMapping mapping, CoiDisclosureForm form, HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+        
+        final int selection = this.getSelectedLine(request);
+        final String confirmMethod = "deleteNoteConfirmed";
+        final StrutsConfirmation confirm = buildParameterizedConfirmationQuestion(mapping, form, request, response, confirmMethod, 
+                                                                                  KeyConstants.QUESTION_DELETE_NOTE_CONFIRMATION);
+        return confirm(confirm, confirmMethod, CONFIRM_NO_DELETE);
+    }
+
+    public ActionForward deleteNoteConfirmed(ActionMapping mapping, ActionForm form, HttpServletRequest request,
+            HttpServletResponse response) throws Exception {
+        
+        final int selection = this.getSelectedLine(request);
+        
+        if (!((CoiDisclosureForm)form).getCoiNotesAndAttachmentsHelper().deleteNote(selection)) {
+            //may want to tell the user the selection was invalid.
+        }
+        
+        return mapping.findForward(Constants.MAPPING_BASIC);
     }
     
     

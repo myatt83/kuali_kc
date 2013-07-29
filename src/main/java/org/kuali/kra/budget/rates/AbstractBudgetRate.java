@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -199,7 +199,6 @@ public abstract class AbstractBudgetRate extends AbstractInstituteRate implement
         int result = super.hashCode();
         result = prime * result + ((affectedBudgetPeriod == null) ? 0 : affectedBudgetPeriod.hashCode());
         result = prime * result + ((applicableRate == null) ? 0 : applicableRate.hashCode());
-        result = prime * result + ((budget == null) ? 0 : budget.hashCode());
         result = prime * result + ((budgetId == null) ? 0 : budgetId.hashCode());
         result = prime * result + ((budgetPeriod == null) ? 0 : budgetPeriod.hashCode());
         result = prime * result + (displayLocation ? 1231 : 1237);

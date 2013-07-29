@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import org.kuali.kra.authorization.ApplicationTask;
 import org.kuali.kra.authorization.KcTransactionalDocumentAuthorizerBase;
 import org.kuali.kra.budget.document.BudgetParentDocument;
 import org.kuali.kra.budget.versions.BudgetDocumentVersion;
+import org.kuali.kra.infrastructure.KeyConstants;
 import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.infrastructure.TaskName;
 import org.kuali.kra.proposaldevelopment.bo.Narrative;
@@ -158,6 +159,11 @@ public class ProposalDevelopmentDocumentAuthorizer extends KcTransactionalDocume
         if (canExecuteTask(userId, doc, TaskName.MAINTAIN_PROPOSAL_HIERARCHY)) {
             editModes.add("maintainProposalHierarchy");
         }
+        
+        if (canExecuteTask(userId, doc, TaskName.REJECT_PROPOSAL)) {
+            editModes.add(TaskName.REJECT_PROPOSAL);
+        }
+        
         setNarrativePermissions(userId, doc, editModes);
     } 
     
@@ -288,7 +294,7 @@ public class ProposalDevelopmentDocumentAuthorizer extends KcTransactionalDocume
     @Override
     public boolean canReload(Document document, Person user) {
         WorkflowDocument workflow = document.getDocumentHeader().getWorkflowDocument();
-        return canEdit(document, user) || workflow.isCanceled();
+        return canEdit(document, user) && !workflow.isInitiated() || workflow.isCanceled();
     }
     
     @Override
@@ -346,7 +352,12 @@ public class ProposalDevelopmentDocumentAuthorizer extends KcTransactionalDocume
     
     @Override
     public boolean canDeleteNoteAttachment(Document document, String attachmentTypeCode, String createdBySelfOnly, Person user) {
-        return canExecuteProposalTask(user.getPrincipalId(), (ProposalDevelopmentDocument) document, TaskName.MODIFY_PROPOSAL);
+        boolean retVal = false;
+        Boolean allowNotesDeletion = getParameterService().getParameterValueAsBoolean(ProposalDevelopmentDocument.class, KeyConstants.ALLOW_PROPOSAL_DEVELOPMENT_NOTES_DELETION); 
+        if(allowNotesDeletion != null && allowNotesDeletion) {
+            retVal = super.canDeleteNoteAttachment(document, attachmentTypeCode, createdBySelfOnly, user);
+        }
+        return retVal;
     }
     
     @Override
@@ -362,6 +373,11 @@ public class ProposalDevelopmentDocumentAuthorizer extends KcTransactionalDocume
     @Override
     public boolean canSendNoteFyi(Document document, Person user) {
         return false;
+    }
+    
+    @Override
+    public boolean canRecall(Document document, Person user) {
+        return canExecuteProposalTask(user.getPrincipalId(), (ProposalDevelopmentDocument)document, TaskName.RECALL_PROPOSAL);
     }
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,9 @@ import org.kuali.kra.award.home.Award;
 import org.kuali.kra.award.home.AwardService;
 import org.kuali.kra.bo.versioning.VersionHistory;
 import org.kuali.kra.bo.versioning.VersionStatus;
+import org.kuali.kra.infrastructure.AwardPermissionConstants;
 import org.kuali.kra.infrastructure.KraServiceLocator;
+import org.kuali.kra.service.KraAuthorizationService;
 import org.kuali.kra.service.KraWorkflowService;
 import org.kuali.kra.service.VersionHistoryService;
 import org.kuali.rice.kew.api.KewApiConstants;
@@ -70,7 +72,7 @@ public class AwardSyncServiceImpl implements AwardSyncService {
     protected static final String SYNC_FAILURE_MESSAGE = "Failed";
     protected static final String CHANGE_LOG_SUCCESS = "Success";
     
-    protected static final String IGNORED_MESSAGE_KEYS = "error.award.person.credit.split.,error.award.person.unit.credit.split.";
+    protected static final String IGNORED_MESSAGE_KEYS = "error.award.person.credit.split.,error.award.person.unit.credit.split.,error.awardProjectPerson.uncertified";
     protected final Log LOG = LogFactory.getLog(AwardSyncServiceImpl.class);
     
     private AwardSyncHelpersService awardSyncHelpersService;
@@ -87,6 +89,7 @@ public class AwardSyncServiceImpl implements AwardSyncService {
     private PersonService personService;
     private PessimisticLockService pessimisticLockService;
     private KraWorkflowService kraWorkflowService;
+    private KraAuthorizationService kraAuthorizationService;
         
     /**
      * @see org.kuali.kra.award.awardhierarchy.sync.service.AwardSyncService#validateHierarchyChanges(org.kuali.kra.award.home.Award)
@@ -510,8 +513,7 @@ public class AwardSyncServiceImpl implements AwardSyncService {
      * @return
      */
     protected boolean hasAwardPermission(AwardSyncStatus awardStatus, Award award, String principalId) {
-        Person person = getPersonService().getPerson(principalId);
-        return new AwardDocumentAuthorizer().canEdit(award.getAwardDocument(), person);
+        return getKraAuthorizationService().hasPermission(principalId, award, AwardPermissionConstants.MODIFY_AWARD.getAwardPermission());
     }
     
     /**
@@ -533,7 +535,8 @@ public class AwardSyncServiceImpl implements AwardSyncService {
         }
         String[] ignoredErrors = IGNORED_MESSAGE_KEYS.split(",");
         for (AwardSyncLog log : awardStatus.getValidationLogs()) {
-            if (!StringUtils.startsWithAny(log.getMessageKey(), ignoredErrors)) {
+            if (!StringUtils.startsWithAny(log.getMessageKey(), ignoredErrors)
+                    && !log.isSuccess()) {
                 result = false;
             } else {
                 log.setSuccess(true);
@@ -1035,6 +1038,14 @@ public class AwardSyncServiceImpl implements AwardSyncService {
 
     public void setAwardSyncUtilityService(AwardSyncUtilityService awardSyncUtilityService) {
         this.awardSyncUtilityService = awardSyncUtilityService;
+    }
+
+    protected KraAuthorizationService getKraAuthorizationService() {
+        return kraAuthorizationService;
+    }
+
+    public void setKraAuthorizationService(KraAuthorizationService kraAuthorizationService) {
+        this.kraAuthorizationService = kraAuthorizationService;
     }
 }
 

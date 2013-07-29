@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,4 +46,12 @@ public interface ProposalPersonService {
      * @return divisionName based on the 4th level node on the Unit hierarchy.
      */
     public String getProposalPersonDivisionName(ProposalPerson proposalPerson);
+    
+    /**
+     * 
+     * This method will be used by person.tag to rebuild the state select list after a country has been changed.
+     * @param countryCode
+     * @return
+     */
+    public String getNewStateList(String countryCode);
 }

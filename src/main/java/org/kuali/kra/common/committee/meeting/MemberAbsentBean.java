@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,13 +25,13 @@ import java.io.Serializable;
 public class MemberAbsentBean implements Serializable, Comparable<MemberAbsentBean> {
 
     private static final long serialVersionUID = -5220883072192174587L;
-    private CommitteeScheduleAttendance attendance;
+    private CommitteeScheduleAttendanceBase attendance;
 
-    public CommitteeScheduleAttendance getAttendance() {
+    public CommitteeScheduleAttendanceBase getAttendance() {
         return attendance;
     }
 
-    public void setAttendance(CommitteeScheduleAttendance attendance) {
+    public void setAttendance(CommitteeScheduleAttendanceBase attendance) {
         this.attendance = attendance;
     }
 

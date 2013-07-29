@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,19 +21,19 @@ public interface BatchCorrespondenceDetailService {
 
     /**
      * 
-     * This method add a BatchCorrespondenceDetail to the BatchCorrespondence.
+     * This method add a BatchCorrespondenceDetailBase to the BatchCorrespondenceBase.
      * @param batchCorrespondence
      * @param newBatchCorrespondenceDetail
      */
-    void addBatchCorrespondenceDetail(BatchCorrespondence batchCorrespondence,
-            BatchCorrespondenceDetail newBatchCorrespondenceDetail);
+    void addBatchCorrespondenceDetail(BatchCorrespondenceBase batchCorrespondence,
+            BatchCorrespondenceDetailBase newBatchCorrespondenceDetail);
 
     /**
      * 
-     * This method saves the BatchCorrespondenceDetais of the BatchCorrespondence.
+     * This method saves the BatchCorrespondenceDetais of the BatchCorrespondenceBase.
      * @param batchCorrespondence
      * @param deletedBos
      */
-    void saveBatchCorrespondenceDetails(BatchCorrespondence batchCorrespondence, 
-            List<BatchCorrespondenceDetail> deletedBos);
+    void saveBatchCorrespondenceDetails(BatchCorrespondenceBase batchCorrespondence, 
+            List<BatchCorrespondenceDetailBase> deletedBos);
 }

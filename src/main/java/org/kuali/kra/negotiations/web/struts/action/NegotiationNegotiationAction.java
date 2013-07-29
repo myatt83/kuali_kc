@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,6 +42,7 @@ import org.kuali.kra.negotiations.bo.NegotiationUnassociatedDetail;
 import org.kuali.kra.negotiations.customdata.NegotiationCustomData;
 import org.kuali.kra.negotiations.document.NegotiationDocument;
 import org.kuali.kra.negotiations.notifications.NegotiationCloseNotificationContext;
+import org.kuali.kra.negotiations.notifications.NegotiationNotification;
 import org.kuali.kra.negotiations.printing.NegotiationActivityPrintType;
 import org.kuali.kra.negotiations.web.struts.form.NegotiationForm;
 import org.kuali.kra.proposaldevelopment.bo.AttachmentDataSource;
@@ -65,11 +66,11 @@ public class NegotiationNegotiationAction extends NegotiationAction {
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
             throws Exception {
         NegotiationForm negotiationForm = (NegotiationForm) form;
-        negotiationForm.getNegotiationDocument().getNegotiation().setAssociatedDocumentWarning(null);
         ActionForward actionForward = super.execute(mapping, form, request, response);
         loadCodeObjects(negotiationForm.getNegotiationDocument().getNegotiation());
         negotiationForm.getMedusaBean().setModuleName("neg");
         negotiationForm.getMedusaBean().setModuleIdentifier(negotiationForm.getNegotiationDocument().getNegotiation().getNegotiationId());
+        negotiationForm.getMedusaBean().generateParentNodes();
         negotiationForm.getNegotiationActivityHelper().sortActivities();
         negotiationForm.getNegotiationActivityHelper().generateAllAttachments();
         return actionForward;
@@ -127,9 +128,10 @@ public class NegotiationNegotiationAction extends NegotiationAction {
     public ActionForward reload(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
         ActionForward actionForward = super.reload(mapping, form, request, response);
         NegotiationForm negotiationForm = (NegotiationForm) form;
-        negotiationForm.getCustomDataHelper().negotiationCustomData(mapping, negotiationForm, request, response);
+        negotiationForm.getCustomDataHelper().prepareCustomData();
         loadCodeObjects(negotiationForm.getNegotiationDocument().getNegotiation());
-        docHandler(mapping, form, request, response);
+        prepareNegotiation(negotiationForm);
+        //docHandler(mapping, form, request, response);
         return actionForward;
     }
     
@@ -182,7 +184,6 @@ public class NegotiationNegotiationAction extends NegotiationAction {
                 sendCloseNotification = true;
             }
         }
-        copyCustomDataToNegotiation(negotiationForm);
         ActionForward actionForward = super.save(mapping, form, request, response);
         
         NegotiationCloseNotificationContext context = new NegotiationCloseNotificationContext(negotiationForm.getNegotiationDocument());
@@ -192,7 +193,7 @@ public class NegotiationNegotiationAction extends NegotiationAction {
                 negotiationForm.getNotificationHelper().initializeDefaultValues(context);
                 return mapping.findForward("notificationEditor");
             } else {
-                getNotificationService().sendNotification(context);
+                getNotificationService().sendNotificationAndPersist(context, new NegotiationNotification(), negotiation);
             }
         }
         if (negotiation.getUnAssociatedDetail() != null) {
@@ -266,61 +267,9 @@ public class NegotiationNegotiationAction extends NegotiationAction {
             throws Exception {
         NegotiationForm negotiationForm = (NegotiationForm) form;
         loadCodeObjects(negotiationForm.getNegotiationDocument().getNegotiation());
-        Negotiation negotiation = negotiationForm.getNegotiationDocument().getNegotiation();
-        copyCustomDataToNegotiation(negotiationForm);
         return super.close(mapping, negotiationForm, request, response);
-            }
-    
-    /**
-     * Copy the custom data to the Award so that it can saved.
-     * @param form
-     */
-    public void copyCustomDataToNegotiation(NegotiationForm negotiationForm) {
-        negotiationForm.getCustomDataHelper().populateCustomAttributeValuesMap();
-        if((negotiationForm.getNegotiationDocument().getNegotiation().getNegotiationCustomDataList().size() == 0)) {
-            copyCustomDataToNewNegotiation(negotiationForm);
-        }else {
-            copyCustomDataToExistingNegotiation(negotiationForm);
-        }
     }
-    
-    /**
-     * This method is called when custom data is created on a newly created Award. It initializes the list on Award and sets the values from the form
-     * @param awardForm
-     */
-    private void copyCustomDataToNewNegotiation(NegotiationForm negotiationForm) {
-        for (Map.Entry<String, String[]>customAttributeValue: negotiationForm.getCustomDataHelper().getCustomAttributeValues().entrySet()) {
-            int customAttributeId = Integer.parseInt(customAttributeValue.getKey().substring(2));         
-            NegotiationCustomData negotiationCustomData = new NegotiationCustomData();
-            negotiationCustomData.setCustomAttribute(new CustomAttribute());
-            negotiationCustomData.getCustomAttribute().setId(customAttributeId);
-            negotiationCustomData.setCustomAttributeId((long) customAttributeId);
-            negotiationCustomData.setNegotiation(negotiationForm.getNegotiationDocument().getNegotiation());
-            if(customAttributeValue.getValue()[0] == null) {
-                negotiationCustomData.setValue("");
-            }else {
-                negotiationCustomData.setValue(customAttributeValue.getValue()[0]);
-            }
-            negotiationForm.getNegotiationDocument().getNegotiation().getNegotiationCustomDataList().add(negotiationCustomData);
-            
-        }
-    }
-    
-    /**
-     * This method copies the values from the form to the awardCustomDataList on Award.
-     * @param awardForm
-     */
-    private void copyCustomDataToExistingNegotiation(NegotiationForm negotiationForm) {
-        for (Map.Entry<String, String[]>customAttributeValue: negotiationForm.getCustomDataHelper().getCustomAttributeValues().entrySet()) {
-            int customAttributeId = Integer.parseInt(customAttributeValue.getKey().substring(2));         
-            String value = customAttributeValue.getValue()[0];
-            for(NegotiationCustomData negotiationCustomData : negotiationForm.getNegotiationDocument().getNegotiation().getNegotiationCustomDataList()) {
-                if(customAttributeId == negotiationCustomData.getCustomAttributeId()) {
-                    negotiationCustomData.setValue(value);
-                }
-            }
-        }
-    }
+
     
     
 
@@ -396,6 +345,10 @@ public class NegotiationNegotiationAction extends NegotiationAction {
         ActionForward actionForward = mapping.findForward(Constants.MAPPING_BASIC);
         NegotiationForm negotiationForm = (NegotiationForm) form;
         Long newAssociationTypeId = negotiationForm.getNegotiationDocument().getNegotiation().getNegotiationAssociationTypeId();
+        if (newAssociationTypeId == null) {
+            // we've lost association with Negotiation, probably from user hitting back button, so exit gracefully
+            return mapping.findForward(Constants.NEGOTIATION_LOST_PLACE_PAGE);
+        }
         NegotiationAssociationType asscType = (NegotiationAssociationType) this.getBusinessObjectService().findBySinglePrimaryKey(
                 NegotiationAssociationType.class, newAssociationTypeId);
         negotiationForm.getNegotiationDocument().getNegotiation().setNegotiationAssociationType(asscType);
@@ -600,4 +553,15 @@ public class NegotiationNegotiationAction extends NegotiationAction {
         return mapping.findForward(Constants.MAPPING_BASIC);
     }
     
+    /**
+     * Returns the user directly to the Portal.
+     * @param mapping
+     * @param form
+     * @param request
+     * @param response
+     * @return
+     */
+    public ActionForward returnToPortal(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
+        return mapping.findForward(KRADConstants.MAPPING_PORTAL);
+    }
 }

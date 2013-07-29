@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,23 +15,11 @@
  */
 package org.kuali.kra.irb.actions.abandon;
 
-import org.kuali.kra.irb.Protocol;
-import org.kuali.kra.irb.actions.genericactions.ProtocolGenericActionBean;
-import org.kuali.rice.kew.api.exception.WorkflowException;
 
 /**
  * 
  * This class is the Api for abandon protocol
  */
-public interface ProtocolAbandonService {
-
-    /**
-     * 
-     * This method is to abandon protocol which is SRR or SMR.
-     * @param protocol
-     * @param protocolAbandonBean
-     * @throws WorkflowException
-     */
-    public void abandonProtocol(Protocol protocol, ProtocolGenericActionBean protocolAbandonBean) throws WorkflowException ;
+public interface ProtocolAbandonService extends org.kuali.kra.protocol.actions.abandon.ProtocolAbandonService {
 
 }

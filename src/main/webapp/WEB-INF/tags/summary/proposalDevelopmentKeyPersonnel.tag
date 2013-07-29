@@ -1,5 +1,5 @@
 <%--
- Copyright 2005-2010 The Kuali Foundation
+ Copyright 2005-2013 The Kuali Foundation
  
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  limitations under the License.
 --%>
 <%@ include file="/WEB-INF/jsp/kraTldHeader.jsp"%>
-
+<%@ attribute name="transparentBackground" required="false" %>
 
 <c:set var="proposalPersonAttributes"
 	value="${DataDictionary.ProposalPerson.attributes}" />
@@ -31,9 +31,9 @@
 <c:set var="proposalPersonAttributes"
 	value="${DataDictionary.ProposalPerson.attributes}" />
 <c:set var="rowIndex" value="1" />
-
+<c:set var="keypersonrole" value="<%=org.kuali.kra.infrastructure.Constants.KEY_PERSON_ROLE%>" />
 <kul:tab
-	tabTitle="Key Personnel (${fn:length(KualiForm.document.developmentProposalList[0].proposalPersons)})"
+	tabTitle="Key Personnel (${fn:length(KualiForm.document.developmentProposalList[0].proposalPersons)})" transparentBackground="${transparentBackground }"
 	defaultOpen="false" tabErrorKey="">
 	<c:if test="${fn:length(KualiForm.document.developmentProposalList[0].proposalPersons) > 0}">
 	
@@ -75,7 +75,10 @@
 							<div align=center>${KualiForm.document.developmentProposalList[0].proposalPersons[status.index].fullName}&nbsp;</div>
 						</td>
 						<td>
-							<div align=center>${KualiForm.document.developmentProposalList[0].proposalPersons[status.index].proposalPersonRoleId}
+							<div align=center>${KualiForm.document.developmentProposalList[0].proposalPersons[status.index].role.description}
+							<c:if test="${KualiForm.document.developmentProposalList[0].proposalPersons[status.index].role.proposalPersonRoleId == keypersonrole }">
+							(${KualiForm.document.developmentProposalList[0].proposalPersons[status.index].projectRole})
+							</c:if>
 								&nbsp;</div>
 						</td>
 						<td>

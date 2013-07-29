@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,12 @@ public interface KcAttachmentService {
      * @return
      */
     String getInvalidCharacters(String text);
+    
+    /**
+     * This method check the Special characters in the string.
+     * @return
+     */
+    boolean getSpecialCharacter(String text);
    
         
     /**
@@ -44,4 +50,12 @@ public interface KcAttachmentService {
      * @return
      */
     String checkAndReplaceInvalidCharacters(String text);
+    
+    /**
+     * This method checks for special characters in strings and replaces
+     * them with underscores.
+     * @param text
+     * @return
+     */
+    String checkAndReplaceSpecialCharacters(String text);
 }

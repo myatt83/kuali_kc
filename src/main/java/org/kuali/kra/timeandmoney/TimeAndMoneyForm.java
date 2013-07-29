@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package org.kuali.kra.timeandmoney;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +27,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
 import org.kuali.kra.authorization.KraAuthorizationConstants;
-import org.kuali.kra.award.awardhierarchy.AwardHierarchy;
 import org.kuali.kra.award.document.AwardDocument;
 import org.kuali.kra.award.home.Award;
 import org.kuali.kra.award.timeandmoney.AwardDirectFandADistributionBean;
@@ -51,6 +51,7 @@ import org.kuali.rice.kns.web.ui.HeaderField;
 import org.kuali.rice.krad.service.BusinessObjectService;
 import org.kuali.rice.krad.service.DocumentService;
 import org.kuali.rice.krad.service.KRADServiceLocator;
+import org.springframework.util.AutoPopulatingList;
 
 public class TimeAndMoneyForm extends KraTransactionalDocumentFormBase {
 
@@ -90,6 +91,11 @@ public class TimeAndMoneyForm extends KraTransactionalDocumentFormBase {
     private Map<String, String> awardHierarchyToggle;
     private String awardHierarchyScrollPosition;
     
+    public final static String PENDING = "1";
+    public final static String CURRENT = "0";
+    
+    private List<String> fieldsInError;
+    
     public String getCurrentAwardNumber() {
         return currentAwardNumber;
     }
@@ -116,22 +122,18 @@ public class TimeAndMoneyForm extends KraTransactionalDocumentFormBase {
         awardDirectFandADistributionBean = new AwardDirectFandADistributionBean(this);
         order = new ArrayList<String>();
         columnSpan = new ArrayList<Integer>();
-        obligationStartDates = new ArrayList<String>();        
-        obligationExpirationDates = new ArrayList<String>();
-        finalExpirationDates = new ArrayList<String>();
-        awardHierarchyNodeItems = new ArrayList<AwardHierarchyNode>();
-        for(int i=0;i<100;i++){
-            obligationStartDates.add(null);
-            obligationExpirationDates.add(null);
-            finalExpirationDates.add(null);
-            awardHierarchyNodeItems.add(new AwardHierarchyNode());
-        }
+        obligationStartDates = new AutoPopulatingList<String>(String.class);        
+        obligationExpirationDates = new AutoPopulatingList<String>(String.class);
+        finalExpirationDates = new AutoPopulatingList<String>(String.class);
+        awardHierarchyNodeItems = new AutoPopulatingList<AwardHierarchyNode>(AwardHierarchyNode.class);
+        
         setControlForAwardHierarchyView("2");
-        setCurrentOrPendingView("0");
+        setToCurrentView();
         setDirectIndirectViewEnabled(getParameterService().getParameterValueAsString(Constants.PARAMETER_MODULE_AWARD, Constants.PARAMETER_COMPONENT_DOCUMENT, "ENABLE_AWD_ANT_OBL_DIRECT_INDIRECT_COST"));
         previousNodeMap = new HashMap<String, String>();
         nextNodeMap = new HashMap<String, String>();
         awardHierarchyToggle = new TreeMap<String, String>();
+        fieldsInError = new ArrayList<String>();
     }
     
     /** {@inheritDoc} */
@@ -163,28 +165,16 @@ public class TimeAndMoneyForm extends KraTransactionalDocumentFormBase {
         this.registerEditableProperty("controlForAwardHierarchyView");
         this.registerEditableProperty("currentOrPendingView");
         this.registerEditableProperty("directIndirectViewEnabled");
-        registerHierarchyNodeDates();
         super.populate(request);
     }
     
-    /**
-     * This method registers the dates for each node that is being sent to the request on save.  Only nodes that are expanded in the 
-     * view will be sent.
-     */
-    public void registerHierarchyNodeDates() {
-        int temp = 1;
-        for (AwardHierarchyNode awardHierarchyNode : awardHierarchyNodeItems) {
-            this.registerEditableProperty("awardHierarchyNodeItems[" + temp + "].currentFundEffectiveDate");
-            this.registerEditableProperty("awardHierarchyNodeItems[" + temp + "].finalExpirationDate");
-            this.registerEditableProperty("awardHierarchyNodeItems[" + temp + "].obligationExpirationDate");
-            this.registerEditableProperty("awardHierarchyNodeItems[" + temp + "].amountObligatedToDate");
-            this.registerEditableProperty("awardHierarchyNodeItems[" + temp + "].anticipatedTotalAmount");
-            this.registerEditableProperty("awardHierarchyNodeItems[" + temp + "].obligatedTotalDirect");
-            this.registerEditableProperty("awardHierarchyNodeItems[" + temp + "].obligatedTotalIndirect");
-            this.registerEditableProperty("awardHierarchyNodeItems[" + temp + "].anticipatedTotalDirect");
-            this.registerEditableProperty("awardHierarchyNodeItems[" + temp + "].anticipatedTotalIndirect");
-            temp++;
+    public boolean isPropertyEditable(String propertyName) {
+        if (propertyName.startsWith("awardHierarchyNodeItems[")) {
+            return true;
+        } else {
+            return super.isPropertyEditable(propertyName);
         }
+
     }
     
     /**
@@ -572,6 +562,17 @@ public class TimeAndMoneyForm extends KraTransactionalDocumentFormBase {
         return currentOrPendingView;
     }
     
+    public void setToCurrentView() {
+        this.currentOrPendingView = CURRENT;
+    }
+
+    public void setToPendingView() {
+        this.currentOrPendingView = PENDING;
+    }
+    
+    public boolean getDisableCurrentValues () {
+        return StringUtils.equals(CURRENT, getCurrentOrPendingView()) && !getTimeAndMoneyDocument().getPendingTransactions().isEmpty();
+    }
 
     /**
      * Sets the currentOrPendingView attribute value.
@@ -720,7 +721,8 @@ public class TimeAndMoneyForm extends KraTransactionalDocumentFormBase {
         BusinessObjectService businessObjectService =  KraServiceLocator.getService(BusinessObjectService.class);
 
         List<TimeAndMoneyDocument> timeAndMoneyDocuments = 
-            (List<TimeAndMoneyDocument>)businessObjectService.findMatchingOrderBy(TimeAndMoneyDocument.class, fieldValues, "documentNumber", true);
+            (List<TimeAndMoneyDocument>)businessObjectService.findMatching(TimeAndMoneyDocument.class, fieldValues);
+        Collections.sort(timeAndMoneyDocuments);
         //BO service does not return workflow data, so we must call document service to retrieve the document to test if it is in workflow
         //TimeAndMoneyDocument t = timeAndMoneyDocuments.get(timeAndMoneyDocuments.size() -1);
         
@@ -818,11 +820,26 @@ public class TimeAndMoneyForm extends KraTransactionalDocumentFormBase {
     public void setAwardHierarchyScrollPosition(String awardHierarchyScrollPosition) {
         this.awardHierarchyScrollPosition = awardHierarchyScrollPosition;
     }
-    
-    
-    
-    
 
-    
+    public List<String> getFieldsInError() {
+        return fieldsInError;
+    }
 
+    public void setFieldsInError(List<String> fieldsInError) {
+        this.fieldsInError = fieldsInError;
+    }
+    
+    public boolean getIsFieldInErrorList(String fieldName) {
+        boolean returnValue = this.getFieldsInError().contains(fieldName);
+        System.err.println("getIsFieldInErrorList  fieldName: " + fieldName + "   returningL " + (returnValue));
+        return returnValue;
+    }
+    
+    public String getFieldsInErrorList() {
+        StringBuffer sb = new StringBuffer("foo");
+        for (String s : this.getFieldsInError()) {
+            sb.append(",").append(s);
+        }
+        return sb.toString();
+    }
 }

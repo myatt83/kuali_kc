@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  *
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
 package org.kuali.kra.proposaldevelopment.web.struts.action;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Method;
@@ -42,6 +44,7 @@ import org.apache.struts.action.ActionMapping;
 import org.kuali.kra.bo.CustomAttributeDocValue;
 import org.kuali.kra.bo.CustomAttributeDocument;
 import org.kuali.kra.bo.DocumentNextvalue;
+import org.kuali.kra.bo.KcPerson;
 import org.kuali.kra.budget.core.Budget;
 import org.kuali.kra.budget.core.BudgetService;
 import org.kuali.kra.budget.document.BudgetDocument;
@@ -57,6 +60,7 @@ import org.kuali.kra.infrastructure.KeyConstants;
 import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.infrastructure.RoleConstants;
 import org.kuali.kra.kew.KraDocumentRejectionService;
+import org.kuali.kra.kim.bo.KcKimAttributes;
 import org.kuali.kra.krms.service.KrmsRulesExecutionService;
 import org.kuali.kra.proposaldevelopment.bo.AttachmentDataSource;
 import org.kuali.kra.proposaldevelopment.bo.DevelopmentProposal;
@@ -91,11 +95,18 @@ import org.kuali.kra.service.KraWorkflowService;
 import org.kuali.kra.service.PersonEditableService;
 import org.kuali.kra.service.SponsorService;
 import org.kuali.kra.web.struts.action.AuditActionHelper;
+import org.kuali.kra.web.struts.action.NonCancellingRecallQuestion;
+import org.kuali.rice.core.api.config.property.ConfigurationService;
+import org.kuali.rice.core.api.util.RiceConstants;
+import org.kuali.rice.core.api.util.RiceKeyConstants;
+import org.kuali.rice.coreservice.framework.CoreFrameworkServiceLocator;
 import org.kuali.rice.coreservice.framework.parameter.ParameterConstants;
 import org.kuali.rice.kew.api.KewApiConstants;
 import org.kuali.rice.kew.api.WorkflowDocument;
 import org.kuali.rice.kew.api.document.DocumentStatus;
 import org.kuali.rice.kew.api.exception.WorkflowException;
+import org.kuali.rice.kim.api.role.Role;
+import org.kuali.rice.kim.api.role.RoleService;
 import org.kuali.rice.kns.util.AuditCluster;
 import org.kuali.rice.kns.util.AuditError;
 import org.kuali.rice.kns.util.KNSGlobalVariables;
@@ -111,6 +122,7 @@ import org.kuali.rice.krad.service.KRADServiceLocatorWeb;
 import org.kuali.rice.krad.util.GlobalVariables;
 import org.kuali.rice.krad.util.KRADConstants;
 import org.kuali.rice.krad.util.KRADPropertyConstants;
+import org.kuali.rice.krad.util.KRADUtils;
 import org.kuali.rice.krad.util.ObjectUtils;
 import org.springframework.util.CollectionUtils;
 
@@ -127,10 +139,13 @@ public class ProposalDevelopmentAction extends BudgetParentActionBase {
     private static final String SUMMARY_ATTACHMENTS_INDICATOR = "enableSummaryAttachmentsPanel";
     private static final String SUMMARY_KEYWORDS_INDICATOR = "enableSummaryKeywordsPanel";
     private static final String PROPOSAL_SUMMARY_DISCLAIMER_INDICATOR = "propSummaryDisclaimerText";
+    private static final String SUMMARY_DATA_VALIDATION_INDICATOR = "enableSummaryDataValidationPanel";
     private static final String ERROR_NO_GRANTS_GOV_FORM_SELECTED = "error.proposalDevelopment.no.grants.gov.form.selected";
+    private static final String ALL_SPONSOR_HIERARCHY_NIH_MULTI_PI = "ALL_SPONSOR_HIERARCHY_NIH_MULTI_PI";
     private static final String PERSON_INDEX= "personIndex";
     private static final String COMMENTS= "comments";
     private static final String SUMMARY_SPECIAL_REVIEW_LIST = "proposal.summary.validSpecialReviewCodes";
+    private static final String PROPOSAL_ATTACHMENT_TYPE_GROUP_CODE = "P";
     private static final Log LOG = LogFactory.getLog(ProposalDevelopmentAction.class);
     private ProposalHierarcyActionHelper hierarchyHelper;
     private KcNotificationService notificationService;
@@ -217,7 +232,26 @@ public class ProposalDevelopmentAction extends BudgetParentActionBase {
             createS2sOpportunityDetails(proposalDevelopmentForm,s2sOpportunity);
 
         }
-        
+        String principalId = GlobalVariables.getUserSession().getPerson().getPrincipalId();
+        Role roleInfo  = getRoleService().getRoleByNamespaceCodeAndName(RoleConstants.OSP_ROLE_TYPE, RoleConstants.OSP_ADMINISTRATOR);
+        List<String> roleIds = new ArrayList<String>();
+        roleIds.add(roleInfo.getId());
+        Map<String, String> qualifiedRoleAttributes = new HashMap<String, String>();
+        qualifiedRoleAttributes.put(KcKimAttributes.UNIT_NUMBER, "*");
+        Map<String,String> qualifications = new HashMap<String,String>(qualifiedRoleAttributes);
+        if(getRoleService().principalHasRole(principalId, roleIds, qualifications)){
+            proposalDevelopmentForm.setSaveXmlPermission(true);
+        }
+        KraAuthorizationService proposalAuthService = KraServiceLocator.getService(KraAuthorizationService.class);
+        List<KcPerson> persons = proposalAuthService.getPersonsInRole(proposalDevelopmentForm.getProposalDevelopmentDocument(), RoleConstants.AGGREGATOR);
+        for (KcPerson person : persons) {
+            if(GlobalVariables.getUserSession().getPrincipalName().equals(person.getUserName())){
+                proposalDevelopmentForm.setSaveXmlPermission(true);
+            }
+        }
+        if(proposalDevelopmentForm.getProposalDevelopmentDocument().getDevelopmentProposal().getS2sOpportunity()!= null){
+            proposalDevelopmentForm.setGrantsGovSelectFlag(true);
+       }
         return forward;
     }
     
@@ -374,8 +408,15 @@ public class ProposalDevelopmentAction extends BudgetParentActionBase {
         if (sponsorService.isSponsorNihMultiplePi(proposal)) {
             proposal.setNihDescription(getKeyPersonnelService().loadKeyPersonnelRoleDescriptions(true));
         }
-        proposal.setSponsorNihMultiplePi(sponsorService.isSponsorNihMultiplePi(proposal));
-        proposal.setSponsorNihOsc(sponsorService.isSponsorNihOsc(proposal));
+        boolean multiPIFlag = getParameterService().getParameterValueAsBoolean(ProposalDevelopmentDocument.class,
+                ALL_SPONSOR_HIERARCHY_NIH_MULTI_PI);
+        if (multiPIFlag) {
+            proposal.setSponsorNihMultiplePi(true);
+            proposal.setSponsorNihOsc(true);
+        } else {
+            proposal.setSponsorNihMultiplePi(sponsorService.isSponsorNihMultiplePi(proposal));
+            proposal.setSponsorNihOsc(sponsorService.isSponsorNihOsc(proposal));
+        }
     }
     
 
@@ -386,8 +427,9 @@ public class ProposalDevelopmentAction extends BudgetParentActionBase {
 
         final ProposalDevelopmentForm proposalDevelopmentForm = (ProposalDevelopmentForm) form;
         final ProposalDevelopmentDocument doc = proposalDevelopmentForm.getProposalDevelopmentDocument();
-        S2sOpportunity s2sOpportunity= new S2sOpportunity();
-        s2sOpportunity = proposalDevelopmentForm.getProposalDevelopmentDocument().getDevelopmentProposal().getS2sOpportunity();
+        //if the proposal hasn't been saved yet, the s2sopp proposal number will be null. We need to save it in the form until we
+        //have a proposal number to set due to OJBs difficulty in dealing with 1-to-1 relationships.
+        S2sOpportunity s2sOpportunity = proposalDevelopmentForm.getProposalDevelopmentDocument().getDevelopmentProposal().getS2sOpportunity();
         if(s2sOpportunity!=null && s2sOpportunity.getProposalNumber()==null){
             proposalDevelopmentForm.getProposalDevelopmentDocument().getDevelopmentProposal().setS2sOpportunity(null);
             proposalDevelopmentForm.setS2sOpportunity(s2sOpportunity);
@@ -402,8 +444,12 @@ public class ProposalDevelopmentAction extends BudgetParentActionBase {
             forward = mapping.findForward(Constants.MAPPING_PROPOSAL_ACTIONS);
         }
         s2sOpportunity=proposalDevelopmentForm.getS2sOpportunity();
-        if(s2sOpportunity!=null)
+        if(s2sOpportunity!=null) {
             doc.getDevelopmentProposal().setS2sOpportunity(s2sOpportunity);
+            s2sOpportunity.setProposalNumber(doc.getDevelopmentProposal().getProposalNumber());
+            getBusinessObjectService().save(s2sOpportunity);
+            proposalDevelopmentForm.setS2sOpportunity(null);
+        }
         
         doc.getDevelopmentProposal().updateProposalNumbers();
 
@@ -459,7 +505,7 @@ public class ProposalDevelopmentAction extends BudgetParentActionBase {
             return super.close(mapping, form, request, response);
         }
     }
-
+    
     /**
      * 
      * This method attempts to deal with the multiple pessimistic locks that can be on the proposal development document
@@ -510,9 +556,18 @@ public class ProposalDevelopmentAction extends BudgetParentActionBase {
                    pdForm.setDocument(updatedDocCopy);
                    pdDocument = updatedDocCopy;
                    loadDocument(pdDocument);
-    
+                   
+                    List<Narrative> newNarrativesCopy = new ArrayList<Narrative>();
+                    if (newNarratives != null) {
+                        for (Narrative refreshNarrativesList : newNarratives) {
+                            if (refreshNarrativesList.getNarrativeType().getNarrativeTypeGroup()
+                                    .equalsIgnoreCase(PROPOSAL_ATTACHMENT_TYPE_GROUP_CODE)) {
+                                newNarrativesCopy.add(refreshNarrativesList);
+                            }
+                        }
+                    }
                    //now re-add narratives that could include changes and can't be modified otherwise
-                   pdDocument.getDevelopmentProposal().setNarratives(newNarratives);
+                   pdDocument.getDevelopmentProposal().setNarratives(newNarrativesCopy);
                    pdDocument.getDevelopmentProposal().setInstituteAttachments(instituteAttachments);
                    pdDocument.getDevelopmentProposal().setProposalAbstracts(newAbstracts);
                    pdDocument.getDevelopmentProposal().setPropPersonBios(newBiographies);
@@ -784,35 +839,7 @@ public class ProposalDevelopmentAction extends BudgetParentActionBase {
 
         ProposalDevelopmentForm proposalDevelopmentForm = (ProposalDevelopmentForm) form;
         ProposalDevelopmentDocument doc = proposalDevelopmentForm.getProposalDevelopmentDocument();
-
-        Map<String, CustomAttributeDocument> customAttributeDocuments = doc.getCustomAttributeDocuments();
-        String documentNumber = doc.getDocumentNumber();
-        for(Map.Entry<String, CustomAttributeDocument> customAttributeDocumentEntry:customAttributeDocuments.entrySet()) {
-            CustomAttributeDocument customAttributeDocument = customAttributeDocumentEntry.getValue();
-            Map<String, Object> primaryKeys = new HashMap<String, Object>();
-            primaryKeys.put(KRADPropertyConstants.DOCUMENT_NUMBER, documentNumber);
-            primaryKeys.put(Constants.CUSTOM_ATTRIBUTE_ID, customAttributeDocument.getCustomAttributeId());
-
-            CustomAttributeDocValue customAttributeDocValue = (CustomAttributeDocValue) KraServiceLocator.getService(BusinessObjectService.class).findByPrimaryKey(CustomAttributeDocValue.class, primaryKeys);
-            if (customAttributeDocValue != null) {
-                customAttributeDocument.getCustomAttribute().setValue(customAttributeDocValue.getValue());
-                proposalDevelopmentForm.getCustomAttributeValues().put("id" + customAttributeDocument.getCustomAttributeId().toString(), new String[]{customAttributeDocValue.getValue()});
-            }
-
-            String groupName = customAttributeDocument.getCustomAttribute().getGroupName();
-            List<CustomAttributeDocument> customAttributeDocumentList = customAttributeGroups.get(groupName);
-
-            if (customAttributeDocumentList == null) {
-                customAttributeDocumentList = new ArrayList<CustomAttributeDocument>();
-                customAttributeGroups.put(groupName, customAttributeDocumentList);
-            }
-            customAttributeDocumentList.add(customAttributeDocument);
-            Collections.sort(customAttributeDocumentList, new LabelComparator());
-           
-        }
-
-        ((ProposalDevelopmentForm)form).setCustomAttributeGroups(customAttributeGroups);
-
+        proposalDevelopmentForm.getCustomDataHelper().prepareCustomData();
         return mapping.findForward(Constants.CUSTOM_ATTRIBUTES_PAGE);
     }
 
@@ -879,6 +906,7 @@ public class ProposalDevelopmentAction extends BudgetParentActionBase {
        proposalDevelopmentForm.getMedusaBean().setMedusaViewRadio("0");
        proposalDevelopmentForm.getMedusaBean().setModuleName("DP");
        proposalDevelopmentForm.getMedusaBean().setModuleIdentifier(Long.valueOf(proposalNumber));
+       proposalDevelopmentForm.getMedusaBean().generateParentNodes();
        return mapping.findForward(Constants.MAPPING_PROPOSAL_MEDUSA_PAGE);
    }
 
@@ -1024,6 +1052,43 @@ public class ProposalDevelopmentAction extends BudgetParentActionBase {
             GlobalVariables.getMessageMap().putError("grantsGovFormValidationErrors", KeyConstants.VALIDATTION_ERRORS_BEFORE_GRANTS_GOV_SUBMISSION);
             return mapping.findForward(Constants.GRANTS_GOV_PAGE);
         }
+        if (proposalDevelopmentDocument.getDevelopmentProposal().getGrantsGovSelectFlag()) {
+            String loggingDirectory = KraServiceLocator.getService(ConfigurationService.class).getPropertyValueAsString(Constants.PRINT_XML_DIRECTORY);
+            String saveXmlFolderName = proposalDevelopmentDocument.getSaveXmlFolderName();
+            if (StringUtils.isNotBlank(loggingDirectory)) {
+                File directory = new File(loggingDirectory);
+                if(!directory.exists()){
+                    directory.createNewFile();
+                }
+                if(!loggingDirectory.endsWith("/")){
+                    loggingDirectory+="/";
+                }
+                File grantsGovXmlDirectoryFile = new File(loggingDirectory + saveXmlFolderName + ".zip");
+                byte[] bytes = new byte[(int) grantsGovXmlDirectoryFile.length()];
+                FileInputStream fileInputStream = new FileInputStream(grantsGovXmlDirectoryFile);
+                fileInputStream.read(bytes);
+                ByteArrayOutputStream baos = null;
+                try {
+                    baos = new ByteArrayOutputStream(bytes.length);
+                    baos.write(bytes);
+                    WebUtils.saveMimeOutputStreamAsFile(response, "binary/octet-stream", baos, saveXmlFolderName + ".zip");
+
+                }
+                finally {
+                    try {
+                        if (baos != null) {
+                            baos.close();
+                            baos = null;
+                        }
+                    }
+                    catch (IOException ioEx) {
+                        LOG.warn(ioEx.getMessage(), ioEx);
+                    }
+                }
+            }
+            proposalDevelopmentDocument.getDevelopmentProposal().setGrantsGovSelectFlag(false);
+            return mapping.findForward(Constants.MAPPING_BASIC);
+        }
         if(attachmentDataSource==null || attachmentDataSource.getContent()==null){
             return mapping.findForward(Constants.MAPPING_PROPOSAL_ACTIONS);
         }
@@ -1042,7 +1107,7 @@ public class ProposalDevelopmentAction extends BudgetParentActionBase {
                 LOG.warn(ioEx.getMessage(), ioEx);
             }
         }        
-        return null;
+        return mapping.findForward(Constants.MAPPING_BASIC);
     }
     
     
@@ -1186,11 +1251,199 @@ public class ProposalDevelopmentAction extends BudgetParentActionBase {
         pdform.getProposalDevelopmentParameters().put(SUMMARY_QUESTIONS_INDICATOR, this.getParameterService().getParameter(Constants.MODULE_NAMESPACE_PROPOSAL_DEVELOPMENT, ParameterConstants.DOCUMENT_COMPONENT, SUMMARY_QUESTIONS_INDICATOR));
         pdform.getProposalDevelopmentParameters().put(SUMMARY_ATTACHMENTS_INDICATOR, this.getParameterService().getParameter(Constants.MODULE_NAMESPACE_PROPOSAL_DEVELOPMENT, ParameterConstants.DOCUMENT_COMPONENT, SUMMARY_ATTACHMENTS_INDICATOR));
         pdform.getProposalDevelopmentParameters().put(SUMMARY_KEYWORDS_INDICATOR, this.getParameterService().getParameter(Constants.MODULE_NAMESPACE_PROPOSAL_DEVELOPMENT, ParameterConstants.DOCUMENT_COMPONENT, SUMMARY_KEYWORDS_INDICATOR));
+        pdform.getProposalDevelopmentParameters().put(SUMMARY_DATA_VALIDATION_INDICATOR, this.getParameterService().getParameter(Constants.MODULE_NAMESPACE_PROPOSAL_DEVELOPMENT, ParameterConstants.DOCUMENT_COMPONENT, SUMMARY_DATA_VALIDATION_INDICATOR));       
         pdform.getProposalDevelopmentParameters().put(PROPOSAL_SUMMARY_DISCLAIMER_INDICATOR, this.getParameterService().getParameter(Constants.MODULE_NAMESPACE_PROPOSAL_DEVELOPMENT, ParameterConstants.DOCUMENT_COMPONENT, PROPOSAL_SUMMARY_DISCLAIMER_INDICATOR));
         pdform.getProposalDevelopmentParameters().put(SUMMARY_SPECIAL_REVIEW_LIST, this.getParameterService().getParameter(Constants.MODULE_NAMESPACE_PROPOSAL_DEVELOPMENT, ParameterConstants.DOCUMENT_COMPONENT, SUMMARY_SPECIAL_REVIEW_LIST));
         pdform.getSpecialReviewHelper().populatePropSpecialReviewApproverView(pdform.getProposalDevelopmentParameters().get(SUMMARY_SPECIAL_REVIEW_LIST).getValue());
         return mapping.findForward(Constants.MAPPING_PROPOSAL_APPROVER_PAGE);
     }
+    
+    
+    
+    
+    
+    /**
+     * Class that encapsulates the workflow for obtaining an reason from an action prompt.
+     */
+    private class ReasonPrompt {
+        final String questionId;
+        final String questionTextKey;
+        final String questionType;
+        final String missingReasonKey;
+        final String questionCallerMapping;
+        final String abortButton;
+        final String noteIntroKey;
+
+        private class Response {
+            final String question;
+            final ActionForward forward;
+            final String reason;
+            final String button;
+            Response(String question, ActionForward forward) {
+                this(question, forward, null, null);
+            }
+            Response(String question, String reason, String button) {
+                this(question, null, reason, button);
+            }
+            private Response(String question, ActionForward forward, String reason, String button) {
+                this.question = question;
+                this.forward = forward;
+                this.reason = reason;
+                this.button = button;
+            }
+        }
+
+        /**
+         * @param questionId the question id/instance, 
+         * @param questionTextKey application resources key for question text
+         * @param questionType the {@link org.kuali.rice.kns.question.Question} question type
+         * @param questionCallerMapping mapping of original action
+         * @param abortButton button value considered to abort the prompt and return (optional, may be null)
+         * @param noteIntroKey application resources key for quesiton text prefix (optional, may be null)
+         */
+        private ReasonPrompt(String questionId, String questionTextKey, String questionType, String missingReasonKey, String questionCallerMapping, String abortButton, String noteIntroKey) {
+            this.questionId = questionId;
+            this.questionTextKey = questionTextKey;
+            this.questionType = questionType;
+            this.questionCallerMapping = questionCallerMapping;
+            this.abortButton = abortButton;
+            this.noteIntroKey = noteIntroKey;
+            this.missingReasonKey = missingReasonKey;
+        }
+
+        /**
+         * Obtain a validated reason and button value via a Question prompt.  Reason is validated against
+         * sensitive data patterns, and max Note text length
+         * @param mapping Struts mapping
+         * @param form Struts form
+         * @param request http request
+         * @param response http response
+         * @return Response object representing *either*: 1) an ActionForward due to error or abort 2) a reason and button clicked
+         * @throws Exception
+         */
+        @SuppressWarnings("deprecation")
+        public Response ask(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+            String question = request.getParameter(KRADConstants.QUESTION_INST_ATTRIBUTE_NAME);
+            String reason = request.getParameter(KRADConstants.QUESTION_REASON_ATTRIBUTE_NAME);
+
+            if (StringUtils.isBlank(reason)) {
+                String context = request.getParameter(KRADConstants.QUESTION_CONTEXT);
+                if (context != null && StringUtils.contains(context, KRADConstants.QUESTION_REASON_ATTRIBUTE_NAME + "=")) {
+                    reason = StringUtils.substringAfter(context, KRADConstants.QUESTION_REASON_ATTRIBUTE_NAME + "=");
+                }
+            }
+
+            String disapprovalNoteText = "";
+
+            // start in logic for confirming the disapproval
+            if (question == null) {
+                // ask question if not already asked
+                return new Response(question, performQuestionWithInput(mapping, form, request, response,
+                        this.questionId,
+                        getKualiConfigurationService().getPropertyValueAsString(this.questionTextKey),
+                        this.questionType, this.questionCallerMapping, ""));
+            }
+
+            String buttonClicked = request.getParameter(KRADConstants.QUESTION_CLICKED_BUTTON);
+            if (this.questionId.equals(question) && abortButton != null && abortButton.equals(buttonClicked)) {
+                // if no button clicked just reload the doc
+                return new Response(question, mapping.findForward(RiceConstants.MAPPING_BASIC));
+            }
+
+            // have to check length on value entered
+            String introNoteMessage = "";
+            if (noteIntroKey != null) {
+                introNoteMessage = getKualiConfigurationService().getPropertyValueAsString(this.noteIntroKey) + KRADConstants.BLANK_SPACE;
+            }
+
+            // build out full message
+            disapprovalNoteText = introNoteMessage + reason;
+
+            // check for sensitive data in note
+            boolean warnForSensitiveData = CoreFrameworkServiceLocator.getParameterService().getParameterValueAsBoolean(
+                    KRADConstants.KNS_NAMESPACE, ParameterConstants.ALL_COMPONENT,
+                    KRADConstants.SystemGroupParameterNames.SENSITIVE_DATA_PATTERNS_WARNING_IND);
+            if (warnForSensitiveData) {
+                String context = KRADConstants.QUESTION_REASON_ATTRIBUTE_NAME + "=" + reason;
+                ActionForward forward = checkAndWarnAboutSensitiveData(mapping, form, request, response,
+                        KRADConstants.QUESTION_REASON_ATTRIBUTE_NAME, disapprovalNoteText, this.questionCallerMapping, context);
+                if (forward != null) {
+                    return new Response(question, forward);
+                }
+            } else {
+                if (KRADUtils.containsSensitiveDataPatternMatch(disapprovalNoteText)) {
+                    return new Response(question, performQuestionWithInputAgainBecauseOfErrors(mapping, form, request, response,
+                            this.questionId, getKualiConfigurationService().getPropertyValueAsString(this.questionTextKey),
+                            this.questionType, this.questionCallerMapping, "", reason,
+                            RiceKeyConstants.ERROR_DOCUMENT_FIELD_CONTAINS_POSSIBLE_SENSITIVE_DATA,
+                            KRADConstants.QUESTION_REASON_ATTRIBUTE_NAME, "reason"));
+                }
+            }
+
+            int disapprovalNoteTextLength = disapprovalNoteText.length();
+
+            // get note text max length from DD
+            int noteTextMaxLength = getDataDictionaryService().getAttributeMaxLength(Note.class, KRADConstants.NOTE_TEXT_PROPERTY_NAME);
+
+            if (StringUtils.isBlank(reason) || (disapprovalNoteTextLength > noteTextMaxLength)) {
+
+                if (reason == null) {
+                    // prevent a NPE by setting the reason to a blank string
+                    reason = "";
+                }
+                return new Response(question, performQuestionWithInputAgainBecauseOfErrors(mapping, form, request, response,
+                        this.questionId,
+                        getKualiConfigurationService().getPropertyValueAsString(this.questionTextKey),
+                        this.questionType, this.questionCallerMapping, "", reason,
+                        this.missingReasonKey,
+                        KRADConstants.QUESTION_REASON_ATTRIBUTE_NAME, Integer.toString(noteTextMaxLength)));
+            }
+
+            return new Response(question, disapprovalNoteText, buttonClicked);
+        }
+    }
+    
+    /**
+     * 
+     * @see org.kuali.rice.kns.web.struts.action.KualiDocumentActionBase#recall(org.apache.struts.action.ActionMapping, org.apache.struts.action.ActionForm, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+     */
+    @SuppressWarnings("deprecation")
+    @Override
+    public ActionForward recall(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        ActionForward forward;  // the return value
+        
+        ReasonPrompt prompt = new ReasonPrompt(KRADConstants.DOCUMENT_RECALL_QUESTION, 
+                                               Constants.NON_CANCELLING_RECALL_QUESTION_TEXT_KEY, 
+                                               Constants.NON_CANCELLING_RECALL_QUESTION, 
+                                               RiceKeyConstants.ERROR_DOCUMENT_RECALL_REASON_REQUIRED, 
+                                               KRADConstants.MAPPING_RECALL, 
+                                               NonCancellingRecallQuestion.NO, 
+                                               RiceKeyConstants.MESSAGE_RECALL_NOTE_TEXT_INTRO);
+        ReasonPrompt.Response resp = prompt.ask(mapping, form, request, response);
+        
+        if (resp.forward != null) {
+            // forward either to a fresh display of the question, or to one with "blank reason" error message due to the previous answer, 
+            // or back to the document if 'return to document' (abort button) was clicked
+            forward = resp.forward; 
+        }
+        // recall to action only if the button was selected by the user
+        else if(KRADConstants.DOCUMENT_RECALL_QUESTION.equals(resp.question) && NonCancellingRecallQuestion.YES.equals(resp.button)) {
+            KualiDocumentFormBase kualiDocumentFormBase = (KualiDocumentFormBase) form;
+            doProcessingAfterPost(kualiDocumentFormBase, request);
+            getDocumentService().recallDocument(kualiDocumentFormBase.getDocument(), resp.reason, false);
+            // we should return to the portal to avoid problems with workflow routing changes to the document. 
+            //This should eventually return to the holding page, but currently waiting on KCINFR-760.
+            forward = mapping.findForward(KRADConstants.MAPPING_PORTAL);
+        }
+        else {
+            // they chose not to recall so return them back to document
+            forward = mapping.findForward(RiceConstants.MAPPING_BASIC);
+        }
+        
+        return forward;
+    }
+    
+    
 
     /**
      * This method allows logic to be executed before a save, after authorization is confirmed.
@@ -1202,7 +1455,10 @@ public class ProposalDevelopmentAction extends BudgetParentActionBase {
      * @throws Exception if bad happens
      */
     public void preSave(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-        //do nothing
+        ProposalDevelopmentForm pdForm = (ProposalDevelopmentForm) form;
+        if (pdForm.isHidePropDevDocDescriptionPanel()) {
+            pdForm.getProposalDevelopmentDocument().defaultDocumentDescription();
+        }
     }
     
     
@@ -1265,7 +1521,13 @@ public class ProposalDevelopmentAction extends BudgetParentActionBase {
            S2SBudgetCalculatorService s2sBudgetCalculatorService) {
        s2SBudgetCalculatorService = s2sBudgetCalculatorService;
    }
-
+   /**
+    * Quick method to get the RoleService
+    * @return RoleService reference
+    */
+   private RoleService getRoleService() {
+       return KraServiceLocator.getService(RoleService.class);
+   }
 }
 
 class S2sOppFormsComparator1 implements Comparator<S2sOppForms> {

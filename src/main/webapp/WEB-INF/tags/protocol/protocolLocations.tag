@@ -1,5 +1,5 @@
 <%--
- Copyright 2005-2010 The Kuali Foundation
+ Copyright 2005-2013 The Kuali Foundation
 
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@
 	<div class="tab-container" align="center">
     	<h3>
     		<span class="subhead-left">Organizations</span>
-    		<span class="subhead-right"><kul:help businessObjectClassName="org.kuali.kra.irb.protocol.location.ProtocolLocation" altText="help"/></span>
+    		<span class="subhead-right"><kul:help businessObjectClassName="org.kuali.kra.iacuc.protocol.location.IacucProtocolLocation" altText="help"/></span>
         </h3>
         <table id="location-table" cellpadding="0" cellspacing="0" summary="">
           	<%-- Header --%>

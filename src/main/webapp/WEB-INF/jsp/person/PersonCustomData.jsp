@@ -1,5 +1,5 @@
 <%--
- Copyright 2005-2010 The Kuali Foundation
+ Copyright 2005-2013 The Kuali Foundation
 
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -25,4 +25,8 @@
 
 <c:set var="readOnly" value="${KualiForm.document.documentHeader.workflowDocument.status.code eq 'F'}" scope="request" />
 
-<kra-person:customDataTab />
+<kra-customdata:customDataTabSpecific
+	customAttributeGroups="${KualiForm.document.newMaintainableObject.customDataHelper.customAttributeGroups}" 
+	customDataList="${KualiForm.document.newMaintainableObject.businessObject.personCustomDataList}" 
+	customDataListPrefix="document.newMaintainableObject.businessObject.personCustomDataList"
+	headerAndFooter="false"/>

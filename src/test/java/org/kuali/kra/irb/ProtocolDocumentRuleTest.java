@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,15 @@
 package org.kuali.kra.irb;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.kuali.kra.bo.ResearchArea;
 import org.kuali.kra.infrastructure.KeyConstants;
 import org.kuali.kra.irb.protocol.research.ProtocolResearchArea;
 import org.kuali.kra.irb.test.ProtocolRuleTestBase;
+import org.kuali.kra.protocol.protocol.research.ProtocolResearchAreaBase;
 import org.kuali.kra.rules.ResearchDocumentRuleBase;
 import org.kuali.rice.core.api.util.RiceKeyConstants;
 import org.kuali.rice.kns.service.DictionaryValidationService;
@@ -138,7 +139,7 @@ public class ProtocolDocumentRuleTest extends ProtocolRuleTestBase {
         dummyRA3.setActive(true);
         dummyPRA3.setResearchAreas(dummyRA3);
         
-        ArrayList<ProtocolResearchArea> pras = new ArrayList<ProtocolResearchArea>();
+        List<ProtocolResearchAreaBase> pras = new ArrayList<ProtocolResearchAreaBase>();
         pras.add(dummyPRA0);
         pras.add(dummyPRA1);
         pras.add(dummyPRA2);

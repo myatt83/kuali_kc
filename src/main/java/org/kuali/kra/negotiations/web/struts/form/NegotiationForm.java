@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,8 +41,10 @@ import org.kuali.kra.negotiations.customdata.CustomDataHelper;
 import org.kuali.kra.negotiations.customdata.NegotiationCustomData;
 import org.kuali.kra.negotiations.document.NegotiationDocument;
 import org.kuali.kra.negotiations.notifications.NegotiationCloseNotificationContext;
+import org.kuali.kra.negotiations.notifications.NegotiationNotification;
 import org.kuali.kra.negotiations.service.NegotiationService;
 import org.kuali.kra.service.TaskAuthorizationService;
+import org.kuali.kra.web.struts.form.CustomDataDocumentForm;
 import org.kuali.kra.web.struts.form.KraTransactionalDocumentFormBase;
 import org.kuali.rice.kew.api.WorkflowDocument;
 import org.kuali.rice.kns.web.ui.HeaderField;
@@ -53,7 +55,7 @@ import org.kuali.rice.krad.util.KRADConstants;
  * 
  * This class holds all the objects required for a negotiation web object.
  */
-public class NegotiationForm extends KraTransactionalDocumentFormBase {
+public class NegotiationForm extends KraTransactionalDocumentFormBase implements CustomDataDocumentForm {
     
     private static final long serialVersionUID = 6245888664423593163L;
 
@@ -91,11 +93,7 @@ public class NegotiationForm extends KraTransactionalDocumentFormBase {
     
     private void init()
     {
-    NegotiationForm negotiationForm = (NegotiationForm) this;
-    List<NegotiationCustomData> negotiationCustomDataList = negotiationForm.getNegotiationDocument().getNegotiation().getNegotiationCustomDataList();
-    negotiationForm.getCustomDataHelper().buildCustomDataCollectionsOnFormNewNegotiations(
-            (SortedMap<String, List>) negotiationForm.getCustomDataHelper().getCustomAttributeGroups(), negotiationForm,
-            negotiationForm.getNegotiationDocument().getCustomAttributeDocuments());
+        getCustomDataHelper().prepareCustomData();
     }
     
     /**
@@ -320,11 +318,20 @@ public class NegotiationForm extends KraTransactionalDocumentFormBase {
     
     /**
      * 
-     * This method calls the negotiation service and return the results of hte getNegotiationActivityHistoryLineBeans funciton.
+     * This method calls the negotiation service and return the results of the getNegotiationActivityHistoryLineBeans function.
      * @return
      */
     public List<NegotiationActivityHistoryLineBean> getNegotiationActivityHistoryLineBeans() {
         return this.getNegotiationService().getNegotiationActivityHistoryLineBeans(this.getNegotiationDocument().getNegotiation().getActivities());
+    }
+
+    /**
+     * 
+     * This method calls the negotiation service and return the results of the getNegotiationNotifications function.
+     * @return
+     */
+    public List<NegotiationNotification> getNegotiationNotifications() {
+        return this.getNegotiationService().getNegotiationNotifications(this.getNegotiationDocument().getNegotiation());
     }
 
     public NotificationHelper<NegotiationCloseNotificationContext> getNotificationHelper() {

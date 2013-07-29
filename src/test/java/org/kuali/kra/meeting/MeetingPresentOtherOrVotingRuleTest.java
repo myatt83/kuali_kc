@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,12 @@ package org.kuali.kra.meeting;
 import java.util.ArrayList;
 
 import org.junit.Test;
+import org.kuali.kra.common.committee.meeting.MeetingEventBase.ErrorType;
+import org.kuali.kra.common.committee.meeting.MeetingPresentOtherOrVotingEvent;
+import org.kuali.kra.common.committee.meeting.MeetingPresentOtherOrVotingRule;
+import org.kuali.kra.common.committee.meeting.MemberAbsentBean;
+import org.kuali.kra.common.committee.meeting.MemberPresentBean;
 import org.kuali.kra.infrastructure.Constants;
-import org.kuali.kra.meeting.MeetingEventBase.ErrorType;
 import org.kuali.kra.rules.TemplateRuleTest;
 
 public class MeetingPresentOtherOrVotingRuleTest {

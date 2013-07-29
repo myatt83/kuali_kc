@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package org.kuali.kra.iacuc.actions.table;
 
-import org.kuali.kra.common.committee.bo.CommonCommitteeSchedule;
+import org.kuali.kra.common.committee.bo.CommitteeScheduleBase;
 import org.kuali.kra.iacuc.IacucProtocol;
 
 /**
@@ -28,7 +28,7 @@ public interface IacucProtocolTableService {
      * @param schedule
      * @return the next schedule in order of schedule date, or null if there is no next schedule.
      */
-    public CommonCommitteeSchedule getNextScheduleForCommittee(CommonCommitteeSchedule schedule);
+    public CommitteeScheduleBase getNextScheduleForCommittee(CommitteeScheduleBase schedule);
     
     
     

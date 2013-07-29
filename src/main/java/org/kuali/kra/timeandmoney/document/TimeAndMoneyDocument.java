@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.commons.lang.StringUtils;
 import org.kuali.kra.award.awardhierarchy.AwardHierarchy;
@@ -28,13 +29,12 @@ import org.kuali.kra.award.awardhierarchy.AwardHierarchyService;
 import org.kuali.kra.award.home.Award;
 import org.kuali.kra.award.timeandmoney.AwardDirectFandADistribution;
 import org.kuali.kra.award.version.service.AwardVersionService;
-import org.kuali.kra.bo.RolePersons;
+import org.kuali.kra.bo.DocumentCustomData;
 import org.kuali.kra.common.permissions.Permissionable;
 import org.kuali.kra.document.ResearchDocumentBase;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.infrastructure.RoleConstants;
-import org.kuali.kra.service.KraAuthorizationService;
 import org.kuali.kra.timeandmoney.AwardHierarchyNode;
 import org.kuali.kra.timeandmoney.AwardVersionHistory;
 import org.kuali.kra.timeandmoney.history.TimeAndMoneyActionSummary;
@@ -52,7 +52,7 @@ import org.kuali.rice.krad.util.ObjectUtils;
  * This class represents the Time and Money Document Object.
  * 
  */
-public class TimeAndMoneyDocument extends ResearchDocumentBase implements  Copyable, SessionDocument, Permissionable{
+public class TimeAndMoneyDocument extends ResearchDocumentBase implements Copyable, SessionDocument, Permissionable, Comparable {
     
     /**
      * Comment for <code>serialVersionUID</code>
@@ -109,7 +109,7 @@ public class TimeAndMoneyDocument extends ResearchDocumentBase implements  Copya
     }
     
     protected void init() {
-        awardHierarchyNodes = new HashMap<String, AwardHierarchyNode>();
+        awardHierarchyNodes = new TreeMap<String, AwardHierarchyNode>();
         awardHierarchyItems = new HashMap<String, AwardHierarchy>();
         pendingTransactions = new ArrayList<PendingTransaction>();
         awardAmountTransactions = new ArrayList<AwardAmountTransaction>();
@@ -131,9 +131,9 @@ public class TimeAndMoneyDocument extends ResearchDocumentBase implements  Copya
             Award tmpAward = getCurrentAward(this);
             this.setAward(tmpAward);
             if(tmpAward != null) {
-                getAwardHierarchyService().populateAwardHierarchyNodesForTandMDoc(this.getAwardHierarchyItems(), this.getAwardHierarchyNodes(), tmpAward.getAwardNumber(), tmpAward.getSequenceNumber().toString(), getDocumentNumber());
+                getAwardHierarchyService().populateAwardHierarchyNodesForTandMDoc(this.getAwardHierarchyItems(), this.getAwardHierarchyNodes(), tmpAward.getAwardNumber(), tmpAward.getSequenceNumber().toString(), this);
             } else {
-                getAwardHierarchyService().populateAwardHierarchyNodesForTandMDoc(this.getAwardHierarchyItems(), this.getAwardHierarchyNodes(), null, null, getDocumentNumber());
+                getAwardHierarchyService().populateAwardHierarchyNodesForTandMDoc(this.getAwardHierarchyItems(), this.getAwardHierarchyNodes(), null, null, this);
             }
             getActivePendingTransactionsService().approveTransactions(this, awardAmountTransactions.get(0));
         }
@@ -161,19 +161,6 @@ public class TimeAndMoneyDocument extends ResearchDocumentBase implements  Copya
     
     protected ActivePendingTransactionsService getActivePendingTransactionsService(){
         return (ActivePendingTransactionsService) KraServiceLocator.getService(ActivePendingTransactionsService.class);
-    }
-    
-    /**
-     * @see org.kuali.kra.document.ResearchDocumentBase#getAllRolePersons()
-     */
-    @Override
-    protected List<RolePersons> getAllRolePersons() {
-        KraAuthorizationService kraAuthorizationService = getKraAuthorizationService(); 
-        return kraAuthorizationService.getAllRolePersons(this);
-    }
-    
-    protected KraAuthorizationService getKraAuthorizationService(){
-        return (KraAuthorizationService) KraServiceLocator.getService(KraAuthorizationService.class);
     }
 
     public String getDocumentKey() {
@@ -442,6 +429,24 @@ public class TimeAndMoneyDocument extends ResearchDocumentBase implements  Copya
            
         return isComplete;
     }
-    
+
+    @Override
+    public int compareTo(Object o) {
+        if (this == o) {
+            return 0;
+        }
+        if (o == null) {
+            return 1;
+        }
+        TimeAndMoneyDocument comparator = (TimeAndMoneyDocument)o;
+        String myKey = StringUtils.leftPad(getDocumentNumber(), 40);
+        String otherKey = StringUtils.leftPad(comparator.getDocumentNumber(), 40);
+        return myKey.compareTo(otherKey);
+    }
+
+    @Override
+    public List<? extends DocumentCustomData> getDocumentCustomData() {
+        return new ArrayList();
+    }
     
 }

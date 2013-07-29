@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,13 @@
  */
 package org.kuali.kra.iacuc.actions.print;
 
-import org.kuali.kra.protocol.actions.print.ProtocolPrintWatermark;
-import org.kuali.kra.protocol.actions.print.ProtocolReviewCommentsPrint;
+import org.kuali.kra.protocol.actions.print.ProtocolPrintWatermarkBase;
+import org.kuali.kra.protocol.actions.print.ProtocolReviewCommentsPrintBase;
 
-public class IacucProtocolReviewCommentsPrint extends ProtocolReviewCommentsPrint {
+public class IacucProtocolReviewCommentsPrint extends ProtocolReviewCommentsPrintBase {
 
     @Override
-    protected ProtocolPrintWatermark getNewProtocolPrintWatermarkInstanceHook() {
+    protected ProtocolPrintWatermarkBase getNewProtocolPrintWatermarkInstanceHook() {
         return new IacucProtocolPrintWatermark();
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,19 +22,21 @@ import java.util.List;
 import java.util.Map;
 
 import org.kuali.kra.common.committee.bo.CommitteeDecisionMotionType;
-import org.kuali.kra.common.committee.bo.CommitteeMembership;
-import org.kuali.kra.common.committee.meeting.ProtocolVoteAbstainee;
-import org.kuali.kra.common.committee.meeting.ProtocolVoteRecused;
-import org.kuali.kra.common.committee.service.CommonCommitteeService;
+import org.kuali.kra.common.committee.bo.CommitteeMembershipBase;
+import org.kuali.kra.common.committee.meeting.ProtocolVoteAbstaineeBase;
+import org.kuali.kra.common.committee.meeting.ProtocolVoteRecusedBase;
 import org.kuali.kra.iacuc.actions.IacucActionHelper;
 import org.kuali.kra.iacuc.actions.IacucProtocolActionBean;
 import org.kuali.kra.iacuc.actions.reviewcomments.IacucReviewCommentsBean;
 import org.kuali.kra.iacuc.actions.submit.IacucProtocolSubmission;
+import org.kuali.kra.iacuc.committee.meeting.IacucProtocolVoteAbstainee;
+import org.kuali.kra.iacuc.committee.meeting.IacucProtocolVoteRecused;
+import org.kuali.kra.iacuc.committee.service.IacucCommitteeService;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.protocol.actions.decision.CommitteeDecision;
-import org.kuali.kra.protocol.actions.reviewcomments.ReviewAttachmentsBean;
-import org.kuali.kra.protocol.actions.reviewcomments.ReviewCommentsBean;
+import org.kuali.kra.protocol.actions.reviewcomments.ReviewAttachmentsBeanBase;
+import org.kuali.kra.protocol.actions.reviewcomments.ReviewCommentsBeanBase;
 import org.kuali.rice.krad.service.BusinessObjectService;
 
 public class IacucCommitteeDecision extends IacucProtocolActionBean implements CommitteeDecision<IacucCommitteePerson> {
@@ -76,8 +78,6 @@ public class IacucCommitteeDecision extends IacucProtocolActionBean implements C
         // getSubmission(protocol) is not necessary the most recent one.
         // this may cause problem later if the most recent submission does not have schedule, then
         // npe when try to getavailable member
-        // TODO : check with Jay
-        //ProtocolSubmission submission = getSubmission(protocol);
         IacucProtocolSubmission submission = (IacucProtocolSubmission) getProtocol().getProtocolSubmission();
         if (submission != null) {
             this.motionTypeCode = submission.getCommitteeDecisionMotionTypeCode();
@@ -98,7 +98,6 @@ public class IacucCommitteeDecision extends IacucProtocolActionBean implements C
     }
     
     public Integer getRecusedCount() {
-        //return recusedCount;
         return this.getRecused().size();
     }
 
@@ -113,22 +112,22 @@ public class IacucCommitteeDecision extends IacucProtocolActionBean implements C
         return lookUpFields;
     }
     
-    private List<CommitteeMembership> getCommitteeMemberships() {
+    private List<CommitteeMembershipBase> getCommitteeMemberships() {
         String committeeId = getProtocol().getProtocolSubmission().getCommittee().getCommitteeId();
         String scheduleId = getProtocol().getProtocolSubmission().getScheduleId();
-        List<CommitteeMembership> committeeMemberships = KraServiceLocator.getService(CommonCommitteeService.class).getAvailableMembers(committeeId, scheduleId);
+        List<CommitteeMembershipBase> committeeMemberships = KraServiceLocator.getService(IacucCommitteeService.class).getAvailableMembers(committeeId, scheduleId);
         return committeeMemberships;
     }
     
     private void initializeAbstainees(IacucProtocolSubmission submission) {
         Map<String, Long> absenteeLookFields = getLookUpFields(getProtocol().getProtocolId(), submission.getSubmissionId());
         
-        Collection<ProtocolVoteAbstainee> protocolVoteAbstainees = KraServiceLocator.getService(BusinessObjectService.class).findMatching(ProtocolVoteAbstainee.class, absenteeLookFields);
+        Collection<IacucProtocolVoteAbstainee> protocolVoteAbstainees = KraServiceLocator.getService(BusinessObjectService.class).findMatching(IacucProtocolVoteAbstainee.class, absenteeLookFields);
         
-        List<CommitteeMembership> committeeMemberships = getCommitteeMemberships();
+        List<CommitteeMembershipBase> committeeMemberships = getCommitteeMemberships();
         
-        for (ProtocolVoteAbstainee abstainee : protocolVoteAbstainees) {
-            for (CommitteeMembership membership : committeeMemberships) {
+        for (ProtocolVoteAbstaineeBase abstainee : protocolVoteAbstainees) {
+            for (CommitteeMembershipBase membership : committeeMemberships) {
                 if (abstainee.isProtocolReviewerFromCommitteeMembership(membership)) {
                     //this committee person is an abstainee
                     IacucCommitteePerson person = new IacucCommitteePerson();
@@ -143,12 +142,12 @@ public class IacucCommitteeDecision extends IacucProtocolActionBean implements C
     private void initializeRecused(IacucProtocolSubmission submission) {
         Map<String, Long> absenteeLookFields = getLookUpFields(getProtocol().getProtocolId(), submission.getSubmissionId());
         
-        Collection<ProtocolVoteRecused> protocolVoteRecused = KraServiceLocator.getService(BusinessObjectService.class).findMatching(ProtocolVoteRecused.class, absenteeLookFields);
+        Collection<IacucProtocolVoteRecused> protocolVoteRecused = KraServiceLocator.getService(BusinessObjectService.class).findMatching(IacucProtocolVoteRecused.class, absenteeLookFields);
         
-        List<CommitteeMembership> committeeMemberships = getCommitteeMemberships();
+        List<CommitteeMembershipBase> committeeMemberships = getCommitteeMemberships();
         
-        for (ProtocolVoteRecused recusee : protocolVoteRecused) {
-            for (CommitteeMembership membership : committeeMemberships) {
+        for (ProtocolVoteRecusedBase recusee : protocolVoteRecused) {
+            for (CommitteeMembershipBase membership : committeeMemberships) {
                 if (recusee.isProtocolReviewerFromCommitteeMembership(membership)) {
                     //this committee person is an recusee
                     IacucCommitteePerson person = new IacucCommitteePerson();
@@ -185,7 +184,6 @@ public class IacucCommitteeDecision extends IacucProtocolActionBean implements C
     }
 
     public Integer getAbstainCount() {
-        //return abstainCount;
         return this.getAbstainers().size();
     }
 
@@ -260,11 +258,11 @@ public class IacucCommitteeDecision extends IacucProtocolActionBean implements C
         return reviewCommentsBean;
     }
 
-    public void setReviewCommentsBean(ReviewCommentsBean reviewCommentsBean) {
+    public void setReviewCommentsBean(ReviewCommentsBeanBase reviewCommentsBean) {
         this.reviewCommentsBean = (IacucReviewCommentsBean) reviewCommentsBean;
     }
 
-    public ReviewAttachmentsBean getReviewAttachmentsBean() {
+    public ReviewAttachmentsBeanBase getReviewAttachmentsBean() {
         // TODO Auto-generated method stub
         return null;
     }

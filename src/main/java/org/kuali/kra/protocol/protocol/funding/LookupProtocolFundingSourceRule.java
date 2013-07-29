@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import org.kuali.kra.rules.ResearchDocumentRuleBase;
 /**
  * Validates the conditions necessary for looking up a funding source in the system.
  */
-public class LookupProtocolFundingSourceRule extends ResearchDocumentRuleBase implements BusinessRuleInterface<LookupProtocolFundingSourceEvent> {
+public class LookupProtocolFundingSourceRule extends ResearchDocumentRuleBase implements BusinessRuleInterface<LookupProtocolFundingSourceEventBase> {
 
     private final ErrorReporter errorReporter = new ErrorReporter();
     
@@ -33,7 +33,7 @@ public class LookupProtocolFundingSourceRule extends ResearchDocumentRuleBase im
      * {@inheritDoc}
      * @see org.kuali.kra.rule.BusinessRuleInterface#processRules(org.kuali.kra.rule.event.KraDocumentEventBaseExtension)
      */
-    public boolean processRules(LookupProtocolFundingSourceEvent event) {
+    public boolean processRules(LookupProtocolFundingSourceEventBase event) {
         boolean valid = true;
         
         if (event.getFundingSourceTypeCode() == null) {

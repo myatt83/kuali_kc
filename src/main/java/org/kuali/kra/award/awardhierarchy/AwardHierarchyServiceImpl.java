@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Queue;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -41,6 +43,7 @@ import org.kuali.kra.award.paymentreports.closeout.AwardCloseout;
 import org.kuali.kra.award.paymentreports.specialapproval.approvedequipment.AwardApprovedEquipment;
 import org.kuali.kra.award.paymentreports.specialapproval.foreigntravel.AwardApprovedForeignTravel;
 import org.kuali.kra.award.specialreview.AwardSpecialReview;
+import org.kuali.kra.award.timeandmoney.AwardDirectFandADistribution;
 import org.kuali.kra.award.version.service.AwardVersionService;
 import org.kuali.kra.bo.versioning.VersionHistory;
 import org.kuali.kra.bo.versioning.VersionStatus;
@@ -52,7 +55,10 @@ import org.kuali.kra.service.VersionHistoryService;
 import org.kuali.kra.service.VersioningService;
 import org.kuali.kra.service.impl.ObjectCopyUtils;
 import org.kuali.kra.timeandmoney.AwardHierarchyNode;
+import org.kuali.kra.timeandmoney.document.TimeAndMoneyDocument;
 import org.kuali.kra.timeandmoney.service.ActivePendingTransactionsService;
+import org.kuali.kra.timeandmoney.transactions.PendingTransaction;
+import org.kuali.rice.core.api.util.type.KualiDecimal;
 import org.kuali.rice.coreservice.framework.parameter.ParameterConstants;
 import org.kuali.rice.coreservice.framework.parameter.ParameterService;
 import org.kuali.rice.kew.api.exception.WorkflowException;
@@ -118,6 +124,15 @@ public class AwardHierarchyServiceImpl implements AwardHierarchyService {
     public AwardHierarchy copyAwardAsNewHierarchy(AwardHierarchy targetNode) {
         String nextAwardNumber = awardNumberService.getNextAwardNumber();
         Award newAward = copyAward(targetNode.getAward(), nextAwardNumber);
+        // Nulling out all dates and amounts from new award since it is copied as new from hierarchy and
+        // should not contain any old dates.
+        newAward.setAwardEffectiveDate(null);
+        int indexOfLatestAwardVersion = newAward.getAwardAmountInfos().size() -1;
+        newAward.getAwardAmountInfos().get(indexOfLatestAwardVersion).setFinalExpirationDate(null);
+        newAward.getAwardAmountInfos().get(indexOfLatestAwardVersion).setObligationExpirationDate(null);
+        newAward.getAwardAmountInfos().get(indexOfLatestAwardVersion).setCurrentFundEffectiveDate(null);
+        newAward.setAwardDirectFandADistributions(new ArrayList<AwardDirectFandADistribution>());
+
         AwardHierarchy newNode = createBasicHierarchy(nextAwardNumber);
         newNode.setAward(newAward);
         return newNode;
@@ -212,45 +227,68 @@ public class AwardHierarchyServiceImpl implements AwardHierarchyService {
      * @see org.kuali.kra.award.awardhierarchy.AwardHierarchyService#loadAwardHierarchy(java.lang.String)
      */
     public AwardHierarchy loadAwardHierarchyBranch(String awardNumber) {
-        return loadAwardHierarchyBranch(loadSingleAwardHierarchyNode(awardNumber));
+        Map<String, AwardHierarchy> hierarchy = getAwardHierarchy(awardNumber, new ArrayList<String>());
+        return hierarchy.get(awardNumber);
     }
-
-     /**/
-    public Map<String, AwardHierarchy> getAwardHierarchy(AwardHierarchy rootNode, List<String> order) {
-        Map<String, Collection<AwardHierarchy>> mapOfChildren = new HashMap<String, Collection<AwardHierarchy>>();
-        Map<String, AwardHierarchy> awardHierarchies = createAwardHierarchyAndPrepareCollectionForSort(rootNode, mapOfChildren);
-
-        String parentAwardNumber = rootNode.getAwardNumber();
-        order.add(parentAwardNumber);
-        if(awardHierarchies.size() > 1){
-            createSortOrder(order, awardHierarchies, mapOfChildren, parentAwardNumber, null, null);
+    
+    public Map<String, AwardHierarchy> getAwardHierarchy(AwardHierarchy anyNode, List<String> order) {
+        Map<String, AwardHierarchy> result = new HashMap<String, AwardHierarchy>();
+        if (anyNode == null) {
+            return result;
         }
+        
+        Map<String, Object> values = new HashMap<String, Object>();
+        //find all hierarchy BOs for the root award number. If the anyNode was got is the root, the award number
+        //will be 'DEFAULT_AWARD_NUMBER' and therefore we will use the award number, otherwise, the root award number
+        String rootAwardNumber = StringUtils.equals(Award.DEFAULT_AWARD_NUMBER, anyNode.getRootAwardNumber()) ? anyNode.getAwardNumber() : anyNode.getRootAwardNumber(); 
+        values.put("rootAwardNumber", rootAwardNumber);
+        values.put("active", true);
+        List<AwardHierarchy> hierarchyList = (List<AwardHierarchy>) businessObjectService.findMatchingOrderBy(AwardHierarchy.class, values, "awardNumber", true);
 
-        return awardHierarchies;
+        if (!hierarchyList.isEmpty()) {
+            for (AwardHierarchy hierarchy : hierarchyList) {
+                result.put(hierarchy.getAwardNumber(), hierarchy);
+                //clear children in case this was already called and cached BOs were returned from OJB.
+                hierarchy.getChildren().clear();
+            }
+            AwardHierarchy rootNode = result.get(rootAwardNumber);
+            for (AwardHierarchy hierarchy : result.values()) {
+                hierarchy.setRoot(rootNode);
+                AwardHierarchy parent = result.get(hierarchy.getParentAwardNumber());
+                if (parent != null) {
+                    parent.getChildren().add(hierarchy);
+                    hierarchy.setParent(parent);
+                }
+            }
+            Queue<AwardHierarchy> queue = new LinkedList<AwardHierarchy>();
+            queue.add(rootNode);
+            while (!queue.isEmpty()) {
+                AwardHierarchy node = queue.poll();
+                order.add(node.getAwardNumber());
+                queue.addAll(node.getChildren());
+            }
+        }
+        return result;
     }
 
     /**
      * @see org.kuali.kra.award.awardhierarchy.AwardHierarchyService#getAwardHierarchy(java.lang.String, java.util.List)
      */
     public Map<String, AwardHierarchy> getAwardHierarchy(String awardNumber, List<String> order) {
-        return getAwardHierarchy(getAwardHierarchyRootNode(awardNumber), order);
+        return getAwardHierarchy(loadSingleAwardHierarchyNode(awardNumber), order);
     }
 
     /**
      * @see org.kuali.kra.award.awardhierarchy.AwardHierarchyService#loadFullHierarchyFromAnyNode(java.lang.String)
      */
     public AwardHierarchy loadFullHierarchyFromAnyNode(String awardNumber) {
-        AwardHierarchy rootNode = null;
-        if(!Award.DEFAULT_AWARD_NUMBER.equals(awardNumber)) {
-            AwardHierarchy someNode = loadSingleAwardHierarchyNode(awardNumber);
-            if(someNode != null) {
-                rootNode = someNode.isRootNode() ? someNode : loadSingleAwardHierarchyNode(someNode.getRootAwardNumber());
-                rootNode.setRoot(rootNode);
-                rootNode.setParent(null);
-                rootNode = loadAwardHierarchyBranch(rootNode);
-            }
+        List<String> order = new ArrayList<String>();
+        Map<String, AwardHierarchy> hierarchy = getAwardHierarchy(awardNumber, order);
+        if (!order.isEmpty()) {
+            return hierarchy.get(order.get(0));
+        } else {
+            return null;
         }
-        return rootNode;
     }
 
     /**
@@ -340,6 +378,7 @@ public class AwardHierarchyServiceImpl implements AwardHierarchyService {
         return loadAwardHierarchy(rootAwardNumber);
     }
 
+    
     /**
      * This method copies an Award to a new Award, sequence #1, with newAwardNumber
      * @param award
@@ -362,13 +401,14 @@ public class AwardHierarchyServiceImpl implements AwardHierarchyService {
             List<AwardSpecialReview> awardSpecialReviews = new ArrayList<AwardSpecialReview>();
             newAward.setSpecialReviews(awardSpecialReviews);
             clearFilteredAttributes(newAward);
+            getAwardService().synchNewCustomAttributes(newAward, award);
+            
         } catch(Exception e) { 
             throw uncheckedException(e);
         }
         return newAward;
     }
    
-    
     protected void clearFilteredAttributes(Award newAward) {
         // setting all financial information to null so copied award can spawn its own
         newAward.setAccountNumber(null);
@@ -376,10 +416,8 @@ public class AwardHierarchyServiceImpl implements AwardHierarchyService {
         newAward.setFinancialAccountDocumentNumber(null);
         newAward.setFinancialChartOfAccountsCode(null);
         newAward.setNoticeDate(null);
-        int sourceFundingProposalsCount = newAward.getFundingProposals().size();
-        for(int i=0; i < sourceFundingProposalsCount; i++) {
-            newAward.removeFundingProposal(i);
-        }
+        //simply clear the funding proposals since we haven't saved and they haven't been added to the associated proposal.
+        newAward.getFundingProposals().clear();
         newAward.setAwardApprovedSubawards(new ArrayList<AwardApprovedSubaward>());
         newAward.setApprovedEquipmentItems(new ArrayList<AwardApprovedEquipment>());
         newAward.setApprovedForeignTravelTrips(new ArrayList<AwardApprovedForeignTravel>());
@@ -459,7 +497,7 @@ public class AwardHierarchyServiceImpl implements AwardHierarchyService {
     }
 
     protected void finalizeAward(Award newAward) {
-        versionHistoryService.createVersionHistory(newAward, VersionStatus.ACTIVE, GlobalVariables.getUserSession().getPrincipalName());
+        versionHistoryService.updateVersionHistory(newAward, VersionStatus.ACTIVE, GlobalVariables.getUserSession().getPrincipalName());
         awardService.updateAwardSequenceStatus(newAward, VersionStatus.ACTIVE);
     }
     
@@ -499,13 +537,6 @@ public class AwardHierarchyServiceImpl implements AwardHierarchyService {
         return !c.isEmpty() ? (DocumentHeader) c.iterator().next() : null;
     }
 
-    AwardHierarchy loadAwardHierarchyBranch(AwardHierarchy branchNode) {
-        if(branchNode != null) {
-            recurseTree(branchNode);
-        }
-        return branchNode;
-    }
-
     AwardHierarchy loadSingleAwardHierarchyNode(String awardNumber) {
         return (AwardHierarchy) businessObjectService.findByPrimaryKey(AwardHierarchy.class, getAwardHierarchyCriteriaMap(awardNumber));
     }
@@ -514,56 +545,10 @@ public class AwardHierarchyServiceImpl implements AwardHierarchyService {
         return ServiceHelper.getInstance().buildCriteriaMap(DOCUMENT_DESCRIPTION_FIELD_NAME, AwardDocument.PLACEHOLDER_DOC_DESCRIPTION);
     }
 
-    /**
-     * This method recurses the AwardHierarchy tree
-     * @param branchNode
-     */
-    @SuppressWarnings("unchecked")
-    void recurseTree(AwardHierarchy branchNode) {
-        Map<String, Object> criteria = ServiceHelper.getInstance().buildCriteriaMap(new String[]{"parentAwardNumber", "active"}, new Object[]{branchNode.getAwardNumber(), Boolean.TRUE});
-        Collection c = businessObjectService.findMatchingOrderBy(AwardHierarchy.class, criteria, AwardHierarchy.UNIQUE_IDENTIFIER_FIELD, true);
-        branchNode.setChildren(new ArrayList<AwardHierarchy>(c));
-        if(branchNode.hasChildren()) {
-            for(AwardHierarchy childNode: branchNode.getChildren()) {
-                childNode.setParent(branchNode);
-                childNode.setRoot(branchNode.getRoot());
-                recurseTree(childNode);
-            }
-        }
-    }
-
     protected void addNewAwardToPlaceholderDocument(AwardDocument doc, AwardHierarchy node) {
         Award award = node.getAward();
         if (award.isNew()) {
             doc.getAwardList().add(award);
-        }
-    }
-
-    /*
-     * This method constructs the entire award hierarchy based on the root node.
-     *
-     * This method also creates a map of children - where the key is parent award number and value is a list of all of its children.
-     * This map will be used to sort award hierarchy nodes in correct parent-child order.
-     *
-     * Both awardHierarchy and mapOfChildren are being updated in same for loop so its not possible to have two separate methods for them.
-     */
-    @SuppressWarnings("unchecked")
-    protected Map<String, AwardHierarchy> createAwardHierarchyAndPrepareCollectionForSort(AwardHierarchy awardHierarchyRootNode,
-                                                                                        Map<String, Collection<AwardHierarchy>> mapOfChildren) {
-        Map<String, AwardHierarchy> hierarchyMap = new HashMap<String, AwardHierarchy>();
-        createAwardHierarchyMap(hierarchyMap, awardHierarchyRootNode, mapOfChildren);
-        return hierarchyMap;
-    }
-
-    // recursively walk hierarchy tree, populating maps
-    protected void createAwardHierarchyMap(Map<String, AwardHierarchy> hierarchyMap, AwardHierarchy node, Map<String, Collection<AwardHierarchy>> mapOfChildren) {
-        if(node != null) {
-            hierarchyMap.put(node.getAwardNumber(), node);
-            // there is a pernicious side-effect in createSortOrder that causes child collection to be cleared, so store a copy of the children collection
-            mapOfChildren.put(node.getAwardNumber(), new ArrayList<AwardHierarchy>(node.getChildren()));
-            for(AwardHierarchy childNode: node.getChildren()) {
-                createAwardHierarchyMap(hierarchyMap, childNode, mapOfChildren);
-            }
         }
     }
 
@@ -577,40 +562,6 @@ public class AwardHierarchyServiceImpl implements AwardHierarchyService {
             throw new MissingHierarchyException(someNodeAwardNumberInHierarchy);
         }
         return getRootNode(someNodeInHierarchy.getRootAwardNumber());
-    }
-
-    /*
-     * This method updates the @listForAwardHierarchySort as per the correct parent-child order. This list will be used to display the award hierarchy nodes
-     * in correct sort order.
-     * The order is going to be root followed by all its children followed by all of their children until there are no children.
-     */
-    protected void createSortOrder(List<String> listForAwardHierarchySort, Map<String, AwardHierarchy> awardHierarchies,
-                                 Map<String, Collection<AwardHierarchy>> mapOfChildren, String parentAwardNumber,
-                                 Collection<AwardHierarchy> ahCollection, AwardHierarchy ah1) {
-
-        while(!StringUtils.equalsIgnoreCase(parentAwardNumber,Constants.AWARD_HIERARCHY_DEFAULT_PARENT_OF_ROOT)){
-            if(mapOfChildren.get(parentAwardNumber).size()!=0){
-                ahCollection = mapOfChildren.get(parentAwardNumber);
-                ah1 = ahCollection.iterator().next();
-                parentAwardNumber = ah1.getAwardNumber();
-                listForAwardHierarchySort.add(parentAwardNumber);
-            }else if(ahCollection!=null && ahCollection.size() ==0){
-                ah1 = awardHierarchies.get(awardHierarchies.get(parentAwardNumber).getAwardNumber());
-                if(ah1!=null){
-                    parentAwardNumber = ah1.getParentAwardNumber();
-                    if(!StringUtils.equalsIgnoreCase(parentAwardNumber,Constants.AWARD_HIERARCHY_DEFAULT_PARENT_OF_ROOT)){
-                        mapOfChildren.get(parentAwardNumber).remove(ah1);
-                    }
-                }else{
-                    parentAwardNumber = Constants.AWARD_HIERARCHY_DEFAULT_PARENT_OF_ROOT;
-                }
-            }
-            else if(ah1!=null){
-                parentAwardNumber = ah1.getParentAwardNumber();
-                ahCollection.remove(ah1);
-            }
-        }
-
     }
 
     protected Map<String, Object> getAwardHierarchyCriteriaMap(String awardNumber) {
@@ -708,21 +659,6 @@ public class AwardHierarchyServiceImpl implements AwardHierarchyService {
         awardHierarchyNode.setAwardDocumentNumber(award.getAwardDocument().getDocumentNumber());
         awardHierarchyNode.setHasChildren(!awardHierarchy.getChildren().isEmpty());
         
-        /*
-        String documentNumber = award.getAwardDocument().getDocumentNumber();
-        boolean awardDocumentFinalStatus = false;
-        try {
-            Document awardDocument = documentService.getByDocumentHeaderId(documentNumber);
-            awardDocumentFinalStatus = (awardDocument != null) ? awardDocument.getDocumentHeader().getWorkflowDocument().isFinal() : false;
-        } catch (WorkflowException e) {
-            throw uncheckedException(e);
-        }
-        
-        awardHierarchyNode.setAwardDocumentNumber(documentNumber);
-        if (awardDocumentFinalStatus && pendingVersionHistory != null && award != null && !pendingVersionHistory.getSequenceOwnerSequenceNumber().equals(award.getSequenceNumber())) {
-            awardDocumentFinalStatus = false;
-        }
-        awardHierarchyNode.setAwardDocumentFinalStatus(awardDocumentFinalStatus);*/
         //if there is not a pending version and there is an active version then the award document is final.
         awardHierarchyNode.setAwardDocumentFinalStatus(pendingVersionHistory == null && activeVersionHistory != null);
         return awardHierarchyNode;
@@ -742,7 +678,7 @@ public class AwardHierarchyServiceImpl implements AwardHierarchyService {
      * @throws WorkflowException 
      * @see org.kuali.kra.award.awardhierarchy.AwardHierarchyService#populateAwardHierarchyNodes(java.util.Map, java.util.Map)
      */
-    public void populateAwardHierarchyNodesForTandMDoc(Map<String, AwardHierarchy> awardHierarchyItems, Map<String, AwardHierarchyNode> awardHierarchyNodes, String currentAwardNumber, String currentSequenceNumber, String docNum) {
+    public void populateAwardHierarchyNodesForTandMDoc(Map<String, AwardHierarchy> awardHierarchyItems, Map<String, AwardHierarchyNode> awardHierarchyNodes, String currentAwardNumber, String currentSequenceNumber, TimeAndMoneyDocument timeAndMoneyDocument) {
         AwardHierarchyNode awardHierarchyNode;
         String tmpAwardNumber = null;
         
@@ -755,30 +691,9 @@ public class AwardHierarchyServiceImpl implements AwardHierarchyService {
             
             VersionHistory pendingVersionHistory = versionHistoryService.findPendingVersion(Award.class, tmpAwardNumber);
             VersionHistory activeVersionHistory = versionHistoryService.findActiveVersion(Award.class, tmpAwardNumber);
-//            Award award = null;
-//            if (pendingVersionHistory != null) {
-//                award = (Award) pendingVersionHistory.getSequenceOwner();
-//            } else if (activeVersionHistory != null) {
-//                award = (Award) activeVersionHistory.getSequenceOwner();
-//            }
             Award award = awardVersionService.getWorkingAwardVersion(tmpAwardNumber);
-            //KRACOEUS-4879 - The above is the same as the commented out section below as long as we prefer the pending version in 
-            
-            /*//Award award = null;
-            VersionHistory pendingVersionHistory = null;
-            //For the current award, we should always show only the pending version if it exists
-//            if(StringUtils.isNotEmpty(currentAwardNumber) && StringUtils.isNotEmpty(currentSequenceNumber) && StringUtils.equals(tmpAwardNumber, currentAwardNumber)) {
-                pendingVersionHistory = versionHistoryService.findPendingVersion(Award.class, currentAwardNumber, currentSequenceNumber);
-//                if(pendingVersionHistory != null) {
-//                    award = (Award) pendingVersionHistory.getSequenceOwner();
-//                }
-//            }
-            Award award = activePendingTransactionsService.getWorkingAwardVersion(tmpAwardNumber);
-//            if(award == null) {
-//                award = activeAward;  
-//            }  */
 
-            AwardAmountInfo awardAmountInfo = awardAmountInfoService.fetchLastAwardAmountInfoForDocNum(award, docNum);            
+            AwardAmountInfo awardAmountInfo = awardAmountInfoService.fetchLastAwardAmountInfoForDocNum(award, timeAndMoneyDocument.getDocumentNumber());            
             
             awardHierarchyNode.setFinalExpirationDate(awardAmountInfo.getFinalExpirationDate());
             awardHierarchyNode.setLeadUnitName(award.getUnitName());
@@ -786,34 +701,36 @@ public class AwardHierarchyServiceImpl implements AwardHierarchyService {
             awardHierarchyNode.setAccountNumber(award.getAccountNumber());
             awardHierarchyNode.setAwardStatusCode(award.getStatusCode());
             awardHierarchyNode.setObliDistributableAmount(awardAmountInfo.getObliDistributableAmount());
-            awardHierarchyNode.setAmountObligatedToDate(awardAmountInfo.getAmountObligatedToDate());
-            awardHierarchyNode.setObligatedTotalDirect(awardAmountInfo.getObligatedTotalDirect());
-            awardHierarchyNode.setObligatedTotalIndirect(awardAmountInfo.getObligatedTotalIndirect());
-            awardHierarchyNode.setAnticipatedTotalAmount(awardAmountInfo.getAnticipatedTotalAmount());
-            awardHierarchyNode.setAnticipatedTotalDirect(awardAmountInfo.getAnticipatedTotalDirect());
-            awardHierarchyNode.setAnticipatedTotalIndirect(awardAmountInfo.getAnticipatedTotalIndirect());
             awardHierarchyNode.setAntDistributableAmount(awardAmountInfo.getAntDistributableAmount());
+            // we need to add in the pending transactions that are a result of changing totals in single-node view
+            KualiDecimal obligatedTotal = awardAmountInfo.getAmountObligatedToDate();
+            KualiDecimal obligatedTotalDirect = awardAmountInfo.getObligatedTotalDirect();
+            KualiDecimal obligatedTotalIndirect = awardAmountInfo.getObligatedTotalIndirect();
+            KualiDecimal anticipatedTotalAmount = awardAmountInfo.getAnticipatedTotalAmount();
+            KualiDecimal anticipatedTotalDirect = awardAmountInfo.getAnticipatedTotalDirect();
+            KualiDecimal anticipatedTotalIndirect = awardAmountInfo.getAnticipatedTotalIndirect();
+            for (PendingTransaction pendingTransaction: timeAndMoneyDocument.getPendingTransactions()){
+                if (pendingTransaction.getProcessedFlag() == false && pendingTransaction.isSingleNodeTransaction()) {
+                    obligatedTotal = obligatedTotal.add(pendingTransaction.getObligatedAmount());
+                    obligatedTotalDirect = obligatedTotalDirect.add(pendingTransaction.getObligatedDirectAmount());
+                    obligatedTotalIndirect = obligatedTotalIndirect.add(pendingTransaction.getObligatedIndirectAmount());
+                    anticipatedTotalAmount = anticipatedTotalAmount.add(pendingTransaction.getAnticipatedAmount());
+                    anticipatedTotalDirect = anticipatedTotalDirect.add(pendingTransaction.getAnticipatedDirectAmount());
+                    anticipatedTotalIndirect = anticipatedTotalIndirect.add(pendingTransaction.getAnticipatedIndirectAmount());
+                }
+            }
+            awardHierarchyNode.setAmountObligatedToDate(obligatedTotal);
+            awardHierarchyNode.setObligatedTotalDirect(obligatedTotalDirect);
+            awardHierarchyNode.setObligatedTotalIndirect(obligatedTotalIndirect);
+            awardHierarchyNode.setAnticipatedTotalAmount(anticipatedTotalAmount);
+            awardHierarchyNode.setAnticipatedTotalDirect(anticipatedTotalDirect);
+            awardHierarchyNode.setAnticipatedTotalIndirect(anticipatedTotalIndirect);
             awardHierarchyNode.setCurrentFundEffectiveDate(awardAmountInfo.getCurrentFundEffectiveDate());
-            //awardHierarchyNode.setCurrentFundEffectiveDate(award.getAwardEffectiveDate());
             awardHierarchyNode.setObligationExpirationDate(awardAmountInfo.getObligationExpirationDate());
             awardHierarchyNode.setProjectStartDate(award.getAwardEffectiveDate());
             awardHierarchyNode.setTitle(award.getTitle());
             awardHierarchyNode.setAwardId(award.getAwardId());
-            
-            /*String documentNumber = award.getAwardDocument().getDocumentNumber();
-            boolean awardDocumentFinalStatus = false;
-            try {
-                Document awardDocument = documentService.getByDocumentHeaderId(documentNumber);
-                awardDocumentFinalStatus = (awardDocument != null) ? awardDocument.getDocumentHeader().getWorkflowDocument().isFinal() : false;
-            } catch(WorkflowException e) {
-                throw uncheckedException(e);
-            }
-            
-            awardHierarchyNode.setAwardDocumentNumber(documentNumber);
-            if(!awardDocumentFinalStatus && pendingVersionHistory != null && award != null && !pendingVersionHistory.getSequenceOwnerSequenceNumber().equals(award.getSequenceNumber())) {
-                awardDocumentFinalStatus = true;   
-            }
-            awardHierarchyNode.setAwardDocumentFinalStatus(new Boolean(awardDocumentFinalStatus));*/
+
             //if there is not a pending version and there is an active version then the award document is final.
             awardHierarchyNode.setAwardDocumentFinalStatus(pendingVersionHistory == null && activeVersionHistory != null);
             awardHierarchyNodes.put(awardHierarchyNode.getAwardNumber(), awardHierarchyNode);

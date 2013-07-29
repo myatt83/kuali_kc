@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@ public class DisclosureQuestionnaireHelper extends QuestionnaireHelperBase {
     private static final long serialVersionUID = -8685872555239368202L;
     
     private CoiDisclosure coiDisclosure;
+    private boolean questionnairesLoaded;
     
     public DisclosureQuestionnaireHelper(CoiDisclosure coiDisclosure) {
         this.setAnswerHeaders(new ArrayList<AnswerHeader>());
@@ -69,17 +70,22 @@ public class DisclosureQuestionnaireHelper extends QuestionnaireHelperBase {
     
     protected void populateQuestionnaires(boolean reload) {
         boolean refreshed = false;
-        if(CollectionUtils.isEmpty(this.getAnswerHeaders()) || reload) {
-            super.populateAnswers();
+        if(!questionnairesLoaded || reload) {
+            populateAnswers();
             refreshed = true;
         } 
         // have to update the child indicator, otherwise, the questionnaire may be hidden
         if (!refreshed && !CollectionUtils.isEmpty(this.getAnswerHeaders())) {
             for (AnswerHeader answerHeader : this.getAnswerHeaders()) {
-                    getQuestionnaireAnswerService().setupChildAnswerIndicator(answerHeader.getAnswers());
+                    getQuestionnaireAnswerService().setupChildAnswerIndicator(answerHeader);
                 }
 
         }
+    }
+    
+    public void populateAnswers() {
+        super.populateAnswers();
+        questionnairesLoaded = true;
     }
     
     public CoiDisclosure getCoiDisclosure() {

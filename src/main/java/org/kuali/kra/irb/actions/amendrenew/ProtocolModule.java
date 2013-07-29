@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,14 @@
  */
 package org.kuali.kra.irb.actions.amendrenew;
 
-import org.kuali.kra.bo.KraPersistableBusinessObjectBase;
+import org.kuali.kra.protocol.actions.amendrenew.ProtocolModuleBase;
 
-@SuppressWarnings("serial")
-public class ProtocolModule extends KraPersistableBusinessObjectBase {
+public class ProtocolModule extends ProtocolModuleBase {
+
+    /**
+     * Comment for <code>serialVersionUID</code>
+     */
+    private static final long serialVersionUID = 4529315510212062290L;
 
     public static final String GENERAL_INFO = "001";
 
@@ -43,27 +47,4 @@ public class ProtocolModule extends KraPersistableBusinessObjectBase {
     public static final String PROTOCOL_PERMISSIONS = "025";
 
     public static final String QUESTIONNAIRE = "026";
-
-    private String protocolModuleCode;
-
-    private String description;
-
-    public ProtocolModule() {
-    }
-
-    public String getProtocolModuleCode() {
-        return protocolModuleCode;
-    }
-
-    public void setProtocolModuleCode(String protocolModuleCode) {
-        this.protocolModuleCode = protocolModuleCode;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
 }

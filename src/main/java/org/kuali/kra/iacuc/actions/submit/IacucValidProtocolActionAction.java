@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  *
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package org.kuali.kra.iacuc.actions.submit;
 
-import org.kuali.kra.protocol.actions.submit.ValidProtocolActionAction;
+import org.kuali.kra.protocol.actions.submit.ValidProtocolActionActionBase;
 
 /**
  * This class represents the action follow up mapping as it exists in coeus.
@@ -25,7 +25,7 @@ import org.kuali.kra.protocol.actions.submit.ValidProtocolActionAction;
  * a unique key on the underlying table.
  * 
  */
-public class IacucValidProtocolActionAction extends ValidProtocolActionAction {
+public class IacucValidProtocolActionAction extends ValidProtocolActionActionBase {
 
     /**
      * Comment for <code>serialVersionUID</code>

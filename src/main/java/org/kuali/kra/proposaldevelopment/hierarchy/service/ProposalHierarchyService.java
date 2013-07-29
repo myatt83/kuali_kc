@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,10 @@ import java.io.IOException;
 import java.util.List;
 
 import org.apache.struts.upload.FormFile;
+import org.kuali.kra.budget.document.BudgetDocument;
 import org.kuali.kra.budget.personnel.HierarchyPersonnelSummary;
 import org.kuali.kra.proposaldevelopment.bo.DevelopmentProposal;
+import org.kuali.kra.proposaldevelopment.budget.bo.ProposalDevelopmentBudgetExt;
 import org.kuali.kra.proposaldevelopment.document.ProposalDevelopmentDocument;
 import org.kuali.kra.proposaldevelopment.hierarchy.ProposalHierarchyErrorDto;
 import org.kuali.kra.proposaldevelopment.hierarchy.ProposalHierarchyException;
@@ -100,6 +102,13 @@ public interface ProposalHierarchyService {
      * @throws ProposalHierarchyException if childProposal is not a member of a hierarchy
      */
     public void synchronizeChild(DevelopmentProposal childProposal) throws ProposalHierarchyException;
+    
+    /**
+     * This method syncs only the budget from the child proposal specificed to the hierarchy budget.
+     * @param childProposal
+     * @throws ProposalHierarchyException
+     */
+    public void synchronizeChildProposalBudget(ProposalDevelopmentBudgetExt budget, DevelopmentProposal childProposal) throws ProposalHierarchyException;  
     
     /**
      * This method synchronizes the contents of all children into the hierarchy.  If any child has changed since its last synchronization, the parent is reaggregated.
@@ -200,4 +209,14 @@ public interface ProposalHierarchyService {
     public void updateAppDocStatus(ProposalDevelopmentDocument doc, String principalId, String newStatus) throws ProposalHierarchyException;
 
     public void calculateAndSetProposalAppDocStatus(ProposalDevelopmentDocument doc, DocumentRouteStatusChange dto) throws ProposalHierarchyException;
+    
+    /**
+     * Gets the budget for hierarchy sync. This will be the budget marked final or the most recently created budget.
+     * @param childProposal
+     * @return
+     * @throws ProposalHierarchyException
+     */
+    public BudgetDocument<DevelopmentProposal> getSyncableBudget(DevelopmentProposal childProposal) throws ProposalHierarchyException;
+    
+    public HierarchyProposalSummary getProposalSummary(String proposalNumber) throws ProposalHierarchyException; 
 }

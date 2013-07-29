@@ -1,5 +1,5 @@
 <%--
- Copyright 2005-2010 The Kuali Foundation
+ Copyright 2005-2013 The Kuali Foundation
  
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -143,7 +143,7 @@
 			
 			<c:set var="firstCellRowSpan" value="0" />
 			<c:forEach var="personnelObjectCode" items="${personnelObjectCodes}" varStatus="objStatus" >
-				<c:set var="firstCellRowSpan" value="${firstCellRowSpan+1}" />
+				<c:set var="firstCellRowSpan" value="${firstCellRowSpan+2}" />
 				<c:set var="personnelList" value="${KualiForm.document.budget.objectCodePersonnelList[personnelObjectCode]}" />
 	            <c:forEach var="person" items="${personnelList}" varStatus="personStatus" >
 	            	<c:set var="firstCellRowSpan" value="${firstCellRowSpan+1}" />

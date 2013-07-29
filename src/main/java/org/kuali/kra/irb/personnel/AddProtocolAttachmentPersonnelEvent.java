@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,24 +15,13 @@
  */
 package org.kuali.kra.irb.personnel;
 
+import org.kuali.kra.irb.ProtocolDocument;
 import org.kuali.kra.irb.noteattachment.ProtocolAttachmentPersonnel;
-import org.kuali.rice.krad.document.Document;
-import org.kuali.rice.krad.rules.rule.BusinessRule;
 
-public class AddProtocolAttachmentPersonnelEvent extends ProtocolAttachmentPersonnelEventBase {
-
-    protected AddProtocolAttachmentPersonnelEvent(String errorPathPrefix, Document document,
-            ProtocolAttachmentPersonnel protocolAttachmentPersonnel, int personIndex) {
-        super("adding ProtocolAttachmentPeronnel to document " + getDocumentId(document), errorPathPrefix, document,
-                protocolAttachmentPersonnel, personIndex);
-    }
-
-    public Class getRuleInterfaceClass() {
-        return AddProtocolAttachmentPersonnelRule.class;
-    }
-
-    public boolean invokeRuleMethod(BusinessRule rule) {
-        return ((AddProtocolAttachmentPersonnelRule) rule).processAddProtocolAttachmentPersonnelRules(this);
+public class AddProtocolAttachmentPersonnelEvent extends org.kuali.kra.protocol.personnel.AddProtocolAttachmentPersonnelEvent {
+    
+    protected AddProtocolAttachmentPersonnelEvent(String errorPathPrefix, ProtocolDocument document, ProtocolAttachmentPersonnel protocolAttachmentPersonnel, int personIndex) {
+        super(errorPathPrefix, document, protocolAttachmentPersonnel, personIndex);
     }
 
 }

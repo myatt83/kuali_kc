@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,16 @@
 package org.kuali.kra.common.committee.notification;
 
 import org.apache.commons.lang.StringUtils;
-import org.kuali.kra.common.committee.bo.CommonCommittee;
-import org.kuali.kra.common.committee.bo.CommonCommitteeSchedule;
+import org.kuali.kra.common.committee.bo.CommitteeBase;
+import org.kuali.kra.common.committee.bo.CommitteeScheduleBase;
 import org.kuali.kra.common.notification.bo.NotificationModuleRoleQualifier;
 import org.kuali.kra.kim.bo.KcKimAttributes;
 
 
-public class CommitteeNotificationRoleQualifierServiceImpl implements CommitteeNotificationRoleQualifierService {
+public class CommitteeNotificationRoleQualifierServiceImpl implements CommonCommitteeNotificationRoleQualifierService {
 
-    private CommonCommittee committee;
-    private CommonCommitteeSchedule committeeSchedule;
-    public static final String COMMON_COMMITTEE_NOTIFICATION_ROLE_QUALIFER_SERVICE_SPRING_NAME = "commonCommitteeNotificationRoleQualifierService";
+    private CommitteeBase committee;
+    private CommitteeScheduleBase committeeSchedule;
     
     /**
      * 
@@ -45,19 +44,19 @@ public class CommitteeNotificationRoleQualifierServiceImpl implements CommitteeN
         return qVal;
     }
 
-    public CommonCommittee getCommittee() {
+    public CommitteeBase getCommittee() {
         return committee;
     }
 
-    public void setCommittee(CommonCommittee committee) {
+    public void setCommittee(CommitteeBase committee) {
         this.committee = committee;
     }
 
-    public CommonCommitteeSchedule getCommitteeSchedule() {
+    public CommitteeScheduleBase getCommitteeSchedule() {
         return committeeSchedule;
     }
 
-    public void setCommitteeSchedule(CommonCommitteeSchedule committeeSchedule) {
+    public void setCommitteeSchedule(CommitteeScheduleBase committeeSchedule) {
         this.committeeSchedule = committeeSchedule;
     }
 

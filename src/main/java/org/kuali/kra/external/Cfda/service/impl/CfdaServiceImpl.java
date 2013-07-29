@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,8 +36,10 @@ import org.kuali.kra.external.Cfda.CfdaService;
 import org.kuali.kra.external.Cfda.CfdaUpdateResults;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.rice.core.api.datetime.DateTimeService;
+import org.kuali.rice.core.framework.persistence.jdbc.sql.SQLUtils;
 import org.kuali.rice.coreservice.framework.parameter.ParameterService;
 import org.kuali.rice.krad.service.BusinessObjectService;
+import org.kuali.rice.krad.service.DocumentService;
 
 import au.com.bytecode.opencsv.CSVReader;
 
@@ -51,9 +53,10 @@ public class CfdaServiceImpl implements CfdaService {
     private ParameterService parameterService;
     private BusinessObjectService businessObjectService;
     private DateTimeService dateTimeService;
-    private String ftpPrefix = "ftp://";
+    private static final String FTP_PREFIX = "ftp://";
     private String cfdaFileName;
     private String govURL;
+    private DocumentService documentService;
     
     private static final Log LOG = LogFactory.getLog(CfdaServiceImpl.class);
     protected static Comparator cfdaComparator;
@@ -162,8 +165,8 @@ public class CfdaServiceImpl implements CfdaService {
         String fileName = StringUtils.substringAfterLast(url, "/");
         url = StringUtils.substringBeforeLast(url, "/");
        
-        if (StringUtils.contains(url, ftpPrefix)) {
-            url = StringUtils.remove(url, ftpPrefix);
+        if (StringUtils.contains(url, FTP_PREFIX)) {
+            url = StringUtils.remove(url, FTP_PREFIX);
         }
         
         Calendar calendar = dateTimeService.getCurrentCalendar();
@@ -204,6 +207,7 @@ public class CfdaServiceImpl implements CfdaService {
         CfdaUpdateResults updateResults = new CfdaUpdateResults();
         StringBuilder message = new StringBuilder();
         Map<String, CFDA> govCfdaMap;
+        
         try {
             govCfdaMap = retrieveGovCodes();
         } catch (IOException ioe) {
@@ -212,57 +216,58 @@ public class CfdaServiceImpl implements CfdaService {
             updateResults.setMessage(message.toString());
             return updateResults;
         }
-        SortedMap<String, CFDA> dbCfdaMap = getCfdaValuesInDatabase();
-        updateResults.setNumberOfRecordsInKcDatabase(dbCfdaMap.size());
+        
+        SortedMap<String, CFDA> kcMap = getCfdaValuesInDatabase();
+        updateResults.setNumberOfRecordsInKcDatabase(kcMap.size());
         updateResults.setNumberOfRecordsRetrievedFromWebSite(govCfdaMap.size());
         
-        for (String dbCfdaKey : dbCfdaMap.keySet()) {
-            CFDA dbCfda = dbCfdaMap.get(dbCfdaKey);
-            CFDA govCfda = govCfdaMap.get(dbCfdaKey);
-            // if the database already has the new gov cfda number
-            if (govCfdaMap.containsKey(dbCfdaKey)) {
-               
-                // these Cfda values are maintained automatically
-                if (dbCfda.getCfdaMaintenanceTypeId().equalsIgnoreCase(Constants.CFDA_MAINT_TYP_ID_AUTOMATIC)) {
-                    // check if title has changed and report, do not change in the database. This can be
-                    // done manually.
-                    String govCfdaProgramTitleName = trimProgramTitleName(govCfda.getCfdaProgramTitleName());
-                    if (!dbCfda.getCfdaProgramTitleName().equalsIgnoreCase(govCfdaProgramTitleName)) {
-                        // report in email
-                        message.append("The cfda program title for the cfda number " + dbCfda.getCfdaNumber() + " has changed.<BR>");
+        for (String key : kcMap.keySet()) {
+            CFDA kcCfda = kcMap.get(key);
+            CFDA govCfda = govCfdaMap.get(key);
+
+
+            if (kcCfda.getCfdaMaintenanceTypeId().equalsIgnoreCase(Constants.CFDA_MAINT_TYP_ID_MANUAL)) {
+                // Leave it alone. It's maintained manually.
+                updateResults.setNumberOfRecordsNotUpdatedBecauseManual(1 + updateResults.getNumberOfRecordsNotUpdatedBecauseManual());
+            }
+            else if (kcCfda.getCfdaMaintenanceTypeId().equalsIgnoreCase(Constants.CFDA_MAINT_TYP_ID_AUTOMATIC)) {
+
+                if (govCfda == null) {
+                    if (kcCfda.getActive()) {
+                        kcCfda.setActive(false);
+                        businessObjectService.save(kcCfda);
+                        updateResults.setNumberOfRecordsDeactivatedBecauseNoLongerOnWebSite(updateResults.getNumberOfRecordsDeactivatedBecauseNoLongerOnWebSite() + 1);
                     }
-                    // if it is active, do nothing
-                    if (dbCfda.getActiveFlag()) {   
-                        updateResults.increaseNumberOfRecordsUpdatedBecauseAutomatic(1);
-                    } else {
-                        // if it is not active, set it to active.
-                        dbCfda.setActiveFlag(true);
-                        getBusinessObjectService().save(dbCfda);
-                        updateResults.increaseNumberOfRecordsReActivated(1);
+                    else {
+                        // Leave it alone for historical purposes
+                        updateResults.setNumberOfRecordsNotUpdatedForHistoricalPurposes(updateResults.getNumberOfRecordsNotUpdatedForHistoricalPurposes() + 1);
                     }
-                } else if (dbCfda.getCfdaMaintenanceTypeId().equalsIgnoreCase(Constants.CFDA_MAINT_TYP_ID_MANUAL)) {
-                    // leave this alone, it is maintained manually
-                    updateResults.increaseNumberOfRecordsNotUpdatedBecauseManual(1);
                 }
-                // delete the CFDA number from the govMap
-                govCfdaMap.remove(dbCfdaKey);
-            } else {
-                // gov does not have this cfda number
-                // if active, set not active
-                if (dbCfda.getActiveFlag()) {
-                    dbCfda.setActiveFlag(false);
-                    getBusinessObjectService().save(dbCfda);
-                    updateResults.increaseNumberOfRecordsDeactivatedBecauseNoLongerOnWebSite(1);
-                } else {
-                    // if not active, leave it alone for historical purposes. 
-                    updateResults.increaseNumberOfRecordsNotUpdatedForHistoricalPurposes(1);
+                else {
+                    if (kcCfda.getActive()) {
+                       /*if (!kcCfda.getCfdaProgramTitleName().equalsIgnoreCase(govCfda.getCfdaProgramTitleName())) {
+                            message.append("The program title for CFDA " + kcCfda.getCfdaNumber() + " changed from " 
+                                            + kcCfda.getCfdaProgramTitleName() + " to " + govCfda.getCfdaProgramTitleName() + ".<BR>");
+                        }*/
+                        updateResults.setNumberOfRecordsUpdatedBecauseAutomatic(updateResults.getNumberOfRecordsUpdatedBecauseAutomatic() + 1);
+                    }
+                    else {
+                        kcCfda.setActive(true);
+                        updateResults.setNumberOfRecordsReActivated(updateResults.getNumberOfRecordsReActivated() + 1);
+                    }
+
+                    kcCfda.setCfdaProgramTitleName(govCfda.getCfdaProgramTitleName());
+                    businessObjectService.save(kcCfda);
                 }
             }
+
+            // Remove it from the govMap so the remaining codes are new 
+            govCfdaMap.remove(key);
         }
-        // add all the new CFDA numbers to the db
+        // New CFDA number from govt, added to the db
         updateResults.setMessage(message.toString());
         addNew(govCfdaMap);
-        updateResults.increaseNumberOfRecordsNewlyAddedFromWebSite(govCfdaMap.size());
+        updateResults.setNumberOfRecordsNewlyAddedFromWebSite(govCfdaMap.size() + 1);
         return updateResults;
     }
  
@@ -290,8 +295,8 @@ public class CfdaServiceImpl implements CfdaService {
             
             String cfdaProgramTitleName = trimProgramTitleName(cfda.getCfdaProgramTitleName());
             // all new cfda numbers are set to automatic and active
-            cfda.setCfdaProgramTitleName(cfdaProgramTitleName);
-            cfda.setActiveFlag(true);
+            cfda.setCfdaProgramTitleName(SQLUtils.cleanString(cfdaProgramTitleName));
+            cfda.setActive(true);
             cfda.setCfdaMaintenanceTypeId(Constants.CFDA_MAINT_TYP_ID_AUTOMATIC);
             getBusinessObjectService().save(cfda);
         }
@@ -342,7 +347,4 @@ public class CfdaServiceImpl implements CfdaService {
     public ParameterService getParameterService() {
         return parameterService;
     }
-
-    
-
 }

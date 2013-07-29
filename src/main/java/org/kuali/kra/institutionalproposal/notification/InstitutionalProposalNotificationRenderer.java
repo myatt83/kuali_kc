@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.kuali.kra.common.notification.NotificationRendererBase;
 import org.kuali.kra.institutionalproposal.home.InstitutionalProposal;
 
@@ -64,6 +65,7 @@ public class InstitutionalProposalNotificationRenderer extends NotificationRende
         } else {
             result.put("{DEADLINE_DATE}", "");
         }
+        result.put("{DEADLINE_TIME}", institutionalProposal.getDeadlineTime());
         result.put("{CFDA_NUMBER}", institutionalProposal.getCfdaNumber());
         result.put("{OPPORTUNITY}", institutionalProposal.getOpportunity());
         return result;

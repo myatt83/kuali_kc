@@ -1,6 +1,5 @@
-// TODO *********code has been moved to base class, should ultimately be removed**********
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  *
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +15,9 @@
  */
 package org.kuali.kra.irb.personnel;
 
-import org.kuali.kra.bo.KraPersistableBusinessObjectBase;
-import org.kuali.rice.core.api.mo.common.active.MutableInactivatable;
+import org.kuali.kra.protocol.personnel.ProtocolPersonRoleBase;
 
-public class ProtocolPersonRole extends KraPersistableBusinessObjectBase implements Comparable<ProtocolPersonRole>, MutableInactivatable {
+public class ProtocolPersonRole extends ProtocolPersonRoleBase {
 
     /**
      * Comment for <code>serialVersionUID</code>
@@ -36,93 +34,4 @@ public class ProtocolPersonRole extends KraPersistableBusinessObjectBase impleme
 
     public static final String ROLE_CORRESPONDENT_ADMINISTRATOR = "CA";
 
-    private String protocolPersonRoleId;
-
-    private String description;
-
-    private boolean unitDetailsRequired;
-
-    private boolean affiliationDetailsRequired;
-
-    private boolean trainingDetailsRequired;
-
-    private boolean commentsDetailsRequired;
-
-    private boolean active;
-
-    public ProtocolPersonRole() {
-    }
-
-    public String getProtocolPersonRoleId() {
-        return protocolPersonRoleId;
-    }
-
-    public void setProtocolPersonRoleId(String protocolPersonRoleId) {
-        this.protocolPersonRoleId = protocolPersonRoleId;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public boolean isUnitDetailsRequired() {
-        return unitDetailsRequired;
-    }
-
-    public void setUnitDetailsRequired(boolean unitDetailsRequired) {
-        this.unitDetailsRequired = unitDetailsRequired;
-    }
-
-    public boolean isAffiliationDetailsRequired() {
-        return affiliationDetailsRequired;
-    }
-
-    public void setAffiliationDetailsRequired(boolean affiliationDetailsRequired) {
-        this.affiliationDetailsRequired = affiliationDetailsRequired;
-    }
-
-    public boolean isTrainingDetailsRequired() {
-        return trainingDetailsRequired;
-    }
-
-    public void setTrainingDetailsRequired(boolean trainingDetailsRequired) {
-        this.trainingDetailsRequired = trainingDetailsRequired;
-    }
-
-    public boolean isCommentsDetailsRequired() {
-        return commentsDetailsRequired;
-    }
-
-    public void setCommentsDetailsRequired(boolean commentsDetailsRequired) {
-        this.commentsDetailsRequired = commentsDetailsRequired;
-    }
-
-    public boolean isActive() {
-        return active;
-    }
-
-    public void setActive(boolean active) {
-        this.active = active;
-    }
-
-    public int compareTo(ProtocolPersonRole other) {
-        int result = 0;
-        if (other != null) {
-            if (description != null && other.description != null) {
-                result = description.compareTo(other.getDescription());
-            } else if (description == null && other.getDescription() != null) {
-                result = 1;
-            } else if (description != null && other.getDescription() == null) {
-                result = -1;
-            } else {
-                result = 0;
-            }
-        }
-        return result;
-    }
 }
-// TODO **********************end************************

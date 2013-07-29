@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,9 @@ package org.kuali.kra.iacuc.protocol.reference;
 import java.text.ParseException;
 
 import org.kuali.kra.iacuc.IacucProtocol;
-import org.kuali.kra.protocol.protocol.reference.ProtocolReference;
+import org.kuali.kra.protocol.protocol.reference.ProtocolReferenceBase;
 
-public class IacucProtocolReference extends ProtocolReference {
+public class IacucProtocolReference extends ProtocolReferenceBase {
     
     /**
      * Comment for <code>serialVersionUID</code>

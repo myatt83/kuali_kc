@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,13 @@ import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 import org.kuali.kra.authorization.KraAuthorizationConstants;
+import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.KeyConstants;
 import org.kuali.kra.infrastructure.KraServiceLocator;
+import org.kuali.kra.infrastructure.TimeFormatter;
 import org.kuali.kra.institutionalproposal.InstitutionalProposalConstants;
+import org.kuali.kra.proposaldevelopment.bo.DevelopmentProposal;
+import org.kuali.kra.service.SponsorService;
 import org.kuali.rice.kns.document.MaintenanceDocument;
 import org.kuali.rice.kns.maintenance.rules.MaintenanceDocumentRuleBase;
 import org.kuali.rice.kns.rules.MaintenanceDocumentRule;
@@ -34,6 +38,8 @@ public class ProposalLogMaintenanceDocumentRules extends MaintenanceDocumentRule
     implements MaintenanceDocumentRule {
     
     private final String SPONSOR_CODE = "document.newMaintainableObject.sponsorCode";
+    
+    private final String SPONSOR_DEADLINE_TIME = "document.newMaintainableObject.deadlineTime";
     /**
      * Checks to see if document is in valid state to save.
      * 
@@ -121,9 +127,22 @@ public class ProposalLogMaintenanceDocumentRules extends MaintenanceDocumentRule
         boolean valid = true;
         ProposalLog proposalLog = (ProposalLog) document.getNewMaintainableObject().getDataObject();
         if (!StringUtils.isBlank(proposalLog.getSponsorCode())) {
+            
             proposalLog.refreshReferenceObject("sponsor");
-            if (proposalLog.getSponsor() == null) {
+            if (!this.getSponsorService().validateSponsor(proposalLog.getSponsor())) {
                 GlobalVariables.getMessageMap().putError(SPONSOR_CODE, KeyConstants.ERROR_INVALID_SPONSOR_CODE);
+                valid = false;
+            }
+            
+        }
+        if (proposalLog.getDeadlineTime() != null) {
+            TimeFormatter formatter = new TimeFormatter();
+            
+            String deadLineTime = (String) formatter.convertToObject(proposalLog.getDeadlineTime());
+            if (!deadLineTime.equalsIgnoreCase(Constants.INVALID_TIME)) {
+                proposalLog.setDeadlineTime(deadLineTime);
+            } else {
+                GlobalVariables.getMessageMap().putError(SPONSOR_DEADLINE_TIME, KeyConstants.INVALID_DEADLINE_TIME);
                 valid = false;
             }
         }
@@ -159,6 +178,10 @@ public class ProposalLogMaintenanceDocumentRules extends MaintenanceDocumentRule
                 InstitutionalProposalConstants.INSTITUTIONAL_PROPOSAL_NAMESPACE, 
                 KraAuthorizationConstants.PERMISSION_SUBMIT_PROPOSAL_LOG, 
                 qualifications);
+    }
+
+    public SponsorService getSponsorService() {
+        return KraServiceLocator.getService(SponsorService.class);
     }
     
 }

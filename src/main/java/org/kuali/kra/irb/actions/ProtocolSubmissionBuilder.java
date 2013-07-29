@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,10 +31,11 @@ import org.kuali.kra.committee.service.CommitteeService;
 import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.irb.Protocol;
 import org.kuali.kra.irb.ProtocolFinderDao;
-import org.kuali.kra.irb.actions.notifyirb.ProtocolActionAttachment;
+// import org.kuali.kra.irb.actions.notifyirb.ProtocolActionAttachment;
 import org.kuali.kra.irb.actions.submit.ProtocolExemptStudiesCheckListItem;
 import org.kuali.kra.irb.actions.submit.ProtocolExpeditedReviewCheckListItem;
 import org.kuali.kra.irb.actions.submit.ProtocolSubmission;
+import org.kuali.kra.protocol.actions.notify.ProtocolActionAttachment;
 import org.kuali.rice.krad.service.BusinessObjectService;
 
 /**
@@ -69,7 +70,7 @@ public class ProtocolSubmissionBuilder {
         protocolSubmission.setSubmissionDate(new Date(System.currentTimeMillis()));
         protocolSubmission.setSubmissionTypeCode(submissionTypeCode);
         
-        ProtocolSubmission oldSubmission = protocol.getProtocolSubmission();
+        ProtocolSubmission oldSubmission = (ProtocolSubmission)protocol.getProtocolSubmission();
         setValuesFromOldSubmission(protocolSubmission, oldSubmission);
         
         
@@ -84,7 +85,7 @@ public class ProtocolSubmissionBuilder {
         if (protocol.isAmendment() || protocol.isRenewal()) {
             String origProtocolNumber = protocol.getProtocolNumber();
             String protocolNumber = origProtocolNumber.substring(0, 10);
-            Protocol origProtocol = getProtocolFinderDao().findCurrentProtocolByNumber(protocolNumber);
+            Protocol origProtocol = (Protocol)getProtocolFinderDao().findCurrentProtocolByNumber(protocolNumber);
             nextSubmissionNumber = origProtocol.getNextValue(NEXT_SUBMISSION_NUMBER_KEY);            
             getBusinessObjectService().save(origProtocol.getProtocolDocument().getDocumentNextvalues());
             
@@ -107,8 +108,6 @@ public class ProtocolSubmissionBuilder {
             // need to investigate if this is good for app.
             // comment scheduleid&scheduleidfk.  this will cause confusing if selected a different committee (or no committee)
             // then this schedule will not match the selected committee
-            //protocolSubmission.setScheduleId(oldSubmission.getScheduleId());
-            //protocolSubmission.setScheduleIdFk(oldSubmission.getScheduleIdFk());
             protocolSubmission.setSubmissionTypeQualifierCode(oldSubmission.getSubmissionTypeQualifierCode());
             protocolSubmission.setComments(oldSubmission.getComments());
             protocolSubmission.setYesVoteCount(oldSubmission.getYesVoteCount());
@@ -134,11 +133,7 @@ public class ProtocolSubmissionBuilder {
         protocolSubmission.setSubmissionDate(new Date(System.currentTimeMillis()));
         getBusinessObjectService().save(protocolSubmission);
         protocolSubmission.getProtocol().getProtocolSubmissions().add(protocolSubmission);
-//        if (ProtocolSubmissionType.NOTIFY_IRB.equals(protocolSubmission.getSubmissionTypeCode())) {
-            saveAttachments();
-//        } else {
-//            saveAttachments();
-//        }
+        saveAttachments();
         return protocolSubmission;
     }
     
@@ -194,7 +189,7 @@ public class ProtocolSubmissionBuilder {
      */
     public void setSchedule(String scheduleId) {
         if (protocolSubmission.getCommittee() != null) {
-            CommitteeSchedule schedule = getCommitteeService().getCommitteeSchedule(protocolSubmission.getCommittee(), scheduleId);
+            CommitteeSchedule schedule = getCommitteeService().getCommitteeSchedule((Committee)protocolSubmission.getCommittee(), scheduleId);
             if (schedule != null) {
                 protocolSubmission.setScheduleId(schedule.getScheduleId());
                 protocolSubmission.setScheduleIdFk(schedule.getId());
@@ -262,26 +257,7 @@ public class ProtocolSubmissionBuilder {
         chkLstItem.setExpeditedReviewCheckListCode(expeditedReviewCheckListCode);
         return chkLstItem;
     }
-    
-    /**
-     * Add an attachment to the submission.
-     * @param file
-     */
-//    public void addAttachment(FormFile file) {
-//        if (file != null) {
-//            attachments.add(file);
-//        }
-//    }
-    
-    /**
-     * Save the attachments to the database.
-     */
-//    private void saveAttachments() {
-//        for (FormFile file : attachments) {
-//            saveAttachment(file, "");
-//        }
-//    }
-    
+        
     /*
      * save notify irb attachments.
      */

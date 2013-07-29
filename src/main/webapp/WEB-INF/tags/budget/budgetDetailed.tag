@@ -1,5 +1,5 @@
 <%--
- Copyright 2005-2010 The Kuali Foundation
+ Copyright 2005-2013 The Kuali Foundation
 
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@
 <c:set var="readOnly" value="${not KualiForm.editingMode['modifyBudgets']}" scope="request" />
 <bean:define id="proposalBudgetFlag" name="KualiForm" property="document.proposalBudgetFlag"/>
 
+<c:set var="budgetPeriodAttributes" value="${DataDictionary.BudgetPeriod.attributes}" />
 <c:set var="budgetLineItemAttributes" value="${DataDictionary.BudgetLineItem.attributes}" />
 <c:set var="awardBudgetLineItemAttributes" value="${DataDictionary.AwardBudgetLineItemExt.attributes}" />
 <c:set var="action" value="budgetExpensesAction" />
@@ -83,6 +84,9 @@
     		</c:forEach>
     	</c:if>
     </c:forEach>
+	<c:if test="${budgetCategoryTypeCodeLabel eq 'Participant Support'}">
+		<c:set var="tabErrorKeyString4" value="document.budget.budgetPeriods[${budgetPeriod - 1}].numberOfParticipants"/>
+	</c:if>
 
 	<%--<c:set var="budgetExpensePanelReadOnly" value="${KualiForm.document.parentDocument.developmentProposalList[0].budgetVersionOverviews[KualiForm.document.budget.budgetVersionNumber-1].finalVersionFlag}" /> --%>
 	<c:if test="${! empty budgetLineItemSize}">
@@ -92,7 +96,7 @@
   		</c:if>		
 	</c:if>
  	<c:if test="${! empty budgetLineItemSize or budgetCategoryTypeCodeKey ne 'H'}">
-	<kul:tab tabTitle="${budgetCategoryTypeCodeLabel}" tabItemCount="${tabItemCount}" defaultOpen="false" tabErrorKey="*costElement*,newBudgetLineItems[${catCodes}].*,${tabErrorKeyString},${tabErrorKeyString2},${tabErrorKeyString3}"  auditCluster="budgetNonPersonnelAuditWarnings${budgetPeriod}${budgetCategoryTypeCodeLabel}" tabAuditKey="${tabErrorKeyString},${tabErrorKeyString2},${tabErrorKeyString3}" useRiceAuditMode="true">
+	<kul:tab tabTitle="${budgetCategoryTypeCodeLabel}" tabItemCount="${tabItemCount}" defaultOpen="false" tabErrorKey="*costElement*,newBudgetLineItems[${catCodes}].*,${tabErrorKeyString},${tabErrorKeyString2},${tabErrorKeyString3},${tabErrorKeyString4}"  auditCluster="budgetNonPersonnelAuditWarnings${budgetPeriod}${budgetCategoryTypeCodeLabel}" tabAuditKey="${tabErrorKeyString},${tabErrorKeyString2},${tabErrorKeyString3},${tabErrorKeyString4}" useRiceAuditMode="true">
 		<div class="tab-container" align="center">
     	<h3>
     		<span class="subhead-left">${budgetCategoryTypeCodeLabel}</span>
@@ -129,6 +133,14 @@
         </h3>
         <jsp:useBean id="paramMap" class="java.util.HashMap"/>
 		<c:set target="${paramMap}" property="budgetCategoryTypeCode" value="${budgetCategoryTypeCodeKey}" />
+		<c:if test="${budgetCategoryTypeCodeLabel eq 'Participant Support'}">
+			<table border="0" cellpadding=0 cellspacing=0 summary="">
+        		<tr>
+        			<th style="width : 15em;"><kul:htmlAttributeLabel attributeEntry="${budgetPeriodAttributes.numberOfParticipants}"/></th>
+        			<td><kul:htmlControlAttribute property="document.budget.budgetPeriods[${budgetPeriod - 1}].numberOfParticipants" attributeEntry="${budgetPeriodAttributes.numberOfParticipants}" /></td>
+        		</tr>
+        	</table>
+        </c:if>
         <table border="0" cellpadding=0 cellspacing=0 summary="">
           	<tr>
           		<th width="6%" class="darkInfoline"><div align="center">&nbsp;</div></th> 
@@ -144,7 +156,7 @@
           	</tr>    
           	
           	<kra:section permission="modifyBudgets">    
-	            <tr>
+	            <tr class="addline">
 					<th class="darkInfoline">
 						<c:out value="Add:" />
 					</th>
@@ -190,7 +202,7 @@
 						<c:if test="${!readOnly}" >
 						<div align="center">
 							<html:image property="methodToCall.addBudgetLineItem.budgetCategoryTypeCode${budgetCategoryTypeCodeKey}.catTypeIndex${catCodes}.anchor${tabKey}"
-							src='${ConfigProperties.kra.externalizable.images.url}tinybutton-add1.gif' styleClass="tinybutton" />
+							src='${ConfigProperties.kra.externalizable.images.url}tinybutton-add1.gif' styleClass="tinybutton addButton" />
 						</div>
 						</c:if>	
 	                </td>			

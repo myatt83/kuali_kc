@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,16 +15,20 @@
  */
 package org.kuali.kra.institutionalproposal.service.impl;
 
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.kuali.kra.award.home.fundingproposal.AwardFundingProposal;
 import org.kuali.kra.bo.CustomAttribute;
 import org.kuali.kra.bo.CustomAttributeDocument;
 import org.kuali.kra.bo.versioning.VersionStatus;
@@ -61,6 +65,7 @@ import org.kuali.kra.service.ServiceHelper;
 import org.kuali.kra.service.VersionException;
 import org.kuali.kra.service.VersioningService;
 import org.kuali.rice.core.api.util.type.KualiDecimal;
+import org.kuali.rice.coreservice.framework.parameter.ParameterService;
 import org.kuali.rice.kew.api.exception.WorkflowException;
 import org.kuali.rice.krad.bo.AdHocRouteRecipient;
 import org.kuali.rice.krad.service.BusinessObjectService;
@@ -90,6 +95,7 @@ public class InstitutionalProposalServiceImpl implements InstitutionalProposalSe
     private VersioningService versioningService;
     private InstitutionalProposalVersioningService institutionalProposalVersioningService;
     private SequenceAccessorService sequenceAccessorService;
+    private ParameterService parameterService;
     
     /**
      * Creates a new pending Institutional Proposal based on given development proposal and budget.
@@ -210,6 +216,7 @@ public class InstitutionalProposalServiceImpl implements InstitutionalProposalSe
                     
                     InstitutionalProposal newVersion = versioningService.createNewVersion(activeVersion);
                     newVersion.setStatusCode(ProposalStatus.FUNDED);
+                    newVersion.setAwardFundingProposals(transferFundingProposals(activeVersion, newVersion));
                     
                     InstitutionalProposalDocument institutionalProposalDocument = 
                         (InstitutionalProposalDocument) documentService.getNewDocument(InstitutionalProposalDocument.class);
@@ -262,7 +269,7 @@ public class InstitutionalProposalServiceImpl implements InstitutionalProposalSe
             for (String proposalNumber : proposalNumbers) {
                 InstitutionalProposal activeVersion = getActiveInstitutionalProposal(proposalNumber);
                 
-                if (activeVersion != null && activeVersion.isFundedByAward(awardNumber, awardSequence) 
+                if (activeVersion != null && activeVersion.isFundedByAward(awardNumber, awardSequence)
                         && activeVersion.getActiveAwardFundingProposals().size() == 1) {
                     LOG.info("Creating a new version of proposal " + proposalNumber + ".");
                     
@@ -425,6 +432,7 @@ public class InstitutionalProposalServiceImpl implements InstitutionalProposalSe
         institutionalProposal.setRequestedStartDateTotal(developmentProposal.getRequestedStartDateInitial());
         institutionalProposal.setRequestedEndDateTotal(developmentProposal.getRequestedEndDateInitial());
         institutionalProposal.setDeadlineDate(developmentProposal.getDeadlineDate());
+        institutionalProposal.setDeadlineTime(developmentProposal.getDeadlineTime());
         institutionalProposal.setNoticeOfOpportunityCode(developmentProposal.getNoticeOfOpportunityCode());
         institutionalProposal.setNumberOfCopies(developmentProposal.getNumberOfCopies());
         institutionalProposal.setDeadlineType(developmentProposal.getDeadlineType());
@@ -617,6 +625,66 @@ public class InstitutionalProposalServiceImpl implements InstitutionalProposalSe
         return 1;
     }
     
+    
+    /**
+     * @see org.kuali.kra.institutionalproposal.service.InstitutionalProposalService#createAndSaveNewVersion(org.kuali.kra.institutionalproposal.home.InstitutionalProposal, org.kuali.kra.institutionalproposal.document.InstitutionalProposalDocument)
+     */
+    public InstitutionalProposalDocument createAndSaveNewVersion(InstitutionalProposal currentInstitutionalProposal, 
+            InstitutionalProposalDocument currentInstitutionalProposalDocument) throws VersionException, 
+            WorkflowException, IOException{
+        InstitutionalProposal newVersion = getVersioningService().createNewVersion(currentInstitutionalProposal);
+        
+        synchNewCustomAttributes(newVersion, currentInstitutionalProposal);
+        
+        newVersion.setProposalSequenceStatus(VersionStatus.PENDING.toString());
+        newVersion.setAwardFundingProposals(transferFundingProposals(currentInstitutionalProposal, newVersion));
+        InstitutionalProposalDocument newInstitutionalProposalDocument = 
+            (InstitutionalProposalDocument) getDocumentService().getNewDocument(InstitutionalProposalDocument.class);
+        newInstitutionalProposalDocument.getDocumentHeader().setDocumentDescription(currentInstitutionalProposalDocument.getDocumentHeader().getDocumentDescription());
+        newInstitutionalProposalDocument.setInstitutionalProposal(newVersion);
+        getDocumentService().saveDocument(newInstitutionalProposalDocument);
+        return newInstitutionalProposalDocument;
+    }
+    
+    /**
+     * This method is to synch custom attributes. During version process only existing custom attributes
+     * available in the old document is copied. We need to make sure we have all the latest custom attributes
+     * tied to the new document.
+     * @param newInstitutionalProposal
+     * @param oldInstitutionalProposal
+     */
+    protected void synchNewCustomAttributes(InstitutionalProposal newInstitutionalProposal, InstitutionalProposal oldInstitutionalProposal) {
+        Set<Integer> availableCustomAttributes = new HashSet<Integer>();
+        for(InstitutionalProposalCustomData customData : newInstitutionalProposal.getInstitutionalProposalCustomDataList()) {
+            availableCustomAttributes.add(customData.getCustomAttributeId().intValue());
+        }
+        
+        if(oldInstitutionalProposal.getInstitutionalProposalDocument() != null) {
+            Map<String, CustomAttributeDocument> customAttributeDocuments = oldInstitutionalProposal.getInstitutionalProposalDocument().getCustomAttributeDocuments();
+            for (Map.Entry<String, CustomAttributeDocument> entry : customAttributeDocuments.entrySet()) {
+                CustomAttributeDocument customAttributeDocument = entry.getValue();
+                if(!availableCustomAttributes.contains(customAttributeDocument.getCustomAttributeId())) {
+                    InstitutionalProposalCustomData customData = new InstitutionalProposalCustomData();
+                    customData.setCustomAttributeId((long) customAttributeDocument.getCustomAttributeId());
+                    customData.setCustomAttribute(customAttributeDocument.getCustomAttribute());
+                    customData.setValue("");
+                    customData.setInstitutionalProposal(newInstitutionalProposal);
+                    newInstitutionalProposal.getInstitutionalProposalCustomDataList().add(customData);
+                }
+            }
+        }
+    }
+    
+    protected ArrayList<AwardFundingProposal> transferFundingProposals(InstitutionalProposal oldIP, InstitutionalProposal newIP) {
+        ArrayList<AwardFundingProposal> newFundingProposals = new ArrayList<AwardFundingProposal>();
+        for (AwardFundingProposal afpp:oldIP.getAwardFundingProposals()) {
+            newFundingProposals.add(new AwardFundingProposal(afpp.getAward(), newIP));
+            afpp.setActive(false);
+        }
+        getBusinessObjectService().save(oldIP.getAwardFundingProposals());
+        return newFundingProposals;
+    }
+    
     /* Service injection getters and setters */
     
     public void setBusinessObjectService(BusinessObjectService businessObjectService) {
@@ -641,6 +709,35 @@ public class InstitutionalProposalServiceImpl implements InstitutionalProposalSe
      */
     public void setSequenceAccessorService(SequenceAccessorService sequenceAccessorService) {
         this.sequenceAccessorService = sequenceAccessorService;
+    }
+
+    /**
+     * @see org.kuali.kra.institutionalproposal.service.InstitutionalProposalService#getValidFundingProposalStatusCodes()
+     */
+    @Override
+    public Collection<String> getValidFundingProposalStatusCodes() {
+        String value = getParameterService().getParameterValueAsString(InstitutionalProposalDocument.class, "validFundingProposalStatusCodes");
+        return Arrays.asList(value.split(","));
+    }
+
+    protected ParameterService getParameterService() {
+        return parameterService;
+    }
+
+    public void setParameterService(ParameterService parameterService) {
+        this.parameterService = parameterService;
+    }
+
+    public DocumentService getDocumentService() {
+        return documentService;
+    }
+
+    public VersioningService getVersioningService() {
+        return versioningService;
+    }
+
+    public BusinessObjectService getBusinessObjectService() {
+        return businessObjectService;
     }
     
 }

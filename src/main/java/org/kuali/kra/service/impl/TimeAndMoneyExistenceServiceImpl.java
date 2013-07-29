@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,10 +37,9 @@ public class TimeAndMoneyExistenceServiceImpl implements TimeAndMoneyExistenceSe
     private DocumentService documentService;
     private BusinessObjectService businessObjectService;
     
-    public boolean validateTimeAndMoneyRule(Award award, Map<String, AwardHierarchy> awardHierarchyNodes) throws WorkflowException {
+    public boolean validateTimeAndMoneyRule(Award award, String rootAwardNumber) throws WorkflowException {
         Map<String, Object> fieldValues = new HashMap<String, Object>();
         Boolean timeAndMoneyDocumentDoesNotExist = Boolean.TRUE;
-        String rootAwardNumber = awardHierarchyNodes.get(award.getAwardNumber()).getRootAwardNumber();
         fieldValues.put("rootAwardNumber", rootAwardNumber);
 
         BusinessObjectService businessObjectService =  KraServiceLocator.getService(BusinessObjectService.class);

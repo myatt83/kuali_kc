@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,6 +54,10 @@ public class S2sOpportunity extends KraPersistableBusinessObjectBase {
     private S2sSubmissionType s2sSubmissionType;
 
     private S2sRevisionType s2sRevisionType;
+    
+    private String providerCode;
+    
+    private S2sProvider s2sProvider;
 
     public String getProposalNumber() {
         return proposalNumber;
@@ -181,5 +185,24 @@ public class S2sOpportunity extends KraPersistableBusinessObjectBase {
 
     public void setS2sSubmissionType(S2sSubmissionType submissionType) {
         s2sSubmissionType = submissionType;
+    }
+
+    public String getProviderCode() {
+        return providerCode;
+    }
+
+    public void setProviderCode(String providerCode) {
+        this.providerCode = providerCode;
+    }
+
+    public S2sProvider getS2sProvider() {
+        if (s2sProvider == null && providerCode != null) {
+            this.refreshReferenceObject("s2sProvider");
+        }
+        return s2sProvider;
+    }
+
+    public void setS2sProvider(S2sProvider s2sProvider) {
+        this.s2sProvider = s2sProvider;
     }
 }

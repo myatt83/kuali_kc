@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-    Copyright 2005-2010 The Kuali Foundation.
+    Copyright 2005-2013 The Kuali Foundation.
 
     Licensed under the Educational Community License, Version 1.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -107,6 +107,8 @@
         <property name="businessObjectService" ref="businessObjectService" />
    		<property name="protocolFinderDao" ref="protocolFinderDao" />
         <property name="parameterService" ref="parameterService"/>
+        <property name="questionnaireService" ref="questionnaireService" />
+        <property name="krmsRulesExecutionService" ref="krmsRulesExecutionService" />
     </bean>
 	<bean id="questionnaireAuthorizationService" class="org.kuali.kra.questionnaire.QuestionnaireAuthorizationServiceImpl">
         <property name="unitAuthorizationService" ref="unitAuthorizationService" />
@@ -120,7 +122,7 @@
 	
 		<!--  questionnaire print -->
       <bean id="questionnaireXmlStream"
-            class="org.kuali.kra.questionnaire.print.QuestionnaireXmlStream">
+            class="org.kuali.kra.questionnaire.print.QuestionnaireXmlStream" scope="prototype">
             <property name="businessObjectService">
                 <ref bean="businessObjectService" />
             </property>

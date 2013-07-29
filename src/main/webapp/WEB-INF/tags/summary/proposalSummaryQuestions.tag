@@ -1,6 +1,6 @@
 
 <%--
- Copyright 2005-2010 The Kuali Foundation
+ Copyright 2005-2013 The Kuali Foundation
 
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -18,17 +18,14 @@
 <%@ attribute name="bean" required="true"
 	type="org.kuali.kra.questionnaire.QuestionnaireHelperBase"%>
 <%@ attribute name="property" required="true"%>
-<%@ attribute name="forceNonTransparent" required="false"%>
-
-<c:if test="${empty forceNonTransparent}">
-	<c:set var="forceNonTransparent" value="false" />
-</c:if>
-
-
-<c:set var="readOnly" value="true" scope="request" />
+<%@ attribute name="forceNonTransparent" required="false" %>
+<%@ attribute name="transparentBackground" required="false" %>
+<%@ attribute name="parentTab" required="true" %>
 
 <c:forEach items="${bean.answerHeaders}" var="answerHeader"
 	varStatus="status">
+	
+	<c:set var="readOnly" value="true" scope="request" />
 
 	<c:set var="prop"
 		value="${property}.answerHeaders[${status.index}].showQuestions" />
@@ -36,9 +33,8 @@
 	<input type="hidden" name="${prop}" id="${prop}"
 		value="${bean.answerHeaders[status.index].showQuestions}" />
 
-	<kra-summary:proposalQuestionnaireAnswers bean="${bean}"
-		property="${property}" answerHeaderIndex="${status.index}"
-		forceNonTransparent="${forceNonTransparent}" />
+	<kra-questionnaire:questionnaireAnswersInnerTab bean="${bean}" property="${property}" answerHeaderIndex="${status.index}"
+		forceNonTransparent="true" readOnly="true" parentTab="${parentTab}"/>
 </c:forEach>
 
 <c:if test="${fn:length(bean.answerHeaders) > 0}">

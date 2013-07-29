@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -111,10 +111,13 @@ public class ProposalLogMaintainableImpl extends KraMaintainableImpl implements 
         // We need to set this here so it's in the stored XML
         proposalLog.setUpdateTimestamp(getDateTimeService().getCurrentTimestamp());
         
-        if (proposalLog.getPerson() != null) {
+        if (proposalLog.getPiId() != null) {
             proposalLog.setPiName(proposalLog.getPerson().getFullName());
-        } else if (proposalLog.getRolodex() != null) {
-            proposalLog.setPiName(proposalLog.getRolodex().getFullName());
+        } else if (proposalLog.getRolodexId() != null) {
+            proposalLog.refreshReferenceObject("rolodex");
+            if (proposalLog.getRolodex() != null) {
+                proposalLog.setPiName(proposalLog.getRolodex().getFullName());
+            }
         }
     }
     

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,9 @@ import java.util.List;
 
 import org.kuali.kra.iacuc.IacucProtocolDocument;
 import org.kuali.kra.iacuc.onlinereview.IacucProtocolReviewAttachment;
-import org.kuali.kra.protocol.actions.reviewcomments.ProtocolManageReviewAttachmentEvent;
+import org.kuali.kra.protocol.actions.reviewcomments.ProtocolManageReviewAttachmentEventBase;
 
-public class IacucProtocolManageReviewAttachmentEvent extends ProtocolManageReviewAttachmentEvent<IacucProtocolReviewAttachment> {
+public class IacucProtocolManageReviewAttachmentEvent extends ProtocolManageReviewAttachmentEventBase<IacucProtocolReviewAttachment> {
 
     public IacucProtocolManageReviewAttachmentEvent(IacucProtocolDocument document, String propertyName, List<IacucProtocolReviewAttachment> reviewAttachments) {
         super(document, propertyName, reviewAttachments);

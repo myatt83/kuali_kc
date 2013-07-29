@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@
  */
 package org.kuali.kra.iacuc.noteattachment;
 
-import org.kuali.kra.protocol.noteattachment.ProtocolAttachmentGroup;
+import org.kuali.kra.protocol.noteattachment.ProtocolAttachmentGroupBase;
 
-public class IacucProtocolAttachmentGroup extends ProtocolAttachmentGroup {
+public class IacucProtocolAttachmentGroup extends ProtocolAttachmentGroupBase {
 
     private static final long serialVersionUID = 5859181137789877884L;
 

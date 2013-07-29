@@ -1,5 +1,5 @@
 <!--
- Copyright 2005-2010 The Kuali Foundation.
+ Copyright 2005-2013 The Kuali Foundation.
  
  Licensed under the Educational Community License, Version 1.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -32,6 +32,9 @@
         <collection-descriptor name="protocolList" proxy="true" element-class-ref="org.kuali.kra.irb.Protocol" collection-class="org.apache.ojb.broker.util.collections.ManageableArrayList" auto-retrieve="true" auto-update="object" auto-delete="object">
             <inverse-foreignkey field-ref="documentNumber" />
         </collection-descriptor>
+        <collection-descriptor name="customDataList" proxy="true" element-class-ref="org.kuali.kra.bo.CustomAttributeDocValue" collection-class="org.apache.ojb.broker.util.collections.ManageableArrayList" auto-retrieve="true" auto-update="object" auto-delete="object">
+			 <inverse-foreignkey field-ref="documentNumber"/>
+		</collection-descriptor>     
         <!-- GENERATE NEXT VALUE -->
         <collection-descriptor name="documentNextvalues" element-class-ref="org.kuali.kra.bo.DocumentNextvalue" auto-retrieve="true" auto-update="object" auto-delete="object">
             <inverse-foreignkey field-ref="documentKey" /> 
@@ -111,7 +114,7 @@
         </collection-descriptor>      
         <collection-descriptor name="protocolAmendRenewals" element-class-ref="org.kuali.kra.irb.actions.amendrenew.ProtocolAmendRenewal" collection-class="org.apache.ojb.broker.util.collections.ManageableArrayList"  auto-retrieve="true" auto-update="object" auto-delete="object">
             <inverse-foreignkey field-ref="protocolId" />
-        </collection-descriptor>
+        </collection-descriptor>   
     </class-descriptor>
 
     <class-descriptor class="org.kuali.kra.irb.actions.ProtocolStatus" table="PROTOCOL_STATUS">
@@ -172,7 +175,7 @@
         <reference-descriptor name="protocol" class-ref="org.kuali.kra.irb.Protocol" auto-retrieve="true" auto-update="none" auto-delete="none"> 
             <foreignkey field-ref="protocolId"/>
         </reference-descriptor>
-        <reference-descriptor name="researchAreas" class-ref="org.kuali.kra.bo.ResearchArea" auto-retrieve="true" auto-update="none" auto-delete="none"> 
+        <reference-descriptor name="researchAreas" class-ref="org.kuali.kra.irb.ResearchArea" auto-retrieve="true" auto-update="none" auto-delete="none"> 
             <foreignkey field-ref="researchAreaCode"/>
         </reference-descriptor>
     </class-descriptor>
@@ -687,6 +690,8 @@
         <field-descriptor name="updateUser" column="UPDATE_USER" jdbc-type="VARCHAR" />
         <field-descriptor name="versionNumber" column="VER_NBR" jdbc-type="BIGINT" locking="false" />
         <field-descriptor name="objectId" column="OBJ_ID" jdbc-type="VARCHAR" />
+        <field-descriptor name="createTimestamp" column="CREATE_TIMESTAMP" jdbc-type="TIMESTAMP" />
+        <field-descriptor name="createUser" column="CREATE_USER" jdbc-type="VARCHAR" />
         
         <reference-descriptor name="protocol" class-ref="org.kuali.kra.irb.Protocol" auto-retrieve="true" auto-update="none" auto-delete="none"> 
             <foreignkey field-ref="protocolId"/>
@@ -749,6 +754,10 @@
         	auto-retrieve="true" auto-update="object" auto-delete="object">
             <inverse-foreignkey field-ref="actionIdFk" />
         </collection-descriptor>
+        <collection-descriptor name="protocolNotifications" element-class-ref="org.kuali.kra.irb.notification.IRBProtocolNotification" 
+        	auto-retrieve="true" auto-update="object" auto-delete="object">
+            <inverse-foreignkey field-ref="owningDocumentIdFk" />
+        </collection-descriptor>
         <!-- 
         <collection-descriptor name="protocolCorrespondences" element-class-ref="org.kuali.kra.irb.correspondence.ProtocolCorrespondence" collection-class="org.apache.ojb.broker.util.collections.ManageableArrayList"  auto-retrieve="true" auto-update="object" auto-delete="object">
             <inverse-foreignkey field-ref="actionIdFk" />
@@ -783,7 +792,7 @@
         <field-descriptor name="votingComments" column="VOTING_COMMENTS" jdbc-type="VARCHAR" />
         <field-descriptor name="updateTimestamp" column="UPDATE_TIMESTAMP" jdbc-type="TIMESTAMP" />
         <field-descriptor name="updateUser" column="UPDATE_USER" jdbc-type="VARCHAR" />
-        <field-descriptor name="versionNumber" column="VER_NBR" jdbc-type="BIGINT" locking="true" />
+        <field-descriptor name="versionNumber" column="VER_NBR" jdbc-type="BIGINT" locking="false" />
         <field-descriptor name="objectId" column="OBJ_ID" jdbc-type="VARCHAR" />
         <field-descriptor name="billable" column="IS_BILLABLE" jdbc-type="VARCHAR" conversion="org.kuali.rice.core.framework.persistence.ojb.conversion.OjbCharBooleanConversion"/>
         <reference-descriptor name="protocolSubmissionType" class-ref="org.kuali.kra.irb.actions.submit.ProtocolSubmissionType" auto-retrieve="true" auto-update="none" auto-delete="none"> 
@@ -807,7 +816,7 @@
         <reference-descriptor name="submissionStatus" class-ref="org.kuali.kra.irb.actions.submit.ProtocolSubmissionStatus" auto-retrieve="true" auto-update="none" auto-delete="none"> 
             <foreignkey field-ref="submissionStatusCode"/>
         </reference-descriptor>
-        <reference-descriptor name="committeeDecisionMotionType" class-ref="org.kuali.kra.committee.bo.CommitteeDecisionMotionType" auto-retrieve="true" auto-update="none" auto-delete="none"> 
+        <reference-descriptor name="committeeDecisionMotionType" class-ref="org.kuali.kra.common.committee.bo.CommitteeDecisionMotionType" auto-retrieve="true" auto-update="none" auto-delete="none"> 
             <foreignkey field-ref="committeeDecisionMotionTypeCode" />
         </reference-descriptor>
         <collection-descriptor name="exemptStudiesCheckList" element-class-ref="org.kuali.kra.irb.actions.submit.ProtocolExemptStudiesCheckListItem" collection-class="org.apache.ojb.broker.util.collections.ManageableArrayList"  auto-retrieve="true" auto-update="object" auto-delete="object">
@@ -1210,7 +1219,7 @@
         <reference-descriptor name="followupProtocolActionType" class-ref="org.kuali.kra.irb.actions.ProtocolActionType" auto-retrieve="true" auto-update="none" auto-delete="none"> 
             <foreignkey field-ref="followupActionCode"/>
         </reference-descriptor>
-        <reference-descriptor name="committeeDecisionMotionType" class-ref="org.kuali.kra.committee.bo.CommitteeDecisionMotionType" auto-retrieve="true" auto-update="none" auto-delete="none"> 
+        <reference-descriptor name="committeeDecisionMotionType" class-ref="org.kuali.kra.common.committee.bo.CommitteeDecisionMotionType" auto-retrieve="true" auto-update="none" auto-delete="none"> 
             <foreignkey field-ref="motionTypeCode"/>
         </reference-descriptor>
     </class-descriptor>
@@ -1352,4 +1361,23 @@
 			<foreignkey field-ref="correspondentTypeCode"/>
 		</reference-descriptor>
 	</class-descriptor>
+	
+	<class-descriptor class="org.kuali.kra.irb.notification.IRBProtocolNotification" table="PROTOCOL_NOTIFICATION">
+        <field-descriptor name="notificationId" column="NOTIFICATION_ID" jdbc-type="BIGINT" primarykey="true" sequence-name="SEQ_NOTIFICATION_ID" autoincrement="true" />
+        <field-descriptor name="notificationTypeId" column="NOTIFICATION_TYPE_ID" jdbc-type="BIGINT" />
+        <field-descriptor name="documentNumber" column="DOCUMENT_NUMBER" jdbc-type="VARCHAR" />
+        <field-descriptor name="owningDocumentIdFk" column="OWNING_DOCUMENT_ID_FK" jdbc-type="BIGINT" />
+        <field-descriptor name="recipients" column="RECIPIENTS" jdbc-type="VARCHAR" />
+        <field-descriptor name="subject" column="SUBJECT" jdbc-type="VARCHAR" />
+        <field-descriptor name="message" column="MESSAGE" jdbc-type="VARCHAR" />
+        <field-descriptor name="createUser" column="CREATE_USER" jdbc-type="VARCHAR" />
+        <field-descriptor name="updateUser" column="UPDATE_USER" jdbc-type="VARCHAR" />
+        <field-descriptor name="updateTimestamp" column="UPDATE_TIMESTAMP" jdbc-type="TIMESTAMP" />
+        <field-descriptor name="versionNumber" column="VER_NBR" jdbc-type="BIGINT" locking="false" />
+        <field-descriptor name="objectId" column="OBJ_ID" jdbc-type="VARCHAR" />
+        <reference-descriptor name="notificationType" class-ref="org.kuali.kra.common.notification.bo.NotificationType" auto-retrieve="false" auto-update="none" auto-delete="none"> 
+            <foreignkey field-ref="notificationTypeId"/>
+        </reference-descriptor>
+    </class-descriptor>
+	
 </descriptor-repository>

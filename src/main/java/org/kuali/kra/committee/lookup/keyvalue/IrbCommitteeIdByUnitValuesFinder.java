@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,12 @@
  */
 package org.kuali.kra.committee.lookup.keyvalue;
 
-import org.kuali.kra.committee.bo.CommitteeType;
+import org.kuali.kra.committee.bo.Committee;
+import org.kuali.kra.common.committee.bo.CommitteeType;
+import org.kuali.kra.common.committee.lookup.keyvalue.CommitteeIdByUnitValuesFinderBase;
 import org.kuali.kra.infrastructure.RoleConstants;
 
-public class IrbCommitteeIdByUnitValuesFinder extends CommitteeIdByUnitValuesFinder {
+public class IrbCommitteeIdByUnitValuesFinder extends CommitteeIdByUnitValuesFinderBase<Committee> {
 
     /**
      * Comment for <code>serialVersionUID</code>
@@ -33,6 +35,11 @@ public class IrbCommitteeIdByUnitValuesFinder extends CommitteeIdByUnitValuesFin
     @Override
     protected String getRoleNameHook() {
         return RoleConstants.IRB_ADMINISTRATOR;
+    }
+
+    @Override
+    protected Class<Committee> getCommitteeBOClassHook() {
+        return Committee.class;
     }
 
 }

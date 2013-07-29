@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -96,12 +96,9 @@ public class FinancialEntitySummaryHelper implements Serializable {
         this.currentVersionNumber = currentVersionNumber;
         currentFinancialEntity = new PersonFinIntDisclosure();
         previousFinancialEntity = new PersonFinIntDisclosure();
-        List<PersonFinIntDisclosure> disclosures;
-        if (StringUtils.equalsIgnoreCase(status, Constants.FINANCIAL_ENTITY_STATUS_ACTIVE)) {
-            disclosures = financialEntityForm.getFinancialEntityHelper().getActiveFinancialEntities();
-        } else {
-            disclosures = financialEntityForm.getFinancialEntityHelper().getInactiveFinancialEntities();
-        }
+        List<PersonFinIntDisclosure> disclosures = new ArrayList<PersonFinIntDisclosure>();
+        disclosures.addAll(financialEntityForm.getFinancialEntityHelper().getActiveFinancialEntities());
+        disclosures.addAll(financialEntityForm.getFinancialEntityHelper().getInactiveFinancialEntities());
         for (PersonFinIntDisclosure financialEntity : disclosures) {
             if (StringUtils.equalsIgnoreCase(financialEntity.getEntityNumber(), entityNumber)) { 
                 List<PersonFinIntDisclosure> currentVersions = financialEntity.getVersions();
@@ -182,6 +179,9 @@ public class FinancialEntitySummaryHelper implements Serializable {
         }
         if (!StringUtils.equalsIgnoreCase(currentSummary.getOwnershipType(), previousSummary.getOwnershipType())) {
             currentSummary.setOwnershipType(addSpan(currentSummary.getOwnershipType()));
+        }
+        if (!StringUtils.equalsIgnoreCase(currentSummary.getEntitySponsorsResearch(), previousSummary.getEntitySponsorsResearch())) {
+            currentSummary.setEntitySponsorsResearch(addSpan(currentSummary.getEntitySponsorsResearch()));
         }
       
     }
@@ -312,17 +312,24 @@ public class FinancialEntitySummaryHelper implements Serializable {
         summary.setAddress(entityAddress);
         summary.setWebAddress(webAddress);
         summary.setOwnershipType(
-                StringUtils.equalsIgnoreCase(financialEntity.getEntityOwnershipType(), Constants.ENTITY_OWNERSHIP_TYPE_CODE_PRIVATE) ? "Private" : "Public");
+                StringUtils.equalsIgnoreCase(financialEntity.getEntityOwnershipType(), Constants.ENTITY_OWNERSHIP_TYPE_CODE_PRIVATE) ? "Private" : "Public");        
+        summary.setEntitySponsorsResearch(StringUtils.equalsIgnoreCase(financialEntity.getEntitySponsorsResearch(), Constants.YES_FLAG) ? "Yes" : "No");
         
         String details = "";
         if (ObjectUtils.isNotNull(financialEntity.getOrgRelationDescription())) {
-            details = "Relationship Description: " + newLine + financialEntity.getRelationshipDescription() + newLine;
-        }
-        if (ObjectUtils.isNotNull(financialEntity.getOrgRelationDescription())) {
-            details += "Org Relation Description: " + newLine + financialEntity.getOrgRelationDescription()  + newLine;
+            details += "Org Relation Description: " + newLine + financialEntity.getOrgRelationDescription() + newLine + newLine;
         }
         if (ObjectUtils.isNotNull(financialEntity.getPrincipalBusinessActivity())) {
-            details += "Entity Principal Business/Activity: " + newLine + financialEntity.getPrincipalBusinessActivity() + newLine;
+            details += "Entity Principal Business/Activity: " + newLine + financialEntity.getPrincipalBusinessActivity() + newLine + newLine;
+        }
+        if (ObjectUtils.isNotNull(financialEntity.getStudentInvolvement())) {
+            details += "Entity Student Involvement: " + newLine + financialEntity.getStudentInvolvement() + newLine + newLine;
+        }
+        if (ObjectUtils.isNotNull(financialEntity.getStaffInvolvement())) {
+            details += "Entity Staff Involvement: " + newLine + financialEntity.getStaffInvolvement() + newLine + newLine;
+        }
+        if (ObjectUtils.isNotNull(financialEntity.getFacilityUse())) {
+            details += "Entity Institutional/Facilities Use: " + newLine + financialEntity.getFacilityUse() + newLine + newLine;
         }
         summary.setDetails(details);
         summary.setStatusDescription(financialEntity.getFinIntEntityStatus() != null ? financialEntity.getFinIntEntityStatus().getDescription(): "");

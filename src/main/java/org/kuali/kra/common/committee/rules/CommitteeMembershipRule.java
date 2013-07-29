@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,9 @@ import java.sql.Date;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.kuali.kra.common.committee.bo.CommitteeMembership;
+import org.kuali.kra.common.committee.bo.CommitteeMembershipBase;
 import org.kuali.kra.common.committee.bo.CommitteeMembershipRole;
-import org.kuali.kra.common.committee.document.CommonCommitteeDocument;
+import org.kuali.kra.common.committee.document.CommitteeDocumentBase;
 import org.kuali.kra.common.committee.rule.AddCommitteeMembershipRoleRule;
 import org.kuali.kra.common.committee.rule.AddCommitteeMembershipRule;
 import org.kuali.kra.common.committee.rule.event.AddCommitteeMembershipEvent;
@@ -31,7 +31,7 @@ import org.kuali.kra.rules.ResearchDocumentRuleBase;
 
 /**
  * 
- * This class contains the rules to validate a <code>{@link CommitteeMembership}</code>
+ * This class contains the rules to validate a <code>{@link CommitteeMembershipBase}</code>
  * 
  * @author Kuali Research Administration Team (kc.dev@kuali.org)
  */
@@ -53,7 +53,7 @@ public class CommitteeMembershipRule extends ResearchDocumentRuleBase
     public boolean processAddCommitteeMembershipBusinessRules(AddCommitteeMembershipEvent addCommitteeMembershipEvent) {
         boolean isValid = true;
         
-        CommitteeMembership committeeMembership = addCommitteeMembershipEvent.getCommitteeMembership();
+        CommitteeMembershipBase committeeMembership = addCommitteeMembershipEvent.getCommitteeMembership();
         
         if (StringUtils.isBlank(committeeMembership.getPersonId()) && (committeeMembership.getRolodexId() == null)) { 
             isValid = false;
@@ -80,8 +80,8 @@ public class CommitteeMembershipRule extends ResearchDocumentRuleBase
 
         int membershipIndex = addCommitteeMembershipRoleEvent.getMembershipIndex();
         
-        CommonCommitteeDocument committeeDocument = (CommonCommitteeDocument) addCommitteeMembershipRoleEvent.getDocument();
-        CommitteeMembership committeeMembership = committeeDocument.getCommittee().getCommitteeMemberships().get(membershipIndex);
+        CommitteeDocumentBase<?, ?, ?> committeeDocument = (CommitteeDocumentBase) addCommitteeMembershipRoleEvent.getDocument();
+        CommitteeMembershipBase committeeMembership = committeeDocument.getCommittee().getCommitteeMemberships().get(membershipIndex);
         List<CommitteeMembershipRole> membershipRoles = committeeMembership.getMembershipRoles();
 
         // Verify role code
@@ -132,7 +132,7 @@ public class CommitteeMembershipRule extends ResearchDocumentRuleBase
      * @param date - the date to be checked
      * @return <code>true</code> if the date is outside the committee membership term, <code>false</code> otherwise
      */
-    private boolean hasDateOutsideCommitteeMembershipTerm(CommitteeMembership committeeMembership, Date date) {
+    private boolean hasDateOutsideCommitteeMembershipTerm(CommitteeMembershipBase committeeMembership, Date date) {
         boolean isOutside = false;
         if ((committeeMembership.getTermStartDate() != null) && (committeeMembership.getTermEndDate() != null) && (date != null)) {
             if (date.before(committeeMembership.getTermStartDate()) || date.after(committeeMembership.getTermEndDate())) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,6 +74,11 @@ public class AwardProjectPersonnelBean extends AwardContactsBean {
                     if (awardPerson.getPerson().getUnit() != null) {
                         awardPerson.getUnits().add(new AwardPersonUnit(awardPerson, awardPerson.getPerson().getUnit(), false));
                     }
+                }
+                else {
+                    if (!awardPerson.isEmployee()) {
+                        awardPerson.getUnits().add(new AwardPersonUnit(awardPerson,awardPerson.getRolodex().getUnit(),false));
+                    }                    
                 }
             }
             return awardPerson;

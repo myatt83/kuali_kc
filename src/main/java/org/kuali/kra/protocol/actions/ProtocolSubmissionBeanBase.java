@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,50 +39,4 @@ public interface ProtocolSubmissionBeanBase extends ProtocolActionBean {
     public List<ProtocolActionAttachment> getActionAttachments();
 
     public void setActionAttachments(List<ProtocolActionAttachment> actionAttachments);
-
-    public List<AnswerHeader> getAnswerHeaders();
-
-    public void setAnswerHeaders(List<AnswerHeader> answerHeaders);
-    
-    /*private String committeeId;
-    private ProtocolActionAttachment newActionAttachment;
-    private List<ProtocolActionAttachment> actionAttachments = new ArrayList<ProtocolActionAttachment>();
-    private List<AnswerHeader> answerHeaders;
-
-    public ProtocolSubmissionBeanBase(ActionHelper actionHelper) {
-        super(actionHelper);
-    }
-
-    public String getCommitteeId() {
-        return committeeId;
-    }
-
-    public void setCommitteeId(String committeeId) {
-        this.committeeId = committeeId;
-    }
-
-    public ProtocolActionAttachment getNewActionAttachment() {
-        return newActionAttachment;
-    }
-
-    public void setNewActionAttachment(ProtocolActionAttachment newActionAttachment) {
-        this.newActionAttachment = newActionAttachment;
-    }
-
-    public List<ProtocolActionAttachment> getActionAttachments() {
-        return actionAttachments;
-    }
-
-    public void setActionAttachments(List<ProtocolActionAttachment> actionAttachments) {
-        this.actionAttachments = actionAttachments;
-    }
-
-    public List<AnswerHeader> getAnswerHeaders() {
-        return answerHeaders;
-    }
-
-    public void setAnswerHeaders(List<AnswerHeader> answerHeaders) {
-        this.answerHeaders = answerHeaders;
-    }*/
-
 }

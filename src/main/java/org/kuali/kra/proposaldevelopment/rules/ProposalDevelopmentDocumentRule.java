@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  *
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import org.kuali.kra.budget.core.BudgetService;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.KeyConstants;
 import org.kuali.kra.infrastructure.KraServiceLocator;
+import org.kuali.kra.infrastructure.TimeFormatter;
 import org.kuali.kra.proposaldevelopment.bo.DevelopmentProposal;
 import org.kuali.kra.proposaldevelopment.bo.NarrativeUserRights;
 import org.kuali.kra.proposaldevelopment.bo.PropScienceKeyword;
@@ -75,7 +76,7 @@ import org.kuali.kra.proposaldevelopment.service.ProposalDevelopmentService;
 import org.kuali.kra.proposaldevelopment.web.bean.ProposalUserRoles;
 import org.kuali.kra.rule.BusinessRuleInterface;
 import org.kuali.kra.rule.event.KraDocumentEventBaseExtension;
-import org.kuali.kra.rule.event.SaveCustomAttributeEvent;
+import org.kuali.kra.rule.event.SaveCustomDataEvent;
 import org.kuali.kra.rules.ResearchDocumentRuleBase;
 import org.kuali.kra.service.SponsorService;
 import org.kuali.rice.core.api.util.RiceKeyConstants;
@@ -132,20 +133,39 @@ public class ProposalDevelopmentDocumentRule extends ResearchDocumentRuleBase im
         
         GlobalVariables.getMessageMap().addToErrorPath("document.developmentProposalList[0]");
         valid &= processProposalRequiredFieldsBusinessRule(proposalDevelopmentDocument);
-        valid &= processProtocolCustomDataBusinessRules(proposalDevelopmentDocument);
         
         valid &= processProposalYNQBusinessRule(proposalDevelopmentDocument, false);
         valid &= processBudgetVersionsBusinessRule(proposalDevelopmentDocument, false);
         valid &= processProposalGrantsGovBusinessRule(proposalDevelopmentDocument);
         valid &= processSponsorProgramBusinessRule(proposalDevelopmentDocument);
         valid &= processKeywordBusinessRule(proposalDevelopmentDocument);
+        valid &= proccessValidateSponsor(proposalDevelopmentDocument);
         GlobalVariables.getMessageMap().removeFromErrorPath("document.developmentProposalList[0]");
      
         return valid;
     }
     
-    private boolean processProtocolCustomDataBusinessRules(ProposalDevelopmentDocument document) {
-        return processRules(new SaveCustomAttributeEvent(Constants.EMPTY_STRING, document));
+    private boolean proccessValidateSponsor(ProposalDevelopmentDocument proposalDevelopmentDocument) {
+        System.err.println("proccessValidateSponsor");
+        boolean valid = true;
+        DataDictionaryService dataDictionaryService = KraServiceLocator.getService(DataDictionaryService.class);
+        if (!this.getSponsorService().validateSponsor(proposalDevelopmentDocument.getDevelopmentProposal().getSponsor())) {
+            System.err.println("  Invalid sponsor");
+            valid = false;
+            //this.reportError("document.developmentProposalList[0].sponsorCode", KeyConstants.ERROR_INVALID_SPONSOR_CODE, "");
+            //GlobalVariables.getMessageMap().putError("document.developmentProposalList[0].sponsorCode", KeyConstants.ERROR_INVALID_SPONSOR_CODE, "");
+            GlobalVariables.getMessageMap().putError("sponsorCode", KeyConstants.ERROR_MISSING, dataDictionaryService.getAttributeErrorLabel(DevelopmentProposal.class, "sponsorCode"));
+        }
+        if (!StringUtils.isEmpty(proposalDevelopmentDocument.getDevelopmentProposal().getPrimeSponsorCode()) && 
+                !this.getSponsorService().validateSponsor(proposalDevelopmentDocument.getDevelopmentProposal().getPrimeSponsor())) {
+            System.err.println("  Invalid  prime sponsor");
+            valid = false;
+            //this.reportError("document.developmentProposalList[0].primeSponsorCode", KeyConstants.ERROR_INVALID_SPONSOR_CODE, "");
+            GlobalVariables.getMessageMap().putError("primeSponsorCode", KeyConstants.ERROR_MISSING, dataDictionaryService.getAttributeErrorLabel(DevelopmentProposal.class, "primeSponsorCode"));
+            
+        }
+        System.err.println("  returning: " +  (valid));
+        return valid;
     }
 
     public boolean processDeleteProposalSiteRules(BasicProposalSiteEvent proposalSiteEvent) {
@@ -245,7 +265,8 @@ public class ProposalDevelopmentDocumentRule extends ResearchDocumentRuleBase im
 
         MessageMap errorMap = GlobalVariables.getMessageMap();
         DataDictionaryService dataDictionaryService = KraServiceLocator.getService(DataDictionaryService.class);
-
+        
+        /*
         proposalDevelopmentDocument.getDevelopmentProposal().refreshReferenceObject("sponsor");
         if (proposalDevelopmentDocument.getDevelopmentProposal().getSponsorCode() != null
                 && proposalDevelopmentDocument.getDevelopmentProposal().getSponsor() == null) {
@@ -253,6 +274,7 @@ public class ProposalDevelopmentDocumentRule extends ResearchDocumentRuleBase im
             errorMap.putError("sponsorCode", KeyConstants.ERROR_MISSING, dataDictionaryService.getAttributeErrorLabel(
                     DevelopmentProposal.class, "sponsorCode"));
         }
+        */
         
         //if either is missing, it should be caught on the DD validation.
         if (proposalDevelopmentDocument.getDevelopmentProposal().getRequestedStartDateInitial() != null
@@ -368,7 +390,18 @@ public class ProposalDevelopmentDocumentRule extends ResearchDocumentRuleBase im
                  valid = false;
              }
          }
- 
+         if (proposalDevelopmentDocument.getDevelopmentProposal().getDeadlineTime() != null) {
+             TimeFormatter formatter = new TimeFormatter();
+            
+             String deadLineTime = (String) formatter.convertToObject(proposalDevelopmentDocument.getDevelopmentProposal().getDeadlineTime());
+             if (!deadLineTime.equalsIgnoreCase(Constants.INVALID_TIME)) {
+                 proposalDevelopmentDocument.getDevelopmentProposal().setDeadlineTime(deadLineTime);
+             } else {
+                 errorMap.putError("deadlineTime", KeyConstants.INVALID_DEADLINE_TIME, 
+                         dataDictionaryService.getAttributeErrorLabel(DevelopmentProposal.class, "deadlineTime"));
+                 valid = false;
+             }
+         }
         return valid;
     }
     
@@ -570,6 +603,10 @@ public class ProposalDevelopmentDocumentRule extends ResearchDocumentRuleBase im
         boolean retVal = false;
         retVal = event.getRule().processRules(event);
         return retVal;
+    }
+    
+    private SponsorService getSponsorService() {
+        return KraServiceLocator.getService(SponsorService.class);
     }
 
 }

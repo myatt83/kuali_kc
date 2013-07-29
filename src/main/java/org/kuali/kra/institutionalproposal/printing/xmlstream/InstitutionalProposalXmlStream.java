@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,7 +85,7 @@ import org.kuali.kra.institutionalproposal.specialreview.InstitutionalProposalSp
 import org.kuali.kra.irb.Protocol;
 import org.kuali.kra.printing.util.PrintingUtils;
 import org.kuali.kra.proposaldevelopment.bo.ProposalPerson;
-import org.kuali.kra.service.InstitutionalProposalCustomAttributeService;
+import org.kuali.kra.service.CustomAttributeService;
 import org.kuali.rice.coreservice.framework.parameter.ParameterConstants;
 import org.kuali.rice.coreservice.framework.parameter.ParameterService;
 
@@ -211,8 +211,8 @@ public class InstitutionalProposalXmlStream extends
 	 */
 	private OtherGroupTypes getCustomData(
 	        InstitutionalProposal institutionalProposal){	    
-	    InstitutionalProposalCustomAttributeService institutionalProposalCustomAttributeService = KraServiceLocator.getService(InstitutionalProposalCustomAttributeService.class);
-        Map<String, CustomAttributeDocument> customAttributeDocuments = institutionalProposalCustomAttributeService.getDefaultInstitutionalProposalCustomAttributeDocuments();
+	    CustomAttributeService customAttributeService = KraServiceLocator.getService(CustomAttributeService.class);
+        Map<String, CustomAttributeDocument> customAttributeDocuments = customAttributeService.getDefaultCustomAttributeDocuments(institutionalProposal.getInstitutionalProposalDocument().getDocumentTypeCode(), institutionalProposal.getInstitutionalProposalCustomDataList());
         OtherGroupTypes otherGroup=OtherGroupTypes.Factory.newInstance();        
         List<OtherGroupDetailsTypes> otherGroupDetailsTypesList = new LinkedList<OtherGroupDetailsTypes>();       
        

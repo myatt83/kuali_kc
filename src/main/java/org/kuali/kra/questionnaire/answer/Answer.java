@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  *
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,6 +50,8 @@ public class Answer extends KraPersistableBusinessObjectBase {
 
     // transient field : indicate whether a child should be displayed  
     private String matchedChild = "N";
+    
+    private boolean ruleMatched = false;
 
     private List<Answer> parentAnswer;
 
@@ -225,5 +227,13 @@ public class Answer extends KraPersistableBusinessObjectBase {
 
     public void setParentAnswer(List<Answer> parentAnswer) {
         this.parentAnswer = parentAnswer;
+    }
+
+    public boolean isRuleMatched() {
+        return ruleMatched;
+    }
+
+    public void setRuleMatched(boolean ruleMatched) {
+        this.ruleMatched = ruleMatched;
     }
 }

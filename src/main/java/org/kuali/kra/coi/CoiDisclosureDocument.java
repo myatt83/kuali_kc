@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,23 +15,28 @@
  */
 package org.kuali.kra.coi;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
-import org.kuali.kra.coi.rules.CoiDisclosureFactBuilderService;
+import org.kuali.kra.authorization.KraAuthorizationConstants;
+import org.kuali.kra.bo.DocumentCustomData;
 import org.kuali.kra.document.ResearchDocumentBase;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.krms.KcKrmsConstants;
 import org.kuali.kra.krms.KrmsRulesContext;
+import org.kuali.kra.krms.service.KcKrmsFactBuilderService;
 import org.kuali.rice.coreservice.framework.parameter.ParameterConstants;
 import org.kuali.rice.coreservice.framework.parameter.ParameterConstants.COMPONENT;
 import org.kuali.rice.coreservice.framework.parameter.ParameterConstants.NAMESPACE;
 import org.kuali.rice.krad.document.Copyable;
 import org.kuali.rice.krad.document.SessionDocument;
+import org.kuali.rice.krad.util.GlobalVariables;
 import org.kuali.rice.krms.api.engine.Facts;
+import org.kuali.rice.kim.api.identity.Person;
 
 /**
  * 
@@ -130,8 +135,37 @@ public class CoiDisclosureDocument extends ResearchDocumentBase implements Copya
     }
     
     public void addFacts(Facts.Builder factsBuilder) {
-        CoiDisclosureFactBuilderService fbService = KraServiceLocator.getService(CoiDisclosureFactBuilderService.class);
+        KcKrmsFactBuilderService fbService = KraServiceLocator.getService("coiDisclosureFactBuilderService");
         fbService.addFacts(factsBuilder, this);
+    }
+    
+    @Override
+    public void populateAgendaQualifiers(Map<String, String> qualifiers) {
+        qualifiers.put(KcKrmsConstants.UNIT_NUMBER, getCoiDisclosure().getLeadUnitNumber());
+    }
+
+    @Override
+    public List<? extends DocumentCustomData> getDocumentCustomData() {
+        return new ArrayList();
+    }
+    
+    @Override
+    public String getCustomLockDescriptor(Person user) {
+        String activeLockRegion = (String) GlobalVariables.getUserSession().retrieveObject(KraAuthorizationConstants.ACTIVE_LOCK_REGION);
+        String updatedTimestamp = "";
+        if (this.getUpdateTimestamp() != null) {
+            updatedTimestamp = (new SimpleDateFormat("MM/dd/yyyy KK:mm a").format(this.getUpdateTimestamp()));
+        }
+        if (StringUtils.isNotEmpty(activeLockRegion)) {
+            return this.getCoiDisclosure().getCoiDisclosureNumber() + "-" + activeLockRegion + "-" + GlobalVariables.getUserSession().getPrincipalName() + "-" + updatedTimestamp;  
+        }
+
+        return null;
+    }
+    
+    @Override
+    public boolean useCustomLockDescriptors() {
+        return true;
     }
 
 }

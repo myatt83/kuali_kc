@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,9 @@
  */
 package org.kuali.kra.irb.actions.assignagenda;
 
-import java.io.Serializable;
-
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.KraServiceLocator;
+import org.kuali.kra.infrastructure.TaskName;
 import org.kuali.kra.irb.actions.ActionHelper;
 import org.kuali.kra.irb.actions.genericactions.ProtocolGenericActionBean;
 import org.kuali.kra.printing.Printable;
@@ -26,7 +25,7 @@ import org.kuali.kra.printing.Printable;
 /**
  * This class is really just a "form" for assigning a protocol to an agenda.
  */
-public class ProtocolAssignToAgendaBean extends ProtocolGenericActionBean implements Serializable {
+public class ProtocolAssignToAgendaBean extends ProtocolGenericActionBean implements org.kuali.kra.protocol.actions.assignagenda.ProtocolAssignToAgendaBean {
 
     private static final long serialVersionUID = -1671485882883282877L;
     
@@ -96,13 +95,17 @@ public class ProtocolAssignToAgendaBean extends ProtocolGenericActionBean implem
      */
     public void prepareView() {
         if (getProtocol() != null && getProtocol().getProtocolNumber() != null) {
-            String assignedCommitteeId = getProtocolAssigntoAgendaService().getAssignedCommitteeId(getProtocol());
-            if (assignedCommitteeId != null) {
-                this.committeeId = assignedCommitteeId;
-                this.committeName = getProtocolAssigntoAgendaService().getAssignedCommitteeName(getProtocol());
-                this.setComments(getProtocolAssigntoAgendaService().getAssignToAgendaComments(getProtocol()));
-                this.protocolAssigned = getProtocolAssigntoAgendaService().isAssignedToAgenda(getProtocol());
-                this.scheduleDate = getProtocolAssigntoAgendaService().getAssignedScheduleDate(getProtocol());
+            // we refresh assign-to-agenda data (committee name, comments etc) from db only if the user is not 
+            // currently working on this task since we do not want to lose user changes
+            if( !(TaskName.ASSIGN_TO_AGENDA.equalsIgnoreCase(getActionHelper().getCurrentTask())) ) {
+                String assignedCommitteeId = getProtocolAssigntoAgendaService().getAssignedCommitteeId(getProtocol());
+                if (assignedCommitteeId != null) {
+                    this.committeeId = assignedCommitteeId;
+                    this.committeName = getProtocolAssigntoAgendaService().getAssignedCommitteeName(getProtocol());
+                    this.setComments(getProtocolAssigntoAgendaService().getAssignToAgendaComments(getProtocol()));
+                    this.protocolAssigned = getProtocolAssigntoAgendaService().isAssignedToAgenda(getProtocol());
+                    this.scheduleDate = getProtocolAssigntoAgendaService().getAssignedScheduleDate(getProtocol());
+                }
             }
         }
         

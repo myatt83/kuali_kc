@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,21 @@
 package org.kuali.kra.iacuc.onlinereview;
 
 import java.sql.Date;
-import org.kuali.kra.protocol.onlinereview.ProtocolOnlineReview;
+import org.kuali.kra.protocol.onlinereview.ProtocolOnlineReviewBase;
 
 /**
  * This class encapsulates the notion of a protocol review. Essentially 
  * a join between protocol, submission, and a reviewer.  The ProtocolReview
  * is created by the IRB Admin as request.
  */
-public class IacucProtocolOnlineReview extends ProtocolOnlineReview {
+public class IacucProtocolOnlineReview extends ProtocolOnlineReviewBase {
+    
+    
+    /**
+     * Comment for <code>serialVersionUID</code>
+     */
+    private static final long serialVersionUID = -3526853926706200095L;
+
     private String determinationReviewTypeCode;
 
     private Date determinationReviewDateDue;
@@ -47,6 +54,16 @@ public class IacucProtocolOnlineReview extends ProtocolOnlineReview {
 
     public void setDeterminationReviewDateDue(Date determinationReviewDateDue) {
         this.determinationReviewDateDue = determinationReviewDateDue;
+    }
+
+    @Override
+    protected String getProtocolOLRRemovedCancelledStatusCodeHook() {
+        return IacucProtocolOnlineReviewStatus.REMOVED_CANCELLED_STATUS_CD;
+    }
+
+    @Override
+    protected String getProtocolOLRFinalStatusCodeHook() {
+        return IacucProtocolOnlineReviewStatus.FINAL_STATUS_CD;
     }
 
 

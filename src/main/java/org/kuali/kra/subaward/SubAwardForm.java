@@ -1,5 +1,5 @@
 /*.
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  *
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,22 +18,22 @@ package org.kuali.kra.subaward;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.struts.upload.FormFile;
 import org.kuali.kra.web.struts.form.Auditable;
+import org.kuali.kra.web.struts.form.CustomDataDocumentForm;
 import org.kuali.kra.web.struts.form.KraTransactionalDocumentFormBase;
 import org.kuali.kra.award.home.Award;
 import org.kuali.kra.bo.Rolodex;
-import org.kuali.kra.budget.document.BudgetDocument;
-import org.kuali.kra.common.customattributes.CustomDataForm;
+import org.kuali.kra.bo.versioning.VersionHistory;
+import org.kuali.kra.common.notification.web.struts.form.NotificationHelper;
 import org.kuali.kra.common.permissions.web.struts.form.PermissionsForm;
 import org.kuali.kra.common.permissions.web.struts.form.PermissionsHelperBase;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.KraServiceLocator;
+import org.kuali.kra.infrastructure.TaskName;
 import org.kuali.kra.medusa.MedusaBean;
-import org.kuali.kra.proposaldevelopment.document.ProposalDevelopmentDocument;
-import org.kuali.kra.proposaldevelopment.document.authorization.ProposalTask;
 import org.kuali.kra.service.TaskAuthorizationService;
+import org.kuali.kra.service.VersionHistoryService;
 import org.kuali.kra.subaward.bo.SubAward;
 import org.kuali.kra.subaward.bo.SubAwardAmountInfo;
 import org.kuali.kra.subaward.bo.SubAwardAmountReleased;
@@ -43,6 +43,7 @@ import org.kuali.kra.subaward.bo.SubAwardFundingSource;
 import org.kuali.kra.subaward.customdata.CustomDataHelper;
 import org.kuali.kra.subaward.document.SubAwardDocument;
 import org.kuali.kra.subaward.document.authorization.SubAwardTask;
+import org.kuali.kra.subaward.notification.SubAwardNotificationContext;
 import org.kuali.kra.subaward.service.SubAwardService;
 import org.kuali.rice.core.api.config.property.ConfigurationService;
 import org.kuali.rice.kew.api.KewApiConstants;
@@ -55,7 +56,7 @@ import org.kuali.rice.krad.util.GlobalVariables;
  * This class represents the SubAward Form Struts class....
  */
 public class SubAwardForm extends KraTransactionalDocumentFormBase
-implements PermissionsForm, CustomDataForm, Auditable {
+implements PermissionsForm, Auditable, CustomDataDocumentForm {
 
     private static final long serialVersionUID = -1452575757578523254L;
 
@@ -69,6 +70,7 @@ implements PermissionsForm, CustomDataForm, Auditable {
     private SubAwardContact newSubAwardContact;
     private SubAwardAmountReleased newSubAwardAmountReleased;
     private CustomDataHelper customDataHelper = new CustomDataHelper(this);
+    private NotificationHelper<SubAwardNotificationContext> notificationHelper;
     private boolean auditActivated;
     private MedusaBean medusaBean;
     private FormFile newFile;
@@ -173,7 +175,20 @@ implements PermissionsForm, CustomDataForm, Auditable {
 		this.customDataHelper = customDataHelper;
 	}
 
-	/**
+	
+	public NotificationHelper<SubAwardNotificationContext> getNotificationHelper() {
+        return notificationHelper;
+    }
+
+    public void setNotificationHelper(NotificationHelper<SubAwardNotificationContext> notificationHelper) {
+        this.notificationHelper = notificationHelper;
+    }
+
+    public void setSubAward(SubAward subAward) {
+        this.subAward = subAward;
+    }
+
+    /**
 	 * Constructs a SubAwardForm.java.
 	 */
 	public SubAwardForm() {
@@ -198,6 +213,8 @@ implements PermissionsForm, CustomDataForm, Auditable {
         newSubAwardCloseout = new SubAwardCloseout();
         newSubAwardAmountReleased = new SubAwardAmountReleased();
         newSubAwardAmountInfo = new SubAwardAmountInfo();
+        notificationHelper = new NotificationHelper<SubAwardNotificationContext>();
+        
     }
 
     /**
@@ -299,7 +316,7 @@ implements PermissionsForm, CustomDataForm, Auditable {
     }
 
     public SubAward getSubAward() {
-        return subAward;
+        return getSubAwardDocument().getSubAward();
     }
 
     public void setLookupResultsSequenceNumber(String lookupResultsSequenceNumber) {
@@ -381,10 +398,30 @@ implements PermissionsForm, CustomDataForm, Auditable {
 
         TaskAuthorizationService tas = KraServiceLocator.getService(TaskAuthorizationService.class);
         ConfigurationService configurationService = KRADServiceLocator.getKualiConfigurationService();
-        if(tas.isAuthorized(GlobalVariables.getUserSession().getPrincipalId(), new SubAwardTask("modifySubaward", doc))) {       
+        SubAwardTask task = new SubAwardTask(TaskName.ADD_INVOICE_SUBAWARD, doc);
+        if(tas.isAuthorized(GlobalVariables.getUserSession().getPrincipalId(), task)) {       
             String submitToGrantsGovImage = KRADServiceLocator.getKualiConfigurationService().getPropertyValueAsString(externalImageURL) + "buttonsmall_addinvoice.gif";
             addExtraButton("methodToCall.addAmountReleased", submitToGrantsGovImage, "Add Invoice");
         }
         return extraButtons;
     }
+    
+    /*
+     * returns flag indicating if edit button should be displayed at bottom of form 
+     * 
+     */
+    public boolean getDisplayEditButton() {
+        boolean displayEditButton = !isViewOnly();
+        VersionHistory activeVersion = getVersionHistoryService().findActiveVersion(SubAward.class, getSubAwardDocument().getSubAward().getSubAwardCode());
+        if (activeVersion != null) {
+            displayEditButton &= activeVersion.getSequenceOwnerSequenceNumber().equals(getSubAwardDocument().getSubAward().getSequenceNumber());
+        }
+        
+        return displayEditButton;
+    }
+    
+    protected VersionHistoryService getVersionHistoryService() {
+        return KraServiceLocator.getService(VersionHistoryService.class);
+    }
+
 }

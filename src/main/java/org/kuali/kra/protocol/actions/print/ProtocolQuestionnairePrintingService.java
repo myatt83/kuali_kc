@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ package org.kuali.kra.protocol.actions.print;
 
 import java.util.List;
 
-import org.kuali.kra.protocol.Protocol;
+import org.kuali.kra.protocol.ProtocolBase;
 import org.kuali.kra.questionnaire.answer.AnswerHeader;
 
 public interface ProtocolQuestionnairePrintingService {
@@ -28,6 +28,6 @@ public interface ProtocolQuestionnairePrintingService {
      * @param protocol
      * @param questionnairesToPrints
      */
-    public void setupQnPrintOption(List<AnswerHeader> answerHeaders, Protocol protocol, List<QuestionnairePrintOption> questionnairesToPrints);
+    public void setupQnPrintOption(List<AnswerHeader> answerHeaders, ProtocolBase protocol, List<QuestionnairePrintOption> questionnairesToPrints);
 
 }

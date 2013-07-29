@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,15 @@ package org.kuali.kra.common.committee.meeting;
 
 import java.util.List;
 
-import org.kuali.kra.common.committee.bo.CommonCommitteeSchedule;
+import org.kuali.kra.common.committee.bo.CommitteeScheduleBase;
 import org.kuali.rice.krad.bo.PersistableBusinessObject;
 
 /**
  * 
  * This class is to provide service for meeting management
  */
-public interface CommonMeetingService {
+public interface CommonMeetingService<CS extends CommitteeScheduleBase<CS, ?, ?, CSM>,
+                                      CSM extends CommitteeScheduleMinuteBase<CSM, CS>> {
     
     /**
      * 
@@ -32,7 +33,7 @@ public interface CommonMeetingService {
      * @param committeeSchedule
      * @param deletedBos
      */
-    public void saveMeetingDetails(CommonCommitteeSchedule committeeSchedule, List<? extends PersistableBusinessObject> deletedBos);
+    public void saveMeetingDetails(CS committeeSchedule, List<? extends PersistableBusinessObject> deletedBos);
     
     
     /**
@@ -50,7 +51,7 @@ public interface CommonMeetingService {
      * @param committeeSchedule
      * @param newOtherAction
      */
-    public void addOtherAction(CommScheduleActItem newOtherAction, CommonCommitteeSchedule committeeSchedule);    
+    public void addOtherAction(CommScheduleActItemBase newOtherAction, CS committeeSchedule);    
    
     /**
      * 
@@ -60,7 +61,7 @@ public interface CommonMeetingService {
      * @param itemNumber
      * @param deletedOtherActions
      */
-    public void deleteOtherAction(CommonCommitteeSchedule committeeSchedule, int itemNumber, List<CommScheduleActItem> deletedOtherActions);
+    public void deleteOtherAction(CS committeeSchedule, int itemNumber, List<CommScheduleActItemBase> deletedOtherActions);
 
     /**
      * 
@@ -77,7 +78,7 @@ public interface CommonMeetingService {
      * This method is to add new committee schedule minute entry to minute entry list.
      * @param meetingHelper
      */
-    public void addCommitteeScheduleMinute(MeetingHelper meetingHelper);
+    public void addCommitteeScheduleMinute(MeetingHelperBase meetingHelper);
     
     /**
      * 
@@ -86,7 +87,7 @@ public interface CommonMeetingService {
      * @param deletedCommitteeScheduleMinutes
      * @param itemNumber
      */
-    public void deleteCommitteeScheduleMinute(CommonCommitteeSchedule committeeSchedule, List<CommitteeScheduleMinute> deletedCommitteeScheduleMinutes, int itemNumber);
+    public void deleteCommitteeScheduleMinute(CS committeeSchedule, List<CSM> deletedCommitteeScheduleMinutes, int itemNumber);
     
     /**
      * 
@@ -95,7 +96,7 @@ public interface CommonMeetingService {
      * @param commSchedule
      * @param lineNumber
      */
-    public void populateFormHelper(MeetingHelper meetingHelper, CommonCommitteeSchedule commSchedule, int lineNumber);
+    public void populateFormHelper(MeetingHelperBase meetingHelper, CS commSchedule, int lineNumber);
     
     /**
      * 
@@ -103,7 +104,7 @@ public interface CommonMeetingService {
      * @param meetingHelper
      * @param itemNumber
      */
-    public void presentVoting(MeetingHelper meetingHelper, int itemNumber);
+    public void presentVoting(MeetingHelperBase meetingHelper, int itemNumber);
     
     /**
      * 
@@ -111,14 +112,14 @@ public interface CommonMeetingService {
      * @param meetingHelper
      * @param itemNumber
      */
-    public void presentOther(MeetingHelper meetingHelper, int itemNumber);
+    public void presentOther(MeetingHelperBase meetingHelper, int itemNumber);
 
     /**
      * 
      * This method is to add the selected person or rolodex to other present list.
      * @param meetingHelper
      */
-    public void addOtherPresent(MeetingHelper meetingHelper);
+    public void addOtherPresent(MeetingHelperBase meetingHelper);
 
     /**
      * 
@@ -127,6 +128,6 @@ public interface CommonMeetingService {
      * @param meetingHelper
      * @param itemNumber
      */
-    public void deleteOtherPresent(MeetingHelper meetingHelper, int itemNumber);
+    public void deleteOtherPresent(MeetingHelperBase meetingHelper, int itemNumber);
     
 }

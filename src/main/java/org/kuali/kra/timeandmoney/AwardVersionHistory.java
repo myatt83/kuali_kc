@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.kuali.kra.award.home.Award;
+
 /**
  * A collection of this class is maintained on Time And Money Document.  There will be one entry for each version
  * of the current Award on Time And Money Document.
@@ -33,11 +35,13 @@ public class AwardVersionHistory implements Serializable{
     private String documentUrl;
     private String awardDescriptionLine;
     private List<TimeAndMoneyDocumentHistory> timeAndMoneyDocumentHistoryList;
-
+    private Award awardParent;
     
-    public AwardVersionHistory() {
+    public AwardVersionHistory(Award parent) {
         timeAndMoneyDocumentHistoryList = new ArrayList<TimeAndMoneyDocumentHistory>();
+        awardParent = parent;
     }
+    
     /**
      * Gets the documentUrl attribute. 
      * @return Returns the documentUrl.
@@ -81,6 +85,8 @@ public class AwardVersionHistory implements Serializable{
         this.timeAndMoneyDocumentHistoryList = timeAndMoneyDocumentHistoryList;
     }
     
-    
+    public Award getAwardParent() {
+        return awardParent;
+    }
     
 }

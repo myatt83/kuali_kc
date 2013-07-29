@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ package org.kuali.kra.common.committee.notification;
 
 import java.util.Map;
 
-import org.kuali.kra.common.committee.meeting.CommScheduleMinuteDoc;
+import org.kuali.kra.common.committee.meeting.CommScheduleMinuteDocBase;
 
 /**
  * Renders additional fields for the Agenda Created notification.
@@ -27,7 +27,7 @@ public class MinutesCreatedNotificationRenderer extends CommitteeNotificationRen
     private static final long serialVersionUID = -6019679826378390076L;
     
     private String actionTaken;
-    private CommScheduleMinuteDoc commScheduleMinuteDoc;
+    private CommScheduleMinuteDocBase commScheduleMinuteDoc;
 
     /**
      * Constructs an Minutes Created notification renderer.
@@ -35,8 +35,8 @@ public class MinutesCreatedNotificationRenderer extends CommitteeNotificationRen
      * @param protocol
      * @param actionTaken
      */
-    public MinutesCreatedNotificationRenderer(CommScheduleMinuteDoc minuteDoc, String actionTaken) {
-        super(minuteDoc.getCommitteeSchedule().getCommittee());
+    public MinutesCreatedNotificationRenderer(CommScheduleMinuteDocBase minuteDoc, String actionTaken) {
+        super(minuteDoc.getCommitteeSchedule().getParentCommittee());
         this.commScheduleMinuteDoc = minuteDoc;
         this.actionTaken = actionTaken;
     }
@@ -49,11 +49,11 @@ public class MinutesCreatedNotificationRenderer extends CommitteeNotificationRen
         this.actionTaken = actionTaken;
     }
 
-    public CommScheduleMinuteDoc getCommScheduleMinuteDoc() {
+    public CommScheduleMinuteDocBase getCommScheduleMinuteDoc() {
         return commScheduleMinuteDoc;
     }
     
-    public void setCommScheduleMinuteDoc(CommScheduleMinuteDoc commScheduleMinuteDoc) {
+    public void setCommScheduleMinuteDoc(CommScheduleMinuteDocBase commScheduleMinuteDoc) {
         this.commScheduleMinuteDoc = commScheduleMinuteDoc;
     }
     
@@ -67,6 +67,7 @@ public class MinutesCreatedNotificationRenderer extends CommitteeNotificationRen
         params.put(CommitteeReplacementParameters.LAST_ACTION_DATE, commScheduleMinuteDoc.getCommitteeSchedule().getScheduledDate().toString());
         params.put(CommitteeReplacementParameters.ACTION_TAKEN, actionTaken);
         params.put(CommitteeReplacementParameters.OBJECT_INDEX, new Integer(commScheduleMinuteDoc.getMinuteNumber().intValue() - 1).toString());
+        params.put(CommitteeReplacementParameters.SCHEDULE_ID,commScheduleMinuteDoc.getCommitteeSchedule().getScheduleId());
         return params;
     }    
 

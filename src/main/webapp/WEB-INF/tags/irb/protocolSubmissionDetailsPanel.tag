@@ -1,5 +1,5 @@
 <%--
- Copyright 2005-2010 The Kuali Foundation
+ Copyright 2005-2013 The Kuali Foundation
  
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -65,13 +65,9 @@
 		    <kra-irb:checklistItems />
 		    <kra-irb:protocolReviewComments />
 		    <kra-irb:protocolReviewAttachments />
-		    <%-- kcirb-1016 : not to display it here.  it will be shown at print panel
-		    <c:if test="${KualiForm.actionHelper.submissionQuestionnaireExist}">
-		        <kra-irb:viewSubmissionQuestionnaire />
-		    </c:if>
-		     --%>
             </tbody>
         </table>
+       
     </div>
     			
 </kul:innerTab>

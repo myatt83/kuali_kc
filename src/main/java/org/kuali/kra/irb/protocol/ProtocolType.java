@@ -1,6 +1,5 @@
-// TODO *********code has been moved to base class, should ultimately be removed**********
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +15,14 @@
  */
 package org.kuali.kra.irb.protocol;
 
-import org.kuali.kra.bo.KraPersistableBusinessObjectBase;
+import org.kuali.kra.protocol.protocol.ProtocolTypeBase;
 
-public class ProtocolType extends KraPersistableBusinessObjectBase {
+public class ProtocolType extends ProtocolTypeBase {
+
+    /**
+     * Comment for <code>serialVersionUID</code>
+     */
+    private static final long serialVersionUID = 5222672499618671313L;
 
     private String protocolTypeCode;
 
@@ -53,4 +57,3 @@ public class ProtocolType extends KraPersistableBusinessObjectBase {
 		this.globalFlag = globalFlag;
 	}
 }
-// TODO **********************end************************

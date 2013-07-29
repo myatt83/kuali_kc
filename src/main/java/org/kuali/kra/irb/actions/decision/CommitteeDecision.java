@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,32 +15,31 @@
  */
 package org.kuali.kra.irb.actions.decision;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.kuali.kra.committee.bo.CommitteeDecisionMotionType;
-import org.kuali.kra.committee.bo.CommitteeMembership;
+import org.kuali.kra.common.committee.bo.CommitteeDecisionMotionType;
+import org.kuali.kra.common.committee.bo.CommitteeMembershipBase;
 import org.kuali.kra.committee.service.CommitteeService;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.irb.actions.ActionHelper;
 import org.kuali.kra.irb.actions.ProtocolActionBean;
-import org.kuali.kra.irb.actions.ProtocolOnlineReviewCommentable;
 import org.kuali.kra.irb.actions.reviewcomments.ReviewAttachmentsBean;
 import org.kuali.kra.irb.actions.reviewcomments.ReviewCommentsBean;
 import org.kuali.kra.irb.actions.submit.ProtocolSubmission;
 import org.kuali.kra.meeting.ProtocolVoteAbstainee;
 import org.kuali.kra.meeting.ProtocolVoteRecused;
+import org.kuali.kra.protocol.actions.reviewcomments.ReviewCommentsBeanBase;
 import org.kuali.rice.krad.service.BusinessObjectService;
 
 /**
  * This class is a bean for managing the input for a committee decision.
  */
-public class CommitteeDecision extends ProtocolActionBean implements ProtocolOnlineReviewCommentable, Serializable {
+public class CommitteeDecision extends ProtocolActionBean implements org.kuali.kra.protocol.actions.decision.CommitteeDecision<CommitteePerson> {
 
     private static final long serialVersionUID = -8052093280852074307L;
     
@@ -80,9 +79,7 @@ public class CommitteeDecision extends ProtocolActionBean implements ProtocolOnl
         // getSubmission(protocol) is not necessary the most recent one.
         // this may cause problem later if the most recent submission does not have schedule, then
         // npe when try to getavailable member
-        // TODO : check with Jay
-        //ProtocolSubmission submission = getSubmission(protocol);
-        ProtocolSubmission submission = getProtocol().getProtocolSubmission();
+        ProtocolSubmission submission = (ProtocolSubmission) getProtocol().getProtocolSubmission();
         if (submission != null) {
             this.motionTypeCode = submission.getCommitteeDecisionMotionTypeCode();
             this.noCount = submission.getNoVoteCount();
@@ -102,7 +99,6 @@ public class CommitteeDecision extends ProtocolActionBean implements ProtocolOnl
     }
     
     public Integer getRecusedCount() {
-        //return recusedCount;
         return this.getRecused().size();
     }
 
@@ -117,10 +113,10 @@ public class CommitteeDecision extends ProtocolActionBean implements ProtocolOnl
         return lookUpFields;
     }
     
-    private List<CommitteeMembership> getCommitteeMemberships() {
+    private List<CommitteeMembershipBase> getCommitteeMemberships() {
         String committeeId = getProtocol().getProtocolSubmission().getCommittee().getCommitteeId();
         String scheduleId = getProtocol().getProtocolSubmission().getScheduleId();
-        List<CommitteeMembership> committeeMemberships = KraServiceLocator.getService(CommitteeService.class).getAvailableMembers(committeeId, scheduleId);
+        List<CommitteeMembershipBase> committeeMemberships = KraServiceLocator.getService(CommitteeService.class).getAvailableMembers(committeeId, scheduleId);
         return committeeMemberships;
     }
     
@@ -129,10 +125,10 @@ public class CommitteeDecision extends ProtocolActionBean implements ProtocolOnl
         
         Collection<ProtocolVoteAbstainee> protocolVoteAbstainees = KraServiceLocator.getService(BusinessObjectService.class).findMatching(ProtocolVoteAbstainee.class, absenteeLookFields);
         
-        List<CommitteeMembership> committeeMemberships = getCommitteeMemberships();
+        List<CommitteeMembershipBase> committeeMemberships = getCommitteeMemberships();
         
         for (ProtocolVoteAbstainee abstainee : protocolVoteAbstainees) {
-            for (CommitteeMembership membership : committeeMemberships) {
+            for (CommitteeMembershipBase membership : committeeMemberships) {
                 if (abstainee.isProtocolReviewerFromCommitteeMembership(membership)) {
                     //this committee person is an abstainee
                     CommitteePerson person = new CommitteePerson();
@@ -149,10 +145,10 @@ public class CommitteeDecision extends ProtocolActionBean implements ProtocolOnl
         
         Collection<ProtocolVoteRecused> protocolVoteRecused = KraServiceLocator.getService(BusinessObjectService.class).findMatching(ProtocolVoteRecused.class, absenteeLookFields);
         
-        List<CommitteeMembership> committeeMemberships = getCommitteeMemberships();
+        List<CommitteeMembershipBase> committeeMemberships = getCommitteeMemberships();
         
         for (ProtocolVoteRecused recusee : protocolVoteRecused) {
-            for (CommitteeMembership membership : committeeMemberships) {
+            for (CommitteeMembershipBase membership : committeeMemberships) {
                 if (recusee.isProtocolReviewerFromCommitteeMembership(membership)) {
                     //this committee person is an recusee
                     CommitteePerson person = new CommitteePerson();
@@ -189,7 +185,6 @@ public class CommitteeDecision extends ProtocolActionBean implements ProtocolOnl
     }
 
     public Integer getAbstainCount() {
-        //return abstainCount;
         return this.getAbstainers().size();
     }
 
@@ -264,8 +259,8 @@ public class CommitteeDecision extends ProtocolActionBean implements ProtocolOnl
         return reviewCommentsBean;
     }
 
-    public void setReviewCommentsBean(ReviewCommentsBean reviewCommentsBean) {
-        this.reviewCommentsBean = reviewCommentsBean;
+    public void setReviewCommentsBean(ReviewCommentsBeanBase reviewCommentsBean) {
+        this.reviewCommentsBean = (ReviewCommentsBean) reviewCommentsBean;
     }
 
     public ReviewAttachmentsBean getReviewAttachmentsBean() {

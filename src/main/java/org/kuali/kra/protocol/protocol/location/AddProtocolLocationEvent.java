@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package org.kuali.kra.protocol.protocol.location;
 
-import org.kuali.kra.protocol.ProtocolDocument;
+import org.kuali.kra.protocol.ProtocolDocumentBase;
 import org.kuali.rice.krad.document.Document;
 import org.kuali.rice.krad.rules.rule.BusinessRule;
 
@@ -24,12 +24,12 @@ import org.kuali.rice.krad.rules.rule.BusinessRule;
  */
 public class AddProtocolLocationEvent extends ProtocolLocationEventBase {
     
-    public AddProtocolLocationEvent(String errorPathPrefix, ProtocolDocument document, ProtocolLocation protocolLocation) {
-        super("adding ProtocolLocation to document " + getDocumentId(document), errorPathPrefix, document, protocolLocation);
+    public AddProtocolLocationEvent(String errorPathPrefix, ProtocolDocumentBase document, ProtocolLocationBase protocolLocation) {
+        super("adding ProtocolLocationBase to document " + getDocumentId(document), errorPathPrefix, document, protocolLocation);
     }
 
-    public AddProtocolLocationEvent(String errorPathPrefix, Document document, ProtocolLocation protocolLocation) {
-        this(errorPathPrefix, (ProtocolDocument) document, protocolLocation);
+    public AddProtocolLocationEvent(String errorPathPrefix, Document document, ProtocolLocationBase protocolLocation) {
+        this(errorPathPrefix, (ProtocolDocumentBase) document, protocolLocation);
     }
     
     /**

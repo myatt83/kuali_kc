@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -132,7 +132,7 @@ public class SpecialReviewServiceImpl implements SpecialReviewService {
             }
             else if (SpecialReviewType.ANIMAL_USAGE.equals(specialReviewTypeCode) )
             {
-                org.kuali.kra.protocol.Protocol protocol = getIacucProtocolFinderDao().findCurrentProtocolByNumber(protocolNumber);
+                org.kuali.kra.protocol.ProtocolBase protocol = getIacucProtocolFinderDao().findCurrentProtocolByNumber(protocolNumber);
                 if (protocol != null) {
                 Document document = getDocumentService().getByDocumentHeaderId(protocol.getProtocolDocument().getDocumentNumber());
                 routeHeaderId = document.getDocumentHeader().getWorkflowDocument().getDocumentId();
@@ -150,13 +150,15 @@ public class SpecialReviewServiceImpl implements SpecialReviewService {
      * @see org.kuali.kra.common.specialreview.service.SpecialReviewService#isLinkedToProtocolFundingSource(java.lang.String, java.lang.String, 
      *      java.lang.String)
      */
+    @SuppressWarnings("unchecked")
     public boolean isLinkedToProtocolFundingSource(String protocolNumber, String fundingSourceNumber, String fundingSourceTypeCode) {
         boolean isLinkedToProtocolFundingSource = false;
         
         if (StringUtils.isNotBlank(protocolNumber)) {
-            Protocol protocol = getProtocolFinderDao().findCurrentProtocolByNumber(protocolNumber);
+            Protocol protocol = (Protocol)getProtocolFinderDao().findCurrentProtocolByNumber(protocolNumber);
             if (protocol != null) {
-                for (ProtocolFundingSource protocolFundingSource : protocol.getProtocolFundingSources()) {
+                List<ProtocolFundingSource> protocolFundingSources = (List)protocol.getProtocolFundingSources();
+                for (ProtocolFundingSource protocolFundingSource : protocolFundingSources) {
                     if (StringUtils.equals(protocolFundingSource.getFundingSourceNumber(), fundingSourceNumber) 
                         && StringUtils.equals(protocolFundingSource.getFundingSourceTypeCode(), fundingSourceTypeCode)) {
                         isLinkedToProtocolFundingSource = true;
@@ -232,12 +234,14 @@ public class SpecialReviewServiceImpl implements SpecialReviewService {
      * @see org.kuali.kra.common.specialreview.service.SpecialReviewService#deleteProtocolFundingSourceForSpecialReview(java.lang.String, java.lang.String, 
      *      java.lang.String)
      */
+    @SuppressWarnings("unchecked")
     public void deleteProtocolFundingSourceForSpecialReview(String protocolNumber, String fundingSourceNumber, String fundingSourceTypeCode) {
         Protocol protocol = getProtocolFinderDao().findCurrentProtocolByNumber(protocolNumber);
         if (protocol != null) {
             List<ProtocolFundingSource> deletedProtocolFundingSources = new ArrayList<ProtocolFundingSource>();
             
-            for (ProtocolFundingSource protocolFundingSource : protocol.getProtocolFundingSources()) {
+            List<ProtocolFundingSource> protocolFundingSources = (List)protocol.getProtocolFundingSources();
+            for (ProtocolFundingSource protocolFundingSource : protocolFundingSources) {
                 if (StringUtils.equals(protocolFundingSource.getFundingSourceNumber(), fundingSourceNumber) 
                     && StringUtils.equals(protocolFundingSource.getFundingSourceTypeCode(), fundingSourceTypeCode)) {
                     deletedProtocolFundingSources.add(protocolFundingSource);
@@ -351,7 +355,8 @@ public class SpecialReviewServiceImpl implements SpecialReviewService {
     private void deleteInstitutionalProposalSpecialReview(InstitutionalProposal institutionalProposal, String protocolNumber) {
         if (institutionalProposal != null) {
             List<InstitutionalProposalSpecialReview> deletedSpecialReviews = new ArrayList<InstitutionalProposalSpecialReview>();
-            
+            institutionalProposal.refreshReferenceObject("specialReviews");
+
             for (InstitutionalProposalSpecialReview specialReview : institutionalProposal.getSpecialReviews()) {
                 if (StringUtils.equals(specialReview.getProtocolNumber(), protocolNumber)) {
                     deletedSpecialReviews.add(specialReview);

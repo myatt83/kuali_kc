@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ public interface ProposalDevelopmentS2sQuestionnaireService {
      * @param formName the name of the form
      * @return
      */
-    List<QuestionnaireUsage> getQuestionnaireUsages(String oppNameSpace, String formName);
+    List<QuestionnaireUsage> getQuestionnaireUsages(String oppNameSpace, String formName, DevelopmentProposal proposal);
     
     /**
      * Get the AnswerHeaders for a specific proposal's form. 

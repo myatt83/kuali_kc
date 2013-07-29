@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,16 +36,16 @@ import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.KeyConstants;
 import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.infrastructure.RoleConstants;
-import org.kuali.kra.protocol.Protocol;
-import org.kuali.kra.protocol.ProtocolDocument;
-import org.kuali.kra.protocol.ProtocolForm;
+import org.kuali.kra.protocol.ProtocolBase;
+import org.kuali.kra.protocol.ProtocolDocumentBase;
+import org.kuali.kra.protocol.ProtocolFormBase;
 import org.kuali.kra.protocol.noteattachment.ProtocolAttachmentBase;
-import org.kuali.kra.protocol.noteattachment.ProtocolAttachmentPersonnel;
+import org.kuali.kra.protocol.noteattachment.ProtocolAttachmentPersonnelBase;
 import org.kuali.kra.protocol.noteattachment.ProtocolAttachmentService;
 import org.kuali.kra.protocol.personnel.AddProtocolUnitEvent;
-import org.kuali.kra.protocol.personnel.ProtocolPerson;
-import org.kuali.kra.protocol.personnel.ProtocolPersonRole;
-import org.kuali.kra.protocol.personnel.ProtocolUnit;
+import org.kuali.kra.protocol.personnel.ProtocolPersonBase;
+import org.kuali.kra.protocol.personnel.ProtocolPersonRoleBase;
+import org.kuali.kra.protocol.personnel.ProtocolUnitBase;
 import org.kuali.kra.service.KraAuthorizationService;
 import org.kuali.kra.web.struts.action.StrutsConfirmation;
 import org.kuali.rice.krad.util.KRADConstants;
@@ -68,13 +68,13 @@ public class IacucProtocolPersonnelAction extends IacucProtocolAction {
             throws Exception {
         ActionForward actionForward = super.execute(mapping, form, request, response);
         getProtocolPersonnelService().selectProtocolUnit(getProtocolPersons(form));
-        ((ProtocolForm)form).getPersonnelHelper().prepareView();
+        ((ProtocolFormBase)form).getPersonnelHelper().prepareView();
         
         return actionForward;
     }
 
     /**
-     * This method is linked to ProtocolPersonnelService to perform the action - Add Protocol Person. 
+     * This method is linked to ProtocolPersonnelService to perform the action - Add ProtocolBase Person. 
      * Method is called in protocolAddPersonnelSection.tag 
      * @param mapping
      * @param form
@@ -85,9 +85,9 @@ public class IacucProtocolPersonnelAction extends IacucProtocolAction {
      */
     public ActionForward addProtocolPerson(ActionMapping mapping, ActionForm form, HttpServletRequest request,
             HttpServletResponse response) throws Exception {
-        ProtocolForm protocolForm = (ProtocolForm) form;
+        ProtocolFormBase protocolForm = (ProtocolFormBase) form;
         IacucProtocolPerson newProtocolPerson = (IacucProtocolPerson)protocolForm.getPersonnelHelper().getNewProtocolPerson();
-        Protocol protocol = protocolForm.getProtocolDocument().getProtocol();
+        ProtocolBase protocol = protocolForm.getProtocolDocument().getProtocol();
 
         // check any business rules
         boolean rulePassed = applyRules(new AddIacucProtocolPersonnelEvent(Constants.EMPTY_STRING, protocolForm.getProtocolDocument(),
@@ -95,7 +95,7 @@ public class IacucProtocolPersonnelAction extends IacucProtocolAction {
         if (rulePassed) {
             getProtocolPersonnelService().addProtocolPerson(protocol, newProtocolPerson);
             //If we are adding a new principal investigator, make sure we update the person id
-            if (StringUtils.equals(newProtocolPerson.getProtocolPersonRoleId(), ProtocolPersonRole.ROLE_PRINCIPAL_INVESTIGATOR)) {
+            if (StringUtils.equals(newProtocolPerson.getProtocolPersonRoleId(), ProtocolPersonRoleBase.ROLE_PRINCIPAL_INVESTIGATOR)) {
                 protocolForm.getProtocolHelper().setPersonId(newProtocolPerson.getPersonId());
             }
             protocolForm.getPersonnelHelper().setNewProtocolPerson(new IacucProtocolPerson());
@@ -105,7 +105,7 @@ public class IacucProtocolPersonnelAction extends IacucProtocolAction {
     }
 
     /**
-     * This method is linked to ProtocolPersonnelService to perform the action - Delete Protocol Person.
+     * This method is linked to ProtocolPersonnelService to perform the action - Delete ProtocolBase Person.
      * Method is called in ProtocolPersonnel.jsp
      * @param mapping
      * @param form
@@ -115,8 +115,8 @@ public class IacucProtocolPersonnelAction extends IacucProtocolAction {
      * @throws Exception
      */
     public ActionForward deleteProtocolPerson(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-        ProtocolForm protocolForm = (ProtocolForm) form;
-        ProtocolDocument protocolDocument = protocolForm.getProtocolDocument();
+        ProtocolFormBase protocolForm = (ProtocolFormBase) form;
+        ProtocolDocumentBase protocolDocument = protocolForm.getProtocolDocument();
 
         boolean rulePassed =  applyRules(new DeleteIacucProtocolPersonnelEvent(Constants.EMPTY_STRING, (IacucProtocolDocument)protocolDocument)); 
 
@@ -137,7 +137,7 @@ public class IacucProtocolPersonnelAction extends IacucProtocolAction {
      * @throws Exception
      */
     public ActionForward clearProtocolPerson(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-        ProtocolForm protocolForm = (ProtocolForm) form;
+        ProtocolFormBase protocolForm = (ProtocolFormBase) form;
         protocolForm.getPersonnelHelper().setNewProtocolPerson(new IacucProtocolPerson());
         return mapping.findForward(Constants.MAPPING_BASIC);
     }
@@ -155,11 +155,11 @@ public class IacucProtocolPersonnelAction extends IacucProtocolAction {
      */
     public ActionForward addPersonnelAttachment(ActionMapping mapping, ActionForm form, HttpServletRequest request,
             HttpServletResponse response) throws Exception {
-        ProtocolForm protocolForm = (ProtocolForm) form;
-        ProtocolDocument protocolDocument = protocolForm.getProtocolDocument();
+        ProtocolFormBase protocolForm = (ProtocolFormBase) form;
+        ProtocolDocumentBase protocolDocument = protocolForm.getProtocolDocument();
         int selectedPersonIndex = getSelectedPersonIndex(request, protocolDocument);
-        ProtocolPerson protocolPerson = protocolDocument.getProtocol().getProtocolPerson(selectedPersonIndex);
-        ProtocolAttachmentPersonnel newAttachmentPersonnel = protocolForm.getPersonnelHelper().getNewProtocolAttachmentPersonnels().get(selectedPersonIndex);
+        ProtocolPersonBase protocolPerson = protocolDocument.getProtocol().getProtocolPerson(selectedPersonIndex);
+        ProtocolAttachmentPersonnelBase newAttachmentPersonnel = protocolForm.getPersonnelHelper().getNewProtocolAttachmentPersonnels().get(selectedPersonIndex);
         newAttachmentPersonnel.setPersonId(protocolPerson.getProtocolPersonId());
         newAttachmentPersonnel.setProtocolNumber(protocolPerson.getProtocolNumber());
         
@@ -186,9 +186,9 @@ public class IacucProtocolPersonnelAction extends IacucProtocolAction {
      */
     public ActionForward viewPersonnelAttachment(ActionMapping mapping, ActionForm form, HttpServletRequest request,
             HttpServletResponse response) throws Exception {
-        ProtocolForm protocolForm = (ProtocolForm) form;
-        ProtocolDocument protocolDocument = protocolForm.getProtocolDocument();
-        ProtocolPerson protocolPerson = protocolDocument.getProtocol().getProtocolPerson(getSelectedPersonIndex(request, protocolDocument));
+        ProtocolFormBase protocolForm = (ProtocolFormBase) form;
+        ProtocolDocumentBase protocolDocument = protocolForm.getProtocolDocument();
+        ProtocolPersonBase protocolPerson = protocolDocument.getProtocol().getProtocolPerson(getSelectedPersonIndex(request, protocolDocument));
         ProtocolAttachmentBase attachment = protocolPerson.getAttachmentPersonnels().get(getSelectedLine(request));
         return printAttachmentProtocol(mapping, protocolForm, response, attachment);
     }
@@ -196,66 +196,17 @@ public class IacucProtocolPersonnelAction extends IacucProtocolAction {
     /*
      * This is to view attachment if attachment is selected in print panel.
      */
-    private ActionForward printAttachmentProtocol(ActionMapping mapping, ProtocolForm form, HttpServletResponse response, ProtocolAttachmentBase attachment) throws Exception {
+    private ActionForward printAttachmentProtocol(ActionMapping mapping, ProtocolFormBase form, HttpServletResponse response, ProtocolAttachmentBase attachment) throws Exception {
 
         if (attachment == null) {
             return mapping.findForward(Constants.MAPPING_BASIC);
         }
         final AttachmentFile file = attachment.getFile();
        
-       /* byte[] attachmentFile =null;
-        String attachmentFileType=file.getType().replace("\"", "");
-        if(attachmentFileType.equalsIgnoreCase(WatermarkConstants.ATTACHMENT_TYPE_PDF)){
-            attachmentFile=getProtocolAttachmentFile(form,attachment);
-            if(attachmentFile!=null){          
-                this.streamToResponse(attachmentFile, getValidHeaderString(file.getName()), getValidHeaderString(file.getType()), response);    }
-            else{
-                this.streamToResponse(file.getData(), getValidHeaderString(file.getName()), getValidHeaderString(file.getType()), response);    }
-            return RESPONSE_ALREADY_HANDLED;
-        }*/
-        
         this.streamToResponse(file.getData(), getValidHeaderString(file.getName()), getValidHeaderString(file.getType()), response);
         return RESPONSE_ALREADY_HANDLED;
     }
-//    /**
-//     * 
-//     * This method for set the attachment with the watermark which selected  by the client .
-//     * @param protocolForm form
-//     * @param protocolAttachmentBase attachment
-//     * @return attachment file
-//     */
-//      
-//    private byte[] getProtocolAttachmentFile(ProtocolForm form,ProtocolAttachmentBase attachment){
-//        
-//        byte[] attachmentFile =null;
-//        final AttachmentFile file = attachment.getFile();
-//        Printable printableArtifacts= getProtocolPrintingService().getProtocolPrintArtifacts(form.getProtocolDocument().getProtocol());
-//        
-//        try {
-//            if(printableArtifacts.isWatermarkEnabled()){
-//            Integer attachmentDocumentId =attachment.getDocumentId();
-//            List<ProtocolAttachmentProtocol> protocolAttachmentList=form.getProtocolDocument().getProtocol().getAttachmentProtocols();
-//            if(protocolAttachmentList.size()>0){
-//                for (ProtocolAttachmentProtocol personnelAttachment : protocolAttachmentList) {
-//                    if(attachmentDocumentId.equals(personnelAttachment.getDocumentId()) && 
-//                            ProtocolAttachmentProtocol.COMPLETE_STATUS_CODE.equals(personnelAttachment.getStatusCode())) {
-//                        if(getProtocolAttachmentService().isNewAttachmentVersion(personnelAttachment)){
-//                            attachmentFile = getWatermarkService().applyWatermark(file.getData(),printableArtifacts.getWatermarkable().getWatermark());
-//                        }else{
-//                            attachmentFile = getWatermarkService().applyWatermark(file.getData(),printableArtifacts.getWatermarkable().getInvalidWatermark());
-//                            LOG.info(INVALID_ATTACHMENT + attachmentDocumentId);
-//                        }
-//                    }
-//                }
-//            }else{
-//                attachmentFile = getWatermarkService().applyWatermark(file.getData(),printableArtifacts.getWatermarkable().getWatermark()); }
-//            }
-//        }
-//        catch (Exception e) {
-//            LOG.error("Exception Occured in ProtocolNoteAndAttachmentAction. : ",e);    
-//        }        
-//        return attachmentFile;
-//    }
+
     /**
      * Method called when deleting an attachment from a person.
      * 
@@ -268,9 +219,9 @@ public class IacucProtocolPersonnelAction extends IacucProtocolAction {
      */
     public ActionForward deletePersonnelAttachment(ActionMapping mapping, ActionForm form, HttpServletRequest request, 
             HttpServletResponse response) throws Exception {
-        ProtocolDocument protocolDocument = ((ProtocolForm) form).getProtocolDocument();
-        ProtocolPerson protocolPerson = protocolDocument.getProtocol().getProtocolPerson(getSelectedPersonIndex(request, protocolDocument));
-        ProtocolAttachmentPersonnel attachment = protocolPerson.getAttachmentPersonnels().get(getSelectedLine(request));
+        ProtocolDocumentBase protocolDocument = ((ProtocolFormBase) form).getProtocolDocument();
+        ProtocolPersonBase protocolPerson = protocolDocument.getProtocol().getProtocolPerson(getSelectedPersonIndex(request, protocolDocument));
+        ProtocolAttachmentPersonnelBase attachment = protocolPerson.getAttachmentPersonnels().get(getSelectedLine(request));
 
         final StrutsConfirmation confirm 
         = buildParameterizedConfirmationQuestion(mapping, form, request, response, CONFIRM_YES_DELETE_ATTACHMENT_PERSONNEL, 
@@ -290,12 +241,12 @@ public class IacucProtocolPersonnelAction extends IacucProtocolAction {
      * @throws Exception if there is a problem executing the request.
      */
     public ActionForward confirmDeleteAttachmentPersonnel(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-        ProtocolDocument protocolDocument = ((ProtocolForm) form).getProtocolDocument();
-        ProtocolPerson protocolPerson = protocolDocument.getProtocol().getProtocolPerson(getSelectedPersonIndex(request, protocolDocument));
-        ProtocolAttachmentPersonnel attachment = protocolPerson.getAttachmentPersonnels().get(getSelectedLine(request));
+        ProtocolDocumentBase protocolDocument = ((ProtocolFormBase) form).getProtocolDocument();
+        ProtocolPersonBase protocolPerson = protocolDocument.getProtocol().getProtocolPerson(getSelectedPersonIndex(request, protocolDocument));
+        ProtocolAttachmentPersonnelBase attachment = protocolPerson.getAttachmentPersonnels().get(getSelectedLine(request));
 
         if (attachment.getFileId() != null && !getProtocolAttachmentService().isSharedFile(attachment)) {
-            ((ProtocolForm) form).getNotesAttachmentsHelper().getFilesToDelete().add(attachment.getFile());
+            ((ProtocolFormBase) form).getNotesAttachmentsHelper().getFilesToDelete().add(attachment.getFile());
         }
         protocolPerson.getAttachmentPersonnels().remove(getSelectedLine(request));
 
@@ -306,7 +257,7 @@ public class IacucProtocolPersonnelAction extends IacucProtocolAction {
 
     /**
      * This method is linked to ProtocolPersonnelService to perform the action
-     * Add ProtocolUnit to Person.
+     * Add ProtocolUnitBase to Person.
      * Method is called in personUnitsSection.tag
      * @param mapping
      * @param form
@@ -316,13 +267,13 @@ public class IacucProtocolPersonnelAction extends IacucProtocolAction {
      * @throws Exception
      */
     public ActionForward addProtocolPersonUnit(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-        ProtocolForm protocolForm = (ProtocolForm) form;
-        ProtocolDocument protocolDocument = protocolForm.getProtocolDocument();
+        ProtocolFormBase protocolForm = (ProtocolFormBase) form;
+        ProtocolDocumentBase protocolDocument = protocolForm.getProtocolDocument();
         int selectedPersonIndex = getSelectedPersonIndex(request, protocolDocument);
 
-        ProtocolPerson protocolPerson = protocolDocument.getProtocol().getProtocolPerson(selectedPersonIndex);
+        ProtocolPersonBase protocolPerson = protocolDocument.getProtocol().getProtocolPerson(selectedPersonIndex);
         
-        ProtocolUnit newProtocolPersonUnit = protocolForm.getPersonnelHelper().getNewProtocolPersonUnits().get(selectedPersonIndex);
+        ProtocolUnitBase newProtocolPersonUnit = protocolForm.getPersonnelHelper().getNewProtocolPersonUnits().get(selectedPersonIndex);
         boolean rulePassed = applyRules(new AddProtocolUnitEvent(Constants.EMPTY_STRING, protocolForm.getProtocolDocument(), 
                 newProtocolPersonUnit, selectedPersonIndex));
 
@@ -335,7 +286,7 @@ public class IacucProtocolPersonnelAction extends IacucProtocolAction {
     
     /**
      * This method is linked to ProtocolPersonnelService to perform the action.
-     * Delete ProtocolUnit from Person unit list.
+     * Delete ProtocolUnitBase from Person unit list.
      * Method is called in personUnitsSection.tag
      * @param mapping
      * @param form
@@ -345,8 +296,8 @@ public class IacucProtocolPersonnelAction extends IacucProtocolAction {
      * @throws Exception
      */
     public ActionForward deleteProtocolPersonUnit(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-        ProtocolForm protocolForm = (ProtocolForm) form;
-        ProtocolDocument protocolDocument = protocolForm.getProtocolDocument();
+        ProtocolFormBase protocolForm = (ProtocolFormBase) form;
+        ProtocolDocumentBase protocolDocument = protocolForm.getProtocolDocument();
         int selectedPersonIndex = getSelectedPersonIndex(request, protocolDocument);
         getProtocolPersonnelService().deleteProtocolPersonUnit(protocolDocument.getProtocol(), selectedPersonIndex, getSelectedLine(request));
 
@@ -363,8 +314,8 @@ public class IacucProtocolPersonnelAction extends IacucProtocolAction {
      * @throws Exception
      */
     public ActionForward updateProtocolPersonView(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-        ProtocolForm protocolForm = (ProtocolForm) form;
-        ProtocolDocument protocolDocument = protocolForm.getProtocolDocument();
+        ProtocolFormBase protocolForm = (ProtocolFormBase) form;
+        ProtocolDocumentBase protocolDocument = protocolForm.getProtocolDocument();
         int selectedPersonIndex = getSelectedPersonIndex(request, protocolDocument);
         getProtocolPersonnelService().switchInvestigatorCoInvestigatorRole(protocolDocument.getProtocol().getProtocolPersons());
         getProtocolPersonnelService().syncPersonRoleAndUnit(protocolDocument.getProtocol().getProtocolPerson(selectedPersonIndex));
@@ -372,23 +323,6 @@ public class IacucProtocolPersonnelAction extends IacucProtocolAction {
         return mapping.findForward(Constants.MAPPING_BASIC);
     }
 
-//
-//    /**
-//     * This method for Watermark Service. 
-//     */
-//    private WatermarkService getWatermarkService() {
-//        return  KraServiceLocator.getService(WatermarkService.class);  
-//    }
-//    
-//    /**
-//     * 
-//     * This method for get Protocol Service.
-//     * @return
-//     */
-//    private ProtocolPrintingService getProtocolPrintingService() {
-//        return KraServiceLocator.getService(ProtocolPrintingService.class);
-//    }
-    
     /**
      * This method is to get selected person index.
      * Each person data is displayed in individual panel.
@@ -397,7 +331,7 @@ public class IacucProtocolPersonnelAction extends IacucProtocolAction {
      * @param document
      * @return
      */
-    protected int getSelectedPersonIndex(HttpServletRequest request, ProtocolDocument document) {
+    protected int getSelectedPersonIndex(HttpServletRequest request, ProtocolDocumentBase document) {
         int selectedPersonIndex = -1;
         String parameterName = (String) request.getAttribute(KRADConstants.METHOD_TO_CALL_ATTRIBUTE);
         if (StringUtils.isNotBlank(parameterName)) {
@@ -411,8 +345,8 @@ public class IacucProtocolPersonnelAction extends IacucProtocolAction {
      * @param form
      * @return
      */
-    private List<ProtocolPerson> getProtocolPersons(ActionForm form) {
-        return ((ProtocolForm) form).getProtocolDocument().getProtocol().getProtocolPersons();
+    private List<ProtocolPersonBase> getProtocolPersons(ActionForm form) {
+        return ((ProtocolFormBase) form).getProtocolDocument().getProtocol().getProtocolPersons();
     }
 
     @Override
@@ -420,10 +354,10 @@ public class IacucProtocolPersonnelAction extends IacucProtocolAction {
             throws Exception {
         super.preSave(mapping, form, request, response);
         
-        ProtocolForm protocolForm = (ProtocolForm) form;
-        Protocol protocol = protocolForm.getProtocolDocument().getProtocol();
+        ProtocolFormBase protocolForm = (ProtocolFormBase) form;
+        ProtocolBase protocol = protocolForm.getProtocolDocument().getProtocol();
         
-        for (ProtocolPerson protocolPerson : protocol.getProtocolPersons()) {
+        for (ProtocolPersonBase protocolPerson : protocol.getProtocolPersons()) {
             String personComparator = (protocolPerson.getPersonId() != null) ? protocolPerson.getPersonId() : protocolPerson.getRolodexId().toString(); 
             if (protocolPerson.isPrincipalInvestigator() && !personComparator.equals(protocol.getPrincipalInvestigatorId())) {
                 // reset PI from cached getter
@@ -453,15 +387,15 @@ public class IacucProtocolPersonnelAction extends IacucProtocolAction {
         keyMap.put("protocolNumber", protocol.getProtocolNumber());
         keyMap.put("sequenceNumber", protocol.getSequenceNumber());
  
-        List<ProtocolAttachmentPersonnel> attachments = (List<ProtocolAttachmentPersonnel>)getBusinessObjectService().findMatching(IacucProtocolAttachmentPersonnel.class, keyMap);
+        List<ProtocolAttachmentPersonnelBase> attachments = (List<ProtocolAttachmentPersonnelBase>)getBusinessObjectService().findMatching(IacucProtocolAttachmentPersonnel.class, keyMap);
         List<AttachmentFile> filesToDelete = new ArrayList<AttachmentFile>();
         List<Long> attachmentIds = new ArrayList<Long>();
-        for (ProtocolAttachmentPersonnel attachment : protocol.getAttachmentPersonnels()) {
+        for (ProtocolAttachmentPersonnelBase attachment : protocol.getAttachmentPersonnels()) {
             if (attachment.getId() != null) {
                 attachmentIds.add(attachment.getId());
             }
         }
-        for (ProtocolAttachmentPersonnel attachment : attachments) {
+        for (ProtocolAttachmentPersonnelBase attachment : attachments) {
             if (!attachmentIds.contains(attachment.getId()) && !getProtocolAttachmentService().isSharedFile(attachment)) {
                 filesToDelete.add(attachment.getFile());
             }
@@ -481,9 +415,9 @@ public class IacucProtocolPersonnelAction extends IacucProtocolAction {
     public void postSave(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
             throws Exception {
         super.postSave(mapping, form, request, response);
-        if (!((ProtocolForm) form).getNotesAttachmentsHelper().getFilesToDelete().isEmpty()) {
-            getBusinessObjectService().delete(((ProtocolForm) form).getNotesAttachmentsHelper().getFilesToDelete());
-            ((ProtocolForm) form).getNotesAttachmentsHelper().getFilesToDelete().clear();
+        if (!((ProtocolFormBase) form).getNotesAttachmentsHelper().getFilesToDelete().isEmpty()) {
+            getBusinessObjectService().delete(((ProtocolFormBase) form).getNotesAttachmentsHelper().getFilesToDelete());
+            ((ProtocolFormBase) form).getNotesAttachmentsHelper().getFilesToDelete().clear();
         }
     }
 }

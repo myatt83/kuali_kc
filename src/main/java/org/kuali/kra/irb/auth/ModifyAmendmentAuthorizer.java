@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ public abstract class ModifyAmendmentAuthorizer extends ModifyProtocolAuthorizer
         Protocol protocol = task.getProtocol();
         boolean hasPermission = super.isAuthorized(userId, task);
 
-        if (hasPermission && isAmendmentOrRenewal(protocol) && !protocol.isRenewalWithoutAmendment()) {
+        if (hasPermission && isAmendmentOrRenewal(protocol)) {
             hasPermission = canModifyModule(protocol, moduleTypeCode);
         }
 

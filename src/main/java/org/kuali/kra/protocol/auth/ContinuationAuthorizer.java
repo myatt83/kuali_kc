@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,16 +15,16 @@
  */
 package org.kuali.kra.protocol.auth;
 
-import org.kuali.kra.protocol.Protocol;
+import org.kuali.kra.protocol.ProtocolBase;
 
-public class ContinuationAuthorizer extends ProtocolAuthorizer {
+public class ContinuationAuthorizer extends ProtocolAuthorizerBase {
 
     @Override
-    public boolean isAuthorized(String userId, ProtocolTask task) {
+    public boolean isAuthorized(String userId, ProtocolTaskBase task) {
         return false;
     }
 
-    protected final boolean isAmendmentOrRenewalOrContinuation(Protocol protocol) {
+    protected final boolean isAmendmentOrRenewalOrContinuation(ProtocolBase protocol) {
         return protocol.getProtocolNumber() != null &&
                (protocol.getProtocolNumber().contains("A") ||
                        protocol.getProtocolNumber().contains("C") ||

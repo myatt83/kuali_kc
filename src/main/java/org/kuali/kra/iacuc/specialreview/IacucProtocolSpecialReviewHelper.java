@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,22 @@
 package org.kuali.kra.iacuc.specialreview;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.kuali.kra.infrastructure.TaskName;
 import org.kuali.kra.iacuc.IacucProtocol;
 import org.kuali.kra.iacuc.IacucProtocolForm;
 import org.kuali.kra.iacuc.auth.IacucProtocolTask;
-import org.kuali.kra.protocol.auth.ProtocolTask;
-import org.kuali.kra.protocol.specialreview.ProtocolSpecialReviewHelper;
+import org.kuali.kra.protocol.auth.ProtocolTaskBase;
+import org.kuali.kra.protocol.specialreview.ProtocolSpecialReviewBase;
+import org.kuali.kra.protocol.specialreview.ProtocolSpecialReviewHelperBase;
 
 /**
  * Defines the Special Review Helper for Protocol.
  */
-public class IacucProtocolSpecialReviewHelper extends ProtocolSpecialReviewHelper {
+public class IacucProtocolSpecialReviewHelper extends ProtocolSpecialReviewHelperBase {
+    
+    private IacucProtocolForm form;
 
     private static final long serialVersionUID = 1485258866764215682L;
 
@@ -36,27 +40,39 @@ public class IacucProtocolSpecialReviewHelper extends ProtocolSpecialReviewHelpe
      * @param form the container form
      */
     public IacucProtocolSpecialReviewHelper(IacucProtocolForm form) {
-        super(form);
-        setLinkedProtocolNumbers(new ArrayList<String>());    
-        setNewSpecialReview();
+        this.form = form;
+        setNewSpecialReview(new IacucProtocolSpecialReview());
+        setLinkedProtocolNumbers(new ArrayList<String>());
     }
 
     @Override
     protected boolean hasModifySpecialReviewPermission(String principalId) {
-        ProtocolTask task = new IacucProtocolTask(TaskName.MODIFY_IACUC_PROTOCOL_SPECIAL_REVIEW, (IacucProtocol)form.getProtocolDocument().getProtocol());
+        ProtocolTaskBase task = new IacucProtocolTask(TaskName.MODIFY_IACUC_PROTOCOL_SPECIAL_REVIEW, (IacucProtocol)form.getProtocolDocument().getProtocol());
         return getTaskAuthorizationService().isAuthorized(principalId, task);
     }
     
-    protected void setNewSpecialReview() {
-        setNewSpecialReview(new IacucProtocolSpecialReview());
+    @Override
+    protected List<ProtocolSpecialReviewBase> getSpecialReviews() {
+        return form.getProtocolDocument().getProtocol().getSpecialReviews();
+    }
+
+    @Override
+    protected boolean isIacucProtocolLinkingEnabledForModule() {
+        return false;
+    }
+
+    @Override
+    protected boolean isIrbProtocolLinkingEnabledForModule() {
+        return false;
+    }
+
+    @Override
+    public boolean isCanCreateIrbProtocol() {
+        return false;
     }
 
     @Override
     public boolean isCanCreateIacucProtocol() {
-        return false;
-    }
-    @Override
-    protected boolean isIacucProtocolLinkingEnabledForModule() {
         return true;
     }
 

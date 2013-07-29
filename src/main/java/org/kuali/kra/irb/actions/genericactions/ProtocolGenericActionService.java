@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import org.kuali.kra.irb.ProtocolDocument;
 /**
  * Defines the functions needed for the generic action service functions.
  */
-public interface ProtocolGenericActionService {
+public interface ProtocolGenericActionService extends org.kuali.kra.protocol.actions.genericactions.ProtocolGenericActionService {
     
     /**
      * Close a protocol.
@@ -49,22 +49,6 @@ public interface ProtocolGenericActionService {
     ProtocolDocument defer(Protocol protocol, ProtocolGenericActionBean actionBean) throws Exception;
     
     /**
-     * Disapproves a protocol.
-     * @param protocol Protocol object
-     * @param actionBean ProtocolGenericActionBean object
-     * @throws Exception if there was a general problem performing the action
-     */
-    void disapprove(Protocol protocol, ProtocolGenericActionBean actionBean) throws Exception;
-    
-    /**
-     * Expire a protocol.
-     * @param protocol Protocol object
-     * @param actionBean ProtocolGenericActionBean object
-     * @throws Exception if there was a general problem performing the action
-     */
-    void expire(Protocol protocol, ProtocolGenericActionBean actionBean) throws Exception;
-    
-    /**
      * Record IRB Acknowledgement for a protocol.
      * @param protocol Protocol object
      * @param actionBean ProtocolGenericActionBean object
@@ -87,34 +71,7 @@ public interface ProtocolGenericActionService {
      * @throws Exception if there was a general problem performing the action
      */
     void reopenEnrollment(Protocol protocol, ProtocolGenericActionBean actionBean) throws Exception;
-    
-    /**
-     * Returns the protocol to the PI for specific minor revisions.
-     * @param protocol Protocol object
-     * @param actionBean ProtocolGenericActionBean object
-     * @return the newly versioned Protocol document
-     * @throws Exception if there was a general problem performing the action
-     */
-    ProtocolDocument returnForSMR(Protocol protocol, ProtocolGenericActionBean actionBean) throws Exception;
-    
 
-    /**
-     * Returns the protocol to the PI for substantial revisions.
-     * @param protocol Protocol object
-     * @param actionBean ProtocolGenericActionBean object
-     * @return the newly versioned Protocol document
-     * @throws Exception if there was a general problem performing the action
-     */
-    ProtocolDocument returnForSRR(Protocol protocol, ProtocolGenericActionBean actionBean) throws Exception;
-
-    /**
-     * Suspend the protocol by the PI or by the IRB Administrator.
-     * @param protocol Protocol object
-     * @param actionBean ProtocolGenericActionBean object
-     * @throws Exception if there was a general problem performing the action
-     */
-    void suspend(Protocol protocol, ProtocolGenericActionBean actionBean) throws Exception;
-    
     /**
      * Suspend the protocol by DSMB.
      * @param protocol Protocol object
@@ -122,23 +79,4 @@ public interface ProtocolGenericActionService {
      * @throws Exception if there was a general problem performing the action
      */
     void suspendByDsmb(Protocol protocol, ProtocolGenericActionBean actionBean) throws Exception;
-    
-    /**
-     * Terminate a protocol.
-     * @param protocol Protocol object
-     * @param actionBean ProtocolGenericActionBean object
-     * @throws Exception if there was a general problem performing the action
-     */
-    void terminate(Protocol protocol, ProtocolGenericActionBean actionBean) throws Exception;
-    
-    /**
-     * 
-     * Return the protocol to the PI.
-     * @param protocol
-     * @param actionBean
-     * @return
-     * @throws Exception
-     */
-    ProtocolDocument returnToPI(Protocol protocol, ProtocolGenericActionBean actionBean) throws Exception;
-    
 }

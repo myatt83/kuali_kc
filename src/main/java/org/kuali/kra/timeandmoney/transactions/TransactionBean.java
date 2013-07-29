@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package org.kuali.kra.timeandmoney.transactions;
 import java.io.Serializable;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.timeandmoney.TimeAndMoneyForm;
@@ -70,10 +71,7 @@ public class TransactionBean implements Serializable {
      * in Pending transactions if system parameter for direct/indirect view is enabled.
      */
     private void sumDirectIndirectIfViewEnabled() {
-        if(newPendingTransaction.getAnticipatedDirectAmount().isPositive() ||
-                newPendingTransaction.getAnticipatedIndirectAmount().isPositive() ||
-                    newPendingTransaction.getObligatedDirectAmount().isPositive() ||
-                        newPendingTransaction.getObligatedIndirectAmount().isPositive()) {
+        if (StringUtils.equals("1", form.getDirectIndirectViewEnabled())) {
             newPendingTransaction.setAnticipatedAmount(newPendingTransaction.getAnticipatedDirectAmount().add(newPendingTransaction.getAnticipatedIndirectAmount()));
             newPendingTransaction.setObligatedAmount(newPendingTransaction.getObligatedDirectAmount().add(newPendingTransaction.getObligatedIndirectAmount()));
         }

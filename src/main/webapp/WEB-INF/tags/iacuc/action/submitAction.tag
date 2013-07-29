@@ -1,5 +1,5 @@
 <%--
- Copyright 2005-2010 The Kuali Foundation
+ Copyright 2005-2013 The Kuali Foundation
 
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -83,7 +83,7 @@
 	                        <c:when test="${KualiForm.actionHelper.showCommittee}">
 	                            <td>
 				                    <html:select property="actionHelper.iacucProtocolSubmitAction.committeeId" onchange="loadScheduleDates('actionHelper.iacucProtocolSubmitAction.committeeId', '${docNumber}', 'actionHelper.iacucProtocolSubmitAction.scheduleId');" >                               
-				                        <c:forEach items="${krafn:getOptionList('org.kuali.kra.committee.lookup.keyvalue.IacucCommitteeIdByUnitValuesFinder', paramMap)}" var="option">   
+				                        <c:forEach items="${krafn:getOptionList('org.kuali.kra.iacuc.committee.lookup.keyvalue.IacucCommitteeIdByUnitValuesFinder', paramMap)}" var="option">   
 				                            <c:choose>                      
 				                                <c:when test="${KualiForm.actionHelper.iacucProtocolSubmitAction.committeeId == option.key}">
 				                                    <option value="${option.key}" selected="selected">${option.value}</option>
@@ -100,7 +100,7 @@
 	                    	<c:otherwise>
 	                    		 <td colspan="3">
                                     <html:select property="actionHelper.iacucProtocolSubmitAction.committeeId" >                               
-                                        <c:forEach items="${krafn:getOptionList('org.kuali.kra.committee.lookup.keyvalue.IacucCommitteeIdByUnitValuesFinder', paramMap)}" var="option">
+                                        <c:forEach items="${krafn:getOptionList('org.kuali.kra.iacuc.committee.lookup.keyvalue.IacucCommitteeIdByUnitValuesFinder', paramMap)}" var="option">
                                             <c:choose>                      
                                                 <c:when test="${KualiForm.actionHelper.iacucProtocolSubmitAction.committeeId == option.key}">
                                                     <option value="${option.key}" selected="selected">${option.value}</option>

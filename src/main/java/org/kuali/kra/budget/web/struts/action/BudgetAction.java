@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -280,12 +280,7 @@ public class BudgetAction extends BudgetActionBase {
         }
 
         if (budgetForm.getMethodToCall().equals("save") && budgetForm.isAuditActivated()) {
-            if (Boolean.valueOf(savedBudgetDoc.getParentDocument().getProposalBudgetFlag())) {
-                forward = this.getReturnToProposalForward(budgetForm);
-            }
-            else {
-                forward = mapping.findForward("budgetActions");
-            }
+            forward = mapping.findForward("budgetActions");
         }
 
         return forward;
@@ -337,6 +332,32 @@ public class BudgetAction extends BudgetActionBase {
         HttpServletRequest request, HttpServletResponse response)
         throws Exception {
         final ActionForward forward = super.reload(mapping, form, request, response);
+//        final BudgetForm budgetForm = (BudgetForm) form;
+//        BudgetDocument budgetDocument = budgetForm.getBudgetDocument();
+//        BudgetParentDocument parentDocument = budgetDocument.getParentDocument();
+//
+//        budgetForm.setFinalBudgetVersion(getFinalBudgetVersion(parentDocument.getBudgetDocumentVersions()));
+//        setBudgetStatuses(budgetDocument.getParentDocument());
+//
+//        final BudgetTDCValidator tdcValidator = new BudgetTDCValidator(request);
+//        tdcValidator.validateGeneratingWarnings(budgetDocument.getParentDocument());
+//
+//        populateBudgetPrintForms(budgetDocument.getBudget());
+        updateBudgetAttributes(form, request);
+        return forward;
+    }
+    
+    @Override
+    public ActionForward reloadWithoutWarning(ActionMapping mapping, ActionForm form,
+            HttpServletRequest request, HttpServletResponse response)
+    throws Exception {
+        final ActionForward forward = super.reloadWithoutWarning(mapping, form, request, response);
+        updateBudgetAttributes(form, request);
+        return forward;
+    }
+    
+    @SuppressWarnings("rawtypes")
+    protected void updateBudgetAttributes(ActionForm form, HttpServletRequest request) {
         final BudgetForm budgetForm = (BudgetForm) form;
         BudgetDocument budgetDocument = budgetForm.getBudgetDocument();
         BudgetParentDocument parentDocument = budgetDocument.getParentDocument();
@@ -348,7 +369,6 @@ public class BudgetAction extends BudgetActionBase {
         tdcValidator.validateGeneratingWarnings(budgetDocument.getParentDocument());
 
         populateBudgetPrintForms(budgetDocument.getBudget());
-        return forward;
     }
     
     public ActionForward versions(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
@@ -556,7 +576,7 @@ public class BudgetAction extends BudgetActionBase {
         BudgetDocument budgetDocument = budgetForm.getBudgetDocument();
         Budget budget = budgetDocument.getBudget();
         populateBudgetPrintForms(budget);
-        KraServiceLocator.getService(BudgetSubAwardService.class).populateBudgetSubAwardAttachments(budget);
+        KraServiceLocator.getService(BudgetSubAwardService.class).prepareBudgetSubAwards(budget);
         return mapping.findForward(Constants.BUDGET_ACTIONS_PAGE);
     }
 

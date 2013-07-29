@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ public class WatermarkColorValuesFinder extends KeyValuesBase {
         keyValues.add(new ConcreteKeyValue("MAGENTA", "MAGENTA"));
         keyValues.add(new ConcreteKeyValue("CYAN", "CYAN"));
         keyValues.add(new ConcreteKeyValue("ORANGE", "ORANGE"));
-        keyValues.add(new ConcreteKeyValue("DARKGRAY", "DARKGRAY"));
+        keyValues.add(new ConcreteKeyValue("DARK_GRAY", "DARK_GRAY"));
         keyValues.add(new ConcreteKeyValue("PINK", "PINK"));
         keyValues.add(new ConcreteKeyValue("GRAY", "GRAY"));
         keyValues.add(new ConcreteKeyValue("RED", "RED"));

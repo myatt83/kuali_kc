@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,15 @@ package org.kuali.kra.iacuc;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.kuali.kra.common.notification.bo.KcNotification;
 import org.kuali.kra.common.permissions.Permissionable;
 import org.kuali.kra.iacuc.actions.IacucProtocolStatus;
 import org.kuali.kra.iacuc.actions.amendrenew.IacucProtocolModule;
@@ -30,6 +35,7 @@ import org.kuali.kra.iacuc.actions.submit.IacucProtocolSubmissionStatus;
 import org.kuali.kra.iacuc.actions.submit.IacucProtocolSubmissionType;
 import org.kuali.kra.iacuc.customdata.IacucProtocolCustomData;
 import org.kuali.kra.iacuc.noteattachment.IacucProtocolAttachmentFilter;
+import org.kuali.kra.iacuc.noteattachment.IacucProtocolAttachmentProtocol;
 import org.kuali.kra.iacuc.personnel.IacucProtocolPersonnelService;
 import org.kuali.kra.iacuc.procedures.IacucProcedurePersonResponsible;
 import org.kuali.kra.iacuc.procedures.IacucProtocolProcedureService;
@@ -53,31 +59,33 @@ import org.kuali.kra.iacuc.threers.IacucPrinciples;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.infrastructure.RoleConstants;
-import org.kuali.kra.protocol.Protocol;
-import org.kuali.kra.protocol.actions.ProtocolStatus;
-import org.kuali.kra.protocol.actions.submit.ProtocolSubmission;
-import org.kuali.kra.protocol.actions.submit.ProtocolSubmissionStatus;
-import org.kuali.kra.protocol.actions.submit.ProtocolSubmissionType;
-import org.kuali.kra.protocol.noteattachment.ProtocolAttachmentFilter;
-import org.kuali.kra.protocol.protocol.research.ProtocolResearchArea;
+import org.kuali.kra.kim.bo.KcKimAttributes;
+import org.kuali.kra.krms.KrmsRulesContext;
+import org.kuali.kra.protocol.ProtocolBase;
+import org.kuali.kra.protocol.actions.ProtocolActionBase;
+import org.kuali.kra.protocol.actions.ProtocolStatusBase;
+import org.kuali.kra.protocol.actions.submit.ProtocolSubmissionBase;
+import org.kuali.kra.protocol.actions.submit.ProtocolSubmissionStatusBase;
+import org.kuali.kra.protocol.actions.submit.ProtocolSubmissionTypeBase;
+import org.kuali.kra.protocol.noteattachment.ProtocolAttachmentFilterBase;
+import org.kuali.kra.protocol.noteattachment.ProtocolAttachmentProtocolBase;
+import org.kuali.kra.protocol.protocol.research.ProtocolResearchAreaBase;
 import org.kuali.kra.protocol.summary.ProtocolSummary;
 import org.kuali.kra.questionnaire.answer.AnswerHeader;
 import org.kuali.kra.questionnaire.answer.ModuleQuestionnaireBean;
 import org.kuali.rice.krad.util.GlobalVariables;
-import org.kuali.rice.krad.util.ObjectUtils;
 
 /**
  * 
- * This class is Protocol Business Object.
+ * This class is ProtocolBase Business Object.
  */
-public class IacucProtocol extends Protocol {
+public class IacucProtocol extends ProtocolBase {
     
     /**
      * Comment for <code>serialVersionUID</code>
      */
     private static final long serialVersionUID = 7380281405644745576L;
     
-//    private Date applicationDate;
     private boolean isBillable;
     private String layStatement1; 
     private String layStatement2;
@@ -164,14 +172,6 @@ public class IacucProtocol extends Protocol {
     public IacucProtocolSubmission getIacucProtocolSubmission() {
         return (IacucProtocolSubmission)getProtocolSubmission();
     }
-    
-//    public Date getApplicationDate() {
-//        return applicationDate;
-//    }
-//
-//    public void setApplicationDate(Date applicationDate) {
-//        this.applicationDate = applicationDate;
-//    }
 
     public boolean getIsBillable() {
         return isBillable;
@@ -287,25 +287,25 @@ public class IacucProtocol extends Protocol {
 
 
     @Override
-    protected ProtocolSubmissionStatus getProtocolSubmissionStatusNewInstanceHook() {
+    protected ProtocolSubmissionStatusBase getProtocolSubmissionStatusNewInstanceHook() {
         return new IacucProtocolSubmissionStatus();
     }
 
 
     @Override
-    protected ProtocolSubmissionType getProtocolSubmissionTypeNewInstanceHook() {
+    protected ProtocolSubmissionTypeBase getProtocolSubmissionTypeNewInstanceHook() {
         return new IacucProtocolSubmissionType();
     }
 
 
     @Override
-    protected ProtocolSubmission getProtocolSubmissionNewInstanceHook() {
+    protected ProtocolSubmissionBase getProtocolSubmissionNewInstanceHook() {
         return new IacucProtocolSubmission();
     }
 
 
     @Override
-    protected ProtocolStatus getProtocolStatusNewInstanceHook() {
+    protected ProtocolStatusBase getProtocolStatusNewInstanceHook() {
         return new IacucProtocolStatus();
     }
 
@@ -346,7 +346,7 @@ public class IacucProtocol extends Protocol {
 
 
     @Override
-    protected ProtocolResearchArea getNewProtocolResearchAreaInstance() {
+    protected ProtocolResearchAreaBase getNewProtocolResearchAreaInstance() {
         return new IacucProtocolResearchArea();
     }
 
@@ -418,7 +418,7 @@ public class IacucProtocol extends Protocol {
     /*
      * get submit for review questionnaire answerheaders
      */
-    protected List <AnswerHeader> getAnswerHeaderForProtocol(Protocol protocol) {
+    protected List <AnswerHeader> getAnswerHeaderForProtocol(ProtocolBase protocol) {
         ModuleQuestionnaireBean moduleQuestionnaireBean = new IacucProtocolModuleQuestionnaireBean((IacucProtocol) protocol);
         moduleQuestionnaireBean.setModuleSubItemCode("0");
         List <AnswerHeader> answerHeaders = new ArrayList<AnswerHeader>();
@@ -428,7 +428,7 @@ public class IacucProtocol extends Protocol {
 
     @Override
     public void initializeProtocolAttachmentFilter() {
-        ProtocolAttachmentFilter protocolAttachmentFilter = new IacucProtocolAttachmentFilter();
+        ProtocolAttachmentFilterBase protocolAttachmentFilter = new IacucProtocolAttachmentFilter();
   
         //Lets see if there is a default set for the attachment sort
         try {
@@ -562,7 +562,7 @@ public class IacucProtocol extends Protocol {
 
 
     @Override
-    public void merge(Protocol amendment, String protocolModuleTypeCode) {
+    public void merge(ProtocolBase amendment, String protocolModuleTypeCode) {
         if (StringUtils.equals(protocolModuleTypeCode, IacucProtocolModule.GENERAL_INFO)) {
             mergeGeneralInfo(amendment);
         }
@@ -593,9 +593,6 @@ public class IacucProtocol extends Protocol {
         else if (StringUtils.equals(protocolModuleTypeCode, IacucProtocolModule.SPECIAL_REVIEW)) {
             mergeSpecialReview(amendment);
         }
-        else if (StringUtils.equals(protocolModuleTypeCode, IacucProtocolModule.SUBJECTS)) {
-            mergeSubjects(amendment);
-        }
         else if (StringUtils.equals(protocolModuleTypeCode, IacucProtocolModule.OTHERS)) {
             mergeOthers(amendment);
         }
@@ -620,8 +617,58 @@ public class IacucProtocol extends Protocol {
         }
     }
     
+    
+    /*
+     * merge amendment/renewal protocol action to original protocol when A/R is approved
+     */
+    @SuppressWarnings("unchecked")
+    protected void mergeProtocolAction(ProtocolBase amendment) {
+        List<ProtocolActionBase> protocolActions = (List<ProtocolActionBase>) deepCopy(amendment.getProtocolActions());  
+        Collections.sort(protocolActions, new Comparator<ProtocolActionBase>() {
+            public int compare(ProtocolActionBase action1, ProtocolActionBase action2) {
+                return action1.getActionId().compareTo(action2.getActionId());
+            }
+        });
+        // the first 1 'protocol created is already added to original protocol
+        // the last one is 'approve'
+        protocolActions.remove(0);
+        protocolActions.remove(protocolActions.size() - 1);
+        for (ProtocolActionBase protocolAction : protocolActions) {
+            protocolAction.setProtocolNumber(this.getProtocolNumber());
+            protocolAction.setProtocolActionId(null);
+            protocolAction.setSequenceNumber(getSequenceNumber());
+            protocolAction.setProtocolId(this.getProtocolId());
+            String index = amendment.getProtocolNumber().substring(11);
+            protocolAction.setActionId(getNextValue(NEXT_ACTION_ID_KEY));
+            String type = getProtocolMergeType(amendment);
+            /*
+            String type = "Amendment";
+            if (amendment.isRenewal()) {
+                type = "Renewal";
+            }
+            */
+            if (StringUtils.isNotBlank(protocolAction.getComments())) {
+                protocolAction.setComments(type + "-" + index + ": " + protocolAction.getComments());
+            } else {
+                protocolAction.setComments(type + "-" + index + ": ");
+            }
+            // reset persistence state for copied notifications so they break ties with old document
+            for (KcNotification notification: protocolAction.getProtocolNotifications()) {
+                notification.setDocumentNumber(getProtocolDocument().getDocumentNumber());
+                notification.setNotificationId(null);
+            }
+            // reset persistence state for copied notifications so they break ties with old document
+            for (KcNotification notification: protocolAction.getProtocolNotifications()) {
+                notification.setDocumentNumber(getProtocolDocument().getDocumentNumber());
+                notification.setNotificationId(null);
+            }
+            this.getProtocolActions().add(protocolAction);
+        }
+    }
+    
+    
     @Override
-    protected void mergeGeneralInfo(Protocol amendment) {
+    protected void mergeGeneralInfo(ProtocolBase amendment) {
         super.mergeGeneralInfo(amendment);
         this.layStatement1 = ((IacucProtocol)amendment).layStatement1;
         this.layStatement2 = ((IacucProtocol)amendment).layStatement2;
@@ -629,19 +676,19 @@ public class IacucProtocol extends Protocol {
         this.protocolProjectTypeCode = ((IacucProtocol)amendment).protocolProjectTypeCode;
     }
         
-    protected void mergeProtocolThreers(Protocol amendment) {
+    protected void mergeProtocolThreers(ProtocolBase amendment) {
         getProtocolCopyService().copyProtocolThreers((IacucProtocol)amendment, this);
     }
 
-    protected void mergeProtocolSpeciesAndGroups(Protocol amendment) {
-        getProtocolCopyService().copyProtocolSpeciesAndGroups((IacucProtocol)amendment, this);
+    protected void mergeProtocolSpeciesAndGroups(ProtocolBase amendment) {
+        getProtocolCopyService().mergeProtocolSpeciesAndGroups((IacucProtocol)amendment, this);
     }
     
-    protected void mergeProtocolProcedures(Protocol amendment) {
-        getProtocolCopyService().copyProtocolProcedures((IacucProtocol)amendment, this);
+    protected void mergeProtocolProcedures(ProtocolBase amendment) {
+        getProtocolCopyService().mergeProtocolProcedures((IacucProtocol)amendment, this);
     }
 
-    protected void mergeProtocolExceptions(Protocol amendment) {
+    protected void mergeProtocolExceptions(ProtocolBase amendment) {
         getProtocolCopyService().copyProtocolExceptions((IacucProtocol)amendment, this);
     }
     
@@ -653,8 +700,8 @@ public class IacucProtocol extends Protocol {
         return getProtocolNumber().contains(CONTINUATION_LETTER);
     }
 
-    @Override
-    protected String getProtocolMergeType(Protocol amendment) {
+
+    protected String getProtocolMergeType(ProtocolBase amendment) {
         IacucProtocol protocolAmend = (IacucProtocol)amendment;
         String type = "Amendment";
         if (protocolAmend.isRenewal()) {
@@ -697,7 +744,26 @@ public class IacucProtocol extends Protocol {
     }
 
     protected IacucProtocolProcedureService getProtocolProcedureService() {
-        return (IacucProtocolProcedureService)KraServiceLocator.getService("iacucProtocolProcedureService");
+        return KraServiceLocator.getService(IacucProtocolProcedureService.class);
+    }
+
+    @Override
+    public KrmsRulesContext getKrmsRulesContext() {
+        return getIacucProtocolDocument();
+    }
+    
+    @Override
+    public void populateAdditionalQualifiedRoleAttributes(Map<String, String> qualifiedRoleAttributes) {
+        if (qualifiedRoleAttributes == null) {
+            qualifiedRoleAttributes = new HashMap<String, String>();
+        }
+        String protocolNumber = this.getProtocolNumber()  != null ? this.getProtocolNumber() : "*";
+        qualifiedRoleAttributes.put(KcKimAttributes.PROTOCOL, protocolNumber);
+    }
+
+    @Override
+    protected Class<? extends ProtocolAttachmentProtocolBase> getProtocolAttachmentProtocolClassHook() {
+        return IacucProtocolAttachmentProtocol.class;
     }
 
 }

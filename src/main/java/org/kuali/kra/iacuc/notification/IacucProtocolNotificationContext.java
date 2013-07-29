@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import org.kuali.kra.bo.CoeusModule;
 import org.kuali.kra.iacuc.IacucProtocol;
 import org.kuali.kra.iacuc.onlinereview.IacucProtocolOnlineReview;
 import org.kuali.kra.infrastructure.KraServiceLocator;
-import org.kuali.kra.protocol.notification.ProtocolNotificationContext;
+import org.kuali.kra.protocol.notification.ProtocolNotificationContextBase;
 import org.kuali.kra.protocol.notification.ProtocolNotificationRoleQualifierService;
 
 
@@ -27,13 +27,18 @@ import org.kuali.kra.protocol.notification.ProtocolNotificationRoleQualifierServ
  * This class extends the notification context base and provides some helpful functions for
  * any Protocol- specific events.
  */
-public class IacucProtocolNotificationContext extends ProtocolNotificationContext {
+public class IacucProtocolNotificationContext extends ProtocolNotificationContextBase {
 
     private static final long serialVersionUID = 7517888688386565168L;
 
     public IacucProtocolNotificationContext(IacucProtocol protocol, IacucProtocolOnlineReview protocolOnlineReview, String actionTypeCode, String contextName, IacucProtocolNotificationRenderer renderer) {
         this(protocol, actionTypeCode, contextName, renderer);
         ((ProtocolNotificationRoleQualifierService) getNotificationRoleQualifierService()).setProtocolOnlineReview(protocolOnlineReview);
+    }
+    
+    public IacucProtocolNotificationContext(IacucProtocol protocol, String actionTypeCode, String contextName, IacucProtocolNotificationRenderer renderer, String forwardName) {
+        this(protocol, actionTypeCode, contextName, renderer);
+        setForwardName(forwardName);
     }
     
     public IacucProtocolNotificationContext(IacucProtocol protocol, String actionTypeCode, String contextName, IacucProtocolNotificationRenderer renderer) {
@@ -50,4 +55,5 @@ public class IacucProtocolNotificationContext extends ProtocolNotificationContex
         return CoeusModule.IACUC_PROTOCOL_MODULE_CODE;
     }
 
+    
 }

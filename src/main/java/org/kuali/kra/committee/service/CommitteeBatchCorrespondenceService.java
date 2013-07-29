@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,25 +15,24 @@
  */
 package org.kuali.kra.committee.service;
 
-import java.sql.Date;
-
-import org.kuali.kra.committee.bo.CommitteeBatchCorrespondence;
+import org.kuali.kra.common.committee.service.CommitteeBatchCorrespondenceServiceBase;
 
 /**
  * 
  * This class generates the batch correspondence of committees.
  */
-public interface CommitteeBatchCorrespondenceService {
-    
-    /**
-     * 
-     * This method generates the batch correspondence of a committee.
-     * @param batchCorrespondenceTypeCode
-     * @param startDate
-     * @param endDate
-     * @return CommitteeBatchCorrespondence
-     * @throws Exception 
-     */
-    CommitteeBatchCorrespondence generateBatchCorrespondence(String batchCorrespondenceTypeCode, String committeeId, Date startDate, Date endDate) throws Exception;
+public interface CommitteeBatchCorrespondenceService extends CommitteeBatchCorrespondenceServiceBase {
+
+// TODO ********************** commented out during IRB backfit ************************    
+//    /**
+//     * 
+//     * This method generates the batch correspondence of a committee.
+//     * @param batchCorrespondenceTypeCode
+//     * @param startDate
+//     * @param endDate
+//     * @return CommitteeBatchCorrespondence
+//     * @throws Exception 
+//     */
+//    CommitteeBatchCorrespondence generateBatchCorrespondence(String batchCorrespondenceTypeCode, String committeeId, Date startDate, Date endDate) throws Exception;
 
 }

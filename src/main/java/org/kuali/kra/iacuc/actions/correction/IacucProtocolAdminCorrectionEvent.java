@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,10 @@ package org.kuali.kra.iacuc.actions.correction;
 
 import org.kuali.kra.iacuc.IacucProtocolDocument;
 import org.kuali.kra.protocol.actions.correction.AdminCorrectionBean;
-import org.kuali.kra.protocol.actions.correction.ProtocolAdminCorrectionEvent;
+import org.kuali.kra.protocol.actions.correction.ProtocolAdminCorrectionEventBase;
 import org.kuali.kra.rule.BusinessRuleInterface;
 
-public class IacucProtocolAdminCorrectionEvent extends ProtocolAdminCorrectionEvent {
+public class IacucProtocolAdminCorrectionEvent extends ProtocolAdminCorrectionEventBase {
 
     public IacucProtocolAdminCorrectionEvent(IacucProtocolDocument document, String propertyName, AdminCorrectionBean actionBean) {
         super(document, propertyName, actionBean);

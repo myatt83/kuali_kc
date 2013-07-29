@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,15 +18,15 @@ package org.kuali.kra.common.committee.rule.event;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.kuali.kra.common.committee.bo.CommonCommittee;
-import org.kuali.kra.common.committee.bo.CommitteeMembership;
-import org.kuali.kra.common.committee.document.CommonCommitteeDocument;
+import org.kuali.kra.common.committee.bo.CommitteeBase;
+import org.kuali.kra.common.committee.bo.CommitteeMembershipBase;
+import org.kuali.kra.common.committee.document.CommitteeDocumentBase;
 import org.kuali.kra.rule.event.KraDocumentEventBase;
 import org.kuali.rice.krad.util.ObjectUtils;
 
 /**
  * 
- * This abstract class is used for specific <code>{@link CommonCommittee}</code> events.
+ * This abstract class is used for specific <code>{@link CommitteeBase}</code> events.
  * 
  * @author Kuali Research Administration Team (kc.dev@kuali.org)
  */
@@ -34,7 +34,7 @@ public abstract class CommitteeMembershipEventBase extends KraDocumentEventBase
                                                    implements CommitteeMembershipEvent {
     private static final Log LOG = LogFactory.getLog(CommitteeMembershipEventBase.class);
     
-    private CommitteeMembership committeeMembership;
+    private CommitteeMembershipBase committeeMembership;
     
     /**
      * 
@@ -47,12 +47,12 @@ public abstract class CommitteeMembershipEventBase extends KraDocumentEventBase
      * @param committeeMembership
      */
     protected CommitteeMembershipEventBase(String description, String errorPathPrefix, 
-            CommonCommitteeDocument comitteeDocument, CommitteeMembership committeeMembership) {
+            CommitteeDocumentBase comitteeDocument, CommitteeMembershipBase committeeMembership) {
         super(description, errorPathPrefix, comitteeDocument);
 
         // by doing a deep copy, we are ensuring that the business rule class can't update
         // the original object by reference
-        this.committeeMembership = (CommitteeMembership) ObjectUtils.deepCopy(committeeMembership);
+        this.committeeMembership = (CommitteeMembershipBase) ObjectUtils.deepCopy(committeeMembership);
 
         logEvent();
     }
@@ -67,18 +67,18 @@ public abstract class CommitteeMembershipEventBase extends KraDocumentEventBase
      * @param document
      */
     protected CommitteeMembershipEventBase(String description, String errorPathPrefix, 
-            CommonCommitteeDocument comitteeDocument) {
+            CommitteeDocumentBase comitteeDocument) {
         super(description, errorPathPrefix, comitteeDocument);
         logEvent();
     }
 
     /**
      * 
-     * Get the <code>{@link CommitteeMembership}</code> of this event.
+     * Get the <code>{@link CommitteeMembershipBase}</code> of this event.
      * 
-     * @return <code>CommitteeMembership</code>
+     * @return <code>CommitteeMembershipBase</code>
      */
-    public CommitteeMembership getCommitteeMembership() {
+    public CommitteeMembershipBase getCommitteeMembership() {
         return this.committeeMembership;
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,10 @@ import org.kuali.kra.iacuc.IacucPainCategory;
 import org.kuali.kra.iacuc.IacucSpecies;
 import org.kuali.kra.iacuc.IacucSpeciesCountType;
 import org.kuali.kra.iacuc.species.exception.IacucProtocolException;
-import org.kuali.kra.protocol.ProtocolAssociate;
+import org.kuali.kra.protocol.ProtocolAssociateBase;
 import org.kuali.rice.krad.util.ObjectUtils;
 
-public class IacucProtocolSpecies extends ProtocolAssociate { 
+public class IacucProtocolSpecies extends ProtocolAssociateBase { 
     
     private static final long serialVersionUID = 1L;
 
@@ -181,16 +181,6 @@ public class IacucProtocolSpecies extends ProtocolAssociate {
     public void setIacucProtocolExceptions(List<IacucProtocolException> iacucProtocolExceptions) {
         this.iacucProtocolExceptions = iacucProtocolExceptions;
     }
-
-    /*
-    public IacucProtocolExceptions getIacucProtocolExceptions() {
-        return iacucProtocolExceptions;
-    }
-
-    public void setIacucProtocolExceptions(IacucProtocolExceptions iacucProtocolExceptions) {
-        this.iacucProtocolExceptions = iacucProtocolExceptions;
-    }
-    */
 
     public String getSpeciesName() {
         if (iacucSpecies == null) {

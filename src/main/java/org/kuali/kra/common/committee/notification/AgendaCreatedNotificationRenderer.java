@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ package org.kuali.kra.common.committee.notification;
 
 import java.util.Map;
 
-import org.kuali.kra.common.committee.meeting.ScheduleAgenda;
+import org.kuali.kra.common.committee.meeting.ScheduleAgendaBase;
 
 /**
  * Renders additional fields for the Agenda Created notification.
@@ -27,7 +27,7 @@ public class AgendaCreatedNotificationRenderer extends CommitteeNotificationRend
     private static final long serialVersionUID = -6019679826378390076L;
     
     private String actionTaken;
-    private ScheduleAgenda scheduleAgenda;
+    private ScheduleAgendaBase scheduleAgenda;
 
     /**
      * Constructs an Agenda Created notification renderer.
@@ -35,8 +35,8 @@ public class AgendaCreatedNotificationRenderer extends CommitteeNotificationRend
      * @param protocol
      * @param actionTaken
      */
-    public AgendaCreatedNotificationRenderer(ScheduleAgenda scheduleAgenda, String actionTaken) {
-        super(scheduleAgenda.getCommitteeSchedule().getCommittee());
+    public AgendaCreatedNotificationRenderer(ScheduleAgendaBase scheduleAgenda, String actionTaken) {
+        super(scheduleAgenda.getCommitteeSchedule().getParentCommittee());
         this.scheduleAgenda = scheduleAgenda;
         this.actionTaken = actionTaken;
     }
@@ -49,11 +49,11 @@ public class AgendaCreatedNotificationRenderer extends CommitteeNotificationRend
         this.actionTaken = actionTaken;
     }
 
-    public ScheduleAgenda getScheduleAgenda() {
+    public ScheduleAgendaBase getScheduleAgenda() {
         return scheduleAgenda;
     }
     
-    public void setScheduleAgenda(ScheduleAgenda scheduleAgenda) {
+    public void setScheduleAgenda(ScheduleAgendaBase scheduleAgenda) {
         this.scheduleAgenda = scheduleAgenda;
     }
     
@@ -67,6 +67,7 @@ public class AgendaCreatedNotificationRenderer extends CommitteeNotificationRend
         params.put(CommitteeReplacementParameters.LAST_ACTION_DATE, scheduleAgenda.getCommitteeSchedule().getScheduledDate().toString());
         params.put(CommitteeReplacementParameters.ACTION_TAKEN, actionTaken);
         params.put(CommitteeReplacementParameters.OBJECT_INDEX, new Integer(scheduleAgenda.getAgendaNumber().intValue() - 1).toString());
+        params.put(CommitteeReplacementParameters.SCHEDULE_ID, scheduleAgenda.getCommitteeSchedule().getScheduleId());
         return params;
     }    
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,45 +15,21 @@
  */
 package org.kuali.kra.irb.actions.amendrenew;
 
-import org.kuali.kra.irb.ProtocolDocument;
-import org.kuali.kra.rule.BusinessRuleInterface;
-import org.kuali.kra.rule.event.KraDocumentEventBaseExtension;
+import org.kuali.kra.protocol.ProtocolDocumentBase;
+import org.kuali.kra.protocol.actions.amendrenew.ModifyAmendmentSectionsEventBase;
 
 /**
  * When amendment sections are modified, this event is generated.
  */
 @SuppressWarnings("unchecked")
-public class ModifyAmendmentSectionsEvent<T extends BusinessRuleInterface> extends KraDocumentEventBaseExtension {
+public class ModifyAmendmentSectionsEvent extends ModifyAmendmentSectionsEventBase {
 
-    private ProtocolAmendmentBean amendmentBean;
-    private String propertyName;
-    private boolean amendment;
-
-    public ModifyAmendmentSectionsEvent(ProtocolDocument document, String propertyName, ProtocolAmendmentBean amendmentBean) {
-        super("Modify Amendment Sections", "", document);
-        this.propertyName = propertyName;
-        this.amendmentBean = amendmentBean;
-        this.amendment = getProtocolDocument().getProtocol().isAmendment();
+    public ModifyAmendmentSectionsEvent(ProtocolDocumentBase document, String propertyName, ProtocolAmendmentBean amendmentBean) {
+        super(document, propertyName, amendmentBean);
     }
     
-    public ProtocolDocument getProtocolDocument() {
-        return (ProtocolDocument) getDocument();
-    }
-    
-    public String getPropertyName() {
-        return propertyName;
-    }
-    
-    public ProtocolAmendmentBean getAmendmentBean() {
-        return amendmentBean;
-    }
-    
-    public boolean isAmendment() {
-        return amendment;
-    }
-
     @Override
-    public BusinessRuleInterface getRule() {
+    public ModifyAmendmentSectionsRule getRule() {
         return new ModifyAmendmentSectionsRule();
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,11 +24,11 @@ import org.apache.commons.lang.StringUtils;
 import org.kuali.kra.iacuc.IacucProtocol;
 import org.kuali.kra.iacuc.IacucProtocolDocument;
 import org.kuali.kra.infrastructure.KeyConstants;
-import org.kuali.kra.protocol.ProtocolDocument;
-import org.kuali.kra.protocol.actions.submit.ProtocolReviewType;
-import org.kuali.kra.protocol.actions.submit.ProtocolSubmissionType;
+import org.kuali.kra.protocol.ProtocolDocumentBase;
+import org.kuali.kra.protocol.actions.submit.ProtocolReviewTypeBase;
+import org.kuali.kra.protocol.actions.submit.ProtocolSubmissionTypeBase;
 import org.kuali.kra.protocol.actions.submit.ProtocolSubmitAction;
-import org.kuali.kra.protocol.actions.submit.ProtocolSubmitActionRule;
+import org.kuali.kra.protocol.actions.submit.ProtocolSubmitActionRuleBase;
 import org.kuali.rice.kns.util.AuditCluster;
 import org.kuali.rice.kns.util.AuditError;
 import org.kuali.rice.kns.util.KNSGlobalVariables;
@@ -40,7 +40,7 @@ import org.kuali.rice.kns.util.KNSGlobalVariables;
  * This class...
  */
 @SuppressWarnings("deprecation")
-public class IacucProtocolSubmitActionRule extends ProtocolSubmitActionRule {
+public class IacucProtocolSubmitActionRule extends ProtocolSubmitActionRuleBase {
 
     private final String PROTOCOL_ALT_SEARCH_REQUIRED_PROPERTY_KEY = "document.protocolList[0].iacucPrinciples[0].searchRequired";
     private final String PROTOCOL_ALT_SEARCH_PROPERTY_KEY = "iacucAlternateSearchHelper.newAlternateSearch.databases";
@@ -54,7 +54,7 @@ public class IacucProtocolSubmitActionRule extends ProtocolSubmitActionRule {
      *      org.kuali.kra.irb.actions.submit.ProtocolSubmitAction)
      */
     @Override
-    public boolean processSubmitAction(ProtocolDocument document, ProtocolSubmitAction submitAction) {
+    public boolean processSubmitAction(ProtocolDocumentBase document, ProtocolSubmitAction submitAction) {
 
         boolean isValid = super.processSubmitAction(document, submitAction);
         isValid &= validateThreeRs(submitAction);
@@ -83,17 +83,17 @@ public class IacucProtocolSubmitActionRule extends ProtocolSubmitActionRule {
     }
 
     @Override
-    protected Class<? extends ProtocolSubmissionType> getProtocolSubmissionTypeClassHook() {
+    protected Class<? extends ProtocolSubmissionTypeBase> getProtocolSubmissionTypeClassHook() {
         return IacucProtocolSubmissionType.class;
     }
 
     @Override
-    protected Class<? extends ProtocolReviewType> getProtocolReviewTypeClassHook() {
+    protected Class<? extends ProtocolReviewTypeBase> getProtocolReviewTypeClassHook() {
         return IacucProtocolReviewType.class;
     }
 
     @Override
-    protected Class<? extends ProtocolDocument> getProtocolDocumentClassHook() {
+    protected Class<? extends ProtocolDocumentBase> getProtocolDocumentClassHook() {
         return IacucProtocolDocument.class;
     }
 

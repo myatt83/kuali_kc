@@ -24,16 +24,13 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.kuali.kra.coi.CoiAction;
-import org.kuali.kra.coi.CoiActionType;
 import org.kuali.kra.coi.CoiDisclosure;
 import org.kuali.kra.coi.CoiDisclosureDocument;
 import org.kuali.kra.coi.CoiDisclosureForm;
 import org.kuali.kra.coi.CoiDisclosureStatus;
 import org.kuali.kra.coi.CoiUserRole;
 import org.kuali.kra.coi.disclosure.CoiDisclosureAdministratorActionRule;
-import org.kuali.kra.coi.notification.AssignReviewerNotificationRenderer;
-import org.kuali.kra.coi.notification.CoiNotificationContext;
+import org.kuali.kra.coi.notesandattachments.CoiNoteAndAttachmentAction;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.KeyConstants;
 import org.kuali.kra.infrastructure.RoleConstants;
@@ -41,39 +38,78 @@ import org.kuali.kra.web.struts.action.AuditActionHelper;
 import org.kuali.rice.krad.util.GlobalVariables;
 import org.kuali.rice.krad.util.KRADConstants;
 
-public class CoiDisclosureActionsAction extends CoiAction {
-
-    public ActionForward performAction(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-        
-        
+public class CoiDisclosureActionsAction extends CoiNoteAndAttachmentAction {
+    
+    public ActionForward approve(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
         CoiDisclosureForm coiDisclosureForm = (CoiDisclosureForm) form;
-        String disclosureStatus = coiDisclosureForm.getCoiDisclosureStatusCode();
+        String disclosureStatus = CoiDisclosureStatus.APPROVED;
+        String dispositionCode = coiDisclosureForm.getDisclosureActionHelper().getMaximumDispositionStatus().getCoiDispositionCode();
         CoiDisclosureDocument coiDisclosureDocument = coiDisclosureForm.getCoiDisclosureDocument();
 
         ActionForward forward = mapping.findForward(Constants.MAPPING_BASIC);
-        if (new CoiDisclosureAdministratorActionRule().isValidStatus(disclosureStatus, coiDisclosureForm.getCoiDispositionCode())) {
-            AuditActionHelper auditActionHelper = new AuditActionHelper();
-            if (auditActionHelper.auditUnconditionally(coiDisclosureDocument)) {   
-                ActionForward basicForward = mapping.findForward(KRADConstants.MAPPING_PORTAL);
-                String routeHeaderId = coiDisclosureDocument.getDocumentNumber();
-                String returnLocation = buildActionUrl(routeHeaderId, Constants.MAPPING_COI_DISCLOSURE_ACTIONS_PAGE, "CoiDisclosureDocument");
-                ActionForward holdingPageForward = mapping.findForward(Constants.MAPPING_HOLDING_PAGE);
-
-                if (StringUtils.equalsIgnoreCase(disclosureStatus, CoiDisclosureStatus.APPROVED)) {
-                    coiDisclosureForm.getDisclosureActionHelper().approveDisclosure();                          
-                    return routeToHoldingPage(basicForward, basicForward, holdingPageForward, returnLocation);
-                } else if (StringUtils.equalsIgnoreCase(disclosureStatus, CoiDisclosureStatus.DISAPPROVED)) {
-                    coiDisclosureForm.getDisclosureActionHelper().disapproveDisclosure();
-                    return routeToHoldingPage(basicForward, basicForward, holdingPageForward, returnLocation);
-                } else if (StringUtils.equalsIgnoreCase(disclosureStatus, CoiDisclosureStatus.ROUTED_FOR_REVIEW)) {
-                    coiDisclosureForm.getDisclosureActionHelper().setStatus();
-                }   
-            } else { 
-                GlobalVariables.getMessageMap().putError("coiAdminActionErrors", KeyConstants.ERROR_COI_DISCLOSURE_STATUS_REQUIRED);        
+        AuditActionHelper auditActionHelper = new AuditActionHelper();
+        
+        if (new CoiDisclosureAdministratorActionRule().isValidStatus(disclosureStatus, dispositionCode)) {
+            if (!auditActionHelper.auditUnconditionally(coiDisclosureDocument)) {
+                coiDisclosureForm.setAuditActivated(true);
+                GlobalVariables.getMessageMap().putError("coiAdminActionErrors", KeyConstants.ERROR_COI_VALIDATION, "approving");
+                return forward;
             }
+            coiDisclosureForm.getDisclosureActionHelper().approveDisclosure(dispositionCode);
+            ActionForward basicForward = mapping.findForward(KRADConstants.MAPPING_PORTAL);
+            String routeHeaderId = coiDisclosureDocument.getDocumentNumber();
+            String returnLocation = buildActionUrl(routeHeaderId, Constants.MAPPING_COI_DISCLOSURE_ACTIONS_PAGE, "CoiDisclosureDocument");
+            ActionForward holdingPageForward = mapping.findForward(Constants.MAPPING_HOLDING_PAGE);
+    
+            return routeToHoldingPage(basicForward, basicForward, holdingPageForward, returnLocation);
+        } else {
+            return forward;
         }
+    }
+    
+    public ActionForward disapprove(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        CoiDisclosureForm coiDisclosureForm = (CoiDisclosureForm) form;
+        String disclosureStatus = CoiDisclosureStatus.DISAPPROVED;
+        String dispositionCode = coiDisclosureForm.getDisclosureActionHelper().getMaximumDispositionStatus().getCoiDispositionCode();
+        CoiDisclosureDocument coiDisclosureDocument = coiDisclosureForm.getCoiDisclosureDocument();
 
-        return forward;   
+        ActionForward forward = mapping.findForward(Constants.MAPPING_BASIC);
+        AuditActionHelper auditActionHelper = new AuditActionHelper();
+        
+        if (new CoiDisclosureAdministratorActionRule().isValidStatus(disclosureStatus, dispositionCode)) {
+            if (!auditActionHelper.auditUnconditionally(coiDisclosureDocument)) {
+                coiDisclosureForm.setAuditActivated(true);
+                GlobalVariables.getMessageMap().putError("coiAdminActionErrors", KeyConstants.ERROR_COI_VALIDATION, "disapproving");
+                return forward;
+            }
+            coiDisclosureForm.getDisclosureActionHelper().disapproveDisclosure(dispositionCode);
+            ActionForward basicForward = mapping.findForward(KRADConstants.MAPPING_PORTAL);
+            String routeHeaderId = coiDisclosureDocument.getDocumentNumber();
+            String returnLocation = buildActionUrl(routeHeaderId, Constants.MAPPING_COI_DISCLOSURE_ACTIONS_PAGE, "CoiDisclosureDocument");
+            ActionForward holdingPageForward = mapping.findForward(Constants.MAPPING_HOLDING_PAGE);
+    
+            return routeToHoldingPage(basicForward, basicForward, holdingPageForward, returnLocation);
+        } else {
+            return forward;
+        }
+    }
+
+    public ActionForward updateDisclosureReviewStatus(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
+    throws Exception {
+        CoiDisclosureForm coiDisclosureForm = (CoiDisclosureForm) form;
+        ActionForward forward = mapping.findForward(Constants.MAPPING_BASIC);
+        CoiDisclosure coiDisclosure = coiDisclosureForm.getCoiDisclosureDocument().getCoiDisclosure();
+        getCoiDisclosureActionService().updateDisclosureReviewStatus(coiDisclosure);
+        return forward;
+    }
+    
+    
+    public ActionForward completeReview(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
+    throws Exception {
+        ActionForward forward = mapping.findForward(Constants.MAPPING_BASIC);
+        CoiDisclosureForm coiDisclosureForm = (CoiDisclosureForm) form;
+        getCoiDisclosureActionService().completeCoiReview(coiDisclosureForm.getCoiDisclosureDocument().getCoiDisclosure());
+        return forward;
     }
     
     public ActionForward addCoiUserRole(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)
@@ -95,13 +131,8 @@ public class CoiDisclosureActionsAction extends CoiAction {
         if (checkRule(new AddCoiReviewerEvent("", coiDisclosureDocument.getCoiDisclosure(), coiUserRole))) {
             coiUserRole.setCoiReviewer(coiDisclosureForm.getDisclosureActionHelper().getCoiReviewer(reviewerCode));
             coiUserRole.setPerson(coiDisclosureForm.getDisclosureActionHelper().getKcPerson(userName));
-            getCoiDisclosureActionService().addCoiUserRole(coiDisclosureDocument.getCoiDisclosure(), coiUserRole);
+            forward = getCoiDisclosureActionService().addCoiUserRole(mapping, form, coiDisclosureDocument.getCoiDisclosure(), coiUserRole);
             coiDisclosureForm.getDisclosureActionHelper().setNewCoiUserRole(new CoiUserRole());
-            
-            CoiNotificationContext context = new CoiNotificationContext(coiDisclosureDocument.getCoiDisclosure(), 
-                    CoiActionType.ASSIGN_REVIEWER, "Assign Reviewer", 
-                    new AssignReviewerNotificationRenderer(coiDisclosureDocument.getCoiDisclosure(), "Assigned"));
-            forward = this.sendNotification(mapping, forward, coiDisclosureForm, context);
         }
         
         return forward;
@@ -113,13 +144,7 @@ public class CoiDisclosureActionsAction extends CoiAction {
         CoiDisclosureForm coiDisclosureForm = (CoiDisclosureForm) form;
         CoiDisclosureDocument coiDisclosureDocument = coiDisclosureForm.getCoiDisclosureDocument();
         int index = getSelectedLine(request);
-        getCoiDisclosureActionService().deleteCoiUserRole(coiDisclosureDocument.getCoiDisclosure(), index);
-        
-        CoiNotificationContext context = new CoiNotificationContext(coiDisclosureDocument.getCoiDisclosure(), 
-                CoiActionType.ASSIGN_REVIEWER, "Assign Reviewer", 
-                new AssignReviewerNotificationRenderer(coiDisclosureDocument.getCoiDisclosure(), "Removed"));
-        forward = this.sendNotification(mapping, forward, coiDisclosureForm, context);
-        
+        forward = getCoiDisclosureActionService().deleteCoiUserRole(mapping, form, coiDisclosureDocument.getCoiDisclosure(), index);
         return forward;
     }
     

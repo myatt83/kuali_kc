@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -150,7 +150,7 @@ public class IRBNotificationRendererTest extends KcUnitTestBase {
         renderer.setBusinessObjectService(businessObjectService);
         Map<String, String> nameValueMap = renderer.getDefaultReplacementParameters();
         
-        assertEquals(26, nameValueMap.size());
+        assertEquals(27, nameValueMap.size());
         assertEquals(PROTOCOL_NUMBER_VAL, nameValueMap.get(IRBReplacementParameters.PROTOCOL_NUMBER));
         assertEquals(PI_NAME_VAL, nameValueMap.get(IRBReplacementParameters.PI_NAME));
         assertEquals(LEAD_UNIT_VAL, nameValueMap.get(IRBReplacementParameters.LEAD_UNIT));
@@ -194,7 +194,7 @@ public class IRBNotificationRendererTest extends KcUnitTestBase {
         
         nameValueMap = renderer.getDefaultReplacementParameters();
         
-        assertEquals(22, nameValueMap.size());
+        assertEquals(23, nameValueMap.size());
         assertFalse(nameValueMap.containsKey(IRBReplacementParameters.PROTOCOL_INITIAL_APPROVAL_DATE));
         assertFalse(nameValueMap.containsKey(IRBReplacementParameters.PROTOCOL_LAST_APPROVAL_DATE));
         assertFalse(nameValueMap.containsKey(IRBReplacementParameters.PROTOCOL_EXPIRATION_DATE));
@@ -239,7 +239,7 @@ public class IRBNotificationRendererTest extends KcUnitTestBase {
         
         nameValueMap = renderer.getDefaultReplacementParameters();
         
-        assertEquals(14, nameValueMap.size());
+        assertEquals(15, nameValueMap.size());
         assertFalse(nameValueMap.containsKey(IRBReplacementParameters.PROTOCOL_INITIAL_APPROVAL_DATE));
         assertFalse(nameValueMap.containsKey(IRBReplacementParameters.PROTOCOL_LAST_APPROVAL_DATE));
         assertFalse(nameValueMap.containsKey(IRBReplacementParameters.PROTOCOL_EXPIRATION_DATE));        

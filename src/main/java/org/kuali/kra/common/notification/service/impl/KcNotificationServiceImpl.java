@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,8 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.kuali.kra.bo.KcPerson;
+import org.kuali.kra.bo.KraPersistableBusinessObjectBase;
 import org.kuali.kra.bo.Rolodex;
 import org.kuali.kra.common.notification.NotificationContext;
 import org.kuali.kra.common.notification.bo.KcNotification;
@@ -59,6 +61,7 @@ import org.kuali.rice.kim.api.identity.entity.Entity;
 import org.kuali.rice.kim.api.identity.type.EntityTypeContactInfo;
 import org.kuali.rice.kim.api.role.RoleService;
 import org.kuali.rice.krad.service.BusinessObjectService;
+import org.springframework.util.ObjectUtils;
 
 /**
  * Defines methods for creating and sending KC Notifications.
@@ -115,9 +118,9 @@ public class KcNotificationServiceImpl implements KcNotificationService {
 
     /**
      * {@inheritDoc}
-     * @see org.kuali.kra.common.notification.service.KcNotificationService#createNotification(org.kuali.kra.common.notification.NotificationContext)
+     * @see org.kuali.kra.common.notification.service.KcNotificationService#createNotificationObject(org.kuali.kra.common.notification.NotificationContext)
      */
-    public KcNotification createNotification(NotificationContext context) {
+    public KcNotification createNotificationObject(NotificationContext context) {
         KcNotification notification = new KcNotification();
         
         NotificationType notificationType = getNotificationType(context);
@@ -168,7 +171,7 @@ public class KcNotificationServiceImpl implements KcNotificationService {
      *      org.kuali.kra.common.notification.NotificationContext)
      */
     public void sendNotification(NotificationContext context) {
-        KcNotification notification = createNotification(context);
+        KcNotification notification = createNotificationObject(context);
         
         if (notification.getNotificationType() != null && notification.getNotificationType().isActive()) {
             String contextName = context.getContextName();
@@ -216,7 +219,7 @@ public class KcNotificationServiceImpl implements KcNotificationService {
      */
     public void sendEmailNotification(NotificationContext context) {
         if (isEmailEnabled()) {
-            KcNotification notification = createNotification(context);
+            KcNotification notification = createNotificationObject(context);
             
             if (notification.getNotificationType() != null && notification.getNotificationType().isActive()) {
                 String subject = notification.getSubject();
@@ -329,7 +332,7 @@ public class KcNotificationServiceImpl implements KcNotificationService {
         List<NotificationTypeRecipient> notificationRecipients = getNotificationType(context).getNotificationTypeRecipients();
         
         uniqueRecipients.addAll(getRoleRecipients(notificationRecipients, context));
-        
+
         return uniqueRecipients;
     }
     
@@ -538,6 +541,73 @@ public class KcNotificationServiceImpl implements KcNotificationService {
         return emailEnabled;
     }
 
+    /**
+     * {@inheritDoc}
+     * @see org.kuali.kra.common.notification.service.KcNotificationService#createNotificationObject(org.kuali.kra.common.notification.NotificationContext)
+     */
+    private void fillinNotificationObject(KcNotification notification, NotificationContext context, List<NotificationTypeRecipient> notificationTypeRecipients) {
+        fillinNotificationObject(notification, context);
+        String resultList = notification.getRecipients();
+        for (NotificationTypeRecipient recipient: notificationTypeRecipients) {
+            if (recipient.getPersonId() != null) {
+                KcPerson person = getKcPersonService().getKcPersonByPersonId(recipient.getPersonId()); 
+                if (person != null) {
+                    if(resultList != null) {
+                        resultList += ", " + person.getUserName();
+                    }else {
+                        resultList = person.getUserName();
+                    }
+                }
+            }
+        }            
+        notification.setRecipients(resultList);
+    }
+    
+    /**
+     * {@inheritDoc}
+     * @see org.kuali.kra.common.notification.service.KcNotificationService#createNotificationObject(org.kuali.kra.common.notification.NotificationContext)
+     */
+    private void fillinNotificationObject(KcNotification notification, NotificationContext context) {
+        NotificationType notificationType = getNotificationType(context);
+        // some fields will already be set if we get here from one of the notification editors
+        if (notificationType != null) {
+            if (notification.getNotificationType() == null) {
+                notification.setNotificationTypeId(notificationType.getNotificationTypeId());
+                notification.setSubject(context.replaceContextVariables(StringUtils.isEmpty(notification.getSubject()) ? notificationType.getSubject() : notification.getSubject()));
+                notification.setMessage(context.replaceContextVariables(StringUtils.isEmpty(notification.getMessage()) ? notificationType.getMessage() : notification.getMessage()));
+                notification.setNotificationType(notificationType);
+            }
+            notification.setDocumentNumber(context.getDocumentNumber());
+            Collection<NotificationRecipient.Builder> notificationRecipients = getNotificationRecipients(context);
+            String resultList = "";
+            for (NotificationRecipient.Builder recipient: notificationRecipients) {
+                resultList += ", " + recipient.getRecipientId();
+            }       
+            
+            if(resultList != "") {
+                notification.setRecipients(resultList.substring(2));
+            }
+        }
+    }
+    
+    
+    
+    public void sendNotificationAndPersist(NotificationContext context, KcNotification notification, KraPersistableBusinessObjectBase object) {
+        fillinNotificationObject(notification, context);
+        if (notification.getNotificationType() != null && notification.getNotificationType().isActive()) {
+            sendNotification(context);
+            notification.persistOwningObject(object);
+        }
+    }
+
+    public void sendNotificationAndPersist(NotificationContext context, KcNotification notification, List<NotificationTypeRecipient> notificationTypeRecipients, KraPersistableBusinessObjectBase object) {
+        fillinNotificationObject(notification, context, notificationTypeRecipients);
+        if (notification.getNotificationType() != null && notification.getNotificationType().isActive()) {
+            sendNotification(context, notification, notificationTypeRecipients);
+            notification.persistOwningObject(object);
+        }
+    }
+
     public BusinessObjectService getBusinessObjectService() {
         return businessObjectService;
     }
@@ -601,5 +671,16 @@ public class KcNotificationServiceImpl implements KcNotificationService {
     public void setKcEmailService(KcEmailService kcEmailService) {
         this.kcEmailService = kcEmailService;
     }
-    
+
+    public KcNotification copy(KcNotification oldNotification) {
+        KcNotification newNotification = new KcNotification();
+        newNotification.setNotificationId(oldNotification.getNotificationId());
+        newNotification.setNotificationTypeId(oldNotification.getNotificationTypeId());
+        newNotification.setDocumentNumber(oldNotification.getDocumentNumber());
+        newNotification.setRecipients(oldNotification.getRecipients());
+        newNotification.setSubject(oldNotification.getSubject());
+        newNotification.setMessage(oldNotification.getMessage());
+        newNotification.setNotificationType(oldNotification.getNotificationType());
+        return newNotification;
+    }
 }

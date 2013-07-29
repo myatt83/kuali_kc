@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,10 +21,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.kuali.kra.committee.bo.CommitteeMembership;
-import org.kuali.kra.committee.bo.CommitteeMembershipRole;
+import org.kuali.kra.common.committee.bo.CommitteeMembershipRole;
 import org.kuali.kra.committee.document.CommitteeDocument;
-import org.kuali.kra.committee.rule.event.AddCommitteeMembershipEvent;
-import org.kuali.kra.committee.rule.event.AddCommitteeMembershipRoleEvent;
+import org.kuali.kra.common.committee.rule.event.AddCommitteeMembershipEvent;
+import org.kuali.kra.common.committee.rule.event.AddCommitteeMembershipRoleEvent;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.KeyConstants;
 
@@ -32,12 +32,12 @@ import org.kuali.kra.infrastructure.KeyConstants;
  * Test the Committee Membership Add Rules
  */
 public class CommitteeMembershipAddRuleTest extends CommitteeRuleTestBase {
-    private CommitteeMembershipRule rule;
+    private org.kuali.kra.common.committee.rules.CommitteeMembershipRule rule;
     
     @Before
     public void setup() throws Exception {
         super.setUp();
-        rule = new CommitteeMembershipRule();
+        rule = new org.kuali.kra.common.committee.rules.CommitteeMembershipRule();
     }
     
     @After

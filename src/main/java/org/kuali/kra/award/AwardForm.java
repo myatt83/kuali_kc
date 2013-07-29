@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,7 +68,6 @@ import org.kuali.kra.award.specialreview.SpecialReviewHelper;
 import org.kuali.kra.award.web.struts.action.SponsorTermFormHelper;
 import org.kuali.kra.bo.versioning.VersionHistory;
 import org.kuali.kra.budget.BudgetDecimal;
-import org.kuali.kra.common.customattributes.CustomDataForm;
 import org.kuali.kra.common.notification.web.struts.form.NotificationHelper;
 import org.kuali.kra.common.permissions.web.struts.form.PermissionsForm;
 import org.kuali.kra.external.award.web.AccountCreationPresentationHelper;
@@ -79,6 +78,7 @@ import org.kuali.kra.service.AwardHierarchyUIService;
 import org.kuali.kra.service.VersionHistoryService;
 import org.kuali.kra.web.struts.form.Auditable;
 import org.kuali.kra.web.struts.form.BudgetVersionFormBase;
+import org.kuali.kra.web.struts.form.CustomDataDocumentForm;
 import org.kuali.kra.web.struts.form.MultiLookupFormBase;
 import org.kuali.rice.core.api.CoreApiServiceLocator;
 import org.kuali.rice.core.api.config.property.ConfigurationService;
@@ -102,8 +102,8 @@ import org.kuali.rice.krad.util.KRADConstants;
 public class AwardForm extends BudgetVersionFormBase 
                                         implements MultiLookupFormBase,
                                                     Auditable,
-                                                    CustomDataForm,
-                                                    PermissionsForm {
+                                                    PermissionsForm,
+                                                    CustomDataDocumentForm {
 
     public static final String SAVE = "save";
     public static final String RELOAD = "reload";
@@ -166,7 +166,6 @@ public class AwardForm extends BudgetVersionFormBase
     private AwardCreditSplitBean awardCreditSplitBean;
     private Map<String, AwardHierarchy> awardHierarchyNodes;
     private String awardNumberInputTemp;//This is temporary till the GUI mock is ready for award hierarchy
-    private List<String> order;
     private AwardFundingProposalBean fundingProposalBean;
     private String awardHierarchy;
     private String awardNumber;
@@ -267,8 +266,7 @@ public class AwardForm extends BudgetVersionFormBase
         fundingProposalBean = new AwardFundingProposalBean(this);
         awardPrintNotice = new AwardPrintNotice();
         awardPrintChangeReport = new AwardTransactionSelectorBean();
-        order = new ArrayList<String>();
-        reportTrackingBeans = buildReportTrackingBeans();
+        buildReportTrackingBeans();
         awardHierarchyBean = new AwardHierarchyBean(this);
         medusaBean = new MedusaBean();
         //sync
@@ -283,13 +281,12 @@ public class AwardForm extends BudgetVersionFormBase
         accountCreationHelper = new AccountCreationPresentationHelper();
     }
     
-    public List<ReportTrackingBean> buildReportTrackingBeans() {
-        List<ReportTrackingBean> beans = new ArrayList<ReportTrackingBean>();
+    public void buildReportTrackingBeans() {
+        reportTrackingBeans = new ArrayList<ReportTrackingBean>();
         int numberOfReportItems = this.getAwardDocument().getAward().getAwardReportTermItems().size();
         for (int i=0; i<numberOfReportItems; i++) {
-            beans.add(new ReportTrackingBean());
+            reportTrackingBeans.add(new ReportTrackingBean());
         }
-        return beans;
     }
 
     /**
@@ -853,22 +850,6 @@ public class AwardForm extends BudgetVersionFormBase
     public void setAwardNumberInputTemp(String awardNumberInputTemp) {
         this.awardNumberInputTemp = awardNumberInputTemp;
     }
-
-    /**
-     * Gets the order attribute. 
-     * @return Returns the order.
-     */
-    public List<String> getOrder() {
-        return order;
-    }
-
-    /**
-     * Sets the order attribute value.
-     * @param order The order to set.
-     */
-    public void setOrder(List<String> order) {
-        this.order = order;
-    }
     
     public AwardHierarchyBean getAwardHierarchyBean() {
         return awardHierarchyBean;
@@ -1303,7 +1284,7 @@ public class AwardForm extends BudgetVersionFormBase
     }
     
     public boolean getDisplayEditButton() {
-        boolean displayEditButton = !isViewOnly();
+        boolean displayEditButton = !isViewOnly() && !getAwardDocument().isCanceled();
         if (isDocOpenedFromAwardSearch() || getAwardDocument().isPlaceHolderDocument()) {
             displayEditButton = true;
         }
@@ -1412,7 +1393,7 @@ public class AwardForm extends BudgetVersionFormBase
             //List returned by DD is it's cached copy of the header navigation list.
         for (HeaderNavigation nav : navigation) {
             if (StringUtils.equals(nav.getHeaderTabNavigateTo(),CUSTOM_DATA_NAV_TO)) {
-                boolean displayTab = !this.getAwardDocument().getCustomAttributeDocuments().isEmpty();
+                boolean displayTab = !this.getCustomDataHelper().getCustomAttributeDocuments().isEmpty();
                 nav.setDisabled(!displayTab);
                 if (displayTab) {
                     resultList.add(nav);
@@ -1508,4 +1489,28 @@ public class AwardForm extends BudgetVersionFormBase
         this.reportTrackingBeans = reportTrackingBeans;
     }
     
+    public String determineRootAwardNumber(AwardForm awardForm) {
+        String prevRootAwardNumber = getPrevRootAwardNumber();
+        return prevRootAwardNumber != null ? prevRootAwardNumber : getAwardDocument().getAward().getAwardNumber();
+    }
+
+    public String determineParentAwardNumber(AwardForm awardForm) {
+        String prevAwardNumber = getPrevAwardNumber();
+        return prevAwardNumber != null ? prevAwardNumber : Constants.AWARD_HIERARCHY_DEFAULT_PARENT_OF_ROOT;
+    }    
+ 
+    // returns list of awards with the same award number and prior to or equal to this one
+    public List<Award>getAwardsForHistoryDisplay() {
+        List<Award>results = new ArrayList<Award>();
+        List<Award>rawList = getAwardDocument().getAward().getAwardVersions();
+        for (int i=0; i<rawList.size();i++) {
+            Award award = rawList.get(i);
+            if (award.getSequenceNumber().compareTo(getAwardDocument().getAward().getSequenceNumber()) > 0) {
+                break;
+            } else {
+                results.add(0,award);  // need reverse order
+            }
+        }
+        return results;
+    }
 }

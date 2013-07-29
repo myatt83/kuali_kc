@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,25 +22,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.kuali.kra.drools.brms.FactBean;
-import org.kuali.kra.irb.Protocol;
-import org.kuali.kra.irb.ProtocolDao;
-import org.kuali.kra.irb.actions.ProtocolAction;
+import org.kuali.kra.common.committee.meeting.CommitteeScheduleMinuteBase;
 import org.kuali.kra.irb.actions.ProtocolActionType;
 import org.kuali.kra.meeting.CommitteeScheduleMinute;
-import org.kuali.rice.kim.api.identity.Person;
-import org.kuali.rice.krad.service.BusinessObjectService;
-import org.kuali.rice.krad.util.GlobalVariables;
+import org.kuali.kra.protocol.actions.ProtocolActionBase;
+import org.kuali.kra.protocol.actions.submit.ProtocolActionMappingBase;
 
 /*
  * This class is for the condition attributes of of the protocol action.
  * i.e., the condition of protocol status, submissionstatus, action type code etc.
  */
-public class ProtocolActionMapping implements FactBean {
+public class ProtocolActionMapping extends ProtocolActionMappingBase {
     
-    private static final String PROTOCOL_NUMBER = "protocolNumber";
-    private static final String SEQUENCE_NUMBER = "sequenceNumber";
-    private static final String SUBMISSION_NUMBER = "submissionNumber";
     private static final Map<String, String> ACTION_TYPE_SUBMISSION_TYPE_MAP;
     static {
         final Map<String, String> codeMap = new HashMap<String, String>();        
@@ -62,78 +55,17 @@ public class ProtocolActionMapping implements FactBean {
         codes.add(ProtocolActionType.GRANT_EXEMPTION);
         APPROVE_ACTION_TYPES = codes;
     }
-
-
-    private BusinessObjectService businessObjectService;
     
-    private ProtocolDao dao;
     
-    String submissionStatusCode;
-    
-    String submissionTypeCode;
-    
-    String protocolReviewTypeCode;
-    
-    String actionTypeCode;
-    
-    String protocolStatusCode;
-    
-    String scheduleId;
-    
-    Protocol protocol;
-    
-    Integer submissionNumber;
-
-    boolean allowed = false;
-
     public ProtocolActionMapping(String actionTypeCode, String submissionStatusCode, String submissionTypeCode, String protocolReviewTypeCode, String protocolStatusCode, String scheduleId, Integer submissionNumber) {
-        super();
-        this.actionTypeCode = actionTypeCode;
-        this.submissionStatusCode = submissionStatusCode;        
-        this.submissionTypeCode = submissionTypeCode;
-        this.protocolReviewTypeCode = protocolReviewTypeCode;
-        this.protocolStatusCode = protocolStatusCode;
-        this.scheduleId = scheduleId;
-        this.submissionNumber = submissionNumber;
+        super(actionTypeCode, submissionStatusCode, submissionTypeCode, protocolReviewTypeCode, protocolStatusCode, scheduleId, submissionNumber);
+    }    
+       
+    protected Class<? extends CommitteeScheduleMinuteBase> getCommitteeScheduleMinuteBOClassHook() {
+        return CommitteeScheduleMinute.class;
     }
     
-    public void setBusinessObjectService(BusinessObjectService businessObjectService) {
-        this.businessObjectService = businessObjectService;
-    }
     
-    public void setDao(ProtocolDao dao) {
-        this.dao = dao;
-    }
-
-    public void setProtocol(Protocol protocol) {
-        this.protocol = protocol;
-    }
-    
-    @SuppressWarnings("unchecked")
-    public String getProtocolSubmissionScheduleId() {
-        // TODO : should not need to retrieve from DB because protocol.getProtocolSubmission() is
-        // the same as the one retrieved.  The positiveFieldValues are the pk in coeus.
-        // this is used in rule for null check.
-        
-        if (protocol.getProtocolSubmission() == null) {
-            return null;
-        } else {
-            return protocol.getProtocolSubmission().getScheduleId();
-        }        
-    }
-    
-    /**
-     * 
-     * This method if this submission has committee schedule minutes
-     * @return
-     */
-    public boolean getMinutesCount() {
-        Map<String, Object> fieldValues = new HashMap<String, Object>();
-        fieldValues.put(PROTOCOL_NUMBER, protocol.getProtocolNumber());
-        fieldValues.put(SUBMISSION_NUMBER, protocol.getProtocolSubmission().getSubmissionNumber());
-        return businessObjectService.countMatching(CommitteeScheduleMinute.class, fieldValues) > 0;
-    }
-        
     /**
      * Check if there are any pending submissions for this protocol
      *  whose submission type is not the matching submission type in ACTION_TYPE_SUBMISSION_TYPE_MAP.
@@ -164,16 +96,7 @@ public class ProtocolActionMapping implements FactBean {
         
         return businessObjectService.countMatching(ProtocolSubmission.class, positiveFieldValues) == 0;
     }
-    
-    /**
-     * 
-     * This method Check if there are any pending amendmends/renewals for this protocols
-     * @return
-     */
-    public boolean getSubmissionCountCond3() {
-        return dao.getProtocolSubmissionCountFromProtocol(protocol.getProtocolNumber());
-    }
-    
+        
     /**
      * 
      * This method check to see if there is pending submission with one of the following submission type
@@ -212,20 +135,6 @@ public class ProtocolActionMapping implements FactBean {
 
     }
     
-    /*
-     * select count(protocol_number)
-                                    into li_SubmissionCount
-                                    from osp$protocol_submission
-                                    where protocol_number = as_protocol_number and
-                                    sequence_number = as_sequence_number and
-                                    submission_status_code in (100, 101, 102) and
-                                    submission_number = (select max(a.submission_number)
-                                                 from osp$protocol_submission a
-                                                 where osp$protocol_submission.protocol_number = a.protocol_number and
-                                                 osp$protocol_submission.sequence_number = a.sequence_number);
-     * 
-     */
-    
     /**
      * check if there are any other pending submissions.
      * Basically, check the matching protocol submission with the highest submission# does not have
@@ -257,90 +166,12 @@ public class ProtocolActionMapping implements FactBean {
         
     }
     
-
-    /**
-     * This method finds number of reviewers tied to protocol submission. Implementation in lieu of following query 
-     *           SELECT count(OSP$PROTOCOL_REVIEWERS.PERSON_ID)
-     *           INTO li_PersonCnt
-     *           FROM OSP$PROTOCOL_REVIEWERS
-     *           WHERE OSP$PROTOCOL_REVIEWERS.PROTOCOL_NUMBER = AS_PROTOCOL_NUMBER
-     *           AND OSP$PROTOCOL_REVIEWERS.SUBMISSION_NUMBER = AS_SUBMISSION_NUMBER; 
-     * @return
-     */
-    public boolean getProtocolReviewerCountCond1() {       
-        return protocol.getProtocolSubmission().getProtocolReviewers().size() > 0;
-    }
-    
-    public String getActionTypeCode() {
-        return actionTypeCode;
-    }
-
-    public void setActionTypeCode(String actionTypeCode) {
-        this.actionTypeCode = actionTypeCode;
-    }
-
-    public String getSubmissionStatusCode() {
-        return submissionStatusCode;
-    }
-
-    public void setSubmissionStatusCode(String submissionStatusCode) {
-        this.submissionStatusCode = submissionStatusCode;
-    }
-
-    public String getSubmissionTypeCode() {
-        return submissionTypeCode;
-    }
-
-    public void setSubmissionTypeCode(String submissionTypeCode) {
-        this.submissionTypeCode = submissionTypeCode;
-    }
-
-    public String getProtocolReviewTypeCode() {
-        return protocolReviewTypeCode;
-    }
-
-    public void setProtocolReviewTypeCode(String protocolReviewTypeCode) {
-        this.protocolReviewTypeCode = protocolReviewTypeCode;
-    }
-    
-    public String getProtocolStatusCode() {
-        return protocolStatusCode;
-    }
-
-    public void setProtocolStatusCode(String protocolStatusCode) {
-        this.protocolStatusCode = protocolStatusCode;
-    }    
-    
-    public String getScheduleId() {
-        return scheduleId;
-    }
-
-    public void setScheduleId(String scheduleId) {
-        this.scheduleId = scheduleId;
-    }
-
-    public Integer getSubmissionNumber() {
-        return submissionNumber;
-    }
-
-    public void setSubmissionNumber(Integer submissionNumber) {
-        this.submissionNumber = submissionNumber;
-    }
-
-    public boolean isAllowed() {
-        return allowed;
-    }
-
-    public void setAllowed(boolean allowed) {
-        this.allowed = allowed;
-    }
-    
     /**
      * check if this protocol has not been approved
      */
     public boolean isInitialProtocol() {
         boolean initialProtocol = true;
-        for (ProtocolAction action : protocol.getProtocolActions()) {
+        for (ProtocolActionBase action : protocol.getProtocolActions()) {
             if (APPROVE_ACTION_TYPES.contains(action.getProtocolActionTypeCode())) {
                 initialProtocol = false;
                 break;
@@ -350,25 +181,13 @@ public class ProtocolActionMapping implements FactBean {
     }
 
     /**
-     * check if user is PI
-     */
-    public boolean isPrincipalInvestigator() {
-        Person user = GlobalVariables.getUserSession().getPerson();
-        boolean isPi = false;
-        if (user.getPrincipalId().equals(protocol.getPrincipalInvestigator().getPersonId())) {
-            isPi = true;
-        }
-        return isPi;
-    }
-
-    /**
      * check if this submission is protocol is just SRR/SMR
      * protocolSubmissions is sorted by submissionNumber in repository.
      */
     public boolean isSubmitForRevision() {
         boolean revisionSubmission = false;
         if (protocol.getProtocolSubmissions().size() >= 2) {
-            ProtocolSubmission prevSubmission = protocol.getProtocolSubmissions().get(protocol.getProtocolSubmissions().size() - 2);
+            ProtocolSubmission prevSubmission = (ProtocolSubmission) protocol.getProtocolSubmissions().get(protocol.getProtocolSubmissions().size() - 2);
             if (ProtocolSubmissionStatus.SPECIFIC_MINOR_REVISIONS_REQUIRED.equals(prevSubmission.getSubmissionStatusCode()) || ProtocolSubmissionStatus.SUBSTANTIVE_REVISIONS_REQUIRED
                             .equals(prevSubmission.getSubmissionStatusCode())) {
                 revisionSubmission = true;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,15 @@
  */
 package org.kuali.kra.iacuc.actions.assignCmt;
 
-import org.kuali.kra.protocol.Protocol;
+import org.kuali.kra.protocol.ProtocolBase;
 
 
 public interface IacucProtocolAssignCmtService {
     
-    public void assignToCommittee(Protocol protocol, IacucProtocolAssignCmtBean actionBean) throws Exception;
+    public void assignToCommittee(ProtocolBase protocol, IacucProtocolAssignCmtBean actionBean) throws Exception;
 
-    public String getAssignedCommitteeId(Protocol protocol);
+    public String getAssignedCommitteeId(ProtocolBase protocol);
     
-    public String getAssignedScheduleId(Protocol protocol);
+    public String getAssignedScheduleId(ProtocolBase protocol);
 
 }

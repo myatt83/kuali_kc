@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import static org.kuali.kra.infrastructure.Constants.PRINCIPAL_INVESTIGATOR_ROLE
 import static org.kuali.kra.infrastructure.KeyConstants.ERROR_INVESTIGATOR_LOWBOUND;
 import static org.kuali.kra.infrastructure.KeyConstants.ERROR_INVESTIGATOR_UNITS_UPBOUND;
 import static org.kuali.kra.infrastructure.KeyConstants.ERROR_PROPOSAL_PERSON_CERTIFICATION_INCOMPLETE;
+import static org.kuali.kra.infrastructure.KeyConstants.ERROR_ERA_COMMON_USER_NAME;
 import static org.kuali.kra.infrastructure.KraServiceLocator.getService;
 
 import java.util.ArrayList;
@@ -37,6 +38,7 @@ import java.util.Map.Entry;
 
 import org.apache.commons.collections.keyvalue.DefaultMapEntry;
 import org.kuali.kra.bo.Unit;
+import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.proposaldevelopment.bo.ProposalPerson;
 import org.kuali.kra.proposaldevelopment.bo.ProposalPersonUnit;
@@ -46,6 +48,7 @@ import org.kuali.kra.proposaldevelopment.service.KeyPersonnelService;
 import org.kuali.kra.questionnaire.answer.AnswerHeader;
 import org.kuali.kra.questionnaire.answer.QuestionnaireAnswerService;
 import org.kuali.kra.rules.ResearchDocumentRuleBase;
+import org.kuali.kra.service.SponsorService;
 import org.kuali.rice.kns.util.AuditCluster;
 import org.kuali.rice.kns.util.AuditError;
 import org.kuali.rice.kns.util.KNSGlobalVariables;
@@ -77,9 +80,16 @@ public class KeyPersonnelAuditRule extends ResearchDocumentRuleBase implements D
         retval &= new ProposalDevelopmentKeyPersonsRule().processCustomSaveDocumentBusinessRules(pd);
         
         boolean hasInvestigator = false;
-        
+        int  personCount = 0;
         for (ProposalPerson person : pd.getDevelopmentProposal().getProposalPersons()) {
             retval &= validateInvestigator(person);
+            if (KraServiceLocator.getService(SponsorService.class).isSponsorNihMultiplePi(pd.getDevelopmentProposal())) {
+                if (person.isMultiplePi() || person.getRole().getProposalPersonRoleId().equalsIgnoreCase(Constants.PRINCIPAL_INVESTIGATOR_ROLE)) {
+                    retval &= validateEraCommonUserName(person, personCount);
+                }
+                
+            }
+
             if (!hasInvestigator && isInvestigator(person)) {
                 hasInvestigator = true;
             }
@@ -91,6 +101,17 @@ public class KeyPersonnelAuditRule extends ResearchDocumentRuleBase implements D
         }
         return retval;
 
+    }
+    
+    private boolean validateEraCommonUserName(ProposalPerson person, int personCount) {
+        boolean retval = true;
+        if (person.getEraCommonsUserName() == null) {
+            getAuditErrors().add(new AuditError(
+                    "document.developmentProposalList[0].proposalPersons[" + personCount + "].eraCommonUserName", 
+                        ERROR_ERA_COMMON_USER_NAME, KEY_PERSONNEL_PAGE + "." + KEY_PERSONNEL_PANEL_ANCHOR, new String[]{person.getFullName()}));
+            retval = false;
+        }
+        return retval;
     }
        
     /**
@@ -163,7 +184,7 @@ public class KeyPersonnelAuditRule extends ResearchDocumentRuleBase implements D
         List<AnswerHeader> headers = KraServiceLocator.getService(QuestionnaireAnswerService.class).getQuestionnaireAnswer(bean);
         
         for (AnswerHeader head : headers) {
-            retval &= head.getAllQuestionsAnswered();
+            retval &= head.getCompleted();
         }
         /*
         for (ProposalPersonYnq question : investigator.getProposalPersonYnqs()) {

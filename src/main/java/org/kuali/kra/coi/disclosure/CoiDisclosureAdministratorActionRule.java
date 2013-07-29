@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,12 @@
 package org.kuali.kra.coi.disclosure;
 
 import org.apache.commons.lang.StringUtils;
+import org.kuali.kra.coi.CoiDisclosureStatus;
+import org.kuali.kra.coi.CoiDispositionStatus;
+import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.KeyConstants;
+import org.kuali.kra.infrastructure.KraServiceLocator;
+import org.kuali.rice.krad.service.BusinessObjectService;
 import org.kuali.rice.krad.util.GlobalVariables;
 
 
@@ -25,16 +30,48 @@ public class CoiDisclosureAdministratorActionRule {
     private static final String ADMIN_ERRORS = "coiAdminActionErrors";
     
     public boolean isValidStatus(String disclosureStatus, String dispositionStatus) {
+        return isValidStatus(disclosureStatus, convertDispositionStatus(dispositionStatus));
+    }
+    
+    public boolean isValidStatus(String disclosureStatus, Integer dispositionStatus) {
         boolean isValid = true;
         if (StringUtils.isBlank(disclosureStatus)) {
             GlobalVariables.getMessageMap().putError(ADMIN_ERRORS, KeyConstants.ERROR_COI_DISCLOSURE_STATUS_REQUIRED);    
             isValid = false;
         }
-        if (StringUtils.isBlank(dispositionStatus)) {
+        if (dispositionStatus == null) {
             GlobalVariables.getMessageMap().putError(ADMIN_ERRORS, KeyConstants.ERROR_COI_DISPOSITON_STATUS_REQUIRED); 
             isValid = false;
         }
+        CoiDispositionStatus disposition = KraServiceLocator.getService(BusinessObjectService.class).findBySinglePrimaryKey(CoiDispositionStatus.class, dispositionStatus);
+        if (disposition == null) {
+            GlobalVariables.getMessageMap().putError(ADMIN_ERRORS, KeyConstants.ERROR_COI_DISPOSITON_STATUS_REQUIRED);
+            isValid = false;
+        }
+        //if the disposition requires disapproval, then the disclosureStatus must be disapproved.
+        if (StringUtils.equals(disposition.getCoiDisclosureStatusCode(), CoiDisclosureStatus.DISAPPROVED) 
+                && !StringUtils.equals(disclosureStatus, CoiDisclosureStatus.DISAPPROVED)) {
+            GlobalVariables.getMessageMap().putError(ADMIN_ERRORS, KeyConstants.ERROR_COI_DISCLOSURE_STATUS_INVALID);
+            isValid = false;
+        }
         return isValid;
+    }
+    
+    public boolean isValidDispositionStatus(String dispositionStatus) {
+        return isValidDispositionStatus(convertDispositionStatus(dispositionStatus));
+    }
+    
+    public boolean isValidDispositionStatus(Integer dispositionStatus) {        
+        boolean isValid = true;
+        if (dispositionStatus == null) {
+            GlobalVariables.getMessageMap().putError(Constants.DISCLOSURE_MANUAL_DISPOSITION_STATUS, KeyConstants.ERROR_COI_DISPOSITON_STATUS_REQUIRED); 
+            isValid = false;
+        }
+        return isValid;
+    }
+    
+    protected Integer convertDispositionStatus(String dispositionStatus) {
+        return dispositionStatus != null ? Integer.valueOf(dispositionStatus) : null;
     }
 
 }

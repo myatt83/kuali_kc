@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,9 @@ package org.kuali.kra.protocol.onlinereview.authorization;
 import org.kuali.kra.infrastructure.PermissionConstants;
 
 /*
- * Allows checks from the ProtocolOnlineReview for MAINTAIN_ONLINE_REVIEWS persmission on the parent Protocol.
+ * Allows checks from the ProtocolOnlineReviewBase for MAINTAIN_ONLINE_REVIEWS persmission on the parent ProtocolBase.
  */
-public class MaintainProtocolOnlineReviewsAuthorizer extends ProtocolOnlineReviewAuthorizer {
+public class MaintainProtocolOnlineReviewsAuthorizer extends ProtocolOnlineReviewAuthorizerBase {
 
     @Override
     public boolean isAuthorized(String userId, ProtocolOnlineReviewTask task) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,46 +17,22 @@ package org.kuali.kra.irb.actions.reviewcomments;
 
 import org.kuali.kra.irb.ProtocolDocument;
 import org.kuali.kra.meeting.CommitteeScheduleMinute;
-import org.kuali.kra.rule.BusinessRuleInterface;
-import org.kuali.kra.rule.event.KraDocumentEventBaseExtension;
+import org.kuali.kra.protocol.actions.reviewcomments.ProtocolAddReviewCommentEventBase;
+import org.kuali.kra.protocol.actions.reviewcomments.ProtocolAddReviewCommentRuleBase;
 
 /**
  * Encapsulates a validation event for a Reviewer Comment add action.
  */
-public class ProtocolAddReviewCommentEvent extends KraDocumentEventBaseExtension {
-    
-    private String propertyName;
-    private CommitteeScheduleMinute reviewComment;
 
-    /**
-     * Constructs a ProtocolAddReviewerCommentEvent.
-     * 
-     * @param document The document to validate
-     * @param propertyName The error path property prefix
-     * @param reviewComment The added Reviewer Comment
-     */
+@SuppressWarnings("unchecked")
+public class ProtocolAddReviewCommentEvent extends ProtocolAddReviewCommentEventBase {
+
     public ProtocolAddReviewCommentEvent(ProtocolDocument document, String propertyName, CommitteeScheduleMinute reviewComment) {
-        super("Enter reviewer comment", "", document);
-        this.propertyName = propertyName;
-        this.reviewComment = reviewComment;
-    }
-    
-    public ProtocolDocument getProtocolDocument() {
-        return (ProtocolDocument) getDocument();
-    }
-    
-    public String getPropertyName() {
-        return propertyName;
-    }
-    
-    public CommitteeScheduleMinute getReviewComment() {
-        return reviewComment;
+        super(document, propertyName, reviewComment);
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public BusinessRuleInterface getRule() {
+    protected ProtocolAddReviewCommentRuleBase<?> getNewProtocolAddReviewCommentRuleInstanceHook() {
         return new ProtocolAddReviewCommentRule();
     }
-
 }

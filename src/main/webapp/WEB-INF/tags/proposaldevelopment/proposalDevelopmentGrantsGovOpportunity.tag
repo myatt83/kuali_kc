@@ -1,5 +1,5 @@
 <%--
- Copyright 2005-2010 The Kuali Foundation
+ Copyright 2005-2013 The Kuali Foundation
  
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -203,7 +203,10 @@
                         <html:link href="${KualiForm.document.developmentProposalList[0].s2sOpportunity.schemaUrl}" target="_blank">
                         	<c:out value="${KualiForm.document.developmentProposalList[0].s2sOpportunity.schemaUrl}"/> </html:link>                                                
                   </td>
-                 </tr> 
+                 </tr>
+                 <tr>
+                 	<th><div style="text-align: right;"><kul:htmlAttributeLabel attributeEntry="${s2sOpportunity.providerCode}" readOnly="true"/></div></th>
+                 	<td><c:out value="${KualiForm.document.developmentProposalList[0].s2sOpportunity.s2sProvider.description}"/>&nbsp;</td>
 
                 </tbody>
                 </table>        

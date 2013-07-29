@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package org.kuali.kra.budget.web.struts.action;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -129,37 +130,9 @@ public class BudgetExpensesAction extends BudgetAction {
 //            if(CollectionUtils.isNotEmpty(budgetPeriods)) {
 //                budgetPeriod = budgetPeriods.get(0);
 //            }
-            
-            BudgetCategory newBudgetCategory = new BudgetCategory();
-            newBudgetCategory.setBudgetCategoryTypeCode(getSelectedBudgetCategoryType(request));
-            newBudgetCategory.refreshNonUpdateableReferences();
-            newBudgetLineItem.setBudgetPeriod(budgetPeriod.getBudgetPeriod());
-            newBudgetLineItem.setBudgetPeriodId(budgetPeriod.getBudgetPeriodId());
-            newBudgetLineItem.setBudgetCategory(newBudgetCategory);
-            newBudgetLineItem.setStartDate(budget.getBudgetPeriod(budgetPeriod.getBudgetPeriod() - 1).getStartDate());
-            newBudgetLineItem.setEndDate(budget.getBudgetPeriod(budgetPeriod.getBudgetPeriod() - 1).getEndDate());
-            newBudgetLineItem.setBudgetId(budget.getBudgetId());
-            newBudgetLineItem.setLineItemNumber(budgetDocument.getHackedDocumentNextValue(Constants.BUDGET_LINEITEM_NUMBER));
-            newBudgetLineItem.setApplyInRateFlag(true);
-            newBudgetLineItem.setSubmitCostSharingFlag(budget.getSubmitCostSharingFlag());
-            newBudgetLineItem.refreshReferenceObject("costElementBO");
-            
-            // on/off campus flag enhancement
-            String onOffCampusFlag = budget.getOnOffCampusFlag();
-            if (onOffCampusFlag.equalsIgnoreCase(Constants.DEFALUT_CAMUS_FLAG)) {
-                newBudgetLineItem.setOnOffCampusFlag(newBudgetLineItem.getCostElementBO().getOnOffCampusFlag()); 
-            } else {
-                newBudgetLineItem.setOnOffCampusFlag(onOffCampusFlag.equalsIgnoreCase(Constants.ON_CAMUS_FLAG));                 
-            }
-            newBudgetLineItem.setBudgetCategoryCode(newBudgetLineItem.getCostElementBO().getBudgetCategoryCode());
-            newBudgetLineItem.setLineItemSequence(newBudgetLineItem.getLineItemNumber());
-            if(isBudgetFormulatedCostEnabled()){
-                List<String> formulatedCostElements = getFormulatedCostElements();
-                if(formulatedCostElements.contains(newBudgetLineItem.getCostElement())){
-                    newBudgetLineItem.setFormulatedCostElementFlag(true);
-                }
-            }
-            budget.getBudgetPeriod(budgetPeriod.getBudgetPeriod() - 1).getBudgetLineItems().add(newBudgetLineItem);            
+
+            budgetService.populateNewBudgetLineItem(newBudgetLineItem, budgetPeriod);
+            budgetPeriod.getBudgetLineItems().add(newBudgetLineItem);            
             
             getCalculationService().populateCalculatedAmount(budget, newBudgetLineItem);
             recalculateBudgetPeriod(budgetForm,budget, budget.getBudgetPeriod(budgetPeriod.getBudgetPeriod() - 1));
@@ -375,7 +348,12 @@ public class BudgetExpensesAction extends BudgetAction {
             throws Exception {
         BudgetForm budgetForm = (BudgetForm) form;
         Budget budget = budgetForm.getBudgetDocument().getBudget();
-        List<String> formulatedCostElements = getFormulatedCostElements();
+        List<String> formulatedCostElements = null;
+        if (isBudgetFormulatedCostEnabled()) {
+            formulatedCostElements = getFormulatedCostElements();
+        } else {
+            formulatedCostElements = new ArrayList<String>();
+        }
         int budgetPeriodIndex = -1;
         for(BudgetPeriod budgetPeriod:budget.getBudgetPeriods()){
             ++budgetPeriodIndex;

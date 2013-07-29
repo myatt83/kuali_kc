@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 1.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ public interface S2SService {
 	 *         opportunities for the corresponding parameters.
 	 * @throws S2SException
 	 */
-	public List<S2sOpportunity> searchOpportunity(String cfdaNumber,
+	public List<S2sOpportunity> searchOpportunity(String providerCode, String cfdaNumber,
 			String opportunityId, String competitionId) throws S2SException;
 
 	/**

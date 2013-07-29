@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@ import org.kuali.kra.iacuc.actions.IacucProtocolActionBean;
 import org.kuali.kra.iacuc.actions.reviewcomments.IacucReviewAttachmentsBean;
 import org.kuali.kra.iacuc.actions.reviewcomments.IacucReviewCommentsBean;
 import org.kuali.kra.protocol.actions.genericactions.ProtocolGenericActionBean;
-import org.kuali.kra.protocol.actions.reviewcomments.ReviewAttachmentsBean;
-import org.kuali.kra.protocol.actions.reviewcomments.ReviewCommentsBean;
+import org.kuali.kra.protocol.actions.reviewcomments.ReviewAttachmentsBeanBase;
+import org.kuali.kra.protocol.actions.reviewcomments.ReviewCommentsBeanBase;
 
 /**
  * This class is really just a "form" for generic actions.
@@ -37,8 +37,8 @@ public class IacucProtocolGenericActionBean extends IacucProtocolActionBean impl
     
     private String errorPropertyKey;
     
-    private ReviewCommentsBean reviewCommentsBean;
-    private ReviewAttachmentsBean reviewAttachmentsBean;
+    private ReviewCommentsBeanBase reviewCommentsBean;
+    private ReviewAttachmentsBeanBase reviewAttachmentsBean;
     
     /**
      * Constructs a ProtocolGenericActionBean.
@@ -72,15 +72,15 @@ public class IacucProtocolGenericActionBean extends IacucProtocolActionBean impl
         return errorPropertyKey;
     }
 
-    public ReviewCommentsBean getReviewCommentsBean() {
+    public ReviewCommentsBeanBase getReviewCommentsBean() {
         return reviewCommentsBean;
     }
 
-    public ReviewAttachmentsBean getReviewAttachmentsBean() {
+    public ReviewAttachmentsBeanBase getReviewAttachmentsBean() {
         return reviewAttachmentsBean;
     }
 
-    public void setReviewAttachmentsBean(ReviewAttachmentsBean reviewAttachmentsBean) {
+    public void setReviewAttachmentsBean(ReviewAttachmentsBeanBase reviewAttachmentsBean) {
         this.reviewAttachmentsBean = reviewAttachmentsBean;
     }
     

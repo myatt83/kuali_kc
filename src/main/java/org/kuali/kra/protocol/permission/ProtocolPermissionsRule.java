@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import org.kuali.kra.infrastructure.RoleConstants;
 
 /**
  * Business Rule to determine the legality of modifying the access
- * to a Protocol Document.
+ * to a ProtocolBase Document.
  * 
  * @author Kuali Research Administration Team (kualidev@oncourse.iu.edu)
  */

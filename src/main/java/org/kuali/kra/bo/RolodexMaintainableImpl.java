@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,9 @@ public class RolodexMaintainableImpl extends KraMaintainableImpl {
     public static final String AUTO_GEN_ROLODEX_ID_PARM = "AUTO_GENERATE_NON_EMPLOYEE_ID";
     public static final String SECTION_ID = "Edit Address Book";
     public static final String ROLODEX_ID_NAME = "rolodexId";
-    
+    public static final String ORGANIZATION = "organization";
+    private static final String YES = "Y";
+    private static final String NO = "N";
     
     private transient ParameterService parameterService;
     private transient SequenceAccessorService sequenceAccessorService;
@@ -73,6 +75,7 @@ public class RolodexMaintainableImpl extends KraMaintainableImpl {
     }
     
     protected void disableRolodexId(List<Section> sections) {
+        Rolodex rolodex = (Rolodex) getBusinessObject();
         for (Section section : sections) {
             if (StringUtils.equals(section.getSectionId(), SECTION_ID)) {
                 for (Row row : section.getRows()) {
@@ -118,5 +121,18 @@ public class RolodexMaintainableImpl extends KraMaintainableImpl {
     public void setSequenceAccessorService(SequenceAccessorService sequenceAccessorService) {
         this.sequenceAccessorService = sequenceAccessorService;
     }
-
+    
+    @Override
+    public void prepareForSave() {
+        super.prepareForSave();
+        Rolodex rolodex = (Rolodex) getBusinessObject();
+        if(rolodex != null) {
+            if(rolodex.getIsSponsorAddress() != null && rolodex.getIsSponsorAddress().equalsIgnoreCase(YES)) {
+                rolodex.setSponsorAddressFlag(true);
+            }else if(rolodex.getIsSponsorAddress() != null && rolodex.getIsSponsorAddress().equalsIgnoreCase(NO)) {
+                rolodex.setSponsorAddressFlag(false);
+            }
+        }
+    }
+    
 }

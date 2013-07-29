@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  *
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -88,7 +88,7 @@ public class TimeAndMoneyDocumentRule extends ResearchDocumentRuleBase implement
     
     /**
      * 
-     * This method reports a warning when a change occured that might change report tracking.
+     * This method reports a warning when a change occurred that might change report tracking.
      * @param document
      */
     protected void reportAwardReportTrackingError(Document document) {

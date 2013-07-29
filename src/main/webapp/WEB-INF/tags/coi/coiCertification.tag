@@ -12,6 +12,8 @@
 <c:set var="submitThankyouStatement" value="${KualiForm.document.coiDisclosureList[0].submitThankyouStatement}" />
 <c:set var="viewCertificationAuth" value="${KualiForm.disclosureHelper.canViewDisclosureCertification}" />
 <c:set var="certifyCertificationAuth" value="${KualiForm.disclosureHelper.canCertifyDisclosure}" />
+<c:set var="disclosureHelper" value="${KualiForm.disclosureHelper}" />
+
 <c:if test="${topTab == true}">
 	<%--instead of using kul:tabTop tag just define the workarea div - this gets around an unbalanced tag problem when using conditional tags --%>
 	<div id="workarea">
@@ -129,7 +131,7 @@
 															// trigger
 															$j("#certSubmit").click(
 																function() {
-																	alert("${submitThankyouStatement}");
+<%-- we don't really need this...											alert("${submitThankyouStatement}");   --%>
 																	$j("#certSubmit").hide(0);
 																	$j("#certCheckbox").attr("disabled", true);
 																}
@@ -142,7 +144,7 @@
                     	                <td id="certPrint" style="border:none; background:none; text-align:center;" rowspan="2">
 											<html:image property="methodToCall.printDisclosureCertification"
 													    src="${ConfigProperties.kra.externalizable.images.url}tinybutton-print.gif" 
-														title="Print Approved Disclosure" alt="Print Approved Disclosure" 
+														title="Print Disclosure" alt="Print Disclosure" 
 														styleClass="tinybutton"  onclick="excludeSubmitRestriction = true;"/>
 	                                    </td>
                                     </c:if>

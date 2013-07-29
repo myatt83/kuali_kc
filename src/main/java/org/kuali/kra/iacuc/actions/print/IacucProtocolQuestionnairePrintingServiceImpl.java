@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,34 @@
 package org.kuali.kra.iacuc.actions.print;
 
 import org.kuali.kra.bo.CoeusModule;
-import org.kuali.kra.protocol.actions.print.ProtocolQuestionnairePrintingServiceImpl;
+import org.kuali.kra.iacuc.IacucProtocol;
+import org.kuali.kra.iacuc.actions.IacucProtocolAction;
+import org.kuali.kra.iacuc.actions.submit.IacucProtocolSubmission;
+import org.kuali.kra.protocol.ProtocolBase;
+import org.kuali.kra.protocol.actions.ProtocolActionBase;
+import org.kuali.kra.protocol.actions.print.ProtocolQuestionnairePrintingServiceImplBase;
+import org.kuali.kra.protocol.actions.submit.ProtocolSubmissionBase;
 
-public class IacucProtocolQuestionnairePrintingServiceImpl extends ProtocolQuestionnairePrintingServiceImpl implements IacucProtocolQuestionnairePrintingService{
+public class IacucProtocolQuestionnairePrintingServiceImpl extends ProtocolQuestionnairePrintingServiceImplBase implements IacucProtocolQuestionnairePrintingService{
 
     @Override
     protected String getCoeusModuleCode() {
         return CoeusModule.IACUC_PROTOCOL_MODULE_CODE;
+    }
+
+    @Override
+    protected Class<? extends ProtocolSubmissionBase> getProtocolSubmissionBOClassHook() {
+        return IacucProtocolSubmission.class;
+    }
+
+    @Override
+    protected Class<? extends ProtocolActionBase> getProtocolActionBOClassHook() {
+        return IacucProtocolAction.class;
+    }
+
+    @Override
+    protected Class<? extends ProtocolBase> getProtocolBOClassHook() {
+        return IacucProtocol.class;
     }
 
 }

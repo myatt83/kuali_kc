@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,10 @@
 package org.kuali.kra.iacuc.onlinereview;
 
 import org.kuali.kra.iacuc.IacucProtocol;
-import org.kuali.kra.protocol.onlinereview.ProtocolOnlineReviewRedirectAction;
+import org.kuali.kra.protocol.onlinereview.ProtocolOnlineReviewRedirectActionBase;
 import org.kuali.kra.protocol.onlinereview.ProtocolOnlineReviewService;
 
-public class IacucProtocolOnlineReviewRedirectAction extends ProtocolOnlineReviewRedirectAction{
+public class IacucProtocolOnlineReviewRedirectAction extends ProtocolOnlineReviewRedirectActionBase{
 
     protected Class<IacucProtocol> getProtocolClass() {
         return IacucProtocol.class;
@@ -28,8 +28,16 @@ public class IacucProtocolOnlineReviewRedirectAction extends ProtocolOnlineRevie
     protected String getAdminRoleName() {
         return "IACUC Administrator";
     }
-    protected Class<IacucProtocolOnlineReviewService> getOlrClass() {
+
+    @Override
+    protected Class<? extends ProtocolOnlineReviewService> getProtocolOnlineReviewServiceClassHook() {
         return IacucProtocolOnlineReviewService.class;
     }
+
+    @Override
+    protected String getProtocolOnlineReviewActionIdHook() {
+        return "iacucProtocolOnlineReview";
+    }
+  
 
 }

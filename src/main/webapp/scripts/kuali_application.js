@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,145 @@
  * limitations under the License.
  */
 
+if (!Function.prototype.bind) {
+  Function.prototype.bind = function (oThis) {
+    if (typeof this !== "function") {
+      // closest thing possible to the ECMAScript 5 internal IsCallable function
+      throw new TypeError("Function.prototype.bind - what is trying to be bound is not callable");
+    }
+ 
+    var aArgs = Array.prototype.slice.call(arguments, 1), 
+        fToBind = this, 
+        fNOP = function () {},
+        fBound = function () {
+          return fToBind.apply(this instanceof fNOP && oThis
+                                 ? this
+                                 : oThis,
+                               aArgs.concat(Array.prototype.slice.call(arguments)));
+        };
+ 
+    fNOP.prototype = this.prototype;
+    fBound.prototype = new fNOP();
+ 
+    return fBound;
+  };
+}
 
+//override callHandler to support WarningOnAddRow functionality for date pickers
+Calendar.prototype.callHandler = function () {
+	if (this.onSelected) {
+		this.onSelected(this, this.date.print(this.dateFormat));
+	}
+	jQuery(this.params.inputField).trigger('change');
+};
 
 //Fix rice ids for use with jquery
 //Takes an id and escapes the . : ] and [ and adds #
 function jq_escape(myid) { 
   return '#' + myid.replace(/(:|\.|\[|\])/g,'\\$1');
+}
+
+
+var jq = jQuery.noConflict();
+jq(document).ready(function() {
+    createLoading(false);
+});
+
+
+var formHasAlreadyBeenSubmitted = false;
+var excludeSubmitRestriction = false;
+window.hasFormAlreadyBeenSubmitted = function(){
+	try {
+		// save the current scroll position
+		saveScrollPosition();
+	} catch ( ex ) {
+		// do nothing - don't want to stop submit
+	}
+
+    createLoading(true);
+    if (excludeSubmitRestriction) {
+        timeout = setTimeout(function() {
+ 	      excludeSubmitRestriction = false;
+          createLoading(false);
+        }, 500);
+    }
+}
+
+
+/**
+ * Uses jQuery plug-in to show a loading notification for a page request. See
+ * <link>http://plugins.jquery.com/project/showLoading</link> for documentation
+ * on options.
+ *
+ * @param showLoading -
+ *          boolean that indicates whether the loading indicator should be shown
+ *          (true) or hidden (false)
+ */
+function createLoading(showLoading) {
+	//var jq = jQuery.noConflict();
+    var processingMessage = '<h1><img src="' + "krad/images/" + 'loading.gif" alt="working..." />Page is being processed by the server....</h1>';
+    
+        if (showLoading) {
+            getContext().blockUI({message: processingMessage});
+        }
+        else {
+            getContext().unblockUI();
+        }
+}
+
+/**
+ * Get the current context
+ *
+ * @returns the jQuery context that can be used to perform actions that must be global to the entire page
+ * ie, showing lightBoxes and growls etc
+ */
+function getContext(){
+    if (usePortalForContext()) {
+        return top.jQuery;
+    }
+    else {
+        return jq;
+    }
+}
+function generateInputParams(reportSelect) {	
+	
+	var reportId = dwr.util.getValue(reportSelect);
+	var reportLabel = reportSelect.options[reportSelect.selectedIndex].text;
+	if(reportId > 0) {
+	document.forms[0].action=extractUrlBase()+ "/reporting.do?methodToCall=getReportParametersFromDesign&reportId="+reportId+"&reportLabel="+reportLabel;
+	document.forms[0].submit();
+	}
+}
+
+function resetBirtSelectDiv() {
+	document.getElementById("custReportDetails.reportLabelDisplay").selectedIndex =0;
+	
+}
+
+/**
+ * Check if portal should be used for context
+ *
+ * <p>
+ * To avoid cross server script errors the local context is used in case the portal window is on a different host.
+ * </p>
+ *
+ * @return true if portal is used for context, false otherwise
+ */
+function usePortalForContext() {
+    var usePortal = false;
+
+    // for iframe use the outer window's context unless the outer window is hosted on a different domain.
+    try {
+        // For security reasons the browsers will not allow cross server scripts and
+        // throw an exception instead.
+        // Note that bad browsers (e.g. google chrome) will not catch the exception
+        usePortal = (top != self) && (top.location.host == location.host);
+    }
+    catch (e) {
+        usePortal = false;
+    }
+
+    return usePortal;
 }
 
 
@@ -1260,7 +1393,13 @@ function loadContactPersonName(usernameFieldName, fullnameElementId,
 			var dwrReply = {
 					callback:function(data) {
 						if ( data != null ) {							
-							fullNameElement.innerHTML = data.fullName;
+						    if ( data.fullName != null ) {
+							    fullNameElement.innerHTML = "&nbsp;&nbsp;" + data.fullName;
+							} else if (data.organization == undefined) {
+							    fullNameElement.innerHTML = wrapError( "not found" );
+							} else {
+							    fullNameElement.innerHTML = "&nbsp;&nbsp;" + data.organization;
+							}
 							rolodexIdElement.value = data.rolodexId;
 							
 						} else {							
@@ -1467,7 +1606,97 @@ function updateLookupReturn_Callback( data ) {
 			 }
 
 }
- 
+
+function getURLParameters(paramName) 
+{
+        var sURL = top.window.location.href.toString();  
+    if (sURL.indexOf("?") > 0)
+    {
+       var arrParams = sURL.split("?");         
+       var arrURLParams = arrParams[1].split("&");      
+       var arrParamNames = new Array(arrURLParams.length);
+       var arrParamValues = new Array(arrURLParams.length);     
+       var i = 0;
+       for (i=0;i<arrURLParams.length;i++)
+       {
+        var sParam =  arrURLParams[i].split("=");
+        arrParamNames[i] = sParam[0];
+        if (sParam[1] != "")
+            arrParamValues[i] = unescape(sParam[1]);
+        else
+            arrParamValues[i] = "No Value";
+       }
+
+       for (i=0;i<arrURLParams.length;i++)
+       {
+                if(arrParamNames[i] == paramName){
+                return arrParamValues[i];
+             }
+       }
+       return "No Parameters Found";
+    }
+
+}
+
+function lookupUrl()
+{
+  return getURLParameters("channelUrl");
+}
+
+function refreshAddressBookLookup() {
+		var sponsorFlagValue = "";
+		var issponsorAddressValue = "";
+		jQuery("input[id='document.newMaintainableObject.organization']").attr("readonly",true);
+		jQuery("input[id='document.newMaintainableObject.organization']").css("background-color","#EFEFE9");
+		if(document.getElementById('document.newMaintainableObject.isSponsorAddress')) {
+			sponsorFlagValue = document.getElementById('document.newMaintainableObject.isSponsorAddress').value;	
+			if(sponsorFlagValue == 'Y') {
+				jQuery("input[id='document.newMaintainableObject.organization']").parent().children('input:image').remove();
+				jQuery("input[id='document.newMaintainableObject.organization']").parent().append("<input type='image' tabindex='1000000' name='methodToCall.performLookup.(!!org.kuali.kra.bo.Sponsor!!).(((sponsorCode:document.newMaintainableObject.sponsorCode,))).((`document.newMaintainableObject.sponsorCode:sponsorCode,`)).((&lt;&gt;)).(([])).((**)).((^^)).((&amp;&amp;)).((//)).((~~)).(::::;"+lookupUrl()+";::::).anchor4' src='../kr/static/images/searchicon.gif' border='0' class='tinybutton' valign='middle' alt='Search Organization' title='Search Organization'>");
+			} else if(sponsorFlagValue == 'N') {
+				jQuery("input[id='document.newMaintainableObject.organization']").parent().children('input:image').remove();
+				jQuery("input[id='document.newMaintainableObject.organization']").parent().append("<input type='image' tabindex='1000000' name='methodToCall.performLookup.(!!org.kuali.kra.bo.Organization!!).(((organizationId:document.newMaintainableObject.organization,))).((`document.newMaintainableObject.organization:organizationId,`)).((&lt;&gt;)).(([])).((**)).((^^)).((&amp;&amp;)).((//)).((~~)).(::::;"+lookupUrl()+";::::).anchor4' src='../kr/static/images/searchicon.gif' border='0' class='tinybutton' valign='middle' alt='Search Organization' title='Search Organization'>");
+			}
+		}
+
+		if(document.getElementById('isSponsorAddress')) {
+			issponsorAddressValue = document.getElementById('isSponsorAddress').value;
+			if(issponsorAddressValue == 'Y') {
+				jQuery("input[id='organization']").parent().children('input:image').remove();
+				jQuery("input[id='organization']").parent().append("<input type='image' tabindex='1000000' name='methodToCall.performLookup.(!!org.kuali.kra.bo.Sponsor!!).(((sponsorName:organization))).((`organization:sponsorName`)).((&lt;&gt;)).(([])).((**)).((^^)).((&amp;&amp;)).((//)).((~~)).(::::;"+lookupUrl()+";::::).anchor' src='../kr/static/images/searchicon.gif' border='0' class='tinybutton' valign='middle' alt='Search Organization' title='Search Organization'>");
+			} else if(issponsorAddressValue == 'N') {
+				jQuery("input[id='organization']").parent().children('input:image').remove();
+				jQuery("input[id='organization']").parent().append("<input type='image' tabindex='1000000' name='methodToCall.performLookup.(!!org.kuali.kra.bo.Organization!!).(((organizationName:organization))).((`organization:organizationName`)).((&lt;&gt;)).(([])).((**)).((^^)).((&amp;&amp;)).((//)).((~~)).(::::;"+lookupUrl()+";::::).anchor' src='../kr/static/images/searchicon.gif' border='0' class='tinybutton' valign='middle' alt='Search Organization' title='Search Organization'>");
+			}
+		}
+			
+	}
+	 function updateOrganizationLookupReturn(lookupClassField) {
+		 if(lookupClassField.value == "N") {
+			 lookupOrganization();
+		 } else if(lookupClassField.value == "Y") {
+			lookupSponsor();
+		 }
+	 }
+	 
+	function lookupOrganization(){
+		jQuery("input[id='organization']").parent().children('input:image').remove();
+		jQuery("input[id='organization']").parent().append("<input type='image' tabindex='1000000' name='methodToCall.performLookup.(!!org.kuali.kra.bo.Organization!!).(((organizationName:organization))).((`organization:organizationName`)).((&lt;&gt;)).(([])).((**)).((^^)).((&amp;&amp;)).((//)).((~~)).(::::;"+lookupUrl()+";::::).anchor' src='../kr/static/images/searchicon.gif' border='0' class='tinybutton' valign='middle' alt='Search Organization' title='Search Organization'>");
+		
+		
+		jQuery("input[id='document.newMaintainableObject.organization']").parent().children('input:image').remove();
+		jQuery("input[id='document.newMaintainableObject.organization']").parent().append("<input type='image' tabindex='1000000' name='methodToCall.performLookup.(!!org.kuali.kra.bo.Organization!!).(((organizationId:document.newMaintainableObject.organization,))).((`document.newMaintainableObject.organization:organizationId,`)).((&lt;&gt;)).(([])).((**)).((^^)).((&amp;&amp;)).((//)).((~~)).(::::;"+lookupUrl()+";::::).anchor4' src='../kr/static/images/searchicon.gif' border='0' class='tinybutton' valign='middle' alt='Search Organization' title='Search Organization'>");
+	}
+
+	function lookupSponsor() {
+		jQuery("input[id='organization']").parent().children('input:image').remove();
+		jQuery("input[id='organization']").parent().append("<input type='image' tabindex='1000000' name='methodToCall.performLookup.(!!org.kuali.kra.bo.Sponsor!!).(((sponsorName:organization))).((`organization:sponsorName`)).((&lt;&gt;)).(([])).((**)).((^^)).((&amp;&amp;)).((//)).((~~)).(::::;"+lookupUrl()+";::::).anchor' src='../kr/static/images/searchicon.gif' border='0' class='tinybutton' valign='middle' alt='Search Organization' title='Search Organization'>");
+		
+		
+		jQuery("input[id='document.newMaintainableObject.organization']").parent().children('input:image').remove();
+		jQuery("input[id='document.newMaintainableObject.organization']").parent().append("<input type='image' tabindex='1000000' name='methodToCall.performLookup.(!!org.kuali.kra.bo.Sponsor!!).(((sponsorCode:document.newMaintainableObject.sponsorCode,))).((`document.newMaintainableObject.sponsorCode:sponsorCode,`)).((&lt;&gt;)).(([])).((**)).((^^)).((&amp;&amp;)).((//)).((~~)).(::::;"+lookupUrl()+";::::).anchor4' src='../kr/static/images/searchicon.gif' border='0' class='tinybutton' valign='middle' alt='Search Organization' title='Search Organization'>");
+	}
+
 var oldDisplayValue;
 var displayValue;
 var dataType;
@@ -2035,7 +2264,7 @@ function unselectAllBudgetForms(document) {
 // CustomAttributeService.getLookupReturnsForAjaxCall = function(p0, callback) { DWREngine._execute(CustomAttributeService._path, 'CustomAttributeService', 'getLookupReturnsForAjaxCall', p0, callback); } 
 
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -2517,9 +2746,10 @@ function displayReviewers(protocolId) {
 	
     var committeeId = dwr.util.getValue('actionHelper.protocolSubmitAction.committeeId');
     var scheduleId = dwr.util.getValue('actionHelper.protocolSubmitAction.scheduleId');
-	var docFormKey = dwr.util.getValue( "docFormKey" );
+    var protocolReviewTypeCode = dwr.util.getValue('actionHelper.protocolSubmitAction.protocolReviewTypeCode');
     
-    if (scheduleId == "select") {
+    // we suppress the reviewer display if a committee is not selected, or if a schedule is not selected in case of a non-expedited review type
+    if ( ((scheduleId === "") && (protocolReviewTypeCode != '2')) || (committeeId === "") ) {
     	document.getElementById("reviewers").style.display = 'none';
     }
     else {
@@ -2533,7 +2763,7 @@ function displayReviewers(protocolId) {
 				window.status = errorMessage;
 			}
 		};
-		ProtocolActionAjaxService.getReviewers(protocolId, committeeId, scheduleId,docFormKey, dwrReplyReviewers);
+		ProtocolActionAjaxService.getReviewers(protocolId, committeeId, scheduleId, dwrReplyReviewers);
 	}
 }
 
@@ -2927,10 +3157,12 @@ function resetGrpNameTextbox() {
 }
 
 function previousPeriodSet() {
+	document.forms[0].methodToCall.value = "previousPeriodSet";
 	document.forms[0].submit();
 }
 
 function nextPeriodSet() {
+	document.forms[0].methodToCall.value = "nextPeriodSet";
 	document.forms[0].submit();
 }
 
@@ -3278,41 +3510,6 @@ function ajaxLoad(methodToCall, codeField, fieldToUpdate) {
     return false;
 }
 
-/**
- * Display the Protocol link and make the fields read-only if the special review type is Human Subjects
- */
-
-function showHideSpecialReviewProtocolLink(specialReviewTypeCode, idPrefix, canCreateIrbProtocol, canCreateIacucProtocol, enableIrbProtocolLinking, enableIacucProtocolLinking) {
-	var readOnly = ( specialReviewTypeCode.value == '1' || specialReviewTypeCode.value == '2');
-	if (specialReviewTypeCode.value == '1' &&  canCreateIrbProtocol == 'true' ) {
-		changeObjectVisibility(idPrefix + ".startprotocol.image.div", "inline");
-	}
-	else if (specialReviewTypeCode.value == '2' && canCreateIacucProtocol == 'true' ) {
-		changeObjectVisibility(idPrefix + ".startprotocol.image.div", "inline");
-	}
-	else
-	{
-		changeObjectVisibility(idPrefix + ".startprotocol.image.div", "none"); 	
-	}
-	if (specialReviewTypeCode.value == '1' &&  enableIrbProtocolLinking == 'true' ) {
-		changeObjectVisibility(idPrefix + ".protocolNumber.irb.link.div", "inline");
-		changeObjectVisibility(idPrefix + ".protocolNumber.iacuc.link.div", "none");
-		enableDisableReadOnlyDynamicHtmlControl(true, new Array(idPrefix + ".approvalTypeCode", idPrefix + ".applicationDate", idPrefix + ".approvalDate", idPrefix + ".expirationDate", idPrefix + ".exemptionTypeCodes"));
-	}
-	else if (specialReviewTypeCode.value == '2' && enableIacucProtocolLinking == 'true' ) {
-		changeObjectVisibility(idPrefix + ".protocolNumber.irb.link.div", "none"); 
-		changeObjectVisibility(idPrefix + ".protocolNumber.iacuc.link.div", "inline");
-		enableDisableReadOnlyDynamicHtmlControl(true, new Array(idPrefix + ".approvalTypeCode", idPrefix + ".applicationDate", idPrefix + ".approvalDate", idPrefix + ".expirationDate", idPrefix + ".exemptionTypeCodes"));
-	}
-	else
-	{
-		changeObjectVisibility(idPrefix + ".protocolNumber.irb.link.div", "none"); 
-		changeObjectVisibility(idPrefix + ".protocolNumber.iacuc.link.div", "none");
-		enableDisableReadOnlyDynamicHtmlControl(false, new Array(idPrefix + ".approvalTypeCode", idPrefix + ".applicationDate", idPrefix + ".approvalDate", idPrefix + ".expirationDate", idPrefix + ".exemptionTypeCodes"));
-
-	}
-}
-
 function enableDisableReadOnlyDynamicHtmlControl(readOnly, ids) {
 	if (readOnly) {
 		for (var i = 0; i < ids.length; i++) {
@@ -3521,7 +3718,7 @@ function proposalDevelopmentPersonCertificationPop(personIndex,docFormKey,sessio
 		
 		propDevPersonCertificationWindow.focus();
 	}else {
-		propDevPersonCertificationWindow = window.open(extractUrlBase()+ "/proposalDevelopment.do?methodToCall=getProposalPersonCertification&personIndex="+personIndex+"&docFormKey="+docFormKey+"&documentWebScope="+documentWebScope, "mywindow", "width=800, height=300, scrollbars=yes");
+		propDevPersonCertificationWindow = window.open(extractUrlBase()+ "/proposalDevelopment.do?methodToCall=getProposalPersonCertification&personIndex="+personIndex+"&docFormKey="+docFormKey+"&documentWebScope="+documentWebScope, "mywindow", "width=900, height=500, scrollbars=yes");
 	}
 }
 
@@ -3619,3 +3816,142 @@ function loadUnitFormulatedCost(unitNumber, propertyFieldName ) {
 		BudgetRatesService.getUnitFormulatedCost(unitNumber, formulatesTypeCode ,dwrReply);
 	}
 }
+
+//properties is a hash map of the form {id : description, ....}
+//for example {'newAttachment.fileName' : 'File Name'}
+//each property specified is checked to make sure the value is not null and if it is null,
+//the error icon is added as well as "Errors in this section" for it.
+function requirePropertiesOnAdd(properties) {
+	jQuery('.addedByRequireOnAdd').remove();
+	var success = true;
+	for (var id in properties) {
+		var item = jQuery(jq_escape(id));
+		if (item.val().length <= 0) {
+			item.after(jQuery('<img class="addedByRequireOnAdd" alt="error" src="kr/static/images/errormark.gif"/>'));
+			addErrorForItem(item, properties[id] + " is required");
+			success = false;
+		}
+	}
+	return success;
+}
+
+function addErrorForItem(item, errorMsg) {
+	var tab = jQuery(item).parents('div.tab-container').parent();
+	var lastErrorMessage = jQuery(tab).find('div.tab-container-error div.left-errmsg-tab div div').last();
+	if (lastErrorMessage.length == 0) {
+		var errorContainer = jQuery('<div class="tab-container-error addedByRequireOnAdd"/>').html('<div class="left-errmsg-tab"><div><img alt="error" src="kr/static/images/errormark.gif"><strong>Errors found in this Section:</strong></div></div>');
+		tab.children().first().before(errorContainer);
+		lastErrorMessage = errorContainer.find('strong');
+	}
+	lastErrorMessage.after('<div style="display:list-item;margin-left:20px;" class="addedByRequireOnAdd">' + errorMsg + '</div>');
+}
+
+var WarningOnAddRow = (function($) {
+	return {
+		emptyValues: [' ', '0.00', '(new group)'],
+		inputs: '.addline input, .addline select, .addline textarea',
+		elementsToIgnore: ['input[name="multiSelectToReset"]', 'input[name^="document.budget.budgetCategoryType["]'],
+		asterisk: $('<img class="changedNotice changedAsterisk" src="static/images/asterisk_orange.png"/>'),
+		resetBtn: $('<img class="changedNotice changedResetBtn" src="static/images/tinybutton-reset1.gif"/>'),
+		pageNotice: $('<div class="changedNotice changedPageNotice">Unsaved changes will be lost.</div>'),
+		init: function() {
+			this.checkModification = this.checkModification.bind(this);
+			this.valueChanged = this.valueChanged.bind(this);
+			this.rowChanged = this.rowChanged.bind(this);
+			this.resetRow = this.resetRow.bind(this);
+			this.panelChanged = this.panelChanged.bind(this);
+			this.pageChanged = this.pageChanged.bind(this);
+			this.recursePanelChanged = this.recursePanelChanged.bind(this);
+			this.isEmptyValue = this.isEmptyValue.bind(this);
+			//if the page reloads and there is input in the add line then mark it as such, then after monitor for changes.
+			$(this.inputs).each(this.checkModification);
+			$(this.inputs).change(this.valueChanged);
+			$(this.inputs).keyup(this.valueChanged);
+			refreshAddressBookLookup();
+		},
+		isEmptyValue : function(value) {
+			for (var i = 0; i < this.emptyValues.length; i++) {
+				if (this.emptyValues[i] === value) {
+					return true;
+				}
+			}
+			return false;
+		},
+		checkModification : function(idx, element) {
+			var addLine = $(element).parents('.addline').first();
+			if ($(element).val() != undefined && $(element).val().length > 0 && !this.isEmptyValue($(element).val())
+					&& !this.isIgnoredElement(element)) {
+				$(element).addClass('changed');
+			} else {
+				$(element).removeClass('changed');
+			}
+			this.rowChanged($(element).parents('.addline').first());
+		},
+		valueChanged: function(event) {
+			var element = event.target;
+			this.checkModification(0, element);
+		},
+		rowChanged: function(row) {
+			if ($(row).find('input.changed, select.changed, textarea.changed').length > 0) {
+				if (!$(row).is('.changedRow')) {
+					$(row).addClass('changedRow');
+					$(row).find('.addButton').before(this.asterisk.clone());
+					$(row).find('.addButton').after(this.resetBtn.clone());
+					$(row).find('.changedResetBtn').click(this.resetRow);
+				}
+			} else {
+				$(row).removeClass('changedRow');
+				$(row).find('.changedNotice').remove();
+			}
+			this.panelChanged($(row).parents('div[id^="tab-"]').first());
+		},
+		panelChanged: function(panelDiv) {
+			this.recursePanelChanged(panelDiv);
+			this.pageChanged();
+		},
+		recursePanelChanged: function(panelDiv) {
+			if (typeof panelDiv !== "undefined" && panelDiv.length > 0) {
+				if ($(panelDiv).find(this.inputs).filter('.changed').length > 0) {
+					if (!$(panelDiv).is('.changed')) {
+						$(panelDiv).addClass('changed');
+						$(panelDiv).prev('table.tab').find('.tabtable1-left').append(this.asterisk.clone());
+						$(panelDiv).prev('.innerTab-head').append(this.asterisk.clone());
+					}
+				} else {
+					$(panelDiv).removeClass('changed');
+					$(panelDiv).prev('table.tab').find('.changedNotice').remove();
+					$(panelDiv).prev('.innerTab-head').find('.changedNotice').remove();
+				}
+				this.recursePanelChanged($(panelDiv).parents('div[id^="tab-"]').first());
+			}
+		},
+		pageChanged: function() {
+			if ($('#workarea').find(this.inputs).filter('.changed').length > 0) {
+				if (!$('#workarea').is('.changed')) {
+					$('#workarea').addClass('changed');
+					$('div.msg-excol div.left-errmsg').append(this.pageNotice.clone().prepend(this.asterisk.clone()));
+				} 
+			} else {
+					$('#workarea').removeClass('changed');
+					$('div.msg-excol div.left-errmsg').find('.changedNotice').remove();					
+			}
+		},
+		resetRow: function(event) {
+			var row = $(event.target).parents('.addline').first();
+			$(row).find('.changed').val('');
+			$(row).find('.changed option:selected').removeAttr('selected');
+			$(row).find('.changed').trigger('change');
+			$(row).find('.changedClearOnReset').html('');
+		},
+		isIgnoredElement: function(element) {
+			for (idx in this.elementsToIgnore) {
+				if ($(element).is(this.elementsToIgnore[idx])) {
+					return true;
+				}
+			}
+			return false;
+		}
+		
+	}
+}(jQuery));
+jQuery(document).ready(function() {WarningOnAddRow.init();});

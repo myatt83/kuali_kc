@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,12 +19,12 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.kuali.kra.authorization.ApplicationTask;
-import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.infrastructure.TaskName;
-import org.kuali.kra.irb.ProtocolDocument;
+import org.kuali.kra.protocol.protocol.funding.ProtocolFundingSourceBase;
 import org.kuali.kra.service.TaskAuthorizationService;
 import org.kuali.rice.krad.util.GlobalVariables;
+import org.kuali.rice.krad.util.ObjectUtils;
 import org.kuali.kra.irb.Protocol;
 import org.kuali.kra.irb.protocol.funding.ProtocolFundingSource;
 /**
@@ -53,8 +53,14 @@ public class CreateProposalDevelopmentProtocolAuthorizer extends ProtocolAuthori
         
     private boolean hasProposalRequiredFields(Protocol protocol)
     {
+        boolean isProtocolSaved = protocol.getProtocolDocument().getDocumentHeader().getWorkflowDocument().isSaved();
         boolean validProposalRequiredFields=true;
-             
+
+        if (!isProtocolSaved)
+        {
+            validProposalRequiredFields = false;
+        }
+        
         if (StringUtils.isEmpty(protocol.getTitle()))
         {
             validProposalRequiredFields = false;
@@ -68,13 +74,13 @@ public class CreateProposalDevelopmentProtocolAuthorizer extends ProtocolAuthori
             validProposalRequiredFields = false;
         }
         // find sponsor from funding source
-        List<ProtocolFundingSource> protocolFundingSources = protocol.getProtocolFundingSources();
+        List<ProtocolFundingSourceBase> protocolFundingSources = protocol.getProtocolFundingSources();
         ProtocolFundingSource sponsorProtocolFundingSource = null; 
-        for(ProtocolFundingSource protocolFundingSource : protocolFundingSources)
+        for(ProtocolFundingSourceBase protocolFundingSource : protocolFundingSources)
         {
             if ( protocolFundingSource.isSponsorFunding() )
             {
-                sponsorProtocolFundingSource = protocolFundingSource;
+                sponsorProtocolFundingSource = (ProtocolFundingSource) protocolFundingSource;
                 break;
             }
         }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,4 +25,6 @@ public class CoiActionType {
     //These numbers are arbitrary, just don't duplicate
     public static final String ASSIGN_REVIEWER = "205";
     public static final String CERTIFIED_EVENT = "214";
+    public static final String APPROVED_EVENT = "204";
+    public static final String DISAPPROVED_EVENT = "304";
 }

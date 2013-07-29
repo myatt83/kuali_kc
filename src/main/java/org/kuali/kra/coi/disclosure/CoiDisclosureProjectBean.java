@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -96,12 +96,11 @@ public class CoiDisclosureProjectBean implements Serializable {
 
 
     public String getProjectName() {
-        if (StringUtils.isEmpty(projectName) && !getCoiDisclosure().isAnnualEvent()) {
-            if (ObjectUtils.isNotNull(coiDisclProject)) {
-                projectName = coiDisclProject.getProjectName();
-            } 
+        if(getCoiDisclosure().isAnnualEvent() || getCoiDisclosure().isUpdateEvent()) {
+            return null;
+        }else {
+            return projectName;
         }
-        return projectName;
     }
 
 
@@ -120,12 +119,11 @@ public class CoiDisclosureProjectBean implements Serializable {
     }
 
     public String getProjectId() {
-        if (StringUtils.isEmpty(projectId)  && !getCoiDisclosure().isAnnualEvent()) {
-            if (ObjectUtils.isNotNull(coiDisclProject)) {
-                projectId = coiDisclProject.getProjectId();
-            }
+        if(getCoiDisclosure().isAnnualEvent() || getCoiDisclosure().isUpdateEvent()) {
+            return null;
+        }else {
+            return projectId;
         }
-        return projectId;
     }
 
 
@@ -190,10 +188,16 @@ public class CoiDisclosureProjectBean implements Serializable {
         this.projectQuestionnaireHelper = projectQuestionnaireHelper;
     }
     
-    public void populateAnswers(String originalDisclosureId) {
-        projectQuestionnaireHelper = new DisclProjectQuestionnaireHelper(coiDisclProject, coiDisclProject.getCoiDisclosure(), originalDisclosureId);
+    public void populateAnswers(CoiDisclosure originalDisclosure) {
+        projectQuestionnaireHelper = new DisclProjectQuestionnaireHelper(coiDisclProject, coiDisclProject.getCoiDisclosure(), originalDisclosure);
         projectQuestionnaireHelper.populateAnswers();
     }
+    
+    public void versionDisclosureAnswers(CoiDisclosure originalDisclosure) {
+        projectQuestionnaireHelper = new DisclProjectQuestionnaireHelper(coiDisclProject, coiDisclProject.getCoiDisclosure(), originalDisclosure);
+        projectQuestionnaireHelper.versionAnswers();
+    }
+    
     
     public List<AnswerHeader> getAnswerHeaders() {
         return this.getProjectQuestionnaireHelper().getAnswerHeaders();

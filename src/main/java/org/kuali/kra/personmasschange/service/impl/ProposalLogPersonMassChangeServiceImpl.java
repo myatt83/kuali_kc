@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,7 +75,7 @@ public class ProposalLogPersonMassChangeServiceImpl extends MassPersonChangeServ
                 Rolodex rolodex = getRolodexService().getRolodex(personMassChange.getReplacerRolodexId());
                 proposalLogChangeCandidate.setPiId(null);
                 proposalLogChangeCandidate.setRolodexId(rolodex.getRolodexId());
-                proposalLogChangeCandidate.setPiName(null);
+                proposalLogChangeCandidate.setPiName(rolodex.getFullName());
             }
 
             getBusinessObjectService().save(proposalLogChangeCandidate);

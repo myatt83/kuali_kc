@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -319,7 +319,6 @@ public class NegotiationDaoOjb extends LookupDaoOjb implements NegotiationDao {
      * @return
      */
     protected Collection<Negotiation> getNegotiationsLinkedToSubAward(Map<String, String> negotiationValues, Map<String, String> associatedValues) {
-        System.err.println("Got to getNegotiationsLinkedToSubAward ****************************** ");
         //List<Negotiation> result = new ArrayList<Negotiation>();
         
         Map<String, String> values = transformMap(associatedValues, subAwardTransform);

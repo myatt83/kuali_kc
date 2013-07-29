@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import java.util.Date;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.KeyConstants;
 import org.kuali.kra.proposaldevelopment.document.ProposalDevelopmentDocument;
 import org.kuali.rice.core.api.datetime.DateTimeService;
@@ -40,13 +41,8 @@ import org.springframework.scheduling.quartz.CronTriggerBean;
 public class KcCronTriggerBean extends CronTriggerBean {
 
     private static final Log LOG = LogFactory.getLog(KcCronTriggerBean.class);
-
-    /**
-     * Default Cron expression which is 1 AM every day.
-     */
-    private static final String DEFAULT_CRON_EXPRESSION = "0 0 1 * * ?";
     
-    private String defaultCronExpression = DEFAULT_CRON_EXPRESSION;
+    private String defaultCronExpression = Constants.DEFAULT_CRON_EXPRESSION;
     private String parameterNamespace;
     private String parameterComponent;
     private String cronExpressionParameterName = KeyConstants.PESSIMISTIC_LOCKING_CRON_EXPRESSION;
@@ -85,33 +81,44 @@ public class KcCronTriggerBean extends CronTriggerBean {
             if (param != null) {
                 return param;
             } 
-            LOG.warn("parameter [" + cronExpressionParameterName + "] not found using default value of [" + DEFAULT_CRON_EXPRESSION + "].");
+            LOG.warn("parameter [" + cronExpressionParameterName + "] not found using default value of [" + defaultCronExpression + "].");
     
         }
-        return DEFAULT_CRON_EXPRESSION;
+        return defaultCronExpression;
     }
     
+    /**
+     * If the trigger is disabled this will return a date 2 years in the future.
+     * If the parm doesn't exist or is empty will return today's date.
+     * If the parm does exist and has a parsable date in it, it will return that date.
+     * If the parm does exist but the value cannot be parsed a date 2 years in the future will be returned.
+     * @return
+     */
     protected Date getCronStartTime() {
-        Calendar today = dateTimeService.getCurrentCalendar();
-        today.add(Calendar.YEAR, 2);
-        Date cronStartTime = today.getTime();
+        Calendar yearInAdvance = dateTimeService.getCurrentCalendar();
+        yearInAdvance.add(Calendar.YEAR, 2);
+        Date disabledStartTime = yearInAdvance.getTime();
+        Date cronStartTime = dateTimeService.getCurrentDate();
         if (!isTriggerEnabled()) {
-            return cronStartTime;
-        } else if (StringUtils.isBlank(startTimeParameterName)) {
-            cronStartTime = dateTimeService.getCurrentDate();
-        } else {
+            return disabledStartTime;
+        } else if (!StringUtils.isBlank(startTimeParameterName) 
+                && getParameterService().parameterExists(parameterNamespace, parameterComponent, startTimeParameterName)) {
             String CUSTOM_DATE_FORMAT = "dd-MMM-yyyy hh:mm a";
             SimpleDateFormat dateFormat = new SimpleDateFormat(CUSTOM_DATE_FORMAT);
             try {
                 String parmStartTime = getParameterService().getParameterValueAsString(parameterNamespace, parameterComponent, startTimeParameterName);
-                try {
-                    cronStartTime = dateTimeService.convertToDate(parmStartTime);
-                } catch (ParseException e) {
-                    cronStartTime = dateFormat.parse(parmStartTime);
+                if (!StringUtils.isBlank(parmStartTime)) {
+                    try {
+                        cronStartTime = dateTimeService.convertToDate(parmStartTime);
+                    } catch (ParseException e) {
+                        cronStartTime = dateFormat.parse(parmStartTime);
+                    }
                 }
             } catch (Exception e) {
+                //if we got an exception while getting or parsing the start time, use the disabled start time and log an error.
+                cronStartTime = disabledStartTime;
                 String defaultDateStr = dateFormat.format(cronStartTime);
-                LOG.warn("Not able to get the starttime for " + this.getJobName() + " scheduler from system param table. Set it to " + defaultDateStr);
+                LOG.error("Not able to get the starttime for " + this.getJobName() + " scheduler from system param table. Set it to " + defaultDateStr, e);
             }
         }
         return cronStartTime;

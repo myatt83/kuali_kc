@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,10 @@ package org.kuali.kra.protocol.auth;
 import org.kuali.kra.irb.actions.amendrenew.ProtocolModule;
 
 /**
- * The Modify Protocol Permissions Authorizer checks to see if the user has 
- * permission to maintain protocol access, i.e. assign Users to Protocol Roles.
+ * The Modify ProtocolBase Permissions Authorizer checks to see if the user has 
+ * permission to maintain protocol access, i.e. assign Users to ProtocolBase Roles.
  */
-public class ModifyProtocolPermissionsAuthorizer extends ModifyAmendmentAuthorizer {
+public class ModifyProtocolPermissionsAuthorizer extends ModifyAmendmentAuthorizerBase {
 
     public ModifyProtocolPermissionsAuthorizer() {
         super(ProtocolModule.PROTOCOL_PERMISSIONS);

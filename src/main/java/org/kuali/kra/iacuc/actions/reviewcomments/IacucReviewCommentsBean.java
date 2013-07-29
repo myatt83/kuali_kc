@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,10 +15,12 @@
  */
 package org.kuali.kra.iacuc.actions.reviewcomments;
 
-import org.kuali.kra.protocol.actions.reviewcomments.ReviewCommentsBean;
+import org.kuali.kra.common.committee.meeting.CommitteeScheduleMinuteBase;
+import org.kuali.kra.iacuc.committee.meeting.IacucCommitteeScheduleMinute;
+import org.kuali.kra.protocol.actions.reviewcomments.ReviewCommentsBeanBase;
 import org.kuali.kra.protocol.actions.reviewcomments.ReviewCommentsService;
 
-public class IacucReviewCommentsBean extends ReviewCommentsBean {
+public class IacucReviewCommentsBean extends ReviewCommentsBeanBase {
 
     /**
      * Comment for <code>serialVersionUID</code>
@@ -34,6 +36,12 @@ public class IacucReviewCommentsBean extends ReviewCommentsBean {
     @Override
     protected Class<? extends ReviewCommentsService> getReviewCommentsServiceClassHook() {
         return IacucReviewCommentsService.class;
+    }
+
+
+    @Override
+    protected CommitteeScheduleMinuteBase getNewCommitteeScheduleMinuteInstanceHook() {
+        return new IacucCommitteeScheduleMinute();
     }
 
 }

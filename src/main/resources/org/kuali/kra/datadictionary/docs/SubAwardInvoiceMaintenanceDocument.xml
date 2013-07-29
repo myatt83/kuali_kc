@@ -2,7 +2,7 @@
 
   <bean id="SubAwardInvoiceMaintenanceDocument" parent="SubAwardInvoiceMaintenanceDocument-parentBean"/>
 
-  <bean id="SubAwardInvoiceMaintenanceDocument-parentBean" abstract="true" parent="MaintenanceDocumentEntry">
+  <bean id="SubAwardInvoiceMaintenanceDocument-parentBean" abstract="true" parent="KcMaintenanceDocumentEntry">
     <property name="businessObjectClass" value="org.kuali.kra.subaward.bo.SubAwardAmountReleased"/>
     <property name="maintainableClass" value="org.kuali.kra.subaward.document.SubAwardInvoiceMaintainableImpl"/>
     <property name="maintainableSections">
@@ -24,15 +24,38 @@
     <property name="documentPresentationControllerClass" value="org.kuali.kra.subaward.document.authorization.SubAwardInvoiceDocumentPresentationController" />
     <property name="documentAuthorizerClass" value="org.kuali.kra.subaward.document.authorizer.SubAwardInvoiceMaintenanceDocumentAuthorizer"/>
     
+    
+    <property name="workflowProperties">
+    	<ref bean="SubAwardInvoiceMaintenanceDocument-workflowProperties"/>
+    </property>
+    
   </bean>
+
+  <bean id="SubAwardInvoiceMaintenanceDocument-workflowProperties" parent="SubAwardInvoiceMaintenanceDocument-workflowProperties-parentBean" />
+
+  <bean id="SubAwardInvoiceMaintenanceDocument-workflowProperties-parentBean" abstract="true" parent="WorkflowProperties">
+	<property name="workflowPropertyGroups">
+		<list>
+			<bean parent="WorkflowPropertyGroup">
+				<property name="workflowProperties">
+					<list>
+						<bean parent="WorkflowProperty" p:path="documentHeader" />
+						<bean parent="WorkflowProperty" p:path="newMaintainableObject.businessObject.subAwardId" />
+					</list>
+				</property>
+			</bean>
+		</list>
+	</property>
+  </bean>
+
 
 <!-- Maintenance Section Definitions -->
 
   <bean id="SubAwardInvoiceMaintenanceDocument-SubAwardSummary" parent="SubAwardInvoiceMaintenanceDocument-SubAwardSummary-parentBean"/>
 
   <bean id="SubAwardInvoiceMaintenanceDocument-SubAwardSummary-parentBean" abstract="true" parent="MaintainableSectionDefinition">
-    <property name="id" value="SubAward Summary"/>
-    <property name="title" value="SubAward Summary"/>
+    <property name="id" value="Subaward Summary"/>
+    <property name="title" value="Subaward Summary"/>
     <property name="maintainableItems">
       <list>
         <bean parent="MaintainableFieldDefinition" p:name="subAwardCode" p:required="false" p:unconditionallyReadOnly="true"/>
@@ -50,8 +73,8 @@
   <bean id="SubAwardInvoiceMaintenanceDocument-SubAwardAmounts" parent="SubAwardInvoiceMaintenanceDocument-SubAwardAmounts-parentBean"/>
 
   <bean id="SubAwardInvoiceMaintenanceDocument-SubAwardAmounts-parentBean" abstract="true" parent="MaintainableSectionDefinition">
-    <property name="id" value="SubAward Amounts"/>
-    <property name="title" value="SubAward Amounts"/>
+    <property name="id" value="Subaward Amounts"/>
+    <property name="title" value="Subaward Amounts"/>
     <property name="maintainableItems">
       <list>
         <bean parent="MaintainableFieldDefinition" p:name="subAward.totalObligatedAmount" p:required="false" p:unconditionallyReadOnly="true"/>
@@ -64,8 +87,8 @@
   <bean id="SubAwardInvoiceMaintenanceDocument-SubAwardInvoice" parent="SubAwardInvoiceMaintenanceDocument-SubAwardInvoice-parentBean"/>
 
   <bean id="SubAwardInvoiceMaintenanceDocument-SubAwardInvoice-parentBean" abstract="true" parent="MaintainableSectionDefinition">
-    <property name="id" value="SubAward Invoice"/>
-    <property name="title" value="SubAward Invoice"/>
+    <property name="id" value="Subaward Invoice"/>
+    <property name="title" value="Subaward Invoice"/>
     <property name="maintainableItems">
       <list>
         <bean parent="MaintainableFieldDefinition" p:name="invoiceNumber" p:required="true"/>

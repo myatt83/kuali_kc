@@ -1,5 +1,5 @@
 /*
-\ * Copyright 2005-2010 The Kuali Foundation
+\ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -87,6 +87,9 @@ public class KcPersonExtendedAttributes extends KraPersistableBusinessObjectBase
     private String multiCampusPrincipalId;
 
     private String multiCampusPrincipalName;
+    
+    private String eraCommonUserName;
+    
     private Date salaryAnniversaryDate;
     
     private List<PersonBiosketch> attachments = new AutoPopulatingList<PersonBiosketch>(PersonBiosketch.class);
@@ -598,6 +601,22 @@ public class KcPersonExtendedAttributes extends KraPersistableBusinessObjectBase
         this.salaryAnniversaryDate = salaryAnniversaryDate;
     }
     
+    /**
+     * Gets the eraCommonUserName attribute. 
+     * @return Returns the eraCommonUserName.
+     */
+    public String getEraCommonUserName() {
+        return this.eraCommonUserName;
+    }
+    
+    /**
+     * Sets the eraCommonUserName attribute value.
+     * @param eraCommonUserName The eraCommonUserName to set.
+     */
+    public void setEraCommonUserName(String eraCommonUserName) {
+        this.eraCommonUserName = eraCommonUserName;
+    }
+
     @Override
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public List<Collection<PersistableBusinessObject>> buildListOfDeletionAwareLists() {

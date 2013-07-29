@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@ package org.kuali.kra.protocol.auth;
 
 import org.apache.commons.lang.StringUtils;
 import org.kuali.kra.infrastructure.PermissionConstants;
-import org.kuali.kra.protocol.Protocol;
+import org.kuali.kra.protocol.ProtocolBase;
 import org.kuali.kra.irb.actions.ProtocolActionType;
-import org.kuali.kra.protocol.actions.submit.ProtocolSubmission;
+import org.kuali.kra.protocol.actions.submit.ProtocolSubmissionBase;
 import org.kuali.kra.irb.actions.submit.ProtocolSubmissionStatus;
 import org.kuali.kra.irb.actions.submit.ProtocolSubmissionType;
 
@@ -27,21 +27,21 @@ import org.kuali.kra.irb.actions.submit.ProtocolSubmissionType;
  * 
  * This class to check the authorization to perform IRB acknowledgement action.
  */
-public class IrbAcknowledgementAuthorizer extends ProtocolAuthorizer {
+public class IrbAcknowledgementAuthorizer extends ProtocolAuthorizerBase {
 
     /** {@inheritDoc} */
     @Override
-    public boolean isAuthorized(String userId, ProtocolTask task) {
+    public boolean isAuthorized(String userId, ProtocolTaskBase task) {
         return isValidToPerform(task)
                 && hasPermission(userId, task.getProtocol(), PermissionConstants.PERFORM_IRB_ACTIONS_ON_PROTO);
     }
 
-    private boolean isValidToPerform(ProtocolTask task) {
+    private boolean isValidToPerform(ProtocolTaskBase task) {
         boolean isValid = false;
-        Protocol protocol = task.getProtocol();
+        ProtocolBase protocol = task.getProtocol();
         if (protocol.getNotifyIrbSubmissionId() != null) {
             // not the current submission, then check programically
-            for (ProtocolSubmission submission : protocol.getProtocolSubmissions()) {
+            for (ProtocolSubmissionBase submission : protocol.getProtocolSubmissions()) {
                 if (submission.getSubmissionId().equals(protocol.getNotifyIrbSubmissionId())) {
                     isValid = isValidFYI(submission);
                 }
@@ -55,7 +55,7 @@ public class IrbAcknowledgementAuthorizer extends ProtocolAuthorizer {
         return isValid;
     }
 
-    private boolean isValidFYI(ProtocolSubmission submission) {
+    private boolean isValidFYI(ProtocolSubmissionBase submission) {
         return isFYISubmission(submission.getSubmissionTypeCode()) && isFYIReview(submission.getProtocolReviewTypeCode())
                 && isStatusValid(submission.getSubmissionStatusCode());
     }
@@ -68,7 +68,6 @@ public class IrbAcknowledgementAuthorizer extends ProtocolAuthorizer {
     private boolean isFYIReview(String reviewTypeCode) {
         // in coeus 4.4, it does not check whether its FYI or not.
         return StringUtils.isNotBlank(reviewTypeCode);
-       // return StringUtils.isNotBlank(reviewTypeCode) && ProtocolReviewType.FYI_TYPE_CODE.equals(reviewTypeCode);
     }
 
     private boolean isStatusValid(String submissionStatusCode) {

@@ -1,5 +1,5 @@
 <%--
- Copyright 2005-2010 The Kuali Foundation
+ Copyright 2005-2013 The Kuali Foundation
  
  Licensed under the Educational Community License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -20,13 +20,21 @@
 <c:set var="awardAttributes" value="${DataDictionary.Award.attributes}" />
 <c:set var="awardAmountInfoAttributes" value="${DataDictionary.AwardAmountInfo.attributes}" />
 <c:set var="awardCurrentActionCommentAttributes" value="${DataDictionary.AwardComment.attributes}" />
-<kul:tab tabTitle="Details & Dates" defaultOpen="true" tabErrorKey="awardEffectiveDate*,document.awardList[0].awardTransactionTypeCode,document.award.version, document.awardList[0].statusCode, document.awardList[0].activityTypeCode,document.awardList[0].awardTypeCode,document.awardList[0].financialChartOfAccountsCode,document.awardList[0].title,document.awardList[0].beginDate,document.awardList[0].awardAmountInfos[0].finalExpirationDate,document.awardList[0].awardEffectiveDate,document.awardList[0].awardExecutionDate,document.awardList[0].sponsorCode,document.awardList[0].unitNumber, detailsAndDatesFormHelper*,document.awardList[0].awardAmountInfos[${KualiForm.document.award.indexOfLastAwardAmountInfo}].*, document.awardList[0].modificationNumber,document.awardList[0].cfdaNumber">
+<kul:tab tabTitle="Details & Dates" defaultOpen="true" 
+	tabErrorKey="document.awardList[0].awardTransactionTypeCode,document.award.version, document.awardList[0].statusCode,document.awardList[0].activityTypeCode,document.awardList[0].awardTypeCode,document.awardList[0].financialChartOfAccountsCode,document.awardList[0].title,document.awardList[0].beginDate,document.awardList[0].awardExecutionDate,document.awardList[0].sponsorCode,document.awardList[0].unitNumber, detailsAndDatesFormHelper*,document.awardList[0].awardAmountInfos[${KualiForm.document.award.indexOfLastAwardAmountInfo}].*, document.awardList[0].modificationNumber,document.awardList[0].cfdaNumber,document.awardList[0].primeSponsorCode"
+	tabAuditKey="document.awardList[0].awardEffectiveDate"
+	auditCluster="homePageAuditWarnings,homePageAuditErrors" useRiceAuditMode="true">
 
 <!-- Institution -->
 <div class="tab-container" align="center">
 	<h3>
    		<span class="subhead-left">Details and Dates</span>
    		<span class="subhead-right">
+   		    <c:if test="${fn:length(KualiForm.awardsForHistoryDisplay) > 0}" >
+      	        <a href="${pageContext.request.contextPath}/awardHistory.do?command=redirectAwardHistoryFullViewForPopup&awardDocumentNumber=${KualiForm.document.documentNumber}&awardNumber=${KualiForm.document.awardList[0].awardNumber}&docTypeName=${KualiForm.docTypeName}" target="_blank" >
+                    <img align="top" width="80" height="15" alt="View History" src="${ConfigProperties.kra.externalizable.images.url}tinybutton-viewhistory.gif" styleClass="tinybutton" />
+                </a>
+   		    </c:if>
    			<kul:help parameterNamespace="KC-AWARD" parameterDetailType="Document" parameterName="awardDetailsDatesHelp" altText="help"/>
 		</span>
     </h3>
@@ -114,6 +122,7 @@
 		</td>
   	</tr>
   	<tr>
+    	<kra:section permission="viewAccountElement">
     	
       	<th>
     		<div align="right"><kul:htmlAttributeLabel attributeEntry="${awardAttributes.accountNumber}" /></div>
@@ -121,6 +130,7 @@
     	<td align="left" valign="middle">
     		<kul:htmlControlAttribute property="document.awardList[0].accountNumber" attributeEntry="${awardAttributes.accountNumber}" />
     	</td>
+    	</kra:section>
     	<th>
     		<div align="right"><kul:htmlAttributeLabel attributeEntry="${awardAttributes.awardTypeCode}" /></div>
       	</th>
@@ -361,7 +371,7 @@
 			    </tr>	
     		</c:otherwise>
 		</c:choose>  		
-    			<tr>
+		<tr>
     				<th>
 						<div align="right"><kul:htmlAttributeLabel attributeEntry="${awardAmountInfoAttributes.finalExpirationDate}" /></div>
         			</th>
@@ -392,18 +402,17 @@
 			            <fmt:formatDate value="${KualiForm.document.awardList[0].awardAmountInfos[KualiForm.document.award.indexOfAwardAmountInfoForDisplay].obligationExpirationDate}" pattern="MM/dd/yyyy" />
 			        </div>
 			        </td>
-			    </tr>
 			    
 		</c:when>
 	     	<c:otherwise>
 	     		    <td align="left" valign="middle">
 			            <kul:htmlControlAttribute property="document.awardList[0].awardAmountInfos[${KualiForm.document.award.indexOfAwardAmountInfoForDisplay}].obligationExpirationDate" attributeEntry="${awardAmountInfoAttributes.obligationExpirationDate}"/>
 			        </td>
-			    </tr>
 			</c:otherwise>
 		</c:choose>	
-			   <tr>
-			        <th>
+			    </tr>
+ 			<tr>
+ 			        <th>
 			            <div align="right"><kul:htmlAttributeLabel attributeEntry="${awardAttributes.awardExecutionDate}" /></div>
 			        </th>
 			        <td align="left" valign="middle">
@@ -554,7 +563,7 @@
 							</c:choose>
 						</c:otherwise>
 					</c:choose>
-</table>
+ </table>
 </kul:innerTab>	
 
 </div>

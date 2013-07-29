@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,19 +33,26 @@ import org.kuali.kra.common.notification.service.KcNotificationService;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.KeyConstants;
 import org.kuali.kra.infrastructure.KraServiceLocator;
+import org.kuali.kra.irb.Protocol;
 import org.kuali.kra.irb.ProtocolAction;
 import org.kuali.kra.irb.ProtocolDocument;
 import org.kuali.kra.irb.ProtocolForm;
 import org.kuali.kra.irb.actions.notification.AssignReviewerNotificationRenderer;
-import org.kuali.kra.irb.actions.notification.DeleteReviewNotificationRenderer;
 import org.kuali.kra.irb.actions.notification.ProtocolNotificationRequestBean;
 import org.kuali.kra.irb.notification.IRBNotificationContext;
-import org.kuali.kra.irb.notification.IRBNotificationRenderer;
+
+// TODO ********************** added or modified during IRB backfit merge BEGIN ************************ 
+import org.kuali.kra.irb.notification.IRBProtocolNotification;
+// TODO ********************** added or modified during IRB backfit merge END ************************ 
+
+import org.kuali.kra.irb.onlinereview.ProtocolOnlineReview;
+import org.kuali.kra.protocol.notification.ProtocolNotification;
 import org.kuali.rice.kns.util.KNSGlobalVariables;
 import org.kuali.rice.krad.util.GlobalVariables;
 import org.kuali.rice.krad.util.KRADConstants;
 import org.kuali.rice.krad.util.ObjectUtils;
 
+@SuppressWarnings("deprecation")
 public class ProtocolNotificationEditorAction extends ProtocolAction {
     private static final String PROTOCOL_ACTIONS_TAB = "protocolActions";
     
@@ -119,6 +126,7 @@ public class ProtocolNotificationEditorAction extends ProtocolAction {
      * @return the action forward
      * @throws Exception
      */
+    @SuppressWarnings("unchecked")
     public ActionForward sendNotification(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
         ActionForward actionForward = mapping.findForward(Constants.MAPPING_BASIC);
         
@@ -128,7 +136,7 @@ public class ProtocolNotificationEditorAction extends ProtocolAction {
         List<NotificationTypeRecipient> notificationRecipients = protocolForm.getNotificationHelper().getNotificationRecipients();
         
         if (applyRules(new SendNotificationEvent(document, notification, notificationRecipients))) {
-            protocolForm.getNotificationHelper().sendNotification();
+            protocolForm.getNotificationHelper().sendNotificationAndPersist(new IRBProtocolNotification(), document.getProtocol());                 
             String forwardName = protocolForm.getNotificationHelper().getNotificationContext().getForwardName();
             protocolForm.getNotificationHelper().setNotificationContext(null);
             if (StringUtils.isNotBlank(forwardName)) {
@@ -165,10 +173,10 @@ public class ProtocolNotificationEditorAction extends ProtocolAction {
     private ActionForward checkToSendNotification(ActionMapping mapping, ActionForward forward, ProtocolForm protocolForm,
             List<ProtocolNotificationRequestBean> notificationRequestBeans) {
 
-        AssignReviewerNotificationRenderer renderer = new AssignReviewerNotificationRenderer(notificationRequestBeans.get(0)
+        AssignReviewerNotificationRenderer renderer = new AssignReviewerNotificationRenderer((Protocol)notificationRequestBeans.get(0)
                 .getProtocol(), "removed");
-        IRBNotificationContext context = new IRBNotificationContext(notificationRequestBeans.get(0).getProtocol(),
-            notificationRequestBeans.get(0).getProtocolOnlineReview(), notificationRequestBeans.get(0).getActionType(),
+        IRBNotificationContext context = new IRBNotificationContext((Protocol)notificationRequestBeans.get(0).getProtocol(),
+            (ProtocolOnlineReview)notificationRequestBeans.get(0).getProtocolOnlineReview(), notificationRequestBeans.get(0).getActionType(),
             notificationRequestBeans.get(0).getDescription(), renderer);
 
         if (protocolForm.getNotificationHelper().getPromptUserForNotificationEditor(context)) {
@@ -191,7 +199,7 @@ public class ProtocolNotificationEditorAction extends ProtocolAction {
             int i = 1;
             // add all new reviewer to recipients
             while (notificationRequestBeans.size() > i) {
-                context = new IRBNotificationContext(notificationRequestBeans.get(i).getProtocol(), notificationRequestBeans.get(i)
+                context = new IRBNotificationContext((Protocol)notificationRequestBeans.get(i).getProtocol(), (ProtocolOnlineReview)notificationRequestBeans.get(i)
                         .getProtocolOnlineReview(), notificationRequestBeans.get(i).getActionType(), notificationRequestBeans
                         .get(i).getDescription(), renderer);
                 // protocolForm.getNotificationHelper().setNotificationRecipients(new ArrayList<NotificationTypeRecipient>());
@@ -219,38 +227,17 @@ public class ProtocolNotificationEditorAction extends ProtocolAction {
         }
         else {
             // should not need this 'no prompt' here because it is processed in service.
+            @SuppressWarnings("unused")
             int i = 0;
-//            while (notificationRequestBeans.size() > i) {
-//                context = new IRBNotificationContext(notificationRequestBeans.get(i).getProtocol(), notificationRequestBeans.get(i)
-//                        .getProtocolOnlineReview(), notificationRequestBeans.get(i).getActionType(), notificationRequestBeans
-//                        .get(i).getDescription(), renderer);
-//                protocolForm.getNotificationHelper().initializeDefaultValues(context);
-//                List<NotificationTypeRecipient> recipients = protocolForm.getNotificationHelper().getNotificationRecipients();
-//                List<NotificationTypeRecipient> allRecipients = new ArrayList<NotificationTypeRecipient>();
-//                for (NotificationTypeRecipient recipient : recipients) {
-//                    try {
-//                        // note : need to deepcopy here. If I don't do that, then all reviewer role will have same
-//                        // notificationrecipient object returned from service call
-//                        // probably the object service/ojb has a cache ?
-//                        NotificationTypeRecipient copiedRecipient = (NotificationTypeRecipient) ObjectUtils.deepCopy(recipient);
-//                        context.populateRoleQualifiers(copiedRecipient);
-//                        allRecipients.add(copiedRecipient);
-//                    } catch (Exception e) {
-//                        
-//                    }
-//                }
-//                protocolForm.getNotificationHelper().setNotificationRecipients(allRecipients);
-//                getNotificationService().sendNotification(context);
-//                i++;
-//            }
             return forward;
         }
     }
-
-    private KcNotificationService getNotificationService() {
+     
+    @SuppressWarnings("unused")
+    private KcNotificationService getKcNotificationService() {
         return KraServiceLocator.getService(KcNotificationService.class);
-    }
-
+    }    
+    
     /**
      * Cancels a Notification.
      * 
@@ -275,9 +262,10 @@ public class ProtocolNotificationEditorAction extends ProtocolAction {
         // use this doc id for holding action to check if online review document is complete and return to online review tab
         returnLocation += "&" + "olrDocId=" + olrDocId + "&" + "olrEvent=" + olrEvent;
         ActionForward basicForward = mapping.findForward(KRADConstants.MAPPING_PORTAL);
-        //ActionForward holdingPageForward = mapping.findForward(Constants.MAPPING_HOLDING_PAGE);
-        ActionForward holdingPageForward = mapping.findForward(Constants.MAPPING_IRB_HOLDING_PAGE);
+        ActionForward holdingPageForward = mapping.findForward(Constants.MAPPING_HOLDING_PAGE);
         GlobalVariables.getUserSession().addObject(Constants.HOLDING_PAGE_DOCUMENT_ID, (Object)olrDocId);
+        // add that alternate session key to the session (for double indirection later in the holding page action)
+        GlobalVariables.getUserSession().addObject(Constants.ALTERNATE_DOC_ID_SESSION_KEY, (Object)Constants.HOLDING_PAGE_DOCUMENT_ID);
         
         return routeToHoldingPage(basicForward, basicForward, holdingPageForward, returnLocation);
 
@@ -295,6 +283,12 @@ public class ProtocolNotificationEditorAction extends ProtocolAction {
  
     private void recordProtocolActionSuccess(String protocolActionName) {
         KNSGlobalVariables.getMessageList().add(KeyConstants.MESSAGE_PROTOCOL_ACTION_SUCCESSFULLY_COMPLETED, protocolActionName);
+    }
+
+    @Override
+    protected ProtocolNotification getProtocolNotificationHook() {
+        // TODO Auto-generated method stub
+        return null;
     }
     
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.infrastructure.RoleConstants;
 import org.kuali.kra.negotiations.document.NegotiationDocument;
+import org.kuali.kra.negotiations.notifications.NegotiationNotification;
 import org.kuali.kra.negotiations.service.NegotiationService;
 import org.kuali.kra.negotiations.customdata.NegotiationCustomData;
 import org.kuali.rice.kim.api.KimConstants;
@@ -74,8 +75,6 @@ public class Negotiation extends KraPersistableBusinessObjectBase implements Per
      * Long awardId - award String proposalNumber -developmentProposal Long proposalId - institutionalProposal
      */
     private String associatedDocumentId;
-    //transient - workaround for inability to actually display warning on final document unless an error exists.
-    private String associatedDocumentWarning;
 
     private NegotiationStatus negotiationStatus;
     private NegotiationAgreementType negotiationAgreementType;
@@ -87,6 +86,8 @@ public class Negotiation extends KraPersistableBusinessObjectBase implements Per
     private boolean printAll = true;
     private Long oldNegotiationAssociationTypeId;
 
+    private List<NegotiationNotification> negotiationNotifications;
+    
     public int getPrintindex() {
         return printindex;
     }
@@ -99,6 +100,7 @@ public class Negotiation extends KraPersistableBusinessObjectBase implements Per
         super();
         activities = new ArrayList<NegotiationActivity>();
         negotiationCustomDataList = new ArrayList<NegotiationCustomData>();
+        negotiationNotifications = new ArrayList<NegotiationNotification>();
     }
 
     public Integer getNegotiationAge() {
@@ -455,11 +457,15 @@ public class Negotiation extends KraPersistableBusinessObjectBase implements Per
         this.oldNegotiationAssociationTypeId = oldNegotiationAssociationTypeId;
     }
 
-    public String getAssociatedDocumentWarning() {
-        return associatedDocumentWarning;
+    public List<NegotiationNotification> getNegotiationNotifications() {
+        return negotiationNotifications;
     }
 
-    public void setAssociatedDocumentWarning(String associatedDocumentWarning) {
-        this.associatedDocumentWarning = associatedDocumentWarning;
+    public void setNegotiationNotifications(List<NegotiationNotification> negotiationNotifications) {
+        this.negotiationNotifications = negotiationNotifications;
+    }
+
+    public void addNotification(NegotiationNotification negotiationNotification) {
+        getNegotiationNotifications().add(negotiationNotification);        
     }
 }

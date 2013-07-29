@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -127,7 +127,6 @@ public class IacucProtocolExceptionSummary implements Serializable {
             speciesNameChanged = !StringUtils.equals(speciesName, otherSummary.speciesName); 
             exceptionCategoryChanged = !StringUtils.equals(exceptionCategory, otherSummary.exceptionCategory); 
             exceptionDescriptionChanged = !StringUtils.equals(exceptionDescription, otherSummary.exceptionDescription); 
-            //exceptionCountChanged = !exceptionCount.equals(otherSummary.exceptionCount);
             exceptionCountChanged = !ObjectUtils.equals(exceptionCount, otherSummary.exceptionCount);
         }
     }

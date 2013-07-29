@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,37 @@
  */
 package org.kuali.kra.iacuc.correspondence;
 
-import org.kuali.kra.protocol.correspondence.ProtocolCorrespondenceTemplateAction;
+import org.kuali.kra.infrastructure.PermissionConstants;
+import org.kuali.kra.protocol.correspondence.ProtocolCorrespondenceTemplateActionBase;
+import org.kuali.kra.protocol.correspondence.ProtocolCorrespondenceTemplateAuthorizationService;
+import org.kuali.kra.protocol.correspondence.ProtocolCorrespondenceTemplateFormBase;
+import org.kuali.kra.protocol.correspondence.ProtocolCorrespondenceTemplateService;
 
-public class IacucProtocolCorrespondenceTemplateAction extends ProtocolCorrespondenceTemplateAction{
+public class IacucProtocolCorrespondenceTemplateAction extends ProtocolCorrespondenceTemplateActionBase{
+
+    @Override
+    protected Class<? extends ProtocolCorrespondenceTemplateAuthorizationService> getProtocolCorrespondenceTemplateAuthorizationServiceClassHook() {
+        return IacucProtocolCorrespondenceTemplateAuthorizationService.class;
+    }
+
+    @Override
+    protected ProtocolCorrespondenceTemplateFormBase getNewProtocolCorrespondenceTemplateFormInstanceHook() {
+        return new IacucProtocolCorrespondenceTemplateForm();
+    }
+
+    @Override
+    protected String getViewCorrespondenceTemplatePermissionNameHook() {
+        return PermissionConstants.VIEW_IACUC_CORRESPONDENCE_TEMPLATE;
+    }
+
+    @Override
+    protected Class<? extends ProtocolCorrespondenceTemplateService> getProtocolCorrespondenceTemplateServiceClassHook() {
+        return IacucProtocolCorrespondenceTemplateService.class;
+    }
+
+    @Override
+    protected String getModifyCorrespondenceTemplatePermissionNameHook() {
+        return PermissionConstants.MODIFY_IACUC_CORRESPONDENCE_TEMPLATE;
+    }
 
 }

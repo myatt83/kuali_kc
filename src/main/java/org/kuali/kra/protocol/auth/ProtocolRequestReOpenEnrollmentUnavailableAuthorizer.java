@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,12 +21,12 @@ import org.kuali.kra.irb.actions.ProtocolActionType;
 /**
  * Is the user allowed to request a close of the enrollment of a protocol and the action is currently not available?
  */
-public class ProtocolRequestReOpenEnrollmentUnavailableAuthorizer extends ProtocolAuthorizer {
+public class ProtocolRequestReOpenEnrollmentUnavailableAuthorizer extends ProtocolAuthorizerBase {
 
     /**
-     * @see org.kuali.kra.protocol.auth.ProtocolAuthorizer#isAuthorized(java.lang.String, org.kuali.kra.protocol.auth.ProtocolTask)
+     * @see org.kuali.kra.protocol.auth.ProtocolAuthorizerBase#isAuthorized(java.lang.String, org.kuali.kra.protocol.auth.ProtocolTaskBase)
      */
-    public boolean isAuthorized(String userId, ProtocolTask task) {
+    public boolean isAuthorized(String userId, ProtocolTaskBase task) {
         return hasPermission(userId, task.getProtocol(), PermissionConstants.SUBMIT_PROTOCOL) &&
                (isAmendmentOrRenewal(task.getProtocol()) ||
                 !canExecuteAction(task.getProtocol(), ProtocolActionType.REQUEST_TO_REOPEN_ENROLLMENT));

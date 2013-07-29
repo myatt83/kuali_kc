@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  *
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@
  */
 package org.kuali.kra.irb.actions.submit;
 
-import org.kuali.kra.bo.KraPersistableBusinessObjectBase;
+import org.kuali.kra.protocol.actions.submit.ProtocolSubmissionStatusBase;
 
-public class ProtocolSubmissionStatus extends KraPersistableBusinessObjectBase {
+public class ProtocolSubmissionStatus extends ProtocolSubmissionStatusBase {
 
     private static final long serialVersionUID = -3005754570292744646L;
 
@@ -52,6 +52,9 @@ public class ProtocolSubmissionStatus extends KraPersistableBusinessObjectBase {
     public static final String IRB_ACKNOWLEDGEMENT = "212";
     
     public static final String RETURNED_TO_PI = "213";
+    
+    public static final String REJECTED_IN_ROUTING = "405";
+    public static final String RECALLED_IN_ROUTING = "406";
 
     private String protocolSubmissionStatusCode;
 

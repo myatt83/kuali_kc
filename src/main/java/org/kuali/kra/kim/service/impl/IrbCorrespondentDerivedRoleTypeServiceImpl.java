@@ -1,5 +1,5 @@
 /*
-un * Copyright 2005-2010 The Kuali Foundation
+un * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -118,7 +118,7 @@ public class IrbCorrespondentDerivedRoleTypeServiceImpl extends DerivedRoleTypeS
         ProtocolSummary protocolSummary = protocol.getProtocolSummary();
         List<RoleMembership> members = new ArrayList<RoleMembership>();
         
-        for (OrganizationSummary orgSummary: protocolSummary.getOrganizations()) {
+        for (org.kuali.kra.protocol.summary.OrganizationSummary orgSummary: protocolSummary.getOrganizations()) {
             String organizationId = orgSummary.getId();
             if (StringUtils.isNotBlank(organizationId)) {
                 List<OrganizationCorrespondent> organizationCorrespondents = getOrganizationService().retrieveOrganizationCorrespondentsByOrganizationId(organizationId);

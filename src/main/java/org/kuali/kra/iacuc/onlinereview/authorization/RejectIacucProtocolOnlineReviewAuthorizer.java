@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 package org.kuali.kra.iacuc.onlinereview.authorization;
 
 import org.kuali.kra.infrastructure.PermissionConstants;
-import org.kuali.kra.protocol.onlinereview.ProtocolOnlineReview;
+import org.kuali.kra.protocol.onlinereview.ProtocolOnlineReviewBase;
 import org.kuali.kra.protocol.onlinereview.authorization.ProtocolOnlineReviewTask;
 
 public class RejectIacucProtocolOnlineReviewAuthorizer extends IacucProtocolOnlineReviewAuthorizer {
@@ -26,7 +26,7 @@ public class RejectIacucProtocolOnlineReviewAuthorizer extends IacucProtocolOnli
      */
     public boolean isAuthorized(String userId, IacucProtocolOnlineReviewTask task) {
         boolean hasPermission = false;
-        ProtocolOnlineReview protocolOnlineReview = task.getProtocolOnlineReview();
+        ProtocolOnlineReviewBase protocolOnlineReview = task.getProtocolOnlineReview();
         
         if ( protocolOnlineReview.getProtocolOnlineReviewId() == null ) {
             //we never authorize edits on a review, the reviews are created

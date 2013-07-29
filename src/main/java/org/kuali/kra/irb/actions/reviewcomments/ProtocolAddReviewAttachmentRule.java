@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,37 +15,10 @@
  */
 package org.kuali.kra.irb.actions.reviewcomments;
 
-import org.apache.commons.lang.StringUtils;
-import org.kuali.kra.infrastructure.KeyConstants;
-import org.kuali.kra.rule.BusinessRuleInterface;
-import org.kuali.kra.rules.ResearchDocumentRuleBase;
-import org.kuali.rice.krad.util.GlobalVariables;
-
 /**
  * 
  * This class implements the business rule when adding new review attachment.  ie, validate description and file are entered.
  */
-public class ProtocolAddReviewAttachmentRule extends ResearchDocumentRuleBase implements BusinessRuleInterface<ProtocolAddReviewAttachmentEvent> {
-    
-    /**
-     * {@inheritDoc}
-     * @see org.kuali.kra.rule.BusinessRuleInterface#processRules(org.kuali.kra.rule.event.KraDocumentEventBaseExtension)
-     */
-    public boolean processRules(ProtocolAddReviewAttachmentEvent event) {
-        boolean isValid = true;
-        
-        String errorPathKey = event.getPropertyName() + ".newReviewAttachment";
-        GlobalVariables.getMessageMap().addToErrorPath(errorPathKey);
-        getDictionaryValidationService().validateBusinessObject(event.getReviewAttachment());
-        if (event.getReviewAttachment().getNewFile() == null || StringUtils.isBlank(event.getReviewAttachment().getNewFile().getFileName())) {
-            GlobalVariables.getMessageMap().putError("newFile",
-            KeyConstants.ERROR_PROTOCOL_ATTACHMENT_MISSING_FILE);
-        }
-        GlobalVariables.getMessageMap().removeFromErrorPath(errorPathKey);
-        
-        isValid &= GlobalVariables.getMessageMap().hasNoErrors();
-        
-        return isValid;
-    }
+public class ProtocolAddReviewAttachmentRule extends org.kuali.kra.protocol.actions.reviewcomments.ProtocolAddReviewAttachmentRule<ProtocolAddReviewAttachmentEvent> {
 
 }

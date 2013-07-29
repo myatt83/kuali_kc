@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,9 @@
  */
 package org.kuali.kra.irb.personnel;
 
+import org.kuali.kra.infrastructure.KraServiceLocator;
+import org.kuali.kra.protocol.personnel.ProtocolPersonnelRuleBase;
+import org.kuali.kra.protocol.personnel.ProtocolPersonnelService;
 import org.kuali.kra.rule.BusinessRuleInterface;
 
 /**
@@ -28,6 +31,11 @@ public class SaveProtocolPersonnelRule extends ProtocolPersonnelRuleBase impleme
      */
     public boolean processRules(SaveProtocolPersonnelEvent event) {
         return processSaveProtocolPersonnelEvent(event);
+    }
+
+    @Override
+    public org.kuali.kra.protocol.personnel.ProtocolPersonnelService getProtocolPersonnelServiceHook() {
+        return (ProtocolPersonnelService)KraServiceLocator.getService(ProtocolPersonnelService.class);
     }
     
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,11 +32,11 @@ public abstract class MeetingEventBase<Z extends BusinessRuleInterface> extends 
     public enum ErrorType {HARDERROR, SOFTERROR};
     
     
-    private MeetingHelper meetingHelper;
+    private MeetingHelperBase meetingHelper;
     
     private ErrorType type;
     
-    public MeetingEventBase(String description, String errorPathPrefix, Document document,  MeetingHelper meetingHelper, ErrorType type) {        
+    public MeetingEventBase(String description, String errorPathPrefix, Document document,  MeetingHelperBase meetingHelper, ErrorType type) {        
         super(description, errorPathPrefix, document);
         this.meetingHelper = meetingHelper;
         this.type = type;
@@ -44,10 +44,10 @@ public abstract class MeetingEventBase<Z extends BusinessRuleInterface> extends 
     
     
     /**
-     * This method should return instance of MeetingHelper.
+     * This method should return instance of MeetingHelperBase.
      * @return
      */
-    public MeetingHelper getMeetingHelper(){
+    public MeetingHelperBase getMeetingHelper(){
         return this.meetingHelper;
     }
     

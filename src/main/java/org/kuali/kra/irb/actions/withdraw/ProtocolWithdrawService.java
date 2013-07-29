@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,21 +15,10 @@
  */
 package org.kuali.kra.irb.actions.withdraw;
 
-import org.kuali.kra.irb.Protocol;
-import org.kuali.kra.irb.ProtocolDocument;
 
 /**
  * Protocol Withdraw Service.
  */
-public interface ProtocolWithdrawService {
+public interface ProtocolWithdrawService extends org.kuali.kra.protocol.actions.withdraw.ProtocolWithdrawService{
 
-    /**
-     * Perform the task of withdrawing a protocol.  A new protocol document will be created
-     * so that it can be re-submitted into workflow at a later time.
-     * @param protocol the protocol
-     * @param withdrawBean the required data for performing a withdrawal
-     * @return new protocol document 
-     * @throws Exception 
-     */
-    public ProtocolDocument withdraw(Protocol protocol, ProtocolWithdrawBean withdrawBean) throws Exception;
 }

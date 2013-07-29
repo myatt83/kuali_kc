@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Copyright 2005-2013 The Kuali Foundation
  * 
  * Licensed under the Educational Community License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,22 +20,14 @@ import java.util.List;
 import org.kuali.kra.printing.Printable;
 import org.kuali.kra.printing.PrintingException;
 import org.kuali.kra.proposaldevelopment.bo.AttachmentDataSource;
-import org.kuali.kra.protocol.Protocol;
-import org.kuali.kra.protocol.ProtocolForm;
+import org.kuali.kra.protocol.ProtocolBase;
+import org.kuali.kra.protocol.ProtocolFormBase;
 
 /**
  * 
- * This class is for Protocol print in protocol actions page
+ * This class is for ProtocolBase print in protocol actions page
  */
 public interface ProtocolPrintingService {
-   
-    /**
-     * 
-     * This method is to get the printable for the selected report.
-     * @param reportType
-     * @return
-     */
-    //Printable getProtocolPrintable(ProtocolPrintType reportType);
     
     /**
      * 
@@ -53,7 +45,7 @@ public interface ProtocolPrintingService {
      * @param protocol
      * @return
      */
-    Printable getProtocolPrintArtifacts(Protocol protocol) ; 
+    Printable getProtocolPrintArtifacts(ProtocolBase protocol) ; 
     
     
     /**
@@ -62,7 +54,7 @@ public interface ProtocolPrintingService {
      * @return
      * @throws PrintingException
      */
-    AttachmentDataSource printProtocolDocument(ProtocolForm protocolForm) throws PrintingException;
+    AttachmentDataSource printProtocolDocument(ProtocolFormBase protocolForm) throws PrintingException;
    
     /**
      * This method is to print selected protocol items
@@ -70,6 +62,6 @@ public interface ProtocolPrintingService {
      * @return
      * @throws PrintingException
      */
-    AttachmentDataSource printProtocolSelectedItems(ProtocolForm protocolForm) throws PrintingException;
+    AttachmentDataSource printProtocolSelectedItems(ProtocolFormBase protocolForm) throws PrintingException;
     
 }
