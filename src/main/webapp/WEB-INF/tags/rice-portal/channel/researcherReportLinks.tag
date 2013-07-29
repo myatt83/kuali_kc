@@ -30,11 +30,11 @@
 
 	<strong>Proposal Reports</strong>
 	<ul class="chan">
-  		<li><a class="portal_link" target="reportWindow" href="${ConfigProperties.application.url}/displayExternalReport.do?awardId=ProposalsBySponsor">Proposals by Sponsor</a></li>
-  		<li><a class="portal_link" target="reportWindow" href="${ConfigProperties.application.url}/displayExternalReport.do?awardId=ProposalbyProposaType">Proposals by Proposal Type</a></li>
+  		<li><a class="portal_link" target="reportWindow" href="${ConfigProperties.application.url}/displayExternalReport.do?awardId=ProposalsBySponsor">Institutional Proposals by Sponsor</a></li>
+  		<li><a class="portal_link" target="reportWindow" href="${ConfigProperties.application.url}/displayExternalReport.do?awardId=ProposalbyProposaType">Institutional Proposals by Proposal Type</a></li>
   		<li><a class="portal_link" target="reportWindow" href="${ConfigProperties.application.url}/displayExternalReport.do?awardId=InvestigatorHistory">Investigator History</a></li>
   		<li><a class="portal_link" target="reportWindow" href="${ConfigProperties.application.url}/displayExternalReport.do?awardId=FundingStatus">Funding Status</a></li>
-  		<li><a class="portal_link" target="reportWindow" href="${ConfigProperties.application.url}/displayExternalReport.do?awardId=PendingProposals">Pending Proposals</a></li>
+  		<li><a class="portal_link" target="reportWindow" href="${ConfigProperties.application.url}/displayExternalReport.do?awardId=PendingProposals">Institutional Proposals by Unit</a></li>
 	</ul>
 
 </div>
