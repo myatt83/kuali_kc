@@ -22,13 +22,13 @@
       <!-- AAP: removed for menu cleanup -->
       <!-- channel:researcherNegotiations /-->
 </td>
-<!-- AAP: removed for menu cleanup -->
-<!-- <td class="content" valign="top">
+<td class="content" valign="top">
       <channel:researcherIRBProtocols/>
-      <channel:researcherCompliance/>
+<!-- AAP: removed for menu cleanup -->
+<!--       <channel:researcherCompliance/>
       <channel:researcherIACUCProtocols/>   
-</td>
  -->
+</td>
 <td class="content" valign="top">
       <channel:researcherQuicklinks />
       <!-- AAP: removed for menu cleanup -->
