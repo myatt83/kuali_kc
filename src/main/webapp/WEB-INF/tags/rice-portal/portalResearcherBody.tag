@@ -29,13 +29,13 @@
       <channel:researcherIACUCProtocols/>   
  -->
 </td>
+<!-- AAP: report links -->
+<td class="content" valign="top">
+      <channel:researcherReportLinks />
+</td>
 <td class="content" valign="top">
       <channel:researcherQuicklinks />
       <!-- AAP: removed for menu cleanup -->
       <!-- channel:researcherPersonnel / -->
       <channel:researcherWorkflow />
-</td>
-<!-- AAP: report links -->
-<td class="content" valign="top">
-      <channel:researcherReportLinks />
 </td>
