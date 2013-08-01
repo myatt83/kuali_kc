@@ -16,18 +16,15 @@
 <%@ include file="/WEB-INF/jsp/kraTldHeader.jsp"%>
 
 <td class="content" valign="top">
-	  	<channel:messageOfTheDay/>
+      <channel:messageOfTheDay/>
       <channel:researcherProposals />
       <channel:researcherAwards />
-      <!-- AAP: removed for menu cleanup -->
-      <!-- channel:researcherNegotiations /-->
+      <channel:researcherNegotiations />
 </td>
 <td class="content" valign="top">
       <channel:researcherIRBProtocols/>
-<!-- AAP: removed for menu cleanup -->
-<!--       <channel:researcherCompliance/>
+      <channel:researcherCompliance/>
       <channel:researcherIACUCProtocols/>   
- -->
 </td>
 <!-- AAP: report links -->
 <td class="content" valign="top">
@@ -35,7 +32,6 @@
 </td>
 <td class="content" valign="top">
       <channel:researcherQuicklinks />
-      <!-- AAP: removed for menu cleanup -->
-      <!-- channel:researcherPersonnel / -->
+      <channel:researcherPersonnel />
       <channel:researcherWorkflow />
 </td>
