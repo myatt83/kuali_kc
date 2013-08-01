@@ -22,13 +22,13 @@
       <channel:researcherNegotiations />
 </td>
 <td class="content" valign="top">
-      <channel:researcherIRBProtocols/>
       <channel:researcherCompliance/>
-      <channel:researcherIACUCProtocols/>   
+      <channel:researcherIRBProtocols/>
 </td>
 <!-- AAP: report links -->
 <td class="content" valign="top">
       <channel:researcherReportLinks />
+      <channel:researcherIACUCProtocols/>
 </td>
 <td class="content" valign="top">
       <channel:researcherQuicklinks />
