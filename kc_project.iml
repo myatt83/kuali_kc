@@ -4,6 +4,7 @@
     <facet type="web" name="Web">
       <configuration>
         <descriptors>
+          <deploymentDescriptor name="jetty-web.xml" url="file://$MODULE_DIR$/src/main/webapp/WEB-INF/jetty-web.xml" />
           <deploymentDescriptor name="web.xml" url="file://$MODULE_DIR$/target/web.xml" />
         </descriptors>
         <webroots>
@@ -917,6 +918,7 @@
       <sourceFolder url="file://$MODULE_DIR$/src/main/webapp/WEB-INF" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/java" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/resources" isTestSource="true" />
+      <excludeFolder url="file://$MODULE_DIR$/target/apache-tomcat-maven-plugin" />
       <excludeFolder url="file://$MODULE_DIR$/target/classes" />
       <excludeFolder url="file://$MODULE_DIR$/target/cxf-codegen-plugin-markers" />
       <excludeFolder url="file://$MODULE_DIR$/target/dependency-maven-plugin-markers" />
@@ -924,7 +926,10 @@
       <excludeFolder url="file://$MODULE_DIR$/target/kc_project-5.2-SNAPSHOT" />
       <excludeFolder url="file://$MODULE_DIR$/target/maven-archiver" />
       <excludeFolder url="file://$MODULE_DIR$/target/maven-status" />
+      <excludeFolder url="file://$MODULE_DIR$/target/rice-server" />
       <excludeFolder url="file://$MODULE_DIR$/target/test-classes" />
+      <excludeFolder url="file://$MODULE_DIR$/target/tmp" />
+      <excludeFolder url="file://$MODULE_DIR$/target/tomcat" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
