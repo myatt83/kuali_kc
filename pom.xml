@@ -17,7 +17,6 @@
 		<name>The Kuali Foundation</name>
 		<url>http://kuali.org</url>
 	</organization>
-
 	<licenses>
 		<license>
 			<name>The Kuali Foundation Educational Community License 2.0</name>
@@ -523,6 +522,23 @@
 	</build>
 
 	<dependencies>
+		<!--  jersy jax -->
+		<dependency>
+			<groupId>com.sun.jersey</groupId>
+			<artifactId>jersey-server</artifactId>
+			<version>${jersey.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.jersey</groupId>
+			<artifactId>jersey-servlet</artifactId>
+			<version>${jersey.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.sun.jersey.contribs</groupId>
+			<artifactId>jersey-multipart</artifactId>
+			<version>${jersey.version}</version>
+		</dependency>
+		
 		<!-- Required for jdk7 -->
 		<dependency>
 			<groupId>com.sun.xml.bind</groupId>
@@ -1712,6 +1728,8 @@
 	</ciManagement>
 
 	<properties>
+		<jersey.version>1.17.1</jersey.version>
+		
 		<cxf.version>2.7.0</cxf.version>
 		<drools.version>5.5.0.Final</drools.version>
 		<jetty.version>7.5.1.v20110908</jetty.version>

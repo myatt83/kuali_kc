@@ -284,6 +284,22 @@
 		<servlet-class>org.kuali.rice.kew.notes.web.AttachmentServlet</servlet-class>
 	</servlet>
 	
+	<servlet>
+	    <servlet-name>Easy424 Service</servlet-name>
+	    <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
+	    <init-param>
+	      <param-name>com.sun.jersey.config.property.packages</param-name>
+	      <param-value>org.easyproposal424.rest</param-value>
+	    </init-param>
+	    <load-on-startup>1</load-on-startup>
+	</servlet>
+	
+	
+	<servlet-mapping>
+		<servlet-name>Easy424 Service</servlet-name>
+		<url-pattern>/easy424/*</url-pattern>
+	</servlet-mapping>
+	
 	<!--  
 	
 		Following servlet and servlet mapping for the PostDataLoadEncryptionServlet are commented out.
