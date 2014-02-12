@@ -27,6 +27,7 @@ import org.easyproposal424.service.EasyProposalService;
 import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.rice.kew.api.exception.WorkflowException;
 import org.kuali.rice.krad.UserSession;
+import org.kuali.rice.krad.service.KualiRuleService;
 import org.kuali.rice.krad.util.GlobalVariables;
 import org.kuali.rice.krad.util.KRADConstants;
 import org.springframework.core.task.AsyncTaskExecutor;
@@ -43,6 +44,7 @@ public class TestCreateProposalResource {
     private String defaultPrincipalId = "admin";
     //
     private static final Log LOG =  LogFactory.getLog(TestCreateProposalResource.class);
+    //We need the rules service to perform the audit.
     
     // The Java method will process HTTP GET requests
     @GET
@@ -52,31 +54,19 @@ public class TestCreateProposalResource {
     public String testCreate() {
         
         String result = "";
-        /* 
-         * To avoid issues with pollution of the thread pool
-         * we are going to use the doInNewGlobalVariables method 
-         * available in GlobalVariables.  This requires a Callable
-         * and a way to wait for the created thread to complete...
-         */
                
-        Callable<String> call = new Callable<String> () {
-            public String call() {
-                String returningDocNumber = null;
-                //try {
-                    //establishUserSession(defaultPrincipalId);
-                    EasyProposalService easyProposalService = KraServiceLocator.getService(EasyProposalService.class);
-                    returningDocNumber = easyProposalService.createTest();
-//                } catch (WorkflowException e) {
-//                    LOG.error(String.format("Workflow exception generated creating new PDD:%s",e.getMessage()),e);
-//                    throw new RuntimeException(String.format("Workflow exception generated creating new PDD:%s",e.getMessage()),e);
-//                }
-                return returningDocNumber;
-            }
-        };
         
         
         try {
-          result =  GlobalVariables.doInNewGlobalVariables(establishUserSession(defaultPrincipalId),call);
+          result =  GlobalVariables.doInNewGlobalVariables(establishUserSession(defaultPrincipalId), new Callable<String> () {
+              public String call() {
+                  String returningDocNumber = null;
+                      EasyProposalService easyProposalService = KraServiceLocator.getService(EasyProposalService.class);
+                      returningDocNumber = easyProposalService.createTest();
+                      return returningDocNumber;
+              }
+          }
+         );
         }
         catch (WorkflowException e) {
             // TODO Auto-generated catch block
