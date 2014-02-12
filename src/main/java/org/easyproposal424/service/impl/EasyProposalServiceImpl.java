@@ -18,6 +18,7 @@ package org.easyproposal424.service.impl;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -35,6 +36,7 @@ import org.kuali.kra.proposaldevelopment.service.NarrativeService;
 import org.kuali.kra.proposaldevelopment.service.ProposalDevelopmentService;
 import org.kuali.kra.proposaldevelopment.service.ProposalPersonBiographyService;
 import org.kuali.kra.service.KraAuthorizationService;
+import org.kuali.kra.web.struts.action.AuditActionHelper;
 import org.kuali.rice.core.api.config.property.ConfigurationService;
 import org.kuali.rice.coreservice.framework.parameter.ParameterService;
 import org.kuali.rice.kew.api.WorkflowDocument;
@@ -43,6 +45,9 @@ import org.kuali.rice.kim.api.identity.IdentityService;
 import org.kuali.rice.kim.api.identity.Person;
 import org.kuali.rice.kim.api.identity.PersonService;
 import org.kuali.rice.kns.service.SessionDocumentService;
+import org.kuali.rice.kns.util.AuditCluster;
+import org.kuali.rice.kns.util.AuditError;
+import org.kuali.rice.kns.util.KNSGlobalVariables;
 import org.kuali.rice.krad.bo.DocumentHeader;
 import org.kuali.rice.krad.document.Document;
 import org.kuali.rice.krad.rules.rule.event.DocumentAuditEvent;
@@ -79,6 +84,7 @@ public class EasyProposalServiceImpl implements EasyProposalService {
     private WorkflowDocumentService workflowDocumentService;
     private ProposalDevelopmentService proposalDevelopmentService;
     
+    private KualiRuleService kualiRuleService;
     
     private String defaultPrincipalIdToInitiate = "admin";
 
@@ -145,6 +151,14 @@ public class EasyProposalServiceImpl implements EasyProposalService {
         return document.getDocumentNumber();
     }
     
+    
+    
+    protected MessageMap auditProposalDevelopmentDocument(ProposalDevelopmentDocument document) {
+        AuditActionHelper helper = new AuditActionHelper();
+        boolean passed = helper.auditUnconditionally(document);
+        return GlobalVariables.getMessageMap();
+    }
+    
     @Override
     public String createTest() {
         
@@ -166,7 +180,20 @@ public class EasyProposalServiceImpl implements EasyProposalService {
         proposalDevelopmentService.initializeUnitOrganizationLocation(doc);
         proposalDevelopmentService.initializeProposalSiteNumbers(doc);
         
-        return saveProposalDevelopmentDocument(doc);
+        String docNumber = saveProposalDevelopmentDocument(doc);
+        Map<String,AuditCluster> audits = KNSGlobalVariables.getAuditErrorMap();
+        
+        auditProposalDevelopmentDocument(doc);
+        
+        for(String key:audits.keySet()) {
+            LOG.info(String.format("Auditcluster %s found",key));
+            AuditCluster a = audits.get(key);
+            for(AuditError o: (List<AuditError>)(a.getAuditErrorList())) {
+                LOG.info(String.format("Audit:%s:%s",o.getMessageKey(),o.getErrorKey()));
+            }
+        }
+        
+        return docNumber;
     }
 
     
@@ -243,6 +270,11 @@ public class EasyProposalServiceImpl implements EasyProposalService {
 
     public void setProposalDevelopmentService(ProposalDevelopmentService proposalDevelopmentService) {
         this.proposalDevelopmentService = proposalDevelopmentService;
+    }
+
+
+    public void setKualiRuleService(KualiRuleService kualiRuleService) {
+        this.kualiRuleService = kualiRuleService;
     }
 
     
