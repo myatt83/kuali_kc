@@ -873,5 +873,9 @@
         <property name="personService" ref = "personService"/>
         <property name="proposalDevelopmentService" ref = "proposalDevelopmentService"/>
    </bean>
+   
+   <bean id="easyProposalGeneralLookupService" class = "org.easyproposal424.service.impl.EasyProposalGeneralLookupServiceImpl">
+   		<property name="businessObjectService" ref = "businessObjectService"/>
+   </bean>
 		
 </beans>
