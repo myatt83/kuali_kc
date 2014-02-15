@@ -16,6 +16,7 @@
 package org.easyproposal424.service;
 
 import java.util.Collection;
+import java.util.HashMap;
 
 import org.kuali.kra.bo.Unit;
 
@@ -23,5 +24,7 @@ import org.kuali.kra.bo.Unit;
 public interface EasyProposalGeneralLookupService {
 
     public abstract Collection<Unit> findUnit(String unitNumber, String unitName);
+    
+    public abstract HashMap<String,String> listUnits();
 
 }

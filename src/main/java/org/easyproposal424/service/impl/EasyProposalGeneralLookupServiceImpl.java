@@ -15,6 +15,7 @@
  */
 package org.easyproposal424.service.impl;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -44,6 +45,17 @@ public class EasyProposalGeneralLookupServiceImpl implements EasyProposalGeneral
     
     public void setBusinessObjectService(BusinessObjectService businessObjectService) {
         this.businessObjectService = businessObjectService;
+    }
+    
+    public HashMap<String,String> listUnits() {
+        HashMap<String,String> unitlist = new HashMap<String,String>();
+        
+        HashMap<String,String> crit = new HashMap<String,String>();
+        Collection<Unit> results = businessObjectService.findMatching(Unit.class, crit);
+        for (Unit unit : results) {
+            unitlist.put(unit.getUnitName(),unit.getUnitNumber());
+        }
+        return unitlist;
     }
     
     
