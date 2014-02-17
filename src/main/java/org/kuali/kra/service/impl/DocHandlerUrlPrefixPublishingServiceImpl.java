@@ -33,12 +33,17 @@ import org.springframework.beans.factory.InitializingBean;
  * @author Kuali Research Administration Team (kualidev@oncourse.iu.edu)
  */
 public class DocHandlerUrlPrefixPublishingServiceImpl implements DocHandlerUrlPrefixPublishingService, InitializingBean {
+    private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(DocHandlerUrlPrefixPublishingServiceImpl.class);
     private String parameterName;
     private String parameterApplicationId;
     private String parameterNamespaceCode;
     private String parameterComponentCode;
     private String parameterTypeCode;
     private String parameterValue;
+    /**
+     * Enabled by default to be backwards compatible. If disabled, then the system parameter will not be published.
+     */
+    private boolean publishingEnabled = true;
 
     private ParameterService parameterService;
 
@@ -90,6 +95,23 @@ public class DocHandlerUrlPrefixPublishingServiceImpl implements DocHandlerUrlPr
         this.parameterValue = parameterValue;
     }
 
+    /**
+     * Gets the publishingEnabled attribute.
+     * @return Returns the publishingEnabled.
+     */
+    public boolean isPublishingEnabled() {
+        return publishingEnabled;
+    }
+
+    /**
+     * Sets the publishingEnabled attribute value.
+     * @param publishingEnabled The publishingEnabled to set.
+     */
+    public void setPublishingEnabled(boolean publishingEnabled) {
+        LOG.debug("setPublishingEnabled(boolean " + publishingEnabled + ")");
+        this.publishingEnabled = publishingEnabled;
+    }
+
     public void setParameterService(ParameterService parameterService) {
         this.parameterService = parameterService;
     }
@@ -105,20 +127,23 @@ public class DocHandlerUrlPrefixPublishingServiceImpl implements DocHandlerUrlPr
     
     @Override
     public void publishDocHandlerUrlPrefix() {
-        if (RunMode.EMBEDDED == getKewRunMode()) {
-            ParameterType.Builder parameterType = ParameterType.Builder.create(parameterTypeCode);
-            Parameter.Builder parameter = Parameter.Builder.create(parameterApplicationId, parameterNamespaceCode, parameterComponentCode, parameterName, parameterType);
-            parameter.setDescription("KC application docHandler prefix");
-            parameter.setValue(parameterValue);
-            parameter.setEvaluationOperator(EvaluationOperator.ALLOW);
-            Parameter existingParameter = parameterService.getParameter(parameterNamespaceCode, parameterComponentCode, parameterName);
-            if(existingParameter == null) {
-                parameterService.createParameter(parameter.build());
-            } else if(!StringUtils.equals(existingParameter.getValue(), parameterValue)) {
-                parameter.setObjectId(existingParameter.getObjectId());
-                parameter.setVersionNumber(existingParameter.getVersionNumber());
-                parameterService.updateParameter(parameter.build());
-            } 
+        if (publishingEnabled) {
+            LOG.info("Publishing system parameter: " + parameterName + " = " + parameterValue);
+            if (RunMode.EMBEDDED == getKewRunMode()) {
+                ParameterType.Builder parameterType = ParameterType.Builder.create(parameterTypeCode);
+                Parameter.Builder parameter = Parameter.Builder.create(parameterApplicationId, parameterNamespaceCode, parameterComponentCode, parameterName, parameterType);
+                parameter.setDescription("KC application docHandler prefix");
+                parameter.setValue(parameterValue);
+                parameter.setEvaluationOperator(EvaluationOperator.ALLOW);
+                Parameter existingParameter = parameterService.getParameter(parameterNamespaceCode, parameterComponentCode, parameterName);
+                if(existingParameter == null) {
+                    parameterService.createParameter(parameter.build());
+                } else if(!StringUtils.equals(existingParameter.getValue(), parameterValue)) {
+                    parameter.setObjectId(existingParameter.getObjectId());
+                    parameter.setVersionNumber(existingParameter.getVersionNumber());
+                    parameterService.updateParameter(parameter.build());
+                }
+            }
         }
     }  
 
