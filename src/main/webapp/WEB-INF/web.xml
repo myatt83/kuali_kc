@@ -289,7 +289,7 @@
 	    <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
 	    <init-param>
 	      <param-name>com.sun.jersey.config.property.packages</param-name>
-	      <param-value>org.easyproposal424.rest</param-value>
+	      <param-value>org.easyproposal424.rest;org.easyproposal424.jackson</param-value>
 	    </init-param>
 	    <init-param>
 			<param-name>com.sun.jersey.api.json.POJOMappingFeature</param-name>

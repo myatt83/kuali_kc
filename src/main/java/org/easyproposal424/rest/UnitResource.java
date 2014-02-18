@@ -15,15 +15,19 @@
  */
 package org.easyproposal424.rest;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import org.codehaus.jackson.map.ObjectMapper;
+import org.easyproposal424.bo.kc.UnitDTO;
+import org.easyproposal424.bo.mixins.UnitMixin;
 import org.easyproposal424.service.EasyProposalGeneralLookupService;
 import org.kuali.kra.bo.Unit;
 import org.kuali.kra.infrastructure.KraServiceLocator;
@@ -40,13 +44,34 @@ public class UnitResource {
     
     public UnitResource() {
         lookupService = KraServiceLocator.getService(EasyProposalGeneralLookupService.class);
+        //setup the mixins we want.  This should be moved to some configuration files...
+        ObjectMapper objMapper = new ObjectMapper();
+        objMapper.getSerializationConfig().addMixInAnnotations(Unit.class, UnitMixin.class);
+        
     }
     
   
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Collection<Unit> findUnits( @QueryParam("unitNumber") String unitNumber,@QueryParam("unitName") String unitName) {
-        return lookupService.findUnit(unitNumber, unitName);
+    public List<UnitDTO> findUnits( @QueryParam("unitNumber") String unitNumber,@QueryParam("unitName") String unitName) {
+        Collection<Unit> res = lookupService.findUnit(unitNumber, unitName);
+        List<UnitDTO> outputList = new ArrayList<UnitDTO>();
+        for (Unit unit:res) {
+            outputList.add(UnitDTO.fromUnit(unit));
+        }
+        return outputList;
+    }
+    
+    
+    @GET
+    @Path("/mappedUnit")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Collection<Unit> findMappedUnits( @QueryParam("unitNumber") String unitNumber,@QueryParam("unitName") String unitName) {
+        Collection<Unit> res = lookupService.findUnit(unitNumber, unitName);
+        ObjectMapper objMapper = new ObjectMapper();
+        objMapper.getSerializationConfig().addMixInAnnotations(Unit.class, UnitMixin.class);
+        
+        return res;
     }
     
  
