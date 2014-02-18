@@ -15,19 +15,11 @@
  */
 package org.easyproposal424.bo.mixins;
 
-import java.util.List;
-
-import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
-import org.codehaus.jackson.annotate.JsonProperty;
-import org.kuali.kra.bo.Organization;
-import org.kuali.kra.bo.Unit;
-import org.kuali.kra.bo.UnitAdministrator;
 
 
-public interface UnitMixin extends KraPersistableBusinessObjectBaseMixin {
-    @JsonIgnore Unit getParentUnit();
-    @JsonIgnore Organization getOrganization();
-    @JsonIgnore List<UnitAdministrator> getUnitAdministrators();
-    @JsonIgnore String getOrganizationIdForMaintenance();
+@JsonIgnoreProperties({"versionNumber","objectId","newCollectionRecord","extension"
+    ,"updateUser","updateTimestamp","updateUserSet","authorPersonName"})
+public interface KraPersistableBusinessObjectBaseMixin {
+
 }
