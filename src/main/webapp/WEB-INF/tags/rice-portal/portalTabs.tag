@@ -93,6 +93,32 @@
               </c:if>
             </c:otherwise>
           </c:choose>
+          &nbsp;
+          <div class="login-form">
+            <c:choose>
+              <c:when test="${empty UserSession.loggedInUserPrincipalName}" >
+              </c:when>
+              <c:when test="${fn:trim(ConfigProperties.environment) == fn:trim(ConfigProperties.production.environment.code)}" >
+                <html:form action="/logout.do" method="post" style="margin:0; display:inline">
+                  <input name="imageField" type="submit" value="Logout" class="go" title="Click to logout.">
+                </html:form>
+              </c:when>
+              <c:otherwise>
+                <c:set var="backboorEnabled" value="<%=org.kuali.rice.coreservice.framework.CoreFrameworkServiceLocator.getParameterService().getParameterValueAsBoolean(org.kuali.rice.kew.api.KewApiConstants.KEW_NAMESPACE, org.kuali.rice.krad.util.KRADConstants.DetailTypes.BACKDOOR_DETAIL_TYPE, org.kuali.rice.kew.api.KewApiConstants.SHOW_BACK_DOOR_LOGIN_IND)%>"/>
+                <c:if test="${backboorEnabled}">
+                  <html:form action="/backdoorlogin.do" method="post" style="margin:0; display:inline">
+                    <input name="backdoorId" type="text" class="searchbox" size="10" title="Enter your backdoor ID here.">
+                    <button type="submit" value="Login" class="btn btn-mini" title="Click to login.">Login</button>
+                    <input name="methodToCall" type="hidden" value="login" />
+                  </html:form>
+                </c:if>
+                <html:form action="/backdoorlogin.do" method="post" style="margin:0; display:inline">
+                  <button name="imageField" type="submit" value="Logout" class="btn btn-mini">Logout</button>
+                  <input name="methodToCall" type="hidden" value="logout" />
+                </html:form>
+              </c:otherwise>
+            </c:choose>
+          </div>
         </li>
 
         <li class="right-nav">
