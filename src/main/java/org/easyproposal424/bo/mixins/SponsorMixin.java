@@ -13,21 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.easyproposal424.service;
+package org.easyproposal424.bo.mixins;
 
-import java.util.Collection;
-import java.util.HashMap;
+import java.util.List;
 
-import org.kuali.kra.bo.Sponsor;
+import org.codehaus.jackson.annotate.JsonIgnore;
+
+import org.kuali.kra.bo.Rolodex;
 import org.kuali.kra.bo.Unit;
 
 
-public interface EasyProposalGeneralLookupService {
-
-    public abstract Collection<Unit> findUnit(String unitNumber, String unitName);
-    
-    public abstract Collection<Sponsor> findSponsor(String searchValue);
-    
-    public abstract HashMap<String,String> listUnits();
-
+public interface SponsorMixin extends KraPersistableBusinessObjectBaseMixin {
+    @JsonIgnore Unit getUnit();
+    @JsonIgnore Rolodex getRolodex();
 }
