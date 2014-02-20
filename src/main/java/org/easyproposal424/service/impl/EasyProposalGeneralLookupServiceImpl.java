@@ -24,6 +24,10 @@ import org.drools.core.util.StringUtils;
 import org.easyproposal424.service.EasyProposalGeneralLookupService;
 import org.kuali.kra.bo.Sponsor;
 import org.kuali.kra.bo.Unit;
+import org.kuali.kra.infrastructure.Constants;
+import org.kuali.kra.infrastructure.KraServiceLocator;
+import org.kuali.kra.infrastructure.PermissionConstants;
+import org.kuali.kra.service.UnitAuthorizationService;
 import org.kuali.rice.krad.service.BusinessObjectService;
 
 public class EasyProposalGeneralLookupServiceImpl implements EasyProposalGeneralLookupService {
@@ -64,5 +68,18 @@ public class EasyProposalGeneralLookupServiceImpl implements EasyProposalGeneral
         if (!StringUtils.isEmpty(searchValue)) crit.put("sponsorName", searchValue);
         Collection<Sponsor> results = businessObjectService.findMatching(Sponsor.class, crit);
         return results;
+    }
+    
+    /**
+     * @see org.easyproposal424.service.EasyProposalGeneralLookupService#findUnit(java.lang.String, java.lang.String)
+     */
+    @Override
+    public List<Unit> findUserAuthorizedUnits(String userid) {
+        List<Unit> userUnits = new ArrayList<Unit>();
+        if (!StringUtils.isEmpty(userid)) {
+            UnitAuthorizationService authService = KraServiceLocator.getService(UnitAuthorizationService.class);
+            userUnits = authService.getUnits(userid, Constants.MODULE_NAMESPACE_PROPOSAL_DEVELOPMENT, PermissionConstants.CREATE_PROPOSAL);
+        }
+        return userUnits;
     }
 }

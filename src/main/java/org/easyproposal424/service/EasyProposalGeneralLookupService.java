@@ -26,6 +26,18 @@ public interface EasyProposalGeneralLookupService {
 
     public abstract Collection<Unit> findUnit(String unitNumber, String unitName);
     
+    /**
+     * @param userId PrincipalId of user must be provided for result
+     * @return       List of Units for which the user has the Create Proposal Development permission 
+     */
+    public abstract Collection<Unit> findUserAuthorizedUnits(String userid);
+    
+    /**
+     * @param searchValue   Value to be searched on.  Currently the code just uses this on sponsor name search
+     *                      * or % can be passed in as a wildcard.   Future implementation might use more sophisticated
+     *                      search techniques which is why only searchValue was provided in interface
+     * @return              List of sponsors based on search value passed in.   
+     */
     public abstract Collection<Sponsor> findSponsor(String searchValue);
     
     public abstract HashMap<String,String> listUnits();

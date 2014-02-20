@@ -74,5 +74,13 @@ public class UnitResource {
         return res;
     }
     
+    @GET
+    @Path("/userUnits")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Collection<Unit> findUserAuthorizedUnits( @QueryParam("userid") String userid) {
+        Collection<Unit> res = lookupService.findUserAuthorizedUnits(userid);      
+        return res;
+    }
+    
  
 }
