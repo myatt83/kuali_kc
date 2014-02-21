@@ -18,13 +18,18 @@ package org.easyproposal424.service;
 import java.util.Collection;
 import java.util.HashMap;
 
+import org.kuali.kra.bo.KcPerson;
 import org.kuali.kra.bo.Unit;
+import org.kuali.rice.kim.api.identity.Person;
+import org.kuali.rice.kim.impl.identity.PersonImpl;
 
 
 public interface EasyProposalGeneralLookupService {
 
+    public abstract Collection<Unit> findUnit(String matchString);
+    
     public abstract Collection<Unit> findUnit(String unitNumber, String unitName);
     
-    public abstract HashMap<String,String> listUnits();
+    public abstract Collection<Person> findPerson(String lastName, String firstName, String userName);
 
 }

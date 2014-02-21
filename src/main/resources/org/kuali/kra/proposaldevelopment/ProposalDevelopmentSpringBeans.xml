@@ -876,6 +876,7 @@
    
    <bean id="easyProposalGeneralLookupService" class = "org.easyproposal424.service.impl.EasyProposalGeneralLookupServiceImpl">
    		<property name="businessObjectService" ref = "businessObjectService"/>
+   		<property name="personService" ref="personService"/>
    </bean>
 		
 </beans>

@@ -22,13 +22,19 @@ import java.util.List;
 
 import org.drools.core.util.StringUtils;
 import org.easyproposal424.service.EasyProposalGeneralLookupService;
+import org.kuali.kra.bo.KcPerson;
 import org.kuali.kra.bo.Unit;
+import org.kuali.kra.service.KcPersonService;
+import org.kuali.rice.kim.api.identity.IdentityService;
+import org.kuali.rice.kim.api.identity.Person;
+import org.kuali.rice.kim.api.identity.PersonService;
+import org.kuali.rice.kim.impl.identity.PersonImpl;
 import org.kuali.rice.krad.service.BusinessObjectService;
 
 public class EasyProposalGeneralLookupServiceImpl implements EasyProposalGeneralLookupService {
     
     private BusinessObjectService businessObjectService;
-    
+    private PersonService personService;
     
     
     /**
@@ -43,21 +49,28 @@ public class EasyProposalGeneralLookupServiceImpl implements EasyProposalGeneral
         return results;
     }
     
+    @Override
+    public Collection<Person> findPerson(String lastName, String firstName, String userName) {
+        HashMap<String,String> crit = new HashMap<String,String>();
+        if(!StringUtils.isEmpty(lastName)) crit.put("lastName", lastName.toUpperCase());
+        if(!StringUtils.isEmpty(firstName)) crit.put("firstName", firstName.toUpperCase());
+        if(!StringUtils.isEmpty(userName)) crit.put("principalName", userName.toUpperCase());
+        List<Person> persons = personService.findPeople(crit);
+        return persons;
+    }
+    
+    
+    @Override
+    public Collection<Unit> findUnit(String matchString) {
+        return findUnit(null,matchString);
+    }
+    
     public void setBusinessObjectService(BusinessObjectService businessObjectService) {
         this.businessObjectService = businessObjectService;
     }
     
-    public HashMap<String,String> listUnits() {
-        HashMap<String,String> unitlist = new HashMap<String,String>();
-        
-        HashMap<String,String> crit = new HashMap<String,String>();
-        Collection<Unit> results = businessObjectService.findMatching(Unit.class, crit);
-        for (Unit unit : results) {
-            unitlist.put(unit.getUnitName(),unit.getUnitNumber());
-        }
-        return unitlist;
+    public void setPersonService(PersonService personService) {
+        this.personService = personService;
     }
-    
-    
 
 }
