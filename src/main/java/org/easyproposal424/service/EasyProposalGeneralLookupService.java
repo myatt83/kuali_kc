@@ -18,6 +18,7 @@ package org.easyproposal424.service;
 import java.util.Collection;
 import java.util.HashMap;
 
+import org.kuali.kra.bo.Organization;
 import org.kuali.kra.bo.Sponsor;
 import org.kuali.kra.bo.Unit;
 
@@ -39,6 +40,14 @@ public interface EasyProposalGeneralLookupService {
      * @return              List of sponsors based on search value passed in.   
      */
     public abstract Collection<Sponsor> findSponsor(String searchValue);
+    
+    /**
+     * @param searchValue   Value to be searched on.  Currently the code just uses this on Organization Name.
+     *                      * or % can be passed in as a wildcard.   Future implementation might use more sophisticated
+     *                      search techniques which is why only searchValue was provided in interface
+     * @return              List of Organizations based on search value passed in.   
+     */
+    public abstract Collection<Organization> findOrganization(String searchValue);
     
     public abstract HashMap<String,String> listUnits();
 

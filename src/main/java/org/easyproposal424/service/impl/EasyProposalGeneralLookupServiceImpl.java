@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.drools.core.util.StringUtils;
 import org.easyproposal424.service.EasyProposalGeneralLookupService;
+import org.kuali.kra.bo.Organization;
 import org.kuali.kra.bo.Sponsor;
 import org.kuali.kra.bo.Unit;
 import org.kuali.kra.infrastructure.Constants;
@@ -67,6 +68,13 @@ public class EasyProposalGeneralLookupServiceImpl implements EasyProposalGeneral
         HashMap<String,String> crit = new HashMap<String,String>();
         if (!StringUtils.isEmpty(searchValue)) crit.put("sponsorName", searchValue);
         Collection<Sponsor> results = businessObjectService.findMatching(Sponsor.class, crit);
+        return results;
+    }
+    
+    public Collection<Organization> findOrganization(String searchValue) {
+        HashMap<String,String> crit = new HashMap<String,String>();
+        if (!StringUtils.isEmpty(searchValue)) crit.put("organizationName", searchValue);
+        Collection<Organization> results = businessObjectService.findMatching(Organization.class, crit);
         return results;
     }
     
