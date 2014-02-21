@@ -22,13 +22,15 @@ import java.util.List;
 
 import org.drools.core.util.StringUtils;
 import org.easyproposal424.service.EasyProposalGeneralLookupService;
-import org.kuali.kra.bo.KcPerson;
+import org.kuali.kra.bo.Organization;
+import org.kuali.kra.bo.Sponsor;
 import org.kuali.kra.bo.Unit;
-import org.kuali.kra.service.KcPersonService;
-import org.kuali.rice.kim.api.identity.IdentityService;
+import org.kuali.kra.infrastructure.Constants;
+import org.kuali.kra.infrastructure.KraServiceLocator;
+import org.kuali.kra.infrastructure.PermissionConstants;
+import org.kuali.kra.service.UnitAuthorizationService;
 import org.kuali.rice.kim.api.identity.Person;
 import org.kuali.rice.kim.api.identity.PersonService;
-import org.kuali.rice.kim.impl.identity.PersonImpl;
 import org.kuali.rice.krad.service.BusinessObjectService;
 
 public class EasyProposalGeneralLookupServiceImpl implements EasyProposalGeneralLookupService {
@@ -36,6 +38,11 @@ public class EasyProposalGeneralLookupServiceImpl implements EasyProposalGeneral
     private BusinessObjectService businessObjectService;
     private PersonService personService;
     
+
+    @Override
+    public Collection<Unit> findUnit(String matchString) {
+        return findUnit(null,matchString);
+    }
     
     /**
      * @see org.easyproposal424.service.EasyProposalGeneralLookupService#findUnit(java.lang.String, java.lang.String)
@@ -49,6 +56,9 @@ public class EasyProposalGeneralLookupServiceImpl implements EasyProposalGeneral
         return results;
     }
     
+    /**
+     * @see org.easyproposal424.service.EasyProposalGeneralLookupService#findPerson(java.lang.String, java.lang.String, java.lang.String)
+     */
     @Override
     public Collection<Person> findPerson(String lastName, String firstName, String userName) {
         HashMap<String,String> crit = new HashMap<String,String>();
@@ -59,12 +69,33 @@ public class EasyProposalGeneralLookupServiceImpl implements EasyProposalGeneral
         return persons;
     }
     
-    
-    @Override
-    public Collection<Unit> findUnit(String matchString) {
-        return findUnit(null,matchString);
+    public Collection<Sponsor> findSponsor(String searchValue) {
+        HashMap<String,String> crit = new HashMap<String,String>();
+        if (!StringUtils.isEmpty(searchValue)) crit.put("upper(sponsorName)", searchValue.toUpperCase());
+        Collection<Sponsor> results = businessObjectService.findMatching(Sponsor.class, crit);
+        return results;
     }
     
+    public Collection<Organization> findOrganization(String searchValue) {
+        HashMap<String,String> crit = new HashMap<String,String>();
+        if (!StringUtils.isEmpty(searchValue)) crit.put("upper(organizationName)", searchValue.toUpperCase());
+        Collection<Organization> results = businessObjectService.findMatching(Organization.class, crit);
+        return results;
+    }
+    
+    /**
+     * @see org.easyproposal424.service.EasyProposalGeneralLookupService#findUnit(java.lang.String, java.lang.String)
+     */
+    @Override
+    public List<Unit> findUserAuthorizedUnits(String userid) {
+        List<Unit> userUnits = new ArrayList<Unit>();
+        if (!StringUtils.isEmpty(userid)) {
+            UnitAuthorizationService authService = KraServiceLocator.getService(UnitAuthorizationService.class);
+            userUnits = authService.getUnits(userid, Constants.MODULE_NAMESPACE_PROPOSAL_DEVELOPMENT, PermissionConstants.CREATE_PROPOSAL);
+        }
+        return userUnits;
+    }
+
     public void setBusinessObjectService(BusinessObjectService businessObjectService) {
         this.businessObjectService = businessObjectService;
     }
@@ -72,5 +103,6 @@ public class EasyProposalGeneralLookupServiceImpl implements EasyProposalGeneral
     public void setPersonService(PersonService personService) {
         this.personService = personService;
     }
+
 
 }

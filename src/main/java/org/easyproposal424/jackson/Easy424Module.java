@@ -17,7 +17,11 @@ package org.easyproposal424.jackson;
 
 import org.codehaus.jackson.Version;
 import org.codehaus.jackson.map.module.SimpleModule;
+import org.easyproposal424.bo.mixins.OrganizationMixin;
+import org.easyproposal424.bo.mixins.SponsorMixin;
 import org.easyproposal424.bo.mixins.UnitMixin;
+import org.kuali.kra.bo.Organization;
+import org.kuali.kra.bo.Sponsor;
 import org.kuali.kra.bo.Unit;
 
 public class Easy424Module extends SimpleModule {
@@ -35,6 +39,8 @@ public class Easy424Module extends SimpleModule {
     public void setupModule(SetupContext context) {
         super.setupModule(context);
         context.setMixInAnnotations(Unit.class,UnitMixin.class);
+        context.setMixInAnnotations(Sponsor.class,SponsorMixin.class);
+        context.setMixInAnnotations(Organization.class,OrganizationMixin.class);
     }
     
 }

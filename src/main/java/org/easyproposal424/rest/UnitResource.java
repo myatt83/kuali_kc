@@ -44,10 +44,6 @@ public class UnitResource {
     
     public UnitResource() {
         lookupService = KraServiceLocator.getService(EasyProposalGeneralLookupService.class);
-        //setup the mixins we want.  This should be moved to some configuration files...
-        ObjectMapper objMapper = new ObjectMapper();
-        objMapper.getSerializationConfig().addMixInAnnotations(Unit.class, UnitMixin.class);
-        
     }
     
   
@@ -68,9 +64,14 @@ public class UnitResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Collection<Unit> findMappedUnits( @QueryParam("unitNumber") String unitNumber,@QueryParam("unitName") String unitName) {
         Collection<Unit> res = lookupService.findUnit(unitNumber, unitName);
-        ObjectMapper objMapper = new ObjectMapper();
-        objMapper.getSerializationConfig().addMixInAnnotations(Unit.class, UnitMixin.class);
-        
+        return res;
+    }
+    
+    @GET
+    @Path("/userUnits")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Collection<Unit> findUserAuthorizedUnits( @QueryParam("userid") String userid) {
+        Collection<Unit> res = lookupService.findUserAuthorizedUnits(userid);      
         return res;
     }
     
