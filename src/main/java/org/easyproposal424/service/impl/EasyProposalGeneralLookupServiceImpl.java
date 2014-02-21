@@ -18,6 +18,7 @@ package org.easyproposal424.service.impl;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import org.drools.core.util.StringUtils;
@@ -66,14 +67,14 @@ public class EasyProposalGeneralLookupServiceImpl implements EasyProposalGeneral
     
     public Collection<Sponsor> findSponsor(String searchValue) {
         HashMap<String,String> crit = new HashMap<String,String>();
-        if (!StringUtils.isEmpty(searchValue)) crit.put("sponsorName", searchValue);
+        if (!StringUtils.isEmpty(searchValue)) crit.put("upper(sponsorName)", searchValue.toUpperCase());
         Collection<Sponsor> results = businessObjectService.findMatching(Sponsor.class, crit);
         return results;
     }
     
     public Collection<Organization> findOrganization(String searchValue) {
         HashMap<String,String> crit = new HashMap<String,String>();
-        if (!StringUtils.isEmpty(searchValue)) crit.put("organizationName", searchValue);
+        if (!StringUtils.isEmpty(searchValue)) crit.put("upper(organizationName)", searchValue.toUpperCase());
         Collection<Organization> results = businessObjectService.findMatching(Organization.class, crit);
         return results;
     }
