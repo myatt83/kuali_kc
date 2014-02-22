@@ -1541,6 +1541,12 @@
 								<contextPath>${default.context.path}</contextPath>
 								<descriptor>${project.build.directory}/web.xml</descriptor>
 							</webAppConfig>
+							<connectors>
+		          			       <connector implementation="org.eclipse.jetty.server.nio.SelectChannelConnector">
+          								<port>8080</port>
+          								<maxIdleTime>360000</maxIdleTime>
+       								</connector>
+    							 </connectors>
 						  </configuration>
 					</plugin>			
 				</plugins>
