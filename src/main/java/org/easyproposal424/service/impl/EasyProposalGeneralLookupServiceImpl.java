@@ -69,16 +69,26 @@ public class EasyProposalGeneralLookupServiceImpl implements EasyProposalGeneral
         return persons;
     }
     
-    public Collection<Sponsor> findSponsor(String searchValue) {
+    public Collection<Sponsor> findSponsor(String sponsorName) {
         HashMap<String,String> crit = new HashMap<String,String>();
-        if (!StringUtils.isEmpty(searchValue)) crit.put("upper(sponsorName)", searchValue.toUpperCase());
+        if (!StringUtils.isEmpty(sponsorName)) crit.put("upper(sponsorName)", sponsorName.toUpperCase());
         Collection<Sponsor> results = businessObjectService.findMatching(Sponsor.class, crit);
         return results;
     }
     
-    public Collection<Organization> findOrganization(String searchValue) {
+    public Collection<String> sponsorQuickList() {
+        ArrayList<String> sponsors = new ArrayList<String>();
+        Collection<Sponsor> results = businessObjectService.findAll(Sponsor.class);
+        for (Sponsor sponsor : results) {
+            sponsors.add(sponsor.getSponsorName());
+        }
+        return sponsors;
+    }
+    
+    public Collection<Organization> findOrganization(String orgName,String orgAddress) {
         HashMap<String,String> crit = new HashMap<String,String>();
-        if (!StringUtils.isEmpty(searchValue)) crit.put("upper(organizationName)", searchValue.toUpperCase());
+        if (!StringUtils.isEmpty(orgName)) crit.put("upper(organizationName)", orgName.toUpperCase());
+        if (!StringUtils.isEmpty(orgAddress)) crit.put("upper(address)", orgAddress.toUpperCase());
         Collection<Organization> results = businessObjectService.findMatching(Organization.class, crit);
         return results;
     }

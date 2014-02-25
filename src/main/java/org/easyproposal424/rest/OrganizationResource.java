@@ -41,8 +41,8 @@ public class OrganizationResource {
   
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Collection<Organization> findOrganization( @QueryParam("searchVal") String searchVal) {
-        Collection<Organization> res = lookupService.findOrganization(searchVal);
+    public Collection<Organization> findOrganization( @QueryParam("organizationName") String orgName, @QueryParam("organizationAddress") String orgAddress) {
+        Collection<Organization> res = lookupService.findOrganization(orgName,orgAddress);
         return res;
     }
    

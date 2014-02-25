@@ -20,10 +20,12 @@ import java.util.List;
 import org.codehaus.jackson.annotate.JsonIgnore;
 
 import org.kuali.kra.bo.Rolodex;
+import org.kuali.kra.bo.SponsorType;
 import org.kuali.kra.bo.Unit;
 
 
 public interface SponsorMixin extends KraPersistableBusinessObjectBaseMixin {
     @JsonIgnore Unit getUnit();
     @JsonIgnore Rolodex getRolodex();
+    @JsonIgnore SponsorType getSponsorType();
 }

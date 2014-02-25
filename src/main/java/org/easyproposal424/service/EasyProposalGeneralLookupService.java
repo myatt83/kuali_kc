@@ -57,7 +57,8 @@ public interface EasyProposalGeneralLookupService {
      *                      search techniques which is why only searchValue was provided in interface
      * @return              List of sponsors based on search value passed in.   
      */
-    public abstract Collection<Sponsor> findSponsor(String searchValue);
+    public abstract Collection<Sponsor> findSponsor(String sponsorName);
+    public abstract Collection<String> sponsorQuickList();
     
     /**
      * @param searchValue   Value to be searched on.  Currently the code just uses this on Organization Name.
@@ -65,6 +66,6 @@ public interface EasyProposalGeneralLookupService {
      *                      search techniques which is why only searchValue was provided in interface
      * @return              List of Organizations based on search value passed in.   
      */
-    public abstract Collection<Organization> findOrganization(String searchValue);
+    public abstract Collection<Organization> findOrganization(String orgName, String orgAddress);
 
 }

@@ -39,8 +39,16 @@ public class SponsorResource {
   
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Collection<Sponsor> findSponsors( @QueryParam("searchVal") String searchVal) {
-        Collection<Sponsor> res = lookupService.findSponsor(searchVal);
+    public Collection<Sponsor> findSponsors( @QueryParam("sponsorName") String sponsorName) {
+        Collection<Sponsor> res = lookupService.findSponsor(sponsorName);
+        return res;
+    }
+    
+    @GET
+    @Path("/quicklist")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Collection<String> sponsorQuickList() {
+        Collection<String> res = lookupService.sponsorQuickList();
         return res;
     }
    
