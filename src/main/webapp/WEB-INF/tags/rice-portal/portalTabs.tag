@@ -81,43 +81,48 @@
     <div class="container-fluid">
       <ul class="nav">
         <li class="first user right-nav">
-          <c:set var="invalidUserMsg" value="Invalid username"/>
-          <c:choose>
-            <c:when test="${empty UserSession.loggedInUserPrincipalName}" >You are not logged in.</c:when>
-            <c:otherwise>User: ${UserSession.loggedInUserPrincipalName}
-              <c:if test="${UserSession.backdoorInUse}" >
-                  Impersonating User:${UserSession.principalName}
-              </c:if>
-              <c:if test="${param.invalidUser}">
-                  Impersonating User:&nbsp;${invalidUserMsg}
-              </c:if>
-            </c:otherwise>
-          </c:choose>
-          &nbsp;
-          <div class="login-form">
-            <c:choose>
-              <c:when test="${empty UserSession.loggedInUserPrincipalName}" >
-              </c:when>
-              <c:when test="${fn:trim(ConfigProperties.environment) == fn:trim(ConfigProperties.production.environment.code)}" >
-                <html:form action="/logout.do" method="post" style="margin:0; display:inline">
-                  <input name="imageField" type="submit" value="Logout" class="go" title="Click to logout.">
-                </html:form>
-              </c:when>
-              <c:otherwise>
-                <c:set var="backboorEnabled" value="<%=org.kuali.rice.coreservice.framework.CoreFrameworkServiceLocator.getParameterService().getParameterValueAsBoolean(org.kuali.rice.kew.api.KewApiConstants.KEW_NAMESPACE, org.kuali.rice.krad.util.KRADConstants.DetailTypes.BACKDOOR_DETAIL_TYPE, org.kuali.rice.kew.api.KewApiConstants.SHOW_BACK_DOOR_LOGIN_IND)%>"/>
-                <c:if test="${backboorEnabled}">
-                  <html:form action="/backdoorlogin.do" method="post" style="margin:0; display:inline">
-                    <input name="backdoorId" type="text" class="searchbox" size="10" title="Enter your backdoor ID here.">
-                    <button type="submit" value="Login" class="btn btn-mini" title="Click to login.">Login</button>
-                    <input name="methodToCall" type="hidden" value="login" />
+          <div class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+              <c:set var="invalidUserMsg" value="Invalid username"/>
+              <c:choose>
+                <c:when test="${empty UserSession.loggedInUserPrincipalName}" >You are not logged in.</c:when>
+                <c:otherwise>User: ${UserSession.loggedInUserPrincipalName}
+                  <c:if test="${UserSession.backdoorInUse}" >
+                      Impersonating User:${UserSession.principalName}
+                  </c:if>
+                  <c:if test="${param.invalidUser}">
+                      Impersonating User:&nbsp;${invalidUserMsg}
+                  </c:if>
+                </c:otherwise>
+              </c:choose>
+              &nbsp;
+              <span aria-hidden="true" class=" icon-caret-down"></span>
+            </a>
+            <div class="login-form dropdown-menu">
+              <c:choose>
+                <c:when test="${empty UserSession.loggedInUserPrincipalName}" >
+                </c:when>
+                <c:when test="${fn:trim(ConfigProperties.environment) == fn:trim(ConfigProperties.production.environment.code)}" >
+                  <html:form action="/logout.do" method="post" style="margin:0; display:inline">
+                    <input name="imageField" type="submit" value="Logout" class="go" title="Click to logout.">
                   </html:form>
-                </c:if>
-                <html:form action="/backdoorlogin.do" method="post" style="margin:0; display:inline">
-                  <button name="imageField" type="submit" value="Logout" class="btn btn-mini">Logout</button>
-                  <input name="methodToCall" type="hidden" value="logout" />
-                </html:form>
-              </c:otherwise>
-            </c:choose>
+                </c:when>
+                <c:otherwise>
+                  <c:set var="backboorEnabled" value="<%=org.kuali.rice.coreservice.framework.CoreFrameworkServiceLocator.getParameterService().getParameterValueAsBoolean(org.kuali.rice.kew.api.KewApiConstants.KEW_NAMESPACE, org.kuali.rice.krad.util.KRADConstants.DetailTypes.BACKDOOR_DETAIL_TYPE, org.kuali.rice.kew.api.KewApiConstants.SHOW_BACK_DOOR_LOGIN_IND)%>"/>
+                  <c:if test="${backboorEnabled}">
+                    <html:form action="/backdoorlogin.do" method="post" style="margin:0; display:inline">
+                      <input name="backdoorId" type="text" class="searchbox" size="10" title="Enter your backdoor ID here.">
+                      <button type="submit" value="Login" class="btn btn-mini" title="Click to login.">Login</button>
+                      <input name="methodToCall" type="hidden" value="login" />
+                    </html:form>
+                  </c:if>
+                  <html:form action="/backdoorlogin.do" method="post" style="margin:0; display:inline">
+                    <button name="imageField" type="submit" value="Logout" class="btn btn-mini">Logout</button>
+                    <input name="methodToCall" type="hidden" value="logout" />
+                  </html:form>
+                </c:otherwise>
+              </c:choose>
+            </div>
           </div>
         </li>
 
@@ -126,13 +131,13 @@
             Doc Search
           </portal:portalLink>
         </li>
-	
+
         <li class="last right-nav">
           <portal:portalLink displayTitle="false" title='Action List' url='${ConfigProperties.kew.url}/ActionList.do'>
             Action List
           </portal:portalLink>
         </li>
-	</ul>
-</div>
+      </ul>
+    </div>
   </div>
 </div>
