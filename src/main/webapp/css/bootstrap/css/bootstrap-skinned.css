@@ -6732,51 +6732,52 @@ a[target=helpWindow] img {
 h1 a[target=helpWindow]:before {
   margin-left: -6px;
 }
-table#login {
+#LoginPage table {
   width: 300px;
   background: #ffffff;
-  margin: 130px auto;
+  margin: 200px auto;
+  margin-top: 40px;
   position: relative;
   -webkit-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.08) inset;
   -moz-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.08) inset;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.08) inset;
 }
-table#login td#buttonRow {
+#LoginPage table td#buttonRow {
   padding-top: 10px;
   padding-bottom: 20px;
   text-align: center;
 }
-table#login td#buttonRow input.btn.btn-primary.login-button {
+#LoginPage table td#buttonRow input.btn.btn-primary.login-button {
   margin-left: -65px;
 }
-table#login td {
+#LoginPage table td {
   padding: .2em;
-  height: 20px;
+  border: none;
+  padding-right: 20px;
 }
-table#login .leftTd {
+#LoginPage table .leftTd {
   padding-left: 1.2em;
 }
-table#login th:before {
+#LoginPage table th:before {
   content: url('../img/logo-login.png');
   position: absolute;
-  top: -20px;
-  left: -20px;
+  top: -5px;
+  left: 10px;
 }
-table#login .rightTd {
+#LoginPage table .rightTd {
   padding-right: 1.2em;
 }
-table#login .rightTd input {
+#LoginPage table .rightTd input {
   height: 30px;
 }
-table#login th {
-  padding-top: 30px;
-  padding-bottom: 20px;
-  padding-left: 90px;
+#LoginPage table th {
+  padding-left: 50px;
   font-size: 2em;
   text-align: left;
+  border: none;
 }
-table#login:before,
-table#login:after {
+#LoginPage table:before,
+#LoginPage table:after {
   content: "";
   position: absolute;
   z-index: -1;
@@ -6790,15 +6791,31 @@ table#login:after {
   -moz-border-radius: 10px;
   border-radius: 10px;
 }
-div.build {
+#LoginPage .uif-header-rightGroup {
   color: #dfdda9;
   margin: .3em;
   position: absolute;
-  top: 360px;
+  top: 280px;
   text-align: center;
   color: #999999;
   width: 100%;
   font-size: 11px;
+}
+#LoginPage table h1 {
+  margin-bottom: 30px;
+  font-size: 28px;
+}
+#LoginPage table tr + tr + tr {
+  height: 0px;
+}
+#LoginPage table tr + tr + tr + tr {
+  height: 0px;
+}
+#LoginPage table tr + tr + tr + tr + tr td {
+  padding-bottom: 20px;
+}
+#LoginPage .uif-headerText-span {
+  margin: 0px;
 }
 body > #header {
   display: none;
@@ -7504,6 +7521,13 @@ div.blockPage {
 }
 #iframe_portlet_container_div {
   padding: 0px;
+}
+.navbar .login-form.dropdown-menu {
+  padding: 6px;
+  left: -120px;
+}
+.navbar .dropdown-toggle {
+  color: #fff;
 }
 .portlet .chan-contain .body ul.chan {
   padding: 0px;
