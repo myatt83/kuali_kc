@@ -6800,6 +6800,7 @@ h1 a[target=helpWindow]:before {
   color: #999999;
   width: 100%;
   font-size: 11px;
+  right: 0px;
 }
 #LoginPage table h1 {
   margin-bottom: 30px;
@@ -6816,6 +6817,12 @@ h1 a[target=helpWindow]:before {
 }
 #LoginPage .uif-headerText-span {
   margin: 0px;
+}
+#LoginPage .uif-boxLayoutHorizontalItem {
+  float: none;
+  display: inherit;
+  margin-right: 0px;
+  margin-bottom: 0px;
 }
 body > #header {
   display: none;
