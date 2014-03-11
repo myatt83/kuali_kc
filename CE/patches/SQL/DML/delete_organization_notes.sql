@@ -1,7 +1,3 @@
-use coeus;
-select * from unit;
-update unit set UNIT_NAME='Portland State University' where UNIT_NUMBER='000001';
-select * from unit;
 select * from organization;
 select count(*) from organization;
 delete from organization where ORGANIZATION_ID='000426';
@@ -59,3 +55,5 @@ delete from budget_details_cal_amts where BUDGET_DETAILS_ID='388';
 delete from budget_details_cal_amts where BUDGET_DETAILS_ID='389';
 select BUDGET_DETAILS_ID, SUBAWARD_NUMBER, BUDGET_ID from budget_details where SUBAWARD_NUMBER='2';
 delete from budget_details where SUBAWARD_NUMBER='2';
+
+delete from budget_rate_and_base where BUDGET_DETAILS_ID in (select BUDGET_DETAILS_ID from budget_details where SUBAWARD_NUMBER='2');
