@@ -39,6 +39,7 @@
     <import resource="classpath:org/kuali/rice/core/RiceJTASpringBeans.xml" />
     <import resource="classpath:org/kuali/kra/KC-RiceDataSourceSpringBeans.xml" />
     <import resource="classpath:org/kuali/kra/core/CommonSpringBeans.xml" />
+    <import resource="classpath:com/rsmart/kuali/coeus/hr/JerseyBeans.xml" />
     <util:constant id="krms.serviceNamespace" static-field="org.kuali.rice.krms.api.KrmsConstants$Namespaces.KRMS_NAMESPACE_2_0"/>
     <util:constant id="kc.integrationServiceNamespace" static-field="org.kuali.kra.infrastructure.Constants.FINANCIAL_INTEGRATION_KC_SERVICE_NAMESPACE"/>
     
