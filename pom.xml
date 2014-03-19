@@ -1379,6 +1379,11 @@ module of int tests -->
                 </exclusion>
             </exclusions>
         </dependency>
+        <dependency>
+            <groupId>com.rsmart.kuali</groupId>
+            <artifactId>kc_hr_rest</artifactId>
+            <version>${rsmart.hr.rest.version}</version>
+        </dependency>
     </dependencies>
 
 	<profiles>
@@ -2194,5 +2199,6 @@ module of int tests -->
         <monitoring.spring.service/>
 
         <wagon.s3.version>1.1.20</wagon.s3.version>
+        <rsmart.hr.rest.version>0.1-SNAPSHOT</rsmart.hr.rest.version>
     </properties>
 </project>
