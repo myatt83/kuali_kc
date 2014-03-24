@@ -1304,11 +1304,11 @@
 		    	</exclusion>
 		    </exclusions>
 		</dependency>
-	    <dependency>
-	    	<groupId>com.rsmart.kuali</groupId>
-	    	<artifactId>kc_hr_rest</artifactId>
-	    	<version>0.1-SNAPSHOT</version>
-	    </dependency>
+		<dependency>
+			<groupId>com.rsmart.kuali</groupId>
+			<artifactId>kc_hr_rest</artifactId>
+			<version>${rsmart.kc.rest.hr.version}</version>
+		</dependency>
 	</dependencies>
 
 	<profiles>
@@ -1864,5 +1864,6 @@
         <monitoring.spring.import />
         <monitoring.spring.service />	
     <wagon.s3.version>1.1.20</wagon.s3.version>
+		<rsmart.kc.rest.hr.version>0.1</rsmart.kc.rest.hr.version>
 	</properties>
 </project>
