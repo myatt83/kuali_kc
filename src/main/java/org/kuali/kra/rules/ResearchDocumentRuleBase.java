@@ -65,9 +65,6 @@ public abstract class ResearchDocumentRuleBase extends DocumentRuleBase implemen
     private BusinessObjectService businessObjectService;
     private ParameterService parameterService;
     private DictionaryValidationService knsDictionaryValidationService;
-    public static final boolean VALIDATION_REQUIRED = true;
-    public static final boolean CHOMP_LAST_LETTER_S_FROM_COLLECTION_NAME = false;
-    
 
     /**
      * Delegates to {@link ErrorReporter#reportError(String, String, String...) ErrorReporter#reportError(String, String, String...)}
