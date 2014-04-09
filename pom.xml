@@ -572,7 +572,7 @@
 		<dependency>
 		    <groupId>cglib</groupId>
 		    <artifactId>cglib-nodep</artifactId>
-		    <version>2.2.2</version>
+		    <version>3.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.birt.runtime.3_7_1</groupId>
