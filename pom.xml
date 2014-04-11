@@ -861,7 +861,7 @@
 		<dependency>
 			<groupId>org.kuali.db.ojb</groupId>
 			<artifactId>db-ojb</artifactId>
-			<version>1.0.4-patch8</version>
+			<version>1.0.4-patch9-SNAPSHOT</version>
 		    <exclusions>
 		    	<exclusion>
 		    		<artifactId>xml-apis</artifactId>
