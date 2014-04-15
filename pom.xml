@@ -2077,7 +2077,7 @@ module of int tests -->
         <commons-lang.version>2.6</commons-lang.version>
         <commons-net.version>3.1</commons-net.version>
         <cxf.version>2.7.0</cxf.version>
-        <db-ojb.version>1.0.4-patch8</db-ojb.version>
+        <db-ojb.version>1.0.4-patch9-rsmart</db-ojb.version>
         <displaytag.version>1.2</displaytag.version>
         <drools.version>5.5.0.Final</drools.version>
         <dwr.version>3.0.RC2</dwr.version>
