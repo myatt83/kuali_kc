@@ -211,7 +211,5 @@
 	<param name="connection.pool.impl">XAPool</param>
 	 
 	<param name="rice.portal.allowed.regex" override="false">^(${application.url}|${rice.server.url})(/.*|)</param>
-
-	<!-- Maintain backwards compatibility and publish to system parameter by default -->
-	<param name="org.kuali.kra.service.impl.DocHandlerUrlPrefixPublishingServiceImpl.publishingEnabled">true</param>
+	
 </config>

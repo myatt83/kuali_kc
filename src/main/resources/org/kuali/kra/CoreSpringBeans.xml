@@ -361,7 +361,6 @@
         <property name="parameterTypeCode" value="CONFG" />
         
         <property name="parameterService" ref="parameterService" />
-        <property name="publishingEnabled" value="${org.kuali.kra.service.impl.DocHandlerUrlPrefixPublishingServiceImpl.publishingEnabled}" />
     </bean>
     
     <bean id="fundingSourceTypeService" class="org.kuali.kra.service.impl.FundingSourceTypeServiceImpl">
