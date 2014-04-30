@@ -4,6 +4,8 @@ delete from proposal_comments;
 delete from proposal_ip_review_join;
 delete from proposal_cost_sharing;
 delete from proposal_admin_details;
+delete from award_funding_proposals;
+delete from proposal_special_review;
 delete from proposal;
 
 delete from eps_prop_per_credit_split;
@@ -29,6 +31,7 @@ delete from budget_details;
 delete from budget_persons;
 delete from eps_prop_person;
 delete from eps_prop_science_keyword;
+delete from eps_prop_abstract;
 delete from eps_proposal;
 
 delete from KRNS_DOC_HDR_T where DOC_HDR_ID IN (select DOCUMENT_NUMBER from EPS_PROPOSAL_DOCUMENT);
