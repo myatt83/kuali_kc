@@ -6,6 +6,8 @@ delete from proposal_cost_sharing;
 delete from proposal_admin_details;
 delete from award_funding_proposals;
 delete from proposal_special_review;
+delete from proposal_custom_data;
+delete from proposal_science_keyword;
 delete from proposal;
 
 delete from eps_prop_per_credit_split;
