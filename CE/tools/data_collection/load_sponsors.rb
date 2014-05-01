@@ -11,7 +11,10 @@ options = { headers: :first_row,
             }
 
 File.open(sql_output, "w") do |sql|
-  sql.write "DELIMITER //
+  sql.write "
+DROP PROCEDURE IF EXISTS LoadSponsors;
+
+DELIMITER //
 CREATE PROCEDURE LoadSponsors()
 BEGIN
 
