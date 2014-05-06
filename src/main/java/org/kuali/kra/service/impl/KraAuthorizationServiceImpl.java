@@ -15,6 +15,8 @@
  */
 package org.kuali.kra.service.impl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.commons.lang.StringUtils;
 import org.kuali.kra.bo.KcPerson;
 import org.kuali.kra.bo.RolePersons;
@@ -47,6 +49,8 @@ public class KraAuthorizationServiceImpl implements KraAuthorizationService {
     private IdentityService identityManagementService;
     private PermissionService permissionService;
     
+    private static final Log LOG = LogFactory.getLog(KraAuthorizationServiceImpl.class);
+
     /**
      * Set the Unit Authorization Service.  Injected by Spring.
      * @param unitAuthorizationService the Unit Authorization Service
@@ -172,9 +176,14 @@ public class KraAuthorizationServiceImpl implements KraAuthorizationService {
             qualifiedRoleAttrs.put(permissionable.getDocumentKey(), permissionable.getDocumentNumberForPermission());
             Collection<String> users = roleManagementService.getRoleMemberPrincipalIds(permissionable.getNamespace(), roleName,new HashMap<String,String>(qualifiedRoleAttrs));
             for(String userId : users) {
-                KcPerson person = kcPersonService.getKcPersonByPersonId(userId);
-                if (person != null && person.getActive()) {
-                    persons.add(person);
+                try {
+                    final KcPerson person = kcPersonService.getKcPersonByPersonId(userId);
+                    if (person != null && person.getActive()) {
+                        persons.add(person);
+                    }
+                }
+                catch (IllegalArgumentException e) {
+                    LOG.info("getPersonsInRole: ignoring missing person/entity: " + userId);
                 }
             }
         } 
