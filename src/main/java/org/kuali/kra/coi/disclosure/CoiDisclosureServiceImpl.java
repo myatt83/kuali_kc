@@ -15,6 +15,8 @@
  */
 package org.kuali.kra.coi.disclosure;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.kuali.kra.award.awardhierarchy.AwardHierarchy;
@@ -78,6 +80,7 @@ import java.util.*;
  * This class...
  */
 public class CoiDisclosureServiceImpl implements CoiDisclosureService {
+    private static final Log LOG = LogFactory.getLog(CoiDisclosureServiceImpl.class);
 
     private BusinessObjectService businessObjectService;
     private KcPersonService kcPersonService;
@@ -233,13 +236,18 @@ public class CoiDisclosureServiceImpl implements CoiDisclosureService {
     private DisclosurePersonUnit createLeadUnit(String personId) {
 
         DisclosurePersonUnit leadUnit = null;
-        KcPerson kcPerson = kcPersonService.getKcPersonByPersonId(personId);
-        if (kcPerson != null && kcPerson.getUnit() != null) {
-            leadUnit = new DisclosurePersonUnit();
-            leadUnit.setLeadUnitFlag(true);
-            leadUnit.setUnitNumber(kcPerson.getUnit().getUnitNumber());
-            leadUnit.setUnitName(kcPerson.getUnit().getUnitName());
-            leadUnit.setPersonId(personId);
+        try {
+            final KcPerson kcPerson = kcPersonService.getKcPersonByPersonId(personId);
+            if (kcPerson != null && kcPerson.getUnit() != null) {
+                leadUnit = new DisclosurePersonUnit();
+                leadUnit.setLeadUnitFlag(true);
+                leadUnit.setUnitNumber(kcPerson.getUnit().getUnitNumber());
+                leadUnit.setUnitName(kcPerson.getUnit().getUnitName());
+                leadUnit.setPersonId(personId);
+            }
+        }
+        catch (IllegalArgumentException e) {
+            LOG.info("createLeadUnit: ignoring missing person/entity: " + personId);
         }
         return leadUnit;
     }
