@@ -191,9 +191,8 @@
                     <source>${project.compile.source}</source>
                     <target>${project.compile.target}</target>
                     <fork>true</fork>
-                    <meminitial>2048m</meminitial>
                     <maxmem>2048m</maxmem>
-                    <permgensize>512m</permgensize>
+                    <permgensize>256m</permgensize>
                 </configuration>
             </plugin>
             <plugin>
@@ -1384,6 +1383,11 @@ module of int tests -->
             <artifactId>kc_hr_rest</artifactId>
             <version>${rsmart.hr.rest.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.rsmart.kuali</groupId>
+            <artifactId>cx_data_migration</artifactId>
+            <version>${rsmart.cx.data.migration.version}</version>
+        </dependency>
     </dependencies>
 
 	<profiles>
@@ -2199,6 +2203,7 @@ module of int tests -->
         <monitoring.spring.service/>
 
         <wagon.s3.version>1.2.1</wagon.s3.version>
-        <rsmart.hr.rest.version>0.3</rsmart.hr.rest.version>
+        <rsmart.hr.rest.version>0.4</rsmart.hr.rest.version>
+        <rsmart.cx.data.migration.version>5.2.0.0-SNAPSHOT</rsmart.cx.data.migration.version>
     </properties>
 </project>
