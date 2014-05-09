@@ -95,5 +95,18 @@
 		p:serviceBus-ref="kc.import.serviceBus" 
 		p:serviceNameSpaceURI-ref="kc.serviceNamespace" />
 
-     
+  <bean id="xmlIngesterService" class="org.kuali.rice.core.framework.resourceloader.GlobalResourceLoaderServiceFactoryBean">
+      <property name="serviceName" value="xmlIngesterService" />
+  </bean>
+
+  <bean id="identityService" class="org.kuali.rice.core.framework.resourceloader.GlobalResourceLoaderServiceFactoryBean">
+      <property name="serviceName" value="kimIdentityService" />
+  </bean>
+
+  <bean id="rsmartAutomatedXmlIngester" class="com.rsmart.kuali.coeus.data.migration.AutomatedXmlIngester"
+      init-method="init">
+      <property name="identityService" ref="identityService"/>
+      <property name="xmlIngesterService" ref="xmlIngesterService"/>
+  </bean>
+
 </beans>
