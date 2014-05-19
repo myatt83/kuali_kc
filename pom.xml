@@ -25,7 +25,11 @@
 			<distribution>manual</distribution>
 		</license>
 	</licenses>
-    
+
+	<prerequisites>
+		<maven>3.2.1</maven>
+	</prerequisites>
+
 	<build>
 		<resources>
 			<resource>
@@ -505,7 +509,16 @@
                 </dependencies>
             </plugin>
 		</plugins>
-	</build>
+
+    <extensions>
+      <extension>
+        <groupId>org.kuali.maven.wagons</groupId>
+        <artifactId>maven-s3-wagon</artifactId>
+        <version>${wagon.s3.version}</version>
+      </extension>
+    </extensions>
+
+</build>
 
 	<dependencies>
 		<!-- For FTP client -->
@@ -1513,6 +1526,17 @@
 			<name>jboss</name>
 			<url>http://repository.jboss.org/nexus/content/groups/public/</url>
 		</repository>
+	    <repository>
+	      <id>rsmart-dev</id>
+	      <name>rsmart-dev</name>
+	      <url>https://nexus.rsmart.com/nexus/content/groups/public/</url>
+	      <snapshots>
+	        <enabled>true</enabled>
+	      </snapshots>
+	      <releases>
+	        <enabled>true</enabled>
+	      </releases>
+	    </repository>
 	</repositories>
 	
     <pluginRepositories>
@@ -1528,20 +1552,32 @@
            </snapshots> 
    		</pluginRepository>
    	</pluginRepositories>
-	
-	<scm>
-		<connection>scm:svn:https://test.kuali.org/svn/kc_project/trunk
-		</connection>
-		<developerConnection>scm:svn:https://test.kuali.org/svn/kc_project/trunk
-		</developerConnection>
-		<tag>HEAD</tag>
-		<url>https://test.kuali.org/fisheye/browse/kc_project</url>
-	</scm>
-	
-	<issueManagement>
-		<system>Jira</system>
-		<url>https://test.kuali.org/jira/</url>
-	</issueManagement>
+
+  <scm>
+    <connection>scm:git:git://github.com/rSmart/kuali_kc.git</connection>
+    <developerConnection>scm:git:git@github.com:rSmart/kuali_kc.git</developerConnection>
+    <url>https://github.com/rSmart/kuali_kc</url>
+    <tag>HEAD</tag>
+  </scm>
+
+  <distributionManagement>
+    <downloadUrl>https://github.com/rSmart/kc_platform</downloadUrl>
+    <snapshotRepository>
+       <id>rsmart.snapshot.repo</id>
+       <name>rsmart snapshot repository</name>
+       <url>s3://rsmart-dev/artifacts/maven/snapshot</url>
+    </snapshotRepository>
+    <repository>
+      <id>rsmart.release.repo</id>
+      <name>rsmart release repository</name>
+      <url>s3://rsmart-dev/artifacts/maven/release</url>
+    </repository>
+  </distributionManagement>
+
+  <issueManagement>
+    <system>github</system>
+    <url>https://github.com/rSmart/kuali_kc/issues</url>
+  </issueManagement>
 
 	<ciManagement>
 		<system>hudson</system>
@@ -1675,5 +1711,6 @@
     	<monitoring.listener />
         <monitoring.spring.import />
         <monitoring.spring.service />	
+		<wagon.s3.version>1.2.1</wagon.s3.version>
 	</properties>
 </project>
