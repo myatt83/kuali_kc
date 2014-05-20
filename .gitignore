@@ -1,0 +1,16 @@
+.classpath
+.project
+.settings/org.eclipse.jdt.ui.prefs
+scripts/launch/AllTests.launch
+scripts/launch/Jetty 8 KC[embedded].launch
+scripts/launch/Jetty 8 Rice[embedded].launch
+scripts/launch/Jetty 8 [bundled].launch
+scripts/launch/Jetty 9 KC[embedded].launch
+scripts/launch/Jetty 9 Rice[embedded].launch
+scripts/launch/Jetty 9 [bundled].launch
+scripts/launch/Tomcat 6 KC[embedded].launch
+scripts/launch/Tomcat 6 Rice[embedded].launch
+scripts/launch/Tomcat 6 [bundled].launch
+scripts/launch/Tomcat 7 KC[embedded].launch
+scripts/launch/Tomcat 7 Rice[embedded].launch
+scripts/launch/Tomcat 7 [bundled].launch
