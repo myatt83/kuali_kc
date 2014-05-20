@@ -9,3 +9,4 @@ src/
 .classpath
 .externalToolBuilders
 .settings/
+**/*.launch
