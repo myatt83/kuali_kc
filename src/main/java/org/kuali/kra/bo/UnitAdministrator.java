@@ -20,6 +20,7 @@ import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.service.KcPersonService;
 
 public class UnitAdministrator extends KraPersistableBusinessObjectBase implements AbstractUnitAdministrator , Comparable<UnitAdministrator> {
+    private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(UnitAdministrator.class);
 
     private String personId;
 
@@ -62,7 +63,14 @@ public class UnitAdministrator extends KraPersistableBusinessObjectBase implemen
     }
 
     public KcPerson getPerson() {
-        return getKcPersonService().getKcPersonByPersonId(personId);
+        KcPerson kcPerson = null;
+        try {
+            kcPerson = getKcPersonService().getKcPersonByPersonId(personId);
+        }
+        catch (IllegalArgumentException e) {
+            LOG.info("getPerson(): ignoring missing person/entity: " + personId);
+        }
+        return kcPerson;
     }
 
     /**
