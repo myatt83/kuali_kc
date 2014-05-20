@@ -1,6 +1,6 @@
 .classpath
 .project
-.settings/org.eclipse.jdt.ui.prefs
+.settings/
 scripts/launch/AllTests.launch
 scripts/launch/Jetty 8 KC[embedded].launch
 scripts/launch/Jetty 8 Rice[embedded].launch
