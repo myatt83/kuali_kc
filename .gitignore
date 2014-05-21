@@ -14,3 +14,4 @@ scripts/launch/Tomcat 6 [bundled].launch
 scripts/launch/Tomcat 7 KC[embedded].launch
 scripts/launch/Tomcat 7 Rice[embedded].launch
 scripts/launch/Tomcat 7 [bundled].launch
+src/main/webapp/
