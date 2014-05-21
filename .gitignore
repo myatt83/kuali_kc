@@ -10,3 +10,4 @@ src/
 .externalToolBuilders
 .settings/
 **/*.launch
+src/main/webapp/
