@@ -107,6 +107,7 @@ public class Award extends KraPersistableBusinessObjectBase implements KeywordsM
     public static final String NOTIFICATION_IACUC_SPECIAL_REVIEW_LINK_DELETED = "555";
     
     private static final long serialVersionUID = 3797220122448310165L;
+    private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(Award.class);
     private Long awardId;
     private AwardDocument awardDocument;
     private String awardNumber;
@@ -3211,13 +3212,20 @@ public class Award extends KraPersistableBusinessObjectBase implements KeywordsM
             KraServiceLocator.getService(UnitService.class).retrieveUnitAdministratorsByUnitNumber(getUnitNumber());
         for (UnitAdministrator unitAdministrator : unitAdministrators) {
             if(unitAdministrator.getUnitAdministratorType().getDefaultGroupFlag().equals(DEFAULT_GROUP_CODE_FOR_CENTRAL_ADMIN_CONTACTS)) {
-                KcPerson person = getKcPersonService().getKcPersonByPersonId(unitAdministrator.getPersonId());
-                AwardUnitContact newAwardUnitContact = new AwardUnitContact();
-                newAwardUnitContact.setAward(this);
-                newAwardUnitContact.setPerson(person);
-                newAwardUnitContact.setUnitAdministratorType(unitAdministrator.getUnitAdministratorType());
-                newAwardUnitContact.setFullName(person.getFullName());
-                centralAdminContacts.add(newAwardUnitContact);
+                KcPerson person = null;
+                try {
+                  person = getKcPersonService().getKcPersonByPersonId(unitAdministrator.getPersonId());
+                } catch (IllegalArgumentException e) {
+                  LOG.info("initCentralAdminContacts(): entity/person missing: " + unitAdministrator.getPersonId());
+                }
+                if (person != null) {
+                  AwardUnitContact newAwardUnitContact = new AwardUnitContact();
+                  newAwardUnitContact.setAward(this);
+                  newAwardUnitContact.setPerson(person);
+                  newAwardUnitContact.setUnitAdministratorType(unitAdministrator.getUnitAdministratorType());
+                  newAwardUnitContact.setFullName(person.getFullName());
+                  centralAdminContacts.add(newAwardUnitContact);        
+                }
             }
         }
     }
