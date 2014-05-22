@@ -112,8 +112,32 @@ delete from eps_proposal;
 delete from KRNS_DOC_HDR_T where DOC_HDR_ID IN (select DOCUMENT_NUMBER from EPS_PROPOSAL_DOCUMENT);
 delete from krew_actn_itm_t where DOC_HDR_ID IN (select DOCUMENT_NUMBER from EPS_PROPOSAL_DOCUMENT);
 delete from krew_doc_hdr_t where DOC_HDR_ID IN (select DOCUMENT_NUMBER from EPS_PROPOSAL_DOCUMENT);
-
 delete from EPS_PROPOSAL_DOCUMENT;
+
+-- select * from award;
+delete from award_amount_info;
+delete from award_attachment;
+delete from award_budget_limit;
+delete from award_closeout;
+delete from award_comment;
+delete from award_cost_share;
+delete from award_funding_proposals;
+delete from award_pers_unit_cred_splits;
+delete from award_person_units;
+delete from award_person_credit_splits;
+delete from award_persons;
+delete from award_rep_terms_recnt;
+delete from award_report_terms;
+delete from award_special_review;
+delete from award_payment_schedule;
+delete from award_idc_rate;
+delete from award_transferring_sponsor;
+delete from award;
+
+delete from KRNS_DOC_HDR_T where DOC_HDR_ID IN (select DOCUMENT_NUMBER from award_document);
+delete from krew_actn_itm_t where DOC_HDR_ID IN (select DOCUMENT_NUMBER from award_document);
+delete from krew_doc_hdr_t where DOC_HDR_ID IN (select DOCUMENT_NUMBER from award_document);
+delete from award_document;
 
 COMMIT;
 
