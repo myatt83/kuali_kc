@@ -142,6 +142,9 @@ delete from award_document;
 -- select * from notification;
 delete from notification;
 
+-- select * from proposal_log;
+delete from proposal_log;
+
 COMMIT;
 
 END //
