@@ -67,6 +67,11 @@ delete from proto_amend_renewal;
 delete from protocol_risk_levels;
 delete from protocol;
 
+delete from KRNS_DOC_HDR_T where DOC_HDR_ID IN (select DOCUMENT_NUMBER from protocol_document);
+delete from krew_actn_itm_t where DOC_HDR_ID IN (select DOCUMENT_NUMBER from protocol_document);
+delete from krew_doc_hdr_t where DOC_HDR_ID IN (select DOCUMENT_NUMBER from protocol_document);
+delete from protocol_document;
+
 -- select * from negotiation;
 delete from negotiation_attachment;
 delete from negotiation_activity;
