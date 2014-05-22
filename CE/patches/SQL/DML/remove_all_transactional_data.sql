@@ -72,6 +72,11 @@ delete from negotiation_attachment;
 delete from negotiation_activity;
 delete from negotiation;
 
+delete from KRNS_DOC_HDR_T where DOC_HDR_ID IN (select DOCUMENT_NUMBER from negotiation_document);
+delete from krew_actn_itm_t where DOC_HDR_ID IN (select DOCUMENT_NUMBER from negotiation_document);
+delete from krew_doc_hdr_t where DOC_HDR_ID IN (select DOCUMENT_NUMBER from negotiation_document);
+delete from negotiation_document;
+
 -- select * from proposal;
 delete from proposal_comments;
 delete from proposal_ip_review_join;
