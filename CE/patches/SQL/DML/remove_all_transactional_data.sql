@@ -17,10 +17,14 @@ END;
 START TRANSACTION;
 
 -- select * from krim_entity_t;
+-- disable all entities except admin
+update krim_entity_emp_info_t set ACTV_IND='N' where ENTITY_ID != '1100';
+update krim_entity_afltn_t set ACTV_IND='N' where ENTITY_ID != '1100';
+update krim_entity_t set ACTV_IND='N' where ENTITY_ID != '1100';
 -- delete all entities except admin
-delete from krim_entity_emp_info_t where ENTITY_AFLTN_ID in (select ENTITY_AFLTN_ID from krim_entity_afltn_t where ENTITY_ID != '1100');
-delete from krim_entity_afltn_t where ENTITY_ID != '1100';
-delete from krim_entity_t where ENTITY_ID != '1100';
+-- delete from krim_entity_emp_info_t where ENTITY_AFLTN_ID in (select ENTITY_AFLTN_ID from krim_entity_afltn_t where ENTITY_ID != '1100');
+-- delete from krim_entity_afltn_t where ENTITY_ID != '1100';
+-- delete from krim_entity_t where ENTITY_ID != '1100';
 
 -- select * from iacuc_protocol;
 delete from iacuc_principles;
