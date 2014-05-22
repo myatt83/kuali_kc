@@ -139,6 +139,9 @@ delete from krew_actn_itm_t where DOC_HDR_ID IN (select DOCUMENT_NUMBER from awa
 delete from krew_doc_hdr_t where DOC_HDR_ID IN (select DOCUMENT_NUMBER from award_document);
 delete from award_document;
 
+-- select * from notification;
+delete from notification;
+
 COMMIT;
 
 END //
