@@ -160,6 +160,17 @@ delete from notification;
 -- select * from proposal_log;
 delete from proposal_log;
 
+-- select * from subaward
+delete from subaward_amount_info;
+delete from subaward_contact;
+delete from subaward_funding_source;
+delete from subaward;
+
+delete from KRNS_DOC_HDR_T where DOC_HDR_ID IN (select DOCUMENT_NUMBER from subaward_document);
+delete from krew_actn_itm_t where DOC_HDR_ID IN (select DOCUMENT_NUMBER from subaward_document);
+delete from krew_doc_hdr_t where DOC_HDR_ID IN (select DOCUMENT_NUMBER from subaward_document);
+delete from subaward_document;
+
 COMMIT;
 
 END //
