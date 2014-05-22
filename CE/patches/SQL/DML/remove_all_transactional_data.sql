@@ -171,6 +171,19 @@ delete from krew_actn_itm_t where DOC_HDR_ID IN (select DOCUMENT_NUMBER from sub
 delete from krew_doc_hdr_t where DOC_HDR_ID IN (select DOCUMENT_NUMBER from subaward_document);
 delete from subaward_document;
 
+-- select * from coi_disclosure;
+delete from coi_discl_projects;
+delete from coi_disclosure_history;
+delete from coi_disclosure_notepad;
+delete from coi_user_roles;
+delete from coi_disc_details;
+delete from coi_disclosure;
+
+delete from KRNS_DOC_HDR_T where DOC_HDR_ID IN (select DOCUMENT_NUMBER from coi_disclosure_document);
+delete from krew_actn_itm_t where DOC_HDR_ID IN (select DOCUMENT_NUMBER from coi_disclosure_document);
+delete from krew_doc_hdr_t where DOC_HDR_ID IN (select DOCUMENT_NUMBER from coi_disclosure_document);
+delete from coi_disclosure_document;
+
 COMMIT;
 
 END //
