@@ -5,14 +5,14 @@ BEGIN
 
 DECLARE exit handler for sqlexception
   BEGIN
-    -- ERROR
+    SHOW ERRORS;
   ROLLBACK;
 END;
 
 DECLARE exit handler for sqlwarning
- BEGIN
-    -- WARNING
- ROLLBACK;
+  BEGIN
+    SHOW WARNINGS;
+  ROLLBACK;
 END;
 
 START TRANSACTION;
