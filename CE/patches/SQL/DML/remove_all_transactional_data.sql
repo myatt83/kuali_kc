@@ -1,4 +1,5 @@
 DELIMITER //
+DROP PROCEDURE IF EXISTS RemoveAllTransactionalData //
 CREATE PROCEDURE RemoveAllTransactionalData()
 BEGIN
 
