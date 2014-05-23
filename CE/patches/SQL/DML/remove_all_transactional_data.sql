@@ -39,6 +39,7 @@ delete from iacuc_protocol_research_areas;
 delete from iacuc_proc_person_responsible;
 delete from iacuc_protocol_study_groups;
 delete from iacuc_protocol_species;
+-- TODO make iacuc_protocol_study_group_dtl if exists conditional
 delete from iacuc_protocol_study_group_dtl;
 delete from iacuc_protocol_study_group_hdr;
 delete from iacuc_proto_study_group_locs;
