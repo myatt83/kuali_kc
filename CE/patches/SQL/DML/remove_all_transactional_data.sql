@@ -129,6 +129,11 @@ delete from krew_actn_itm_t where DOC_HDR_ID IN (select DOCUMENT_NUMBER from EPS
 delete from krew_doc_hdr_t where DOC_HDR_ID IN (select DOCUMENT_NUMBER from EPS_PROPOSAL_DOCUMENT);
 delete from EPS_PROPOSAL_DOCUMENT;
 
+delete from KRNS_DOC_HDR_T where DOC_HDR_ID IN (select DOCUMENT_NUMBER from institute_proposal_document);
+delete from krew_actn_itm_t where DOC_HDR_ID IN (select DOCUMENT_NUMBER from institute_proposal_document);
+delete from krew_doc_hdr_t where DOC_HDR_ID IN (select DOCUMENT_NUMBER from institute_proposal_document);
+delete from institute_proposal_document;
+
 -- select * from award;
 delete from award_amount_info;
 delete from award_attachment;
