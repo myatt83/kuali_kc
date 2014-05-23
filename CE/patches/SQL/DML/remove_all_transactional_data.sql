@@ -206,6 +206,27 @@ delete from krew_actn_itm_t where DOC_HDR_ID IN (select DOCUMENT_NUMBER from com
 delete from krew_doc_hdr_t where DOC_HDR_ID IN (select DOCUMENT_NUMBER from committee_document);
 delete from committee_document;
 
+-- select * from budget;
+delete from budget_modular_idc;
+delete from budget_modular;
+delete from award_budget_period_ext;
+delete from awd_bgt_per_sum_calc_amt;
+delete from budget_periods;
+delete from eps_prop_rates;
+delete from eps_proposal_budget_ext;
+delete from eps_prop_cost_sharing;
+delete from budget_sub_award_files;
+delete from budget_sub_award_period_detail;
+delete from budget_sub_awards;
+delete from award_budget_ext;
+delete from eps_prop_idc_rate;
+delete from budget;
+
+delete from KRNS_DOC_HDR_T where DOC_HDR_ID IN (select DOCUMENT_NUMBER from budget_document);
+delete from krew_actn_itm_t where DOC_HDR_ID IN (select DOCUMENT_NUMBER from budget_document);
+delete from krew_doc_hdr_t where DOC_HDR_ID IN (select DOCUMENT_NUMBER from budget_document);
+delete from budget_document;
+
 COMMIT;
 
 END //
