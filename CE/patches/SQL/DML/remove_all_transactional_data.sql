@@ -19,13 +19,16 @@ START TRANSACTION;
 
 -- select * from krim_entity_t;
 -- disable all entities except admin
+-- FIXME figure out real way to disable entities - evidently 'N' is not quite right.
 update krim_entity_emp_info_t set ACTV_IND='N' where ENTITY_ID != '1100';
 update krim_entity_afltn_t set ACTV_IND='N' where ENTITY_ID != '1100';
 update krim_entity_t set ACTV_IND='N' where ENTITY_ID != '1100';
+update krim_prncpl_t set ACTV_IND='N' where ENTITY_ID != '1100';
 -- delete all entities except admin
 -- delete from krim_entity_emp_info_t where ENTITY_AFLTN_ID in (select ENTITY_AFLTN_ID from krim_entity_afltn_t where ENTITY_ID != '1100');
 -- delete from krim_entity_afltn_t where ENTITY_ID != '1100';
 -- delete from krim_entity_t where ENTITY_ID != '1100';
+-- delete from krim_prncpl_t where ENTITY_ID != '1100';
 
 -- select * from iacuc_protocol;
 delete from iacuc_principles;
@@ -39,7 +42,7 @@ delete from iacuc_protocol_research_areas;
 delete from iacuc_proc_person_responsible;
 delete from iacuc_protocol_study_groups;
 delete from iacuc_protocol_species;
--- TODO make iacuc_protocol_study_group_dtl if exists conditional
+-- FIXME make iacuc_protocol_study_group_dtl if exists conditional
 delete from iacuc_protocol_study_group_dtl;
 delete from iacuc_protocol_study_group_hdr;
 delete from iacuc_proto_study_group_locs;
@@ -238,3 +241,5 @@ END //
 DELIMITER ;
 
 call RemoveAllTransactionalData();
+
+DROP PROCEDURE IF EXISTS RemoveAllTransactionalData;
