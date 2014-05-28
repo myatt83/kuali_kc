@@ -6,8 +6,8 @@
     <groupId>org.kuali.kra</groupId>
     <artifactId>kc_project</artifactId>
     <packaging>war</packaging>
-    <name>Kuali Coeus</name>
-    <version>5.2.1</version>
+    <name>rSmart Cloud Express</name>
+    <version>5.2.1.0-rsmart-SNAPSHOT</version>
     <description>
         The Kuali Coeus (KC) project is building a comprehensive system to manage the complexities of research
         administration that fully addresses the needs from the faculty researcher through grants administration to
@@ -190,6 +190,10 @@
                     <useIncrementalCompilation>false</useIncrementalCompilation>
                     <source>${project.compile.source}</source>
                     <target>${project.compile.target}</target>
+                    <fork>true</fork>
+                    <meminitial>2048m</meminitial>
+                    <maxmem>2048m</maxmem>
+                    <permgensize>512m</permgensize>
                 </configuration>
             </plugin>
             <plugin>
@@ -415,12 +419,6 @@
                 <version>${tomcat6-maven-plugin.version}</version>
                 <dependencies>
                     <dependency>
-                        <groupId>com.oracle</groupId>
-                        <artifactId>ojdbc6</artifactId>
-                        <version>${oracle.version}</version>
-                        <scope>runtime</scope>
-                    </dependency>
-                    <dependency>
                         <groupId>mysql</groupId>
                         <artifactId>mysql-connector-java</artifactId>
                         <version>${mysql.version}</version>
@@ -437,12 +435,6 @@
                 <artifactId>tomcat7-maven-plugin</artifactId>
                 <version>${tomcat7-maven-plugin.version}</version>
                 <dependencies>
-                    <dependency>
-                        <groupId>com.oracle</groupId>
-                        <artifactId>ojdbc6</artifactId>
-                        <version>${oracle.version}</version>
-                        <scope>runtime</scope>
-                    </dependency>
                     <dependency>
                         <groupId>mysql</groupId>
                         <artifactId>mysql-connector-java</artifactId>
@@ -484,12 +476,6 @@
                 <version>${jetty-maven-plugin.version}</version>
                 <dependencies>
                     <dependency>
-                        <groupId>com.oracle</groupId>
-                        <artifactId>ojdbc6</artifactId>
-                        <version>${oracle.version}</version>
-                        <scope>runtime</scope>
-                    </dependency>
-                    <dependency>
                         <groupId>mysql</groupId>
                         <artifactId>mysql-connector-java</artifactId>
                         <version>${mysql.version}</version>
@@ -517,6 +503,13 @@
                 </configuration>
             </plugin>
 		</plugins>
+        <extensions>
+            <extension>
+                <groupId>org.kuali.maven.wagons</groupId>
+                <artifactId>maven-s3-wagon</artifactId>
+                <version>${wagon.s3.version}</version>
+            </extension>
+        </extensions>
 	</build>
 
     <dependencies>
@@ -552,14 +545,6 @@
             </exclusions>
         </dependency>
 
-        <dependency>
-            <groupId>com.oracle</groupId>
-            <artifactId>ojdbc6</artifactId>
-            <version>${oracle.version}</version>
-            <!-- should be provided once embedded jetty is figured out -->
-            <scope>test</scope>
-        </dependency>
-
         <!-- Required for jdk7 -->
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
@@ -577,6 +562,18 @@
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
             <version>${commons-lang.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.rsmart</groupId>
+            <artifactId>tokenauth</artifactId>
+            <version>1.0.7</version>
+            <exclusions>
+                <exclusion>
+                <groupId>commons-logging</groupId>
+                <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- For FTP client -->
@@ -1660,12 +1657,6 @@ module of int tests -->
                         <version>${jetty-maven-plugin.version}</version>
                         <dependencies>
                             <dependency>
-                                <groupId>com.oracle</groupId>
-                                <artifactId>ojdbc6</artifactId>
-                                <version>${oracle.version}</version>
-                                <scope>runtime</scope>
-                            </dependency>
-                            <dependency>
                                 <groupId>mysql</groupId>
                                 <artifactId>mysql-connector-java</artifactId>
                                 <version>${mysql.version}</version>
@@ -1707,12 +1698,6 @@ module of int tests -->
                         <version>${tomcat6-maven-plugin.version}</version>
                         <dependencies>
                             <dependency>
-                                <groupId>com.oracle</groupId>
-                                <artifactId>ojdbc6</artifactId>
-                                <version>${oracle.version}</version>
-                                <scope>runtime</scope>
-                            </dependency>
-                            <dependency>
                                 <groupId>mysql</groupId>
                                 <artifactId>mysql-connector-java</artifactId>
                                 <version>${mysql.version}</version>
@@ -1731,12 +1716,6 @@ module of int tests -->
                         <artifactId>tomcat7-maven-plugin</artifactId>
                         <version>${tomcat7-maven-plugin.version}</version>
                         <dependencies>
-                            <dependency>
-                                <groupId>com.oracle</groupId>
-                                <artifactId>ojdbc6</artifactId>
-                                <version>${oracle.version}</version>
-                                <scope>runtime</scope>
-                            </dependency>
                             <dependency>
                                 <groupId>mysql</groupId>
                                 <artifactId>mysql-connector-java</artifactId>
@@ -2006,6 +1985,17 @@ module of int tests -->
 
     <repositories>
         <repository>
+            <id>rsmart-dev</id>
+            <name>rsmart-dev</name>
+            <url>https://nexus.rsmart.com/nexus/content/groups/public/</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository>
+        <repository>
             <id>kuali.nexus</id>
             <name>Nexus Repository Manager</name>
             <url>http://nexus.kuali.org/content/groups/public</url>
@@ -2033,17 +2023,28 @@ module of int tests -->
     </pluginRepositories>
 
     <scm>
-        <connection>scm:svn:https://svn.kuali.org/repos/kc/trunk
-        </connection>
-        <developerConnection>scm:svn:https://svn.kuali.org/repos/kc/trunk
-        </developerConnection>
-        <tag>HEAD</tag>
-        <url>https://fisheye.kuali.org/browse/kc</url>
+        <connection>scm:git:git://github.com/rSmart/kuali_kc.git</connection>
+        <developerConnection>scm:git:git@github.com:rSmart/kuali_kc.git</developerConnection>
+        <url>https://github.com/rSmart/kuali_kc</url>
     </scm>
 
+    <distributionManagement>
+        <downloadUrl>https://github.com/rSmart/kc_platform</downloadUrl>
+        <snapshotRepository>
+            <id>rsmart.snapshot.repo</id>
+            <name>rsmart snapshot repository</name>
+            <url>s3://rsmart-dev/artifacts/maven/snapshot</url>
+        </snapshotRepository>
+        <repository>
+            <id>rsmart.release.repo</id>
+            <name>rsmart release repository</name>
+            <url>s3://rsmart-dev/artifacts/maven/release</url>
+        </repository>
+    </distributionManagement>
+
     <issueManagement>
-        <system>Jira</system>
-        <url>https://jira.kuali.org</url>
+        <system>github</system>
+        <url>https://github.com/rSmart/kuali_kc/issues</url>
     </issueManagement>
 
     <ciManagement>
@@ -2126,7 +2127,7 @@ module of int tests -->
         <org.eclipse.birt.runtime.version>3.7.1</org.eclipse.birt.runtime.version>
         <pdfbox.version>1.7.1</pdfbox.version>
         <phs398modularbudget-1.2-gg.version>1.0.5</phs398modularbudget-1.2-gg.version>
-        <rice.version>2.3.6</rice.version>
+        <rice.version>2.3.6.0-rsmart-SNAPSHOT</rice.version>
         <servlet.version>2.5</servlet.version>
         <s2sform.version>1.2.2</s2sform.version>
         <sf424-2.1-gg.version>1.0</sf424-2.1-gg.version>
@@ -2200,5 +2201,6 @@ module of int tests -->
         <monitoring.spring.import/>
         <monitoring.spring.service/>
 
+        <wagon.s3.version>1.2.1</wagon.s3.version>
     </properties>
 </project>
