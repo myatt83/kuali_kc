@@ -4,7 +4,6 @@ atomikos-tmp
 Reports
 kra_application.log*
 bin/
-src/
 .project
 .classpath
 .externalToolBuilders
