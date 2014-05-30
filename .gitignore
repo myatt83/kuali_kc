@@ -10,3 +10,5 @@ bin/
 .settings/
 **/*.launch
 src/main/webapp/
+**/.DS_Store
+src/main/config/sql/RELEASE-SCRIPTS/LOGS/
