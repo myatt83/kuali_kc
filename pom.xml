@@ -1182,7 +1182,7 @@
 	    <dependency>
 	    	<groupId>com.rsmart.kuali</groupId>
 	    	<artifactId>kc_hr_rest</artifactId>
-	    	<version>0.1-SNAPSHOT</version>
+	    	<version>0.4</version>
 	    </dependency>
 	</dependencies>
 
