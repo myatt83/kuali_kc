@@ -191,7 +191,7 @@ public abstract class IacucProtocolAttachmentBase extends ProtocolAttachmentBase
      * @param attachments the current collection
      * @return an collection containing only new attachments
      */
-    public static <T extends IacucProtocolAttachmentBase> Collection<T> filterNewAttachments(final Collection<T> attachments) {
+    public static <T extends ProtocolAttachmentBase> Collection<T> filterNewAttachments(final Collection<T> attachments) {
         final Collection<T> newAttachments = new ArrayList<T>();
         for (final T attachment : attachments) {
             if (attachment.isNew()) {
@@ -207,7 +207,7 @@ public abstract class IacucProtocolAttachmentBase extends ProtocolAttachmentBase
      * @param attachments the current collection
      * @return an collection containing only exiting attachments
      */
-    public static <T extends IacucProtocolAttachmentBase> Collection<T> filterExistingAttachments(final Collection<T> attachments) {
+    public static <T extends ProtocolAttachmentBase> Collection<T> filterExistingAttachments(final Collection<T> attachments) {
         final Collection<T> existingAttachments = new ArrayList<T>(attachments);
         existingAttachments.removeAll(filterNewAttachments(attachments));
         return existingAttachments;

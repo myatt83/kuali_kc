@@ -236,9 +236,11 @@
 	                    </goals>
 	                    <configuration>
 	                        <rules>
+<!--
 			          	        <requireJavaVersion>
                     		        <version>1.6</version>
                   		        </requireJavaVersion>
+-->
 	                            <requireMavenVersion>
 	                                <version>[3.0,4.0)</version>
 	                            </requireMavenVersion>
@@ -297,7 +299,6 @@
 										<exclude>jta</exclude>
 										<exclude>javax.persistence</exclude>
 										<!-- activation apis - in jdk 6 -->
-										<exclude>javax.activation</exclude>
 										<exclude>org.apache.geronimo.specs:geronimo-activation_1.0.2_spec</exclude>
 										<exclude>org.apache.geronimo.specs:geronimo-activation_1.1_spec</exclude>
 										
@@ -312,10 +313,6 @@
 										<!-- group ids for many sun xml apis - in jdk 6 -->
 										<exclude>javax.xml</exclude>
 										<exclude>com.sun.xml</exclude>
-										<exclude>javax.xml.bind</exclude>
-										<!-- jaxb apis - in jdk 6 -->
-										<exclude>org.apache.geronimo.specs:geronimo-jaxb_2.1_spec</exclude>
-										<exclude>org.apache.geronimo.specs:geronimo-jaxb_2.2_spec</exclude>
 										
 										<!-- jaxws apis - in jdk 6 -->
 										<exclude>javax.xml.ws</exclude>
@@ -324,10 +321,7 @@
 										<exclude>org.apache.geronimo.specs:geronimo-jaxws_2.2_spec</exclude>
 										
 										<!-- stax apis - in jdk 6 -->
-										<exclude>javax.xml.stream</exclude>
 										<exclude>com.sun.xml.stream</exclude>
-										<exclude>org.apache.geronimo.specs:geronimo-stax-api_1.0_spec</exclude>
-										<exclude>org.apache.geronimo.specs:geronimo-stax-api_1.2_spec</exclude>
 										<exclude>stax</exclude>
 										
 										<!-- jaxp apis - in jdk 6 -->
