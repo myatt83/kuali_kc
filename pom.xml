@@ -469,12 +469,6 @@
 				<version>${jetty.version}</version>
 				<dependencies>
 	                <dependency>
-	                    <groupId>com.oracle</groupId>
-	                    <artifactId>ojdbc14</artifactId>
-	                    <version>${oracle.version}</version>
-	                    <scope>runtime</scope>
-	                </dependency>
-	                <dependency>
 	                    <groupId>mysql</groupId>
 	                    <artifactId>mysql-connector-java</artifactId>
 	                    <version>${mysql.version}</version>
@@ -488,12 +482,6 @@
                 <!-- tomcat 6.0.26 -->
                 <version>1.0</version>
                 <dependencies>  
-                    <dependency>
-                        <groupId>com.oracle</groupId>
-                        <artifactId>ojdbc14</artifactId>
-                        <version>${oracle.version}</version>
-                        <scope>runtime</scope>
-                    </dependency>
                     <dependency>
                         <groupId>mysql</groupId>
                         <artifactId>mysql-connector-java</artifactId>
@@ -536,13 +524,6 @@
 		    <groupId>cglib</groupId>
 		    <artifactId>cglib-nodep</artifactId>
 		    <version>3.1</version>
-		</dependency>
-		<dependency>
-		    <groupId>com.oracle</groupId>
-		    <artifactId>ojdbc14</artifactId>
-		    <version>${oracle.version}</version>
-		    <!-- should be provided once embedded jetty is figured out -->
-		    <scope>test</scope>
 		</dependency>
     
     	<!-- Rice also uses beanutils so we should either use it transitively or atleast add an exclusion to this in our pom so we do not have 
