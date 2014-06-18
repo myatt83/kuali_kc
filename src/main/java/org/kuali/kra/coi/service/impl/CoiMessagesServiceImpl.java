@@ -72,8 +72,11 @@ public class CoiMessagesServiceImpl implements CoiMessagesService {
                 List<CoiDisclosure> annualDisclosures = (List<CoiDisclosure>) businessObjectService.findMatching(CoiDisclosure.class, fieldValues);
                 Timestamp lastAnnualDate = null;
                 for (CoiDisclosure disclosure: annualDisclosures) {
-                    if (lastAnnualDate == null || lastAnnualDate.before(disclosure.getCertificationTimestamp())) {
-                        lastAnnualDate = disclosure.getCertificationTimestamp();
+                    final Timestamp disclosureCertificationTimestamp = disclosure.getCertificationTimestamp();
+                    if (disclosureCertificationTimestamp != null) {
+                        if (lastAnnualDate == null || lastAnnualDate.before(disclosureCertificationTimestamp)) {
+                            lastAnnualDate = disclosureCertificationTimestamp;
+                        }
                     }
                 }
                 Calendar lastAnnualCalendar = null;
