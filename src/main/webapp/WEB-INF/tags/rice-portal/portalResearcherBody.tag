@@ -20,6 +20,7 @@
       <channel:researcherProposals />
       <channel:researcherAwards />
       <channel:researcherNegotiations />
+      <channel:researcherPersonnel />
 </td>
 <td class="content" valign="top">
       <channel:researcherCompliance/>
@@ -29,9 +30,5 @@
 <td class="content" valign="top">
       <channel:researcherReportLinks />
       <channel:researcherIACUCProtocols/>
-</td>
-<td class="content" valign="top">
-      <channel:researcherQuicklinks />
-      <channel:researcherPersonnel />
       <channel:researcherWorkflow />
 </td>
