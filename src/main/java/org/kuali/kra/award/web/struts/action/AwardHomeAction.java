@@ -279,10 +279,19 @@ public class AwardHomeAction extends AwardAction {
         return forward;
     }
 
-    private void setTotalsOnAward(Award award) {
-        AwardAmountInfo aai = award.getLastAwardAmountInfo();
-        aai.setAmountObligatedToDate(aai.getObligatedTotalDirect().add(aai.getObligatedTotalIndirect()));
-        aai.setAnticipatedTotalAmount(aai.getAnticipatedTotalDirect().add(aai.getAnticipatedTotalIndirect()));
+    protected void setTotalsOnAward(final Award award) {
+        final AwardAmountInfo aai = award.getLastAwardAmountInfo();
+        if (aai == null) {
+            return;
+        }
+
+        final KualiDecimal obligatedDirectTotal     = aai.getObligatedTotalDirect() != null ? aai.getObligatedTotalDirect() : KualiDecimal.ZERO;
+        final KualiDecimal obligatedIndirectTotal   = aai.getObligatedTotalIndirect() != null ? aai.getObligatedTotalIndirect() : KualiDecimal.ZERO;
+        final KualiDecimal anticipatedDirectTotal   = aai.getAnticipatedTotalDirect() != null ? aai.getAnticipatedTotalDirect() : KualiDecimal.ZERO;
+        final KualiDecimal anticipatedIndirectTotal = aai.getAnticipatedTotalIndirect() != null ? aai.getAnticipatedTotalIndirect() : KualiDecimal.ZERO;
+
+        aai.setAmountObligatedToDate(obligatedDirectTotal.add(obligatedIndirectTotal));
+        aai.setAnticipatedTotalAmount(anticipatedDirectTotal.add(anticipatedIndirectTotal));
     }
     
     private void persistSpecialReviewProtocolFundingSourceLink(Award award, boolean isAwardProtocolLinkingEnabled) {
