@@ -63,6 +63,8 @@ public class Rolodex extends KraPersistableBusinessObjectBase implements Contact
 
     private Boolean sponsorAddressFlag;
 
+    private String isSponsorAddress = "N";
+
     private String sponsorCode;
 
     private String state;
@@ -74,6 +76,8 @@ public class Rolodex extends KraPersistableBusinessObjectBase implements Contact
     private Unit unit;
 
     private Sponsor sponsor;
+
+    private Organization organizations;
 
     private String createUser;
 
@@ -103,6 +107,18 @@ public class Rolodex extends KraPersistableBusinessObjectBase implements Contact
     }
 
     public String getAddressLine1() {
+        if (this.isSponsorAddress != null) {
+            if (this.isSponsorAddress.equalsIgnoreCase("Y")){
+                if (sponsor != null && sponsor.getPostalCode() != null) {
+                    return sponsor.getPostalCode();
+                }
+            }
+            if (this.isSponsorAddress.equalsIgnoreCase("N")) {
+                if (organizations != null && organizations.getAddress() != null) {
+                    return organizations.getAddress();
+                } 
+            }
+        }
         return addressLine1;
     }
 
@@ -111,7 +127,20 @@ public class Rolodex extends KraPersistableBusinessObjectBase implements Contact
     }
 
     public String getAddressLine2() {
+        if (this.isSponsorAddress != null) {
+            if (this.isSponsorAddress.equalsIgnoreCase("Y")) {
+                if (sponsor != null && sponsor.getState() != null) {
+                    return sponsor.getState();
+                }
+            }
+            if (this.isSponsorAddress.equalsIgnoreCase("N")) {
+                if (organizations != null) {
+                    return null; 
+                }
+            }
+        }
         return addressLine2;
+
     }
 
     public void setAddressLine2(String addressLine2) {
@@ -119,6 +148,18 @@ public class Rolodex extends KraPersistableBusinessObjectBase implements Contact
     }
 
     public String getAddressLine3() {
+        if (this.isSponsorAddress != null) {
+            if (this.isSponsorAddress.equalsIgnoreCase("Y")) {
+                if (sponsor != null && sponsor.getCountryCode() != null) {
+                    return sponsor.getCountryCode();
+                }
+            }
+            if (this.isSponsorAddress.equalsIgnoreCase("N")) {
+                if (organizations != null){
+                    return null; 
+                }
+            }
+        }
         return addressLine3;
     }
 
@@ -254,6 +295,22 @@ public class Rolodex extends KraPersistableBusinessObjectBase implements Contact
         this.sponsorAddressFlag = sponsorAddressFlag;
     }
 
+    /**
+     * Gets the isSponsorAddress attribute. 
+     * @return Returns the isSponsorAddress.
+     */
+    public String getIsSponsorAddress() {
+        return isSponsorAddress;
+    }
+
+    /**
+     * Sets the isSponsorAddress attribute value.
+     * @param isSponsorAddress The isSponsorAddress to set.
+     */
+    public void setIsSponsorAddress(String isSponsorAddress) {
+        this.isSponsorAddress = isSponsorAddress;
+    }
+
     public String getSponsorCode() {
         return sponsorCode;
     }
@@ -320,6 +377,14 @@ public class Rolodex extends KraPersistableBusinessObjectBase implements Contact
      */
     public Sponsor getSponsor() {
         return sponsor;
+    }
+
+    public void setOrganizations(Organization organizations) { 
+        this.organizations = organizations;
+    }
+    
+    public Organization getOrganizations() {
+       return organizations;
     }
 
     public boolean isActive() {
