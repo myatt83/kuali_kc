@@ -7566,20 +7566,23 @@ div.blockPage {
 .navbar .dropdown-toggle {
   color: #fff;
 }
-.portlet .chan-contain .body ul.chan {
+#iframe_portlet_container_table td.content {
+  width: 33%;
+}
+#iframe_portlet_container_table td.content .portlet .chan-contain .body ul.chan {
   padding: 0px;
 }
-.portlet .header {
+#iframe_portlet_container_table td.content .portlet .header {
   height: 40px;
 }
-.portlet .header h2.portlet-title {
-  color: black;
+#iframe_portlet_container_table td.content .portlet .header h2.portlet-title {
   font-family: 'Open Sans', sans-serif;
+  color: black;
   font-size: 1.1em;
   border-bottom: 1px solid #cccccc;
   float: none;
 }
-.portlet .header div.portlet-title {
+#iframe_portlet_container_table td.content .portlet .header div.portlet-title {
   float: none;
 }
 #footer-copyright {
