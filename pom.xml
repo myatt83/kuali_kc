@@ -1861,6 +1861,6 @@
         <monitoring.spring.import />
         <monitoring.spring.service />	
 		<wagon.s3.version>1.1.20</wagon.s3.version>
-		<rsmart.kc.rest.hr.version>0.5-SNAPSHOT</rsmart.kc.rest.hr.version>
+		<rsmart.kc.rest.hr.version>0.5</rsmart.kc.rest.hr.version>
 	</properties>
 </project>
