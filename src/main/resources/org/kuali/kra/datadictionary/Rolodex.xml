@@ -548,7 +548,6 @@
         <bean p:attributeName="rolodexId" parent="FieldDefinition"/>
         <bean p:attributeName="sponsorCode" parent="FieldDefinition"/>
         <bean p:attributeName="sponsor.sponsorName" parent="FieldDefinition"/>
-        <bean p:attributeName="isSponsorAddress" parent="FieldDefinition"/>
         <bean p:attributeName="organization" parent="FieldDefinition"/>
         <bean p:attributeName="lastName" parent="FieldDefinition"/>
         <bean p:attributeName="firstName" parent="FieldDefinition"/>
