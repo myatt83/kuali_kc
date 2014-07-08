@@ -8312,6 +8312,33 @@ th {
   background-color: #f6f6f6;
   border: 1px solid #dddddd;
 }
+.Qdiv {
+  border: #666666 solid 1px;
+  border-collapse: collapse;
+  margin-bottom: 5px;
+}
+.Qquestiondiv {
+  background: #939393;
+  color: #ffffff;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: bold;
+  padding: 2px;
+}
+.Qmoreinfocontrol {
+  float: right;
+  font-size: 9px;
+  font-weight: 100;
+  cursor: pointer;
+}
+.Qmoreinfodiv {
+  background: #FFFFFF;
+  padding: 2px;
+}
+.content_questionnaire .questionnaireAnswer {
+  width: 90%;
+  margin: 15px;
+}
 #addPersonDiv {
   min-height: 20px;
   padding: 19px;
