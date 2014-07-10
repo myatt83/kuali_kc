@@ -172,7 +172,12 @@ public class ProtocolProtocolActionsAction extends ProtocolAction implements Aud
         else {
             protocolForm.getActionHelper().setCurrentTask("");
         }
-        ActionForward actionForward = super.execute(mapping, form, request, response);
+        ActionForward actionForward = super.execute(mapping, form, request, response); 
+        
+        if ("close".equals(protocolForm.getMethodToCall()) || protocolForm.getMethodToCall() == null) {
+            // If we're closing, we can just leave right here.
+            return mapping.findForward(KRADConstants.MAPPING_PORTAL);
+        }
         protocolForm.getActionHelper().prepareView();
         // submit action may change "submission details", so re-initializa it
         protocolForm.getActionHelper().initSubmissionDetails();
