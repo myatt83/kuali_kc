@@ -11,6 +11,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.kuali.kra.bo.Unit;
 import org.kuali.kra.bo.UnitAdministrator;
 import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.proposaldevelopment.bo.ProposalPerson;
@@ -36,7 +37,6 @@ public class UnitAdministratorRoleAttribute extends GenericRoleAttribute {
 	 */
 	private static final long serialVersionUID = 2187135270043141363L;
 
-	@SuppressWarnings("unused")
 	private static final Log LOG = LogFactory.getLog(UnitAdministratorRoleAttribute.class);
 	private static final String HOMEUNIT = "homeUnit";
 	
@@ -98,7 +98,7 @@ public class UnitAdministratorRoleAttribute extends GenericRoleAttribute {
 	protected List<Id> resolveRecipients(RouteContext routeContext, QualifiedRoleName qualifiedRoleName) {
 		List<Id> members = new ArrayList<Id>();
 		Collection<Element> personnels = retrieveKeyPersonnel(routeContext);
-		String homeUnit;
+		String homeUnit = null;
 		Id personId; 
 		
 		//LOG.info("resolveRecipients");
@@ -108,7 +108,13 @@ public class UnitAdministratorRoleAttribute extends GenericRoleAttribute {
 			if (getHomeUnit) {
 				homeUnit = keyPerson.getChildText(HOMEUNIT);
 			} else {
-				homeUnit = getUnitService().getUnit(keyPerson.getChildText(HOMEUNIT)).getParentUnit().getUnitNumber();
+        final Unit unit = getUnitService().getUnit(keyPerson.getChildText(HOMEUNIT));
+        if (unit != null) {
+          final Unit parentUnit = unit.getParentUnit();
+          if (parentUnit != null) {
+            homeUnit = parentUnit.getUnitNumber();
+          }
+        }
 			}
 			
             List<UnitAdministrator> unitAdministrators = getUnitService().retrieveUnitAdministratorsByUnitNumber(homeUnit);
@@ -126,7 +132,6 @@ public class UnitAdministratorRoleAttribute extends GenericRoleAttribute {
 		return members;
 	}
 	
-	@SuppressWarnings({ "unchecked", "unchecked" })
 	private Collection<Element> retrieveKeyPersonnel(RouteContext context) {
 	    Document document = XmlHelper.buildJDocument(context.getDocumentContent().getDocument());
 	   
