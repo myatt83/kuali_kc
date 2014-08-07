@@ -197,12 +197,14 @@ public abstract class MeetingActionsActionBase extends MeetingActionBase {
         MeetingHelperBase meetingHelper = ((MeetingFormBase) form).getMeetingHelper();
         PrintableAttachment source = new PrintableAttachment();
         String scheduleId = request.getParameter("scheduleId");
-        if (scheduleId != null) {
-            String selectedLine = request.getParameter("line");
-            selection = Integer.parseInt(selectedLine);
-            Long schedule_id = Long.parseLong(scheduleId);
-            List<ScheduleAgenda> scheduleAgendas = getAgendaDoc(schedule_id);
-            source.setContent(scheduleAgendas.get(selection).getPdfStore());
+        if (scheduleId != null && scheduleId.length() > 0) {
+            final Long schedule_id = Long.parseLong(scheduleId);
+            final List<ScheduleAgenda> scheduleAgendas = getAgendaDoc(schedule_id);
+            final String selectedLine = request.getParameter("line");
+            if (selectedLine != null && selectedLine.length() > 0) {
+              selection = Integer.parseInt(selectedLine);
+              source.setContent(scheduleAgendas.get(selection).getPdfStore());
+            }
         }
         else {
             source.setContent(meetingHelper.getScheduleAgendas().get(selection).getPdfStore());
