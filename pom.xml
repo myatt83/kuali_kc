@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.kuali.kra</groupId>
     <artifactId>kc_project</artifactId>
     <packaging>war</packaging>
     <name>rSmart Cloud Express</name>
-    <version>5.2.1.0-rsmart-SNAPSHOT</version>
+    <version>5.2.1.0-rsmart</version>
     <description>
         The Kuali Coeus (KC) project is building a comprehensive system to manage the complexities of research
         administration that fully addresses the needs from the faculty researcher through grants administration to
@@ -228,7 +227,7 @@
                                     <phases>clean,deploy,site</phases>
                                 </requirePluginVersions>
 
-                                <banCircularDependencies/>
+                                <banCircularDependencies />
                                 <!--
                                 Commenting out for now.  This is likely due to our "hacked" launched scripts
                                 with invalid jars on the classpath.  Then scripts should be converted to m2e
@@ -2035,7 +2034,8 @@ module of int tests -->
         <connection>scm:git:git://github.com/rSmart/kuali_kc.git</connection>
         <developerConnection>scm:git:git@github.com:rSmart/kuali_kc.git</developerConnection>
         <url>https://github.com/rSmart/kuali_kc</url>
-    </scm>
+      <tag>kc_project-5.2.1.0-rsmart</tag>
+  </scm>
 
     <distributionManagement>
         <downloadUrl>https://github.com/rSmart/kc_platform</downloadUrl>
@@ -2204,11 +2204,11 @@ module of int tests -->
         <account.wsdl.packaged.location>wsdl/AccountCreationService.wsdl</account.wsdl.packaged.location>
         <budget.wsdl.packaged.location>wsdl/BudgetAdjustmentService.wsdl</budget.wsdl.packaged.location>
 
-        <monitoring.filter/>
-        <monitoring.mapping/>
-        <monitoring.listener/>
-        <monitoring.spring.import/>
-        <monitoring.spring.service/>
+        <monitoring.filter />
+        <monitoring.mapping />
+        <monitoring.listener />
+        <monitoring.spring.import />
+        <monitoring.spring.service />
 
         <wagon.s3.version>1.2.1</wagon.s3.version>
         <rsmart.hr.rest.version>0.6</rsmart.hr.rest.version>
