@@ -2211,7 +2211,7 @@ module of int tests -->
         <monitoring.spring.service/>
 
         <wagon.s3.version>1.2.1</wagon.s3.version>
-        <rsmart.hr.rest.version>0.6-SNAPSHOT</rsmart.hr.rest.version>
+        <rsmart.hr.rest.version>0.6</rsmart.hr.rest.version>
         <rsmart.cx.data.migration.version>5.2.1.0</rsmart.cx.data.migration.version>
     </properties>
 </project>
