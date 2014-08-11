@@ -46,6 +46,7 @@ import org.kuali.kra.service.KcPersonService;
 import org.kuali.kra.service.RolodexService;
 import org.kuali.kra.util.EmailAttachment;
 import org.kuali.rice.core.api.datetime.DateTimeService;
+import org.kuali.rice.core.api.exception.RiceIllegalArgumentException;
 import org.kuali.rice.core.api.membership.MemberType;
 import org.kuali.rice.coreservice.framework.parameter.ParameterService;
 import org.kuali.rice.ken.api.notification.Notification;
@@ -539,21 +540,27 @@ public class KcNotificationServiceImpl implements KcNotificationService {
         
         if (CollectionUtils.isNotEmpty(recipients)) {
             for (NotificationRecipient.Builder recipient : recipients) {
-                Entity entityInfo = 
-                    getIdentityService().getEntityByPrincipalName(recipient.getRecipientId());
-                List<EntityTypeContactInfo> entityTypes = entityInfo.getEntityTypeContactInfos();
-                if (CollectionUtils.isNotEmpty(entityTypes)) {
-                    for (EntityTypeContactInfo entityType : entityTypes) {
-                        if (StringUtils.equals(KimConstants.EntityTypes.PERSON, entityType.getEntityTypeCode())) {
-                            if (entityType.getDefaultEmailAddress() != null &&
-                                    StringUtils.isNotBlank(entityType.getDefaultEmailAddress().getEmailAddress())) {
-                                emailAddresses.add(entityType.getDefaultEmailAddress().getEmailAddress());
-                                LOG.info("Added recipient email: " + entityType.getDefaultEmailAddress().getEmailAddress() +
-                                         " for KIM user: " + recipient.getRecipientId());
-                            }
-                        }
-                    }
-            }
+                Entity entityInfo = null;
+                try {
+                  entityInfo = getIdentityService().getEntityByPrincipalName(recipient.getRecipientId());
+                } catch (RiceIllegalArgumentException e) {
+                  LOG.info("getRecipientEmailAddresses: Principal cannot be found: " + recipient.getRecipientId());
+                }
+                if (entityInfo != null) {
+                  List<EntityTypeContactInfo> entityTypes = entityInfo.getEntityTypeContactInfos();
+                  if (CollectionUtils.isNotEmpty(entityTypes)) {
+                      for (EntityTypeContactInfo entityType : entityTypes) {
+                          if (StringUtils.equals(KimConstants.EntityTypes.PERSON, entityType.getEntityTypeCode())) {
+                              if (entityType.getDefaultEmailAddress() != null &&
+                                      StringUtils.isNotBlank(entityType.getDefaultEmailAddress().getEmailAddress())) {
+                                  emailAddresses.add(entityType.getDefaultEmailAddress().getEmailAddress());
+                                  LOG.info("Added recipient email: " + entityType.getDefaultEmailAddress().getEmailAddress() +
+                                           " for KIM user: " + recipient.getRecipientId());
+                              }
+                          }
+                      }
+                   }
+                }
             }
         }
         
