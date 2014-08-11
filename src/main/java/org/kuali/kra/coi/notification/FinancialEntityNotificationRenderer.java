@@ -16,6 +16,7 @@
 package org.kuali.kra.coi.notification;
 
 import org.kuali.kra.bo.KcPerson;
+import org.kuali.kra.bo.Unit;
 import org.kuali.kra.coi.personfinancialentity.PersonFinIntDisclosure;
 import org.kuali.kra.common.notification.NotificationRendererBase;
 import org.kuali.kra.infrastructure.KraServiceLocator;
@@ -53,7 +54,10 @@ public class FinancialEntityNotificationRenderer extends NotificationRendererBas
         Map<String, String> params = super.getDefaultReplacementParameters();
         String personId = getDisclosure().getPersonId();
         KcPerson reporter = getKcPersonService().getKcPersonByPersonId(personId);
-        params.put("{UNIT}", reporter.getUnit().getUnitName());
+        final Unit unit = reporter.getUnit();
+        if (unit != null) {
+          params.put("{UNIT}", unit.getUnitName());
+        }
         params.put("{FE_ENTITY_NAME}", disclosure.getEntityName());
         return params;
     }
