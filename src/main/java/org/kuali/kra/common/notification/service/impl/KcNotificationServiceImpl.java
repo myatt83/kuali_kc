@@ -542,7 +542,10 @@ public class KcNotificationServiceImpl implements KcNotificationService {
             for (NotificationRecipient.Builder recipient : recipients) {
                 Entity entityInfo = null;
                 try {
-                  entityInfo = getIdentityService().getEntityByPrincipalName(recipient.getRecipientId());
+                  final String principalName = recipient.getRecipientId();
+                  if (principalName != null && principalName.length() > 0) {
+                    entityInfo = getIdentityService().getEntityByPrincipalName(recipient.getRecipientId());
+                  }
                 } catch (RiceIllegalArgumentException e) {
                   LOG.info("getRecipientEmailAddresses: Principal cannot be found: " + recipient.getRecipientId());
                 }
