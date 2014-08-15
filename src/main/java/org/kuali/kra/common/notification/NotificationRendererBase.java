@@ -31,6 +31,7 @@ import java.util.Map;
  */
 public abstract class NotificationRendererBase implements NotificationRenderer, Serializable {
 
+    private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(NotificationRendererBase.class);
     private static final long serialVersionUID = 7355369114077509177L;
 
     public static final String USER_FULLNAME = "{USER_FULLNAME}";
@@ -58,8 +59,11 @@ public abstract class NotificationRendererBase implements NotificationRenderer, 
      * @param replacementParameters the parameters to replace in the message
      * @return the message with all the possible search and replace 
      */
-    protected String render(String text, Map<String,String> replacementParameters) { 
+    protected String render(String text, Map<String,String> replacementParameters) {
+        LOG.debug("render(String " + text + ", Map<String,String> " + replacementParameters
+            + ")");
         for (String key : replacementParameters.keySet()) {
+            LOG.info("NotificationRendererBase,render: replacementParameters.key=" + key);
             text = StringUtils.replace(text, key, replacementParameters.get(key));
         }
         
