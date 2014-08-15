@@ -700,8 +700,8 @@ public class S2SUtilServiceImpl implements S2SUtilService {
      * @return Country object matching the code
      * @see org.kuali.kra.s2s.service.S2SUtilService#getCountryFromCode(java.lang.String)
      */
-    public Country getCountryFromCode(String countryCode) {
-        if(countryCode==null) return null;
+    public Country getCountryFromCode(final String countryCode) {
+        if (countryCode == null || StringUtils.isBlank(countryCode)) return null;
         Country country = getCountryService().getCountryByAlternateCode(countryCode);
         if(country==null){
             country = getCountryService().getCountry(countryCode);
