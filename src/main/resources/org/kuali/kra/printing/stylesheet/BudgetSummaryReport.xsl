@@ -743,7 +743,7 @@ CalculationMethodologyWithoutHeader.lay ######### -->
                         </fo:table-body>
                     </fo:table>
                 </fo:block>
-                <!-- GENERATE TABLE START-->
+                <!-- GENERATE TABLE START
                 <fo:block span="none">
                     <fo:table table-layout="fixed" table-omit-footer-at-break="true">
                         <fo:table-column column-width="385pt"/>
@@ -817,7 +817,7 @@ CalculationMethodologyWithoutHeader.lay ######### -->
                             </xsl:for-each>
                         </fo:table-body>
                     </fo:table>
-                </fo:block>
+                </fo:block>-->
                 <!-- GENERATE TABLE START-->
                 <fo:block span="none">
                     <fo:table table-layout="fixed">
@@ -875,7 +875,7 @@ CalculationMethodologyWithoutHeader.lay ######### -->
                         </fo:table-body>
                     </fo:table>
                 </fo:block>
-                <!-- GENERATE TABLE START-->
+                <!-- GENERATE TABLE START
                 <fo:block span="none">
                     <fo:table table-layout="fixed">
                         <fo:table-column column-width="457pt"/>
@@ -910,7 +910,7 @@ CalculationMethodologyWithoutHeader.lay ######### -->
                             </xsl:for-each>
                         </fo:table-body>
                     </fo:table>
-                </fo:block>
+                </fo:block>-->
                 <!-- GENERATE TABLE START-->
                 <fo:block span="none">
                     <fo:table table-layout="fixed">

@@ -814,7 +814,8 @@ public abstract class BudgetBaseStream implements XmlStream {
 			calculatedCost = getCalculatedCostForBudgetExclusionsSortId4();
 			ReportType reportTypeForSortId4 = getReportTypeForExclusions(
 					sortId, categoryDesc, calculatedCost);
-			reportTypeList.add(reportTypeForSortId4);
+			if(calculatedCost.doubleValue()>0.0d)
+			    reportTypeList.add(reportTypeForSortId4);
 		} else {
 			sortId = 1;
 			setReportTypeOHExclusionForSortId(reportTypeList, sortId);
@@ -853,7 +854,8 @@ public abstract class BudgetBaseStream implements XmlStream {
 			calculatedCost = getCalculatedCostForBudgetExclusionsSortId4();
 			ReportType reportTypeForSortId4 = getReportTypeForExclusions(
 					sortId, categoryDesc, calculatedCost);
-			reportTypeList.add(reportTypeForSortId4);
+	         if(calculatedCost.doubleValue()>0.0d)
+	             reportTypeList.add(reportTypeForSortId4);
 		}
 		subReportType.setGroupArray(getGroupsType(reportTypeList));
 		return subReportType;
@@ -1037,7 +1039,7 @@ public abstract class BudgetBaseStream implements XmlStream {
 					&& isLineItemCalAmountOfRateClassTypeOverhead(budgetLineItemCalcAmount)) {
 				if (budgetLineItemCalcAmount.getLineItemNumber().equals(
 						lineItemNumber)) {
-					availabe = true;
+					return true;
 				}
 			}
 		}
@@ -1634,10 +1636,10 @@ public abstract class BudgetBaseStream implements XmlStream {
 						&& rateClassType.equals(budgetPersRateAndBase
 								.getRateClass().getRateClassType())) {
 					String budgetPersRateBaseKey = getBudgetPersRateAndBaseKey(budgetPersRateAndBase);
-					if (otherBudgetPersRateBaseMap
-							.containsKey(budgetPersRateBaseKey)) {
-						continue;
-					}
+//					if (otherBudgetPersRateBaseMap
+//							.containsKey(budgetPersRateBaseKey)) {
+//						continue;
+//					}
 					ReportTypeVO reportTypeVO = getReportTypeVOForBudgetPersonnelRateAndBase(budgetPersRateAndBase);
 					reportTypeVO.setRateTypeDesc(getRateTypeDesc(
 							budgetPersRateAndBase.getRateClassCode(),
@@ -1675,10 +1677,10 @@ public abstract class BudgetBaseStream implements XmlStream {
 						&& budgetPersRateAndBase.getRateClass()
 								.getRateClassType().equals(rateClassType)) {
 					String budgetPersRateBaseKey = getBudgetPersRateAndBaseKey(budgetPersRateAndBase);
-					if (vacBudgetPersRateBaseMap
-							.containsKey(budgetPersRateBaseKey)) {
-						continue;
-					}
+//					if (vacBudgetPersRateBaseMap
+//							.containsKey(budgetPersRateBaseKey)) {
+//						continue;
+//					}
 					ReportTypeVO reportTypeVO = getReportTypeVOForBudgetPersonnelRateAndBase(budgetPersRateAndBase);
 					reportTypeVO.setRateTypeDesc(getRateTypeDesc(
 							budgetPersRateAndBase.getRateClassCode(),
@@ -1755,10 +1757,10 @@ public abstract class BudgetBaseStream implements XmlStream {
 						&& budgetPersRateAndBase.getRateClass()
 								.getRateClassType().equals(rateClassType)) {
 					String budgetPersRateBaseKey = getBudgetPersRateAndBaseKey(budgetPersRateAndBase);
-					if (ebBudgetPersRateBaseMap
-							.containsKey(budgetPersRateBaseKey)) {
-						continue;
-					}
+//					if (ebBudgetPersRateBaseMap
+//							.containsKey(budgetPersRateBaseKey)) {
+//						continue;
+//					}
 					ReportTypeVO reportTypeVO = getReportTypeVOForBudgetPersonnelRateAndBase(budgetPersRateAndBase);
 					reportTypeVO.setRateTypeDesc(getRateTypeDesc(
 							budgetPersRateAndBase.getRateClassCode(),
@@ -1795,10 +1797,10 @@ public abstract class BudgetBaseStream implements XmlStream {
 						&& budgetPersRateAndBase.getRateClass()
 								.getRateClassType().equals(rateClassType)) {
 					String budgetPersRateBaseKey = getBudgetPersRateAndBaseKey(budgetPersRateAndBase);
-					if (ohBudgetPersRateBaseMap
-							.containsKey(budgetPersRateBaseKey)) {
-						continue;
-					}
+//					if (ohBudgetPersRateBaseMap
+//							.containsKey(budgetPersRateBaseKey)) {
+//						continue;
+//					}
 					ReportTypeVO reportTypeVO = getReportTypeVOForBudgetPersonnelRateAndBase(budgetPersRateAndBase);
 					reportTypeVOList.add(reportTypeVO);
 					ohBudgetPersRateBaseMap.put(budgetPersRateBaseKey,

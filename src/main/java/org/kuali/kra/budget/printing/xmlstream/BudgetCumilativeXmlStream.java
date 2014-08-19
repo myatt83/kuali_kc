@@ -87,6 +87,7 @@ public class BudgetCumilativeXmlStream extends BudgetBaseStream {
 		BudgetParent budgetParent = budget.getBudgetParent();
 		ReportHeaderType reportHeaderType = getReportHeaderTypeForCumulativeReport(budgetParent);
 		budgetSummaryReport.setReportHeader(reportHeaderType);
+		
 		cumulativePageType = getCumulativeBudgetReportPageType();
 		budgetSummaryReport.setCumilativePage(cumulativePageType);
 		ReportPageType[] reportPageTypeArray = getReportPageTypes();
@@ -157,7 +158,6 @@ public class BudgetCumilativeXmlStream extends BudgetBaseStream {
 	 * BusgetSummary, CalculationMethodology and period to reportPageType
 	 */
 	private ReportPageType getCumulativeBudgetReportPageType() {
-
 		ReportPageType reportPageType = ReportPageType.Factory.newInstance();
 		BudgetSummary budgetSummary = getCumulativeBudget();
 		CalculationMethodology calculationMethodology = getCumulativeCalculationMethodology();
@@ -389,7 +389,8 @@ public class BudgetCumilativeXmlStream extends BudgetBaseStream {
 		}
 		ReportType reportType = getReportTypeForNonPersonnel(categoryDesc,
 				costElementDesc, calculatedCost, null);
-		reportTypeList.add(reportType);
+		if(calculatedCost.doubleValue()>0.0)
+		    reportTypeList.add(reportType);
 		setReportTypeForBudgetCumulativeNonPersonnel(reportTypeList);
 		Collections.sort(reportTypeList, new Comparator<ReportType>() {
 			public int compare(ReportType reportType1, ReportType reportType2) {
@@ -540,7 +541,8 @@ public class BudgetCumilativeXmlStream extends BudgetBaseStream {
 			calculatedCost = getCalculatedCostForBudgetExclusionsSortId4ForCumulativeReport();
 			ReportType reportTypeForSortId4 = getReportTypeForExclusions(
 					sortId, categoryDesc, calculatedCost);
-			reportTypeList.add(reportTypeForSortId4);
+	         if(calculatedCost.doubleValue()>0.0d)
+	             reportTypeList.add(reportTypeForSortId4);
 		} else {
 			sortId = 1;
 			setReportTypeOHExclusionForSortId(reportTypeList, sortId);
@@ -642,7 +644,8 @@ public class BudgetCumilativeXmlStream extends BudgetBaseStream {
 			calculatedCost = getCalculatedCostForBudgetExclusionsSortId4ForCumulativeReport();
 			ReportType reportTypeForSortId4 = getReportTypeForExclusions(
 					sortId, categoryDesc, calculatedCost);
-			reportTypeList.add(reportTypeForSortId4);
+			if(calculatedCost.doubleValue()>0.0d)
+			    reportTypeList.add(reportTypeForSortId4);
 		}
 		subReportType.setGroupArray(getGroupsType(reportTypeList));
 		return subReportType;
