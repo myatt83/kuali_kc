@@ -41,6 +41,10 @@ public class NarrativeReplaceAuthorizer extends NarrativeAuthorizer {
         if (!doc.getDevelopmentProposal().getSubmitFlag() && hasProposalPermission(userId, doc, PermissionConstants.MODIFY_NARRATIVE)) {
             hasPermission = hasNarrativeRight(userId, narrative, NarrativeRight.MODIFY_NARRATIVE_RIGHT);
         }
+        if (!hasPermission) {
+        	hasPermission = !doc.getDevelopmentProposal().getSubmitFlag() && doc.getDocumentHeader().getWorkflowDocument().isEnroute() 
+        		&& hasProposalPermission(userId, doc, PermissionConstants.ALTER_PROPOSAL_DATA);
+        }
         
         return hasPermission;
     }
