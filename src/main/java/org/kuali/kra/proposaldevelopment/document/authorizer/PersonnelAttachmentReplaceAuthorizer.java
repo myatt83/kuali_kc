@@ -33,6 +33,10 @@ public class PersonnelAttachmentReplaceAuthorizer extends ProposalAuthorizer {
             boolean isRevisionRequested = StringUtils.equalsIgnoreCase(doc.getDevelopmentProposal().getProposalState().getDescription(), "Revisions Requested");
             result = hasPerm && (isInProgress || isApprovalPending || isRevisionRequested);
         }
+        if (!result) {
+        	result = !doc.getDevelopmentProposal().getSubmitFlag() && doc.getDocumentHeader().getWorkflowDocument().isEnroute() 
+            		&& hasProposalPermission(userId, doc, PermissionConstants.ALTER_PROPOSAL_DATA);
+        }        
         return result;
     }
 
