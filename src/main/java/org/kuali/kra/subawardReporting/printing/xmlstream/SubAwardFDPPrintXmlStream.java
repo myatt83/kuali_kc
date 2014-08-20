@@ -393,7 +393,8 @@ public class SubAwardFDPPrintXmlStream implements XmlStream  {
                 rolodexDetails.setFax(subaward.getRolodex().getFaxNumber());
                 rolodexDetails.setEmail(subaward.getRolodex().getEmailAddress());
             }
-                subcontractDetail.setPONumber(subaward.getPurchaseOrderNum());
+            subcontractDetail.setPONumber(subaward.getPurchaseOrderNum());
+            subcontractDetail.setSubContractCode(subaward.getSubAwardCode());
             if(subaward.getOrganization() != null){
                 subcontractDetail.setSubcontractorName(subaward.getOrganization().getOrganizationName());
                 rolodexDetailsType.setAddress1(subaward.getOrganization().getRolodex().getAddressLine1());
