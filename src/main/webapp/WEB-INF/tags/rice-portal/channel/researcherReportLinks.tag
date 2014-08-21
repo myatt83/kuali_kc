@@ -25,7 +25,7 @@
   		<li><a class="portal_link" target="reportWindow" href="${ConfigProperties.application.url}/displayExternalReport.do?awardId=AwardsBySponsor">Awards by Sponsor</a></li>
  		<li><a class="portal_link" target="reportWindow" href="${ConfigProperties.application.url}/displayExternalReport.do?awardId=Awards_By_Sponsor_Type">Awards by Sponsor Type</a></li>
   		<li><a class="portal_link" target="reportWindow" href="${ConfigProperties.application.url}/displayExternalReport.do?awardId=AwardsByAwardType">Awards by Award Type</a></li>
-  		<li><a class="portal_link" target="reportWindow" href="${ConfigProperties.application.url}/displayExternalReport.do?awardId=AWARDS_BY_START_DATE">Awards by Start Date</a></li>
+  		<li><a class="portal_link" target="reportWindow" href="${ConfigProperties.application.url}/displayExternalReport.do?awardId=AWARDS_BY_START_DATE">Awards by Notice Date</a></li>
 	</ul>
 
 	<strong>Proposal Reports</strong>
