@@ -110,7 +110,11 @@ public class KraAuthorizationServiceImpl implements KraAuthorizationService {
 
     @Override
     public boolean hasPermission(String userId, Permissionable permissionable, String permissionName) {
-        return hasPermission(userId, permissionable, permissionable.getNamespace(), permissionName);
+      String nameSpace = null;
+      if (permissionable != null) {
+        nameSpace = permissionable.getNamespace();
+      }
+      return hasPermission(userId, permissionable, nameSpace, permissionName);
     }
 
     @Override
