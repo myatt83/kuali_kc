@@ -121,17 +121,19 @@ public class KraAuthorizationServiceImpl implements KraAuthorizationService {
     public boolean hasPermission(String userId, Permissionable permissionable, String permissionNamespace, String permissionName) {
         boolean userHasPermission = false;
         Map<String, String> qualifiedRoleAttributes = new HashMap<String, String>();
-        qualifiedRoleAttributes.put(permissionable.getDocumentKey(), permissionable.getDocumentNumberForPermission());
-        permissionable.populateAdditionalQualifiedRoleAttributes(qualifiedRoleAttributes);
-        Map<String, String> permissionAttributes = PermissionAttributes.getAttributes(permissionName);
-        
-        String unitNumber = permissionable.getLeadUnitNumber();
-        
-        if(StringUtils.isNotEmpty(permissionable.getDocumentNumberForPermission())) {
-            userHasPermission = permissionService.isAuthorized(userId, permissionNamespace, permissionName, qualifiedRoleAttributes); 
-        }
-        if (!userHasPermission && StringUtils.isNotEmpty(unitNumber)) {
-            userHasPermission = unitAuthorizationService.hasPermission(userId, unitNumber, permissionNamespace, permissionName);
+        if (permissionable != null) {
+          qualifiedRoleAttributes.put(permissionable.getDocumentKey(), permissionable.getDocumentNumberForPermission());
+          permissionable.populateAdditionalQualifiedRoleAttributes(qualifiedRoleAttributes);
+          Map<String, String> permissionAttributes = PermissionAttributes.getAttributes(permissionName);
+
+          String unitNumber = permissionable.getLeadUnitNumber();
+
+          if(StringUtils.isNotEmpty(permissionable.getDocumentNumberForPermission())) {
+              userHasPermission = permissionService.isAuthorized(userId, permissionNamespace, permissionName, qualifiedRoleAttributes); 
+          }
+          if (!userHasPermission && StringUtils.isNotEmpty(unitNumber)) {
+              userHasPermission = unitAuthorizationService.hasPermission(userId, unitNumber, permissionNamespace, permissionName);
+          }
         }
         return userHasPermission;
     }
