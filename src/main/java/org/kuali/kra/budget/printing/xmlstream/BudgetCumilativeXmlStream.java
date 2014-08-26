@@ -550,6 +550,17 @@ public class BudgetCumilativeXmlStream extends BudgetBaseStream {
 		subReportType.setGroupArray(getGroupsType(reportTypeList));
 		return subReportType;
 	}
+	
+    protected void setReportTypeOHExclusionForSortId(
+            List<ReportType> reportTypeList, int sortId) {
+        List<ReportTypeVO> tempReportTypeVOList = new ArrayList<ReportTypeVO>();
+        for (BudgetPeriod budgetPeriod : budget.getBudgetPeriods()) {
+            this.budgetPeriod = budgetPeriod;
+            setReportTypeVOListForOHExclusionSortId(tempReportTypeVOList);
+        }
+        setReportTypeListOHExclusionForSortId(reportTypeList, sortId,
+                tempReportTypeVOList);
+    }
 
 	/*
 	 * This method gets sum of calculatedCost from list of BudgetPeriod,

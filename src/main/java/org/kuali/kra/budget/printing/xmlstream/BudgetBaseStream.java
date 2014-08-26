@@ -46,6 +46,7 @@ import java.lang.reflect.Method;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -298,9 +299,9 @@ public abstract class BudgetBaseStream implements XmlStream {
 					Date endDate = budgetRateAndBase.getEndDate();
 					String key = new StringBuilder(startDate.toString())
 							.append(endDate.toString()).toString();
-					if (laRateBaseMap.containsKey(key)) {
-						continue;
-					}
+//					if (laRateBaseMap.containsKey(key)) {
+//						continue;
+//					}
 					calculatedCost = calculatedCost.add(budgetRateAndBase
 							.getCalculatedCost());
 					laRateBaseMap.put(key, budgetRateAndBase);
@@ -911,26 +912,24 @@ public abstract class BudgetBaseStream implements XmlStream {
 		Map<String, ReportTypeVO> reportTypeMap = new HashMap<String, ReportTypeVO>();
 		for (ReportTypeVO reportTypeVO : tempReportTypeVOList) {
 			String budgetOHExclusionKey = reportTypeVO.getCostElementDesc();
+            BudgetDecimal calculatedCost = reportTypeVO.getCalculatedCost();
 			if (reportTypeMap.containsKey(budgetOHExclusionKey)) {
-				continue;
+			    ReportTypeVO reportTypeVO1 = reportTypeMap.get(budgetOHExclusionKey);
+                calculatedCost = calculatedCost.add(reportTypeVO1.getCalculatedCost());
+			    reportTypeMap.put(budgetOHExclusionKey, reportTypeVO);
 			}
-			BudgetDecimal calculatedCost = BudgetDecimal.ZERO;
-			for (ReportTypeVO reportTypeVO1 : tempReportTypeVOList) {
-				String budgetOHExclusionTempKey = reportTypeVO1
-						.getCostElementDesc();
-				if (budgetOHExclusionTempKey.equals(budgetOHExclusionKey)) {
-					calculatedCost = calculatedCost.add(reportTypeVO1
-							.getCalculatedCost());
-				}
-			}
-			reportTypeMap.put(budgetOHExclusionKey, reportTypeVO);
-			ReportType reportType = ReportType.Factory.newInstance();
-			reportType.setSortId(sortId);
-			reportType.setCostElementDescription(reportTypeVO
-					.getCostElementDesc());
-			reportType.setCalculatedCost(calculatedCost.doubleValue());
-			reportTypeList.add(reportType);
 		}
+		Iterator<String> it = reportTypeMap.keySet().iterator();
+		while (it.hasNext()) {
+            String budgetOHExclusionKey = (String) it.next();
+            ReportTypeVO reportTypeVO1 = reportTypeMap.get(budgetOHExclusionKey);
+            ReportType reportType = ReportType.Factory.newInstance();
+            reportType.setSortId(sortId);
+            reportType.setCostElementDescription(budgetOHExclusionKey);
+            reportType.setCalculatedCost(reportTypeVO1.getCalculatedCost().doubleValue());
+            reportTypeList.add(reportType);
+        }
+
 	}
 
 	/**
