@@ -265,15 +265,17 @@ public class SubAwardPrintingServiceImpl implements SubAwardPrintingService {
         if(subAwardPrint.getAttachment4()){
             printFormTemplates.add(getBusinessObjectService().findBySinglePrimaryKey(SubAwardForms.class, "FDP_ATT_4"));
         }
-        for(SubAwardForms subAwardFormValues : subAwardFormList){
+        if(subAwardFormList != null) {
+          for(SubAwardForms subAwardFormValues : subAwardFormList){
             if(subAwardFormValues.getSelectToPrint()){
                 String description = subAwardFormValues.getDescription();
                 String[] token = description.split("\\s");
                 printFormTemplates.add(getBusinessObjectService().findBySinglePrimaryKey(SubAwardForms.class, "FDP_"+token[0]));
             }
+          }
+          resetsubAwardFormList(subAwardFormList);
         }
         
-        resetsubAwardFormList(subAwardFormList);
         return printFormTemplates;
     }
     
