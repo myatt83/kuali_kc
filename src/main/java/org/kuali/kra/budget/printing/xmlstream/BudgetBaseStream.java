@@ -916,6 +916,9 @@ public abstract class BudgetBaseStream implements XmlStream {
 			if (reportTypeMap.containsKey(budgetOHExclusionKey)) {
 			    ReportTypeVO reportTypeVO1 = reportTypeMap.get(budgetOHExclusionKey);
                 calculatedCost = calculatedCost.add(reportTypeVO1.getCalculatedCost());
+                reportTypeVO1.setCalculatedCost(calculatedCost);
+			    reportTypeMap.put(budgetOHExclusionKey, reportTypeVO1);
+			}else{
 			    reportTypeMap.put(budgetOHExclusionKey, reportTypeVO);
 			}
 		}
