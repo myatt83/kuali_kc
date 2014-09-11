@@ -518,12 +518,12 @@
                                         </fo:inline-container>
                                         <xsl:if test="salary">
                                             <fo:table font-family="Times New Roman" font-size="8pt" table-layout="fixed" width="100%" border="solid 0.4pt gray">
-                                                <fo:table-column column-width="24%"/>
-                                                <fo:table-column column-width="33%"/>
+                                                <fo:table-column column-width="25%"/>
+                                                <fo:table-column column-width="28%"/>
                                                 <fo:table-column column-width="11%"/>
                                                 <fo:table-column column-width="11%"/>
-                                                <fo:table-column column-width="10%"/>
-                                                <fo:table-column column-width="13%"/>
+                                                <fo:table-column column-width="11%"/>
+                                                <fo:table-column column-width="14%"/>
                                                 <fo:table-header start-indent="0pt">
                                                     <fo:table-row>
                                                         <fo:table-cell border="solid 0.4pt gray"   display-align="center">
