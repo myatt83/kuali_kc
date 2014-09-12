@@ -55,6 +55,7 @@ public abstract class CommitteeScheduleAttachmentsBase extends KraPersistableBus
     private CommitteeScheduleBase committeeSchedule;
     private String newUpdateUser;
     private Timestamp newUpdateTimestamp;
+    private Long scheduleIdFk;
     
     /**
      * Gets the committeeSchedule attribute. 
@@ -362,6 +363,14 @@ public abstract class CommitteeScheduleAttachmentsBase extends KraPersistableBus
     @Override
     public String getIconPath() {
         return KraServiceLocator.getService(KcAttachmentService.class).getFileTypeIcon(this);
+    }
+
+    public Long getScheduleIdFk() {
+      return scheduleIdFk;
+    }
+
+    public void setScheduleIdFk(Long scheduleIdFk) {
+      this.scheduleIdFk = scheduleIdFk;
     }
 
 }
