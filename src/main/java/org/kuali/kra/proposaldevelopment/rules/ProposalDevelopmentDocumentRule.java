@@ -543,7 +543,13 @@ public class ProposalDevelopmentDocumentRule extends ResearchDocumentRuleBase im
     }
     
     public boolean processBudgetDataOverrideRules(BudgetDataOverrideEvent budgetDataOverrideEvent) {
-        return new ProposalBudgetDataOverrideRule().processBudgetDataOverrideRules(budgetDataOverrideEvent);
+        try {
+          return new ProposalBudgetDataOverrideRule().processBudgetDataOverrideRules(budgetDataOverrideEvent);
+        } catch (NullPointerException e) {
+          LOG.warn("NPE caught when calling: new ProposalBudgetDataOverrideRule().processBudgetDataOverrideRules(budgetDataOverrideEvent)");
+          LOG.warn("returning false");
+          return false;
+        }
     }
     
     
