@@ -9106,10 +9106,34 @@
 																<xsl:for-each select="AwardDetails">
 																	<xsl:for-each select="OtherHeaderDetails">
 																		<xsl:for-each select="CFDANumber">
-																			<fo:inline>
-																				<xsl:value-of
-																					select="concat(  substring( .,1 , 2 )   ,  &quot;.&quot; ,substring-after( . , substring( .,1 , 2 ) )  )" />
-																			</fo:inline>
+																	<fo:inline-container>
+																		<fo:block>
+																			<xsl:text>&#x2029;</xsl:text>
+																		</fo:block>
+																	</fo:inline-container>
+																	<fo:block white-space="pre"
+																		white-space-collapse="false" wrap-option="wrap"
+																		white-space-treatment="ignore-if-surrounding-linefeed"
+																		margin="0pt">
+																		<fo:block>
+																			<xsl:variable name="value-of-template">
+																				<xsl:apply-templates />
+																			</xsl:variable>
+																			<xsl:choose>
+																				<xsl:when
+																					test="contains(string($value-of-template),'&#x2029;')">
+																					<fo:block>
+																						<xsl:copy-of select="$value-of-template" />
+																					</fo:block>
+																				</xsl:when>
+																				<xsl:otherwise>
+																					<fo:inline>
+																						<xsl:copy-of select="$value-of-template" />
+																					</fo:inline>
+																				</xsl:otherwise>
+																			</xsl:choose>
+																		</fo:block>
+																	</fo:block>
 																		</xsl:for-each>
 																	</xsl:for-each>
 																</xsl:for-each>
