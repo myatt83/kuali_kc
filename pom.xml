@@ -2212,7 +2212,7 @@ module of int tests -->
         <wagon.s3.version>1.2.1</wagon.s3.version>
 
         <rice.version>2.3.6.4-rsmart-SNAPSHOT</rice.version>
-        <rsmart.hr.rest.version>0.7</rsmart.hr.rest.version>
+        <rsmart.hr.rest.version>0.8-SNAPSHOT</rsmart.hr.rest.version>
         <rsmart.cx.data.migration.version>5.2.1.3</rsmart.cx.data.migration.version>
     </properties>
 </project>
