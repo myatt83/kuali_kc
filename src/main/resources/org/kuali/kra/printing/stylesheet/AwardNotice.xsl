@@ -3840,27 +3840,14 @@
 									<fo:block>
 											<xsl:text>&#160;</xsl:text>											
 									</fo:block>
+									<fo:block break-after="page">
+										<fo:leader leader-pattern="space" />
+									</fo:block>
 									<fo:block>
 									<xsl:text>The following articles are provided for your information and do not require unit approval.</xsl:text>
 									</fo:block>
-									<fo:table table-layout="fixed" width="100%"
-										border-spacing="2pt">
-										<fo:table-column column-width="proportional-column-width(1)" />
-										<fo:table-body start-indent="0pt">
-											<fo:table-row>
-												<fo:table-cell padding="2pt" display-align="center">
-													<fo:block />
-												</fo:table-cell>
-											</fo:table-row>
-										</fo:table-body>
-									</fo:table>
-									<fo:block />
 									<xsl:if
 										test="../PrintRequirement/AddressListRequired = 1 or  ../PrintRequirement/CloseoutRequired = 1 or  ../PrintRequirement/CommentsRequired = 1 or  ../PrintRequirement/CostSharingRequired = 1 or  ../PrintRequirement/EquipmentRequired = 1 or  ../PrintRequirement/FlowThruRequired = 1 or  ../PrintRequirement/ForeignTravelRequired = 1 or  ../PrintRequirement/HierarchyInfoRequired = 1 or  ../PrintRequirement/CurrentDate = 1 or  ../PrintRequirement/IndirectCostRequired = 1 or  ../PrintRequirement/PaymentRequired = 1 or  ../PrintRequirement/ProposalDueRequired = 1 or  ../PrintRequirement/ReportingRequired = 1 or  ../PrintRequirement/ScienceCodeRequired = 1 or  ../PrintRequirement/SpecialReviewRequired = 1 or  ../PrintRequirement/SubcontractRequired = 1 or  ../PrintRequirement/TechnicalReportingRequired = 1 or  ../PrintRequirement/TermsRequired = 1 or  ../PrintRequirement/OtherDataRequired  = 1">
-										<fo:block break-after="page">
-											<fo:leader leader-pattern="space" />
-										</fo:block>
-
 										<fo:block />
 
 										<fo:inline-container>
