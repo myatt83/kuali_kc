@@ -8,7 +8,7 @@
         <fo:layout-master-set>
             <fo:simple-page-master master-name="default-page" page-height="8.5in" page-width="11in" margin-left="0.2in" margin-right="0.2in">
                 <fo:region-body margin-top="1.6in" margin-bottom="0.2in"/>
-                <fo:region-before extent="1.3in"/>
+                <fo:region-before extent="1.5in"/>
                 <fo:region-after extent="0.2in"/>
             </fo:simple-page-master>
         </fo:layout-master-set>
@@ -11054,7 +11054,8 @@
                                         </fo:inline>
                                     </fo:block>
                                 </fo:table-cell>
-                                <fo:table-cell font-family="Times New Roman" font-size="9pt" padding-bottom="0" padding-right="10pt" padding="2pt" text-align="left" display-align="before">
+                                <fo:table-cell font-family="Times New Roman" font-size="9pt" padding-bottom="0" padding-right="10pt" padding="2pt" text-align="left" display-align="before"
+                                	number-columns-spanned="3">
                                     <fo:block>
                                         <xsl:for-each select="budgetSalary">
                                             <xsl:for-each select="Title">
@@ -11076,12 +11077,6 @@
                                             </xsl:for-each>
                                         </xsl:for-each>
                                     </fo:block>
-                                </fo:table-cell>
-                                <fo:table-cell font-family="Times New Roman" font-size="9pt" padding-bottom="0" padding-left="10pt" padding="2pt" text-align="right" display-align="before">
-                                    <fo:block/>
-                                </fo:table-cell>
-                                <fo:table-cell font-family="Times New Roman" font-size="9pt" padding-bottom="0" padding-left="10pt" padding="2pt" text-align="left" display-align="before">
-                                    <fo:block/>
                                 </fo:table-cell>
                             </fo:table-row>
                             <fo:table-row>
@@ -11115,17 +11110,6 @@
                                         </xsl:for-each>
                                     </fo:block>
                                 </fo:table-cell>
-                                <fo:table-cell font-family="Times New Roman" font-size="9pt" padding-bottom="0" padding-left="10pt" padding="2pt" text-align="right" display-align="before">
-                                    <fo:block/>
-                                </fo:table-cell>
-                                <fo:table-cell font-family="Times New Roman" font-size="9pt" padding-bottom="0" padding-left="10pt" padding="2pt" text-align="left" display-align="before">
-                                    <fo:block/>
-                                </fo:table-cell>
-                            </fo:table-row>
-                            
-                             
-                                
-                            <fo:table-row>
                                 <fo:table-cell font-family="Times New Roman" font-size="9pt" padding-bottom="0" padding-right="10pt" padding="2pt" text-align="right" display-align="before">
                                     <fo:block>
                                         <fo:inline font-weight="bold">
@@ -11162,12 +11146,6 @@
                                         </xsl:for-each>
                                     </fo:block>
                                 </fo:table-cell>
-                                <fo:table-cell font-family="Times New Roman" font-size="9pt" padding-bottom="0" padding-left="10pt" padding="2pt" text-align="right" display-align="before">
-                                    <fo:block/>
-                                </fo:table-cell>
-                                <fo:table-cell font-family="Times New Roman" font-size="9pt" padding-bottom="0" padding-left="10pt" padding="2pt" text-align="left" display-align="before">
-                                    <fo:block/>
-                                </fo:table-cell>
                             </fo:table-row>
                             <fo:table-row>
                                <fo:table-cell font-family="Times New Roman" font-size="9pt" padding-bottom="0" padding-right="10pt" padding="2pt" text-align="right" display-align="before">
@@ -11177,7 +11155,8 @@
                                         </fo:inline>
                                     </fo:block>
                                 </fo:table-cell>
-                               <fo:table-cell font-family="Times New Roman" font-size="9pt" padding-bottom="0" padding-right="10pt" padding="2pt" text-align="left" display-align="before">
+                               <fo:table-cell font-family="Times New Roman" font-size="9pt" padding-bottom="0" padding-right="10pt" padding="2pt" text-align="left" display-align="before"
+                               		number-columns-spanned="3">
                                      <fo:block>
                                         <xsl:for-each select="budgetSalary">
                                             <xsl:for-each select="Comments">
@@ -11198,13 +11177,6 @@
                                                 </xsl:choose>
                                             </xsl:for-each>
                                         </xsl:for-each>
-                                    </fo:block>
-                                </fo:table-cell>
-                                
-                                      <fo:table-cell font-family="Times New Roman" font-size="9pt" padding-bottom="0" padding-right="10pt" padding="2pt" text-align="left" display-align="before">
-                                    <fo:block>
-                                    <xsl:value-of select="budgetSalary/ReportHeader/Period"/>
-                                       
                                     </fo:block>
                                 </fo:table-cell>
                                 </fo:table-row>
