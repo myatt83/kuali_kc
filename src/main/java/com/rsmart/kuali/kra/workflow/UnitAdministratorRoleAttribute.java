@@ -15,6 +15,7 @@ import org.kuali.kra.bo.Unit;
 import org.kuali.kra.bo.UnitAdministrator;
 import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.proposaldevelopment.bo.ProposalPerson;
+import org.kuali.kra.proposaldevelopment.bo.ProposalPersonUnit;
 import org.kuali.kra.service.UnitService;
 import org.kuali.rice.core.api.util.xml.XmlHelper;
 import org.kuali.rice.kew.api.identity.Id;
@@ -25,10 +26,6 @@ import org.kuali.rice.kew.routeheader.DocumentContent;
 import org.kuali.rice.kew.rule.GenericRoleAttribute;
 import org.kuali.rice.kew.rule.QualifiedRoleName;
 
-/**
- * @author Omar Soto
- * UPRM Special Routing
- */
 @SuppressWarnings("unchecked")
 public class UnitAdministratorRoleAttribute extends GenericRoleAttribute {
 
@@ -39,9 +36,10 @@ public class UnitAdministratorRoleAttribute extends GenericRoleAttribute {
 
 	private static final Log LOG = LogFactory.getLog(UnitAdministratorRoleAttribute.class);
 	private static final String HOMEUNIT = "homeUnit";
+	//private static final String UNITS = "units";
 	
 	// Default Values 
-	private boolean getHomeUnit = true;
+	private boolean getUnits = true;
 	private String roleName = "Department Head";
 	private String unitAdministratorCode = "3";
 	
@@ -63,7 +61,7 @@ public class UnitAdministratorRoleAttribute extends GenericRoleAttribute {
 				this.roleName = info[0];
 				this.unitAdministratorCode = info[1];
 				if (info[2].toUpperCase().equals("FALSE")) {
-					getHomeUnit = false;
+					getUnits = false;
 				}
 			}
 		}
@@ -93,44 +91,57 @@ public class UnitAdministratorRoleAttribute extends GenericRoleAttribute {
     	
         return unitService;
     }
-	
-	@Override
-	protected List<Id> resolveRecipients(RouteContext routeContext, QualifiedRoleName qualifiedRoleName) {
-		List<Id> members = new ArrayList<Id>();
-		Collection<Element> personnels = retrieveKeyPersonnel(routeContext);
-		String homeUnit = null;
-		Id personId; 
-		
-		//LOG.info("resolveRecipients");
-		//LOG.info("Qualified Role Name: " + qualifiedRoleName);
-		
-		for(Element keyPerson : personnels) {
-			if (getHomeUnit) {
-				homeUnit = keyPerson.getChildText(HOMEUNIT);
-			} else {
-        final Unit unit = getUnitService().getUnit(keyPerson.getChildText(HOMEUNIT));
-        if (unit != null) {
-          final Unit parentUnit = unit.getParentUnit();
-          if (parentUnit != null) {
-            homeUnit = parentUnit.getUnitNumber();
-          }
-        }
-			}
-			
-            List<UnitAdministrator> unitAdministrators = getUnitService().retrieveUnitAdministratorsByUnitNumber(homeUnit);
-            for ( UnitAdministrator unitAdministrator : unitAdministrators ) {
-            	if (StringUtils.isNotBlank(unitAdministrator.getPersonId()) && unitAdministrator.getUnitAdministratorType().getUnitAdministratorTypeCode().equals(unitAdministratorCode)) {
-            		personId = new PrincipalId(unitAdministrator.getPersonId());
-            		
-            		if (!members.contains(personId)) {
-            			members.add(personId);
-            		}
-            	}
+    
+    @Override
+    protected List<Id> resolveRecipients(RouteContext routeContext, QualifiedRoleName qualifiedRoleName) {
+        List<Id> members = new ArrayList<Id>();
+        Collection<Element> personnels = retrieveKeyPersonnel(routeContext);
+        //Id personId; 
+        
+        //LOG.info("resolveRecipients");
+        //LOG.info("Qualified Role Name: " + qualifiedRoleName);
+        
+        for(Element keyPerson : personnels) {
+            if (getUnits) {
+               Collection<Element> units = XmlHelper.findElements(keyPerson, ProposalPersonUnit.class.getName());
+               for(Element unitElement : units) {
+                   Unit unit  = getUnitService().getUnit(unitElement.getChildText("unitNumber"));
+                   List<UnitAdministrator> unitAdministrators = getUnitService().retrieveUnitAdministratorsByUnitNumber(unit.getUnitNumber());
+                   for ( UnitAdministrator unitAdministrator : unitAdministrators ) {
+                       if (StringUtils.isNotBlank(unitAdministrator.getPersonId()) && unitAdministrator.getUnitAdministratorType().getUnitAdministratorTypeCode().equals(unitAdministratorCode)) {
+                           Id personId = new PrincipalId(unitAdministrator.getPersonId());
+                           
+                           if (!members.contains(personId)) {
+                               members.add(personId);
+                           }
+                       }
+                   }
+               }
+            } else {
+                Collection<Element> units = XmlHelper.findElements(keyPerson, ProposalPersonUnit.class.getName());
+                for(Element unitElement : units) {
+                    Unit unit  = getUnitService().getUnit(unitElement.getChildText("unitNumber"));
+                    Unit parentUnit = unit.getParentUnit();
+                    if(parentUnit != null){
+                        List<UnitAdministrator> unitAdministrators = getUnitService().retrieveUnitAdministratorsByUnitNumber(parentUnit.getUnitNumber());
+                        for ( UnitAdministrator unitAdministrator : unitAdministrators ) {
+                            if (StringUtils.isNotBlank(unitAdministrator.getPersonId()) && unitAdministrator.getUnitAdministratorType().getUnitAdministratorTypeCode().equals(unitAdministratorCode)) {
+                                Id personId = new PrincipalId(unitAdministrator.getPersonId());
+                                
+                                if (!members.contains(personId)) {
+                                    members.add(personId);
+                                }
+                            }
+                        }
+                    }
+                }
             }
-		}
-		
-		return members;
-	}
+        }
+        
+        return members;
+    }
+    
+    //private List<Id> getMembers()
 	
 	private Collection<Element> retrieveKeyPersonnel(RouteContext context) {
 	    Document document = XmlHelper.buildJDocument(context.getDocumentContent().getDocument());
