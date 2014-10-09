@@ -80,7 +80,7 @@
     </c:if>
 
         <li class="feedback right-nav">
-          <a class="portal_link" href="<bean:message key="app.feedback.link"/>" target="_blank" title="<bean:message key="app.feedback.linkText" />"><bean:message key="app.feedback.linkText" /></a>
+          <a class="portal_link" href="${ConfigProperties.feedback.link.url}" target="_blank" title="${ConfigProperties.feedback.link.text}">${ConfigProperties.feedback.link.text}</a>
         </li>
       </ul>
     </div>
