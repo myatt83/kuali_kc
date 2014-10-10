@@ -359,6 +359,6 @@
 	        <bean p:attributeName="versionNumber" parent="FieldDefinition" />
 		  </list>
 		</property>
-		<property name="resultSetLimit" value="50" />
+		<property name="resultSetLimit" value="500" />
 	</bean>
 </beans>
