@@ -33,6 +33,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class CoiMessagesServiceImpl implements CoiMessagesService {
+    private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(CoiMessagesServiceImpl.class);
 
     private transient BusinessObjectService businessObjectService;
     private transient ParameterService parameterService;
@@ -48,6 +49,7 @@ public class CoiMessagesServiceImpl implements CoiMessagesService {
         if (session != null && StringUtils.isNotEmpty(GlobalVariables.getUserSession().getPrincipalId())) {
             String personId = GlobalVariables.getUserSession().getPrincipalId();
             String renewalDateString = getParameterService().getParameterValueAsString(Constants.MODULE_NAMESPACE_COIDISCLOSURE, ParameterConstants.DOCUMENT_COMPONENT, "ANNUAL_DISCLOSURE_RENEWAL_DATE");
+            LOG.debug("renewalDateString=" + renewalDateString);
             if (StringUtils.isNotEmpty(renewalDateString)) {
                 Date renewalDue = null;
                 try {
@@ -65,6 +67,7 @@ public class CoiMessagesServiceImpl implements CoiMessagesService {
                     System.err.println("***** no valid Annual Disclosure Certification advance notice parameter found.  Defaulting to 30 days.");
                     advanceDays = 30;
                 }
+                LOG.debug("advanceDays=" + advanceDays);
                 // find latest existing annual review
                 Map<String, Object> fieldValues = new HashMap<String, Object>();
                 fieldValues.put("personId", personId);
@@ -84,15 +87,16 @@ public class CoiMessagesServiceImpl implements CoiMessagesService {
                     lastAnnualCalendar = Calendar.getInstance();
                     lastAnnualCalendar.setTimeInMillis(lastAnnualDate.getTime());
                 }
-                Calendar currentTime = Calendar.getInstance();
+                final Calendar currentTime = Calendar.getInstance();
                 boolean sendErrorWithDate = false;
                 boolean sendError = false;
+                LOG.debug("renewalDue=" + renewalDue);
                 if (renewalDue != null) {
-                    Calendar dueCalendarDate = Calendar.getInstance();
-                    dueCalendarDate.setTimeInMillis(renewalDue.getTime());
-                    dueCalendarDate.set(Calendar.YEAR, currentTime.get(Calendar.YEAR));
-                    renewalDue = new Date(dueCalendarDate.getTimeInMillis());
-                    Calendar reminderDate = Calendar.getInstance();
+                    // Calendar dueCalendarDate = Calendar.getInstance();
+                    // dueCalendarDate.setTimeInMillis(renewalDue.getTime());
+                    // dueCalendarDate.set(Calendar.YEAR, currentTime.get(Calendar.YEAR));
+                    // renewalDue = new Date(dueCalendarDate.getTimeInMillis());
+                    final Calendar reminderDate = Calendar.getInstance();
                     reminderDate.setTimeInMillis(renewalDue.getTime());
                     reminderDate.add(Calendar.DATE, -advanceDays);
                     if (currentTime.after(reminderDate) &&
@@ -100,7 +104,7 @@ public class CoiMessagesServiceImpl implements CoiMessagesService {
                         sendErrorWithDate = true;                        
                     }
                 } else {
-                    Calendar dueCalendarDate = Calendar.getInstance();
+                    final Calendar dueCalendarDate = Calendar.getInstance();
                     if (lastAnnualDate == null) {
                         sendError = true;
                     } else {
@@ -108,7 +112,7 @@ public class CoiMessagesServiceImpl implements CoiMessagesService {
                         dueCalendarDate.add(Calendar.YEAR, 1);
                         dueCalendarDate.add(Calendar.DATE, -1);
                         renewalDue = new Date(dueCalendarDate.getTimeInMillis());
-                        Calendar reminderDate = Calendar.getInstance();
+                        final Calendar reminderDate = Calendar.getInstance();
                         reminderDate.setTimeInMillis(renewalDue.getTime());
                         reminderDate.add(Calendar.DATE, -advanceDays);
                         if (currentTime.after(reminderDate)) {
