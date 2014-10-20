@@ -463,7 +463,7 @@
       </list>
     </property>
     
-    <property name="resultSetLimit" value="8000" />
+    <!-- <property name="resultSetLimit" value="500" /> -->
     
   </bean>
 </beans>

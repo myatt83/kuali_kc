@@ -1027,7 +1027,7 @@
 				<bean parent="FieldDefinition" p:attributeName="proposalDocument.documentNumber" />
 			</list>
 		</property>
-		<property name="resultSetLimit" value="500" />
+		<!-- <property name="resultSetLimit" value="500" /> -->
 	</bean>
 </beans>
   

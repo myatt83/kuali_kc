@@ -236,7 +236,7 @@
 		    <bean p:attributeName="fullName" parent="FieldDefinition" />
 		  </list>
 		</property>
-		<property name="resultSetLimit" value="500" />
+		<!-- <property name="resultSetLimit" value="500" /> -->
 	</bean>
   
 </beans>
