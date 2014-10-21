@@ -234,7 +234,7 @@ public class AwardHomeAction extends AwardAction {
             }
             Award oldAward = getAwardVersionService().getActiveAwardVersion(awardDocument.getAward().getAwardNumber());
             AwardAmountInfo aaiNew = awardDocument.getAward().getLastAwardAmountInfo();
-            if (oldAward != null) {
+            if (oldAward != null && oldAward.getLastAwardAmountInfo() != null) {
                 AwardAmountInfo aaiOld = oldAward.getLastAwardAmountInfo();
                 aaiNew.setObligatedChange(aaiNew.getAmountObligatedToDate().subtract(aaiOld.getAmountObligatedToDate()));
                 aaiNew.setObligatedChangeDirect(aaiNew.getObligatedTotalDirect().subtract(aaiOld.getObligatedTotalDirect()));
