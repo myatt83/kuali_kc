@@ -6,7 +6,7 @@
     <artifactId>kc_project</artifactId>
     <packaging>war</packaging>
     <name>rSmart Cloud Express</name>
-    <version>5.2.1.6-rsmart-SNAPSHOT</version>
+    <version>5.2.1.6-rsmart</version>
     <description>
         The Kuali Coeus (KC) project is building a comprehensive system to manage the complexities of research
         administration that fully addresses the needs from the faculty researcher through grants administration to
@@ -2034,7 +2034,7 @@ module of int tests -->
         <connection>scm:git:git://github.com/rSmart/kuali_kc.git</connection>
         <developerConnection>scm:git:git@github.com:rSmart/kuali_kc.git</developerConnection>
         <url>https://github.com/rSmart/kuali_kc</url>
-      <tag>HEAD</tag>
+      <tag>kc_project-5.2.1.6-rsmart</tag>
   </scm>
 
     <distributionManagement>
