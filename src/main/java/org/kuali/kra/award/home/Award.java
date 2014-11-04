@@ -247,7 +247,6 @@ public class Award extends KraPersistableBusinessObjectBase implements KeywordsM
 
     // transient for award header label
     private transient String docIdStatus;
-    private transient String awardIdAccount;
 
     private transient String lookupOspAdministratorName;
     transient AwardAmountInfoService awardAmountInfoService;
@@ -3175,14 +3174,11 @@ public class Award extends KraPersistableBusinessObjectBase implements KeywordsM
     }
 
     public String getAwardIdAccount() {
-        if (awardIdAccount == null) {
-            if (StringUtils.isNotBlank(getAccountNumber())) {
-                awardIdAccount = getAwardNumber() + ":" + getAccountNumber();
-            } else {
-                awardIdAccount = getAwardNumber() + ":";
-            }
+        if (StringUtils.isNotBlank(getAccountNumber())) {
+        	return getAwardNumber() + ":" + getAccountNumber();
+    	} else {
+        	return getAwardNumber() + ":";
         }
-        return awardIdAccount;
     }
 
     public void setLookupOspAdministratorName(String lookupOspAdministratorName) {
