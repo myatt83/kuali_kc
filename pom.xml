@@ -2213,6 +2213,6 @@ module of int tests -->
 
         <rice.version>2.3.6.3-rsmart</rice.version>
         <rsmart.hr.rest.version>0.8</rsmart.hr.rest.version>
-        <rsmart.cx.data.migration.version>5.2.1.7</rsmart.cx.data.migration.version>
+        <rsmart.cx.data.migration.version>5.2.1.8</rsmart.cx.data.migration.version>
     </properties>
 </project>
