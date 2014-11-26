@@ -50,6 +50,7 @@ import org.kuali.kra.budget.versions.BudgetDocumentVersion;
 import org.kuali.kra.budget.versions.BudgetVersionOverview;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.KeyConstants;
+import org.kuali.kra.infrastructure.KraServiceLocator;
 import org.kuali.kra.institutionalproposal.home.InstitutionalProposal;
 import org.kuali.kra.institutionalproposal.proposaladmindetails.ProposalAdminDetails;
 import org.kuali.kra.proposaldevelopment.bo.DevelopmentProposal;
@@ -630,6 +631,10 @@ public class AwardBudgetServiceImpl implements AwardBudgetService {
     }
 
     public void copyLineItemsFromProposalPeriods(Collection rawValues, BudgetPeriod awardBudgetPeriod) throws WorkflowException {
+        //calling awardBudgetPeriod.getBudget() will load Budget.class instead of AwardBudgetExt.class
+        //this will cause classcastexceptions later as the budget with that id is technically an AwardBudgetExt
+        //this is all due to an ojb bug. So here we make sure OJB caches the budget as an AwardBudgetExt correctly.
+        AwardBudgetExt budget = KraServiceLocator.getService(BusinessObjectService.class).findBySinglePrimaryKey(AwardBudgetExt.class, awardBudgetPeriod.getBudgetId());
         awardBudgetPeriod.getBudgetLineItems().clear();
         Iterator iter = rawValues.iterator();
         while (iter.hasNext()) {
